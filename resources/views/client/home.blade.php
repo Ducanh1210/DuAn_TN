@@ -112,15 +112,17 @@
 
         const map = L.map('map', {
             zoomControl: false,
-            maxBoundsViscosity: 1,
+            attributionControl: false, // Ẩn dòng chữ bản quyền Leaflet ở góc dưới cùng bên phải
+            maxBoundsViscosity: 0.8, // Giảm độ cứng của ranh giới (để kéo được dãn ra và tự nảy về)
             preferCanvas: true,
         });
 
         map.createPane('dimPane');
         map.getPane('dimPane').style.zIndex = 450;
 
-        const vectorRenderer = L.canvas({ padding: 0.5 });
-
+        // Tăng padding để render vùng tối (canvas) rộng hơn hẳn màn hình
+        // Giúp khi người dùng kéo bản đồ sẽ không bị lộ phần chưa render
+        const vectorRenderer = L.canvas({ padding: 2.0 });
         // Thêm Base Map — tải tile ngay khi kéo, không đợi thả chuột
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
@@ -175,9 +177,10 @@
             }
         }
 
-        map.on('move', refreshMask);
-        map.on('zoomanim', refreshMask);
-        map.on('resize', refreshMask);
+        // Tắt tính năng ép vẽ lại liên tục (redraw) gây giật lag khi kéo bản đồ
+        // map.on('move', refreshMask);
+        // map.on('zoomanim', refreshMask);
+        // map.on('resize', refreshMask);
 
         // Ranh giới tỉnh Hà Nam cũ (OSM relation 1901010, boundary=historic, hết hiệu lực 30/06/2025)
         fetch(HA_NAM_BOUNDARY_URL)
@@ -200,8 +203,18 @@
                 border.bringToFront();
 
                 const bounds = border.getBounds();
-                map.fitBounds(bounds.pad(0.02));
-                map.setMaxBounds(bounds.pad(0.04));
+                // Căn giữa bản đồ vào Hà Nam
+                map.fitBounds(bounds);
+                
+                // Mặc định zoom cận cảnh hơn 1 mức (như trong ảnh bạn yêu cầu)
+                map.setZoom(map.getZoom() + 1);
+                
+                // Khóa không cho zoom out xa hơn mức mặc định này
+                map.setMinZoom(map.getZoom());
+                
+                // Nới rộng giới hạn kéo thả để người dùng xem được các vùng lân cận rộng hơn
+                map.setMaxBounds(bounds.pad(0.5));
+
             })
             .catch((err) => console.error('Không tải được ranh giới Hà Nam:', err));
 
