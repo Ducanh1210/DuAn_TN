@@ -24,6 +24,8 @@
             --glass-bg: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.4);
             --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --region-line: #7ba7d4;
+            --region-dim: #94a3b8;
         }
 
         body, html {
@@ -40,6 +42,10 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+        }
+
+        .leaflet-container {
+            background: #e4e9ef;
         }
 
 
@@ -95,27 +101,35 @@
     <!-- Leaflet JS & MarkerCluster JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/@turf/turf@7.2.0/dist/turf.min.js"></script>
 
     <script>
-        // API Key từ người dùng (OpenTripMap)
-        const API_KEY = '5ae2e3f221c38a28845f05b673661bd506e322b0659e42a4930080e7';
+        const API_KEY = @json(config('services.opentripmap.key', '5ae2e3f221c38a28845f05b673661bd506e322b0659e42a4930080e7'));
+        const HA_NAM_BOUNDARY_URL = @json(asset('geo/ha-nam-old.geojson'));
 
-        // Khởi tạo bản đồ
+        let haNamGeo = null;
+        let outsideMask = null;
+
         const map = L.map('map', {
-            zoomControl: false // Ẩn zoom mặc định để tuỳ chỉnh vị trí
+            zoomControl: false,
+            maxBoundsViscosity: 1,
+            preferCanvas: true,
         });
 
-        // Căn chỉnh bản đồ vào khu vực Hà Nam (dựa trên toạ độ bạn đã gửi)
-        map.fitBounds([
-            [20.2480, 105.7600],
-            [20.6040, 106.1010]
-        ]);
+        map.createPane('dimPane');
+        map.getPane('dimPane').style.zIndex = 450;
 
-        // Thêm Base Map
+        const vectorRenderer = L.canvas({ padding: 0.5 });
+
+        // Thêm Base Map — tải tile ngay khi kéo, không đợi thả chuột
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
             subdomains: 'abcd',
-            maxZoom: 20
+            maxZoom: 20,
+            updateWhenIdle: false,
+            updateWhenZooming: true,
+            keepBuffer: 4,
+            fadeAnimation: false,
         }).addTo(map);
 
         L.control.zoom({ position: 'bottomleft' }).addTo(map);
@@ -127,8 +141,81 @@
         });
         map.addLayer(markers);
 
-        // Hàm gọi API OpenTripMap để lấy các địa điểm (POIs) xung quanh điểm click
+        function ringsFromGeo(geo) {
+            const holes = [];
+            if (geo.type === 'MultiPolygon') {
+                geo.coordinates.forEach((polygon) => {
+                    holes.push(polygon[0].map(([lng, lat]) => [lat, lng]));
+                });
+            } else if (geo.type === 'Polygon') {
+                holes.push(geo.coordinates[0].map(([lng, lat]) => [lat, lng]));
+            }
+            return holes;
+        }
+
+        function setOutsideDimMask(geo) {
+            if (outsideMask) {
+                map.removeLayer(outsideMask);
+            }
+            const world = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
+            const holes = ringsFromGeo(geo);
+            outsideMask = L.polygon([world, ...holes], {
+                pane: 'dimPane',
+                renderer: vectorRenderer,
+                fillColor: '#94a3b8',
+                fillOpacity: 0.22,
+                stroke: false,
+                interactive: false,
+            }).addTo(map);
+        }
+
+        function refreshMask() {
+            if (outsideMask) {
+                outsideMask.redraw();
+            }
+        }
+
+        map.on('move', refreshMask);
+        map.on('zoomanim', refreshMask);
+        map.on('resize', refreshMask);
+
+        // Ranh giới tỉnh Hà Nam cũ (OSM relation 1901010, boundary=historic, hết hiệu lực 30/06/2025)
+        fetch(HA_NAM_BOUNDARY_URL)
+            .then((res) => res.json())
+            .then((geo) => {
+                haNamGeo = geo;
+                setOutsideDimMask(geo);
+
+                const border = L.geoJSON(geo, {
+                    style: {
+                        color: '#7ba7d4',
+                        weight: 2,
+                        opacity: 0.55,
+                        fillColor: '#f8fafc',
+                        fillOpacity: 0.04,
+                    },
+                    renderer: vectorRenderer,
+                    interactive: false,
+                }).addTo(map);
+                border.bringToFront();
+
+                const bounds = border.getBounds();
+                map.fitBounds(bounds.pad(0.02));
+                map.setMaxBounds(bounds.pad(0.04));
+            })
+            .catch((err) => console.error('Không tải được ranh giới Hà Nam:', err));
+
+        function isInsideHaNam(lat, lon) {
+            if (!haNamGeo || typeof turf === 'undefined') {
+                return true;
+            }
+            return turf.booleanPointInPolygon(turf.point([lon, lat]), haNamGeo);
+        }
+
         function loadPOIsAt(lat, lon) {
+            if (!isInsideHaNam(lat, lon)) {
+                return;
+            }
             // Lấy POIs trong bán kính 5km
             const radius = 5000;
             
