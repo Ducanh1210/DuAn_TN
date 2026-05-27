@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\EventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,5 +73,14 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     Route::put('hotspots/{hotspot}', [\App\Http\Controllers\Admin\PanoramaEditorController::class, 'updateHotspot']);
     Route::delete('hotspots/{hotspot}', [\App\Http\Controllers\Admin\PanoramaEditorController::class, 'deleteHotspot']);
     Route::put('panoramas/{panorama}/name', [\App\Http\Controllers\Admin\PanoramaEditorController::class, 'updateSceneName']);
+
+    // News Management
+    Route::resource('news', NewsController::class);
+    Route::patch('news/{news}/toggle', [NewsController::class, 'toggleVisibility'])->name('news.toggle');
+    Route::post('news/upload-image', [NewsController::class, 'uploadImage'])->name('news.upload_image');
+
+    // Events Management
+    Route::resource('events', EventController::class);
+    Route::patch('events/{event}/toggle', [EventController::class, 'toggleVisibility'])->name('events.toggle');
 });
 
