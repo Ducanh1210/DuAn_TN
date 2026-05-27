@@ -36,6 +36,12 @@
             <a href="{{ route('admin.locations.index') }}" class="{{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
                 <i class="fas fa-map-marker-alt nav-icon"></i> Quản lý Địa điểm
             </a>
+            <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
+                <i class="fas fa-newspaper nav-icon"></i> Quản lý Tin tức
+            </a>
+            <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.*') ? 'active' : '' }}">
+                <i class="fas fa-calendar-alt nav-icon"></i> Quản lý Sự kiện
+            </a>
         </nav>
     </div>
 
