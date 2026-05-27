@@ -15,6 +15,7 @@ class Panorama extends Model
         'image_url',
         'audio_url',
         'sort_order',
+        'is_default',
         'status',
         'initial_yaw',
         'initial_pitch',

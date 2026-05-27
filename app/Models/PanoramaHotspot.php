@@ -12,10 +12,13 @@ class PanoramaHotspot extends Model
     protected $fillable = [
         'panorama_id',
         'target_panorama_id',
+        'target_yaw',
+        'target_pitch',
         'title',
         'hotspot_type',
         'yaw',
         'pitch',
+        'scale',
         'content',
         'link_url',
     ];
