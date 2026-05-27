@@ -39,6 +39,12 @@ Route::get('/', function () {
     return view('client.home', compact('locations'));
 })->name('home');
 
+// Client 360 Viewer
+Route::get('locations/{location:slug}/360', function(\App\Models\Location $location) {
+    return view('client.360', compact('location'));
+})->name('client.locations.360');
+
+
 // Admin Auth Routes
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login.form');
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
@@ -82,5 +88,9 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Events Management
     Route::resource('events', EventController::class);
     Route::patch('events/{event}/toggle', [EventController::class, 'toggleVisibility'])->name('events.toggle');
+
+    // Panorama Audio
+    Route::post('locations/{location}/upload-audio', [\App\Http\Controllers\Admin\LocationController::class, 'uploadAudio'])->name('locations.upload_audio');
+    Route::delete('locations/{location}/delete-audio', [\App\Http\Controllers\Admin\LocationController::class, 'deleteAudio'])->name('locations.delete_audio');
 });
 
