@@ -26,6 +26,7 @@ class Location extends Model
         'phone',
         'website_url',
         'thumbnail_url',
+        'audio_url',
         'attributes',
         'average_rating',
         'review_count',
