@@ -15,8 +15,13 @@
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <!-- MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
 
     <style>
         :root {
@@ -68,19 +73,78 @@
         
         /* Custom Popup Styling */
         .leaflet-popup-content-wrapper {
-            border-radius: 12px;
+            border-radius: 4px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            padding: 4px;
+            padding: 0;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
         }
         .leaflet-popup-content {
             font-family: 'Outfit', sans-serif;
-            margin: 12px 16px;
+            margin: 0;
+            width: 260px !important;
+        }
+        .leaflet-popup-close-button {
+            color: white !important;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8) !important;
+            font-size: 22px !important;
+            padding: 4px 8px !important;
+            z-index: 10;
+        }
+        .leaflet-popup-close-button:hover {
+            color: #f1f5f9 !important;
+            background: transparent !important;
+        }
+        .poi-popup-inner {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+        .poi-thumbnail {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+        .poi-content {
+            padding: 16px;
         }
         .poi-title {
             font-weight: 700;
-            font-size: 16px;
+            font-size: 17px;
             color: #1a1a1a;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+        }
+        .poi-desc {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+        .poi-btn-360 {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: transparent;
+            color: var(--poi-color, var(--primary)) !important;
+            padding: 6px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none !important;
+            transition: all 0.2s;
+            border: 2px solid var(--poi-color, var(--primary));
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .poi-btn-360:hover {
+            filter: brightness(0.85);
+            transform: translateY(-1px);
         }
         .poi-rate {
             display: inline-block;
@@ -91,6 +155,61 @@
             font-size: 12px;
             font-weight: 600;
         }
+
+        /* Custom Map Pin */
+        .custom-map-pin {
+            position: relative;
+            width: 30px;
+            height: 40px;
+            filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.35));
+        }
+        .custom-map-pin svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .leaflet-container .leaflet-marker-pane .pin-icon-img {
+            position: absolute !important;
+            top: 4px !important;
+            left: 4px !important;
+            width: 22px !important;
+            height: 22px !important;
+            max-width: 22px !important;
+            max-height: 22px !important;
+            object-fit: cover !important;
+            z-index: 999 !important;
+            border-radius: 50% !important;
+        }
+        
+        .custom-pin-tooltip {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translate(0px, -50%);
+            background: linear-gradient(to right, color-mix(in srgb, var(--tip-color) 40%, black), var(--tip-color));
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 10001;
+        }
+        
+        .custom-pin-tooltip::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -5px;
+            transform: translateY(-50%);
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: 6px solid color-mix(in srgb, var(--tip-color) 40%, black);
+        }
     </style>
 </head>
 <body>
@@ -100,11 +219,12 @@
 
     <!-- Leaflet JS & MarkerCluster JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
     <script src="https://unpkg.com/@turf/turf@7.2.0/dist/turf.min.js"></script>
 
     <script>
-        const API_KEY = @json(config('services.opentripmap.key', '5ae2e3f221c38a28845f05b673661bd506e322b0659e42a4930080e7'));
+
         const HA_NAM_BOUNDARY_URL = @json(asset('geo/ha-nam-old.geojson'));
 
         let haNamGeo = null;
@@ -136,12 +256,7 @@
 
         L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-        // Khởi tạo Marker Cluster để gom cụm các địa điểm
-        const markers = L.markerClusterGroup({
-            showCoverageOnHover: false,
-            maxClusterRadius: 60
-        });
-        map.addLayer(markers);
+
 
         function ringsFromGeo(geo) {
             const holes = [];
@@ -225,45 +340,110 @@
             return turf.booleanPointInPolygon(turf.point([lon, lat]), haNamGeo);
         }
 
-        function loadPOIsAt(lat, lon) {
-            if (!isInsideHaNam(lat, lon)) {
-                return;
+        // Render markers for locations
+        const locations = @json($locations);
+        const markers = L.markerClusterGroup({
+            maxClusterRadius: 45,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            iconCreateFunction: function(cluster) {
+                const count = cluster.getChildCount();
+                let size = 'small';
+                if (count >= 10) size = 'medium';
+                if (count >= 30) size = 'large';
+                return L.divIcon({
+                    html: '<div><span>' + count + '</span></div>',
+                    className: 'marker-cluster marker-cluster-' + size,
+                    iconSize: L.point(40, 40)
+                });
             }
-            // Lấy POIs trong bán kính 5km
-            const radius = 5000;
-            
-            // Gọi API OpenTripMap với API Key
-            const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${radius}&lon=${lon}&lat=${lat}&kinds=interesting_places&format=geojson&apikey=${API_KEY}`;
-            
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    // Xóa marker cũ để bản đồ không bị "lung tung"
-                    markers.clearLayers();
-                    
-                    // Thêm dữ liệu GeoJSON vào Cluster
-                    L.geoJSON(data, {
-                        pointToLayer: function (feature, latlng) {
-                            return L.marker(latlng);
-                        },
-                        onEachFeature: function (feature, layer) {
-                            if (feature.properties && feature.properties.name) {
-                                const popupContent = `
-                                    <div class="poi-title">${feature.properties.name}</div>
-                                    <div class="poi-rate">Rating: ${feature.properties.rate}/7</div>
-                                `;
-                                layer.bindPopup(popupContent);
-                            }
-                        }
-                    }).addTo(markers);
-                })
-                .catch(err => console.error('Lỗi khi tải dữ liệu bản đồ:', err));
-        }
-
-        // Chỉ hiển thị POI khi người dùng bấm vào một khu vực cụ thể trên bản đồ
-        map.on('click', function(e) {
-            loadPOIsAt(e.latlng.lat, e.latlng.lng);
         });
+
+        locations.forEach(loc => {
+            if (loc.lat && loc.lng) {
+                let markerOptions = {};
+                const iconUrl = loc.category && loc.category.icon_url ? loc.category.icon_url : null;
+
+                if (iconUrl) {
+                    const iconColor = loc.category && loc.category.icon_color ? loc.category.icon_color : '#ef4444';
+                    const pinHtml = '<div class="custom-map-pin">'
+                        + '<svg class="pin-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="30" height="40">'
+                        + '<path fill="' + iconColor + '" d="M172.3 501.7C27 291 0 269.4 0 192 0 86 86 0 192 0s192 86 192 192c0 77.4-27 99-172.3 309.7-9.5 13.8-29.9 13.8-39.5 0z"/>'
+                        + '</svg>'
+                        + '<img class="pin-icon-img" src="' + iconUrl + '">'
+                        + '<div class="custom-pin-tooltip" style="--tip-color: ' + iconColor + ';">' + loc.name + '</div>'
+                        + '</div>';
+
+                    const customIcon = L.divIcon({
+                        className: '',
+                        html: pinHtml,
+                        iconSize: [30, 40],
+                        iconAnchor: [15, 40],
+                        popupAnchor: [0, -40]
+                    });
+                    markerOptions = { icon: customIcon };
+                }
+
+                const marker = L.marker([loc.lat, loc.lng], markerOptions);
+                const thumbUrl = loc.thumbnail_url ? loc.thumbnail_url : 'https://placehold.co/400x250/e2e8f0/475569?text=No+Image';
+                const iconColor = loc.category && loc.category.icon_color ? loc.category.icon_color : '#ef4444';
+                
+                const popupHtml = '<div class="poi-popup-inner" style="--poi-color: ' + iconColor + ';">'
+                    + '<img src="' + thumbUrl + '" class="poi-thumbnail" alt="' + loc.name + '">'
+                    + '<div class="poi-content">'
+                    + '<div class="poi-title">' + loc.name + '</div>'
+                    + (loc.short_description ? '<div class="poi-desc">' + loc.short_description + '</div>' : '')
+                    + '<a href="/locations/' + loc.slug + '/360" class="poi-btn-360">'
+                    + 'Khám phá ngay'
+                    + '</a>'
+                    + '</div>'
+                    + '</div>';
+                
+                marker.bindPopup(popupHtml, { minWidth: 260, maxWidth: 260, closeButton: false });
+                
+                // GSAP Animations on Hover
+                marker.on('mouseover', function(e) {
+                    const el = e.target.getElement();
+                    if (el) {
+                        const tooltip = el.querySelector('.custom-pin-tooltip');
+                        const pinSvg = el.querySelector('.pin-svg');
+                        const pinImg = el.querySelector('.pin-icon-img');
+                        
+                        // Bring element to front while hovering
+                        el.style.zIndex = 10000;
+                        
+                        // Tooltip fade in and slide right
+                        gsap.to(tooltip, { overwrite: true, autoAlpha: 1, x: 10, y: "-50%", duration: 0.3, ease: "back.out(1.5)" });
+                        
+                        // Pin bounce/scale slightly
+                        gsap.to([pinSvg, pinImg], { overwrite: true, scale: 1.15, y: -5, duration: 0.3, ease: "back.out(2)" });
+                    }
+                });
+
+                marker.on('mouseout', function(e) {
+                    const el = e.target.getElement();
+                    if (el) {
+                        const tooltip = el.querySelector('.custom-pin-tooltip');
+                        const pinSvg = el.querySelector('.pin-svg');
+                        const pinImg = el.querySelector('.pin-icon-img');
+                        
+                        // Reset z-index
+                        el.style.zIndex = '';
+                        
+                        // Tooltip fade out and slide left
+                        gsap.to(tooltip, { overwrite: true, autoAlpha: 0, x: 0, y: "-50%", duration: 0.2, ease: "power2.in" });
+                        
+                        // Pin return to normal
+                        gsap.to([pinSvg, pinImg], { overwrite: true, scale: 1, y: 0, duration: 0.2, ease: "power2.in" });
+                    }
+                });
+
+                markers.addLayer(marker);
+            }
+        });
+
+        map.addLayer(markers);
 
     </script>
 </body>
