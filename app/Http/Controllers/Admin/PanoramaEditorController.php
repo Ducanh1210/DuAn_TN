@@ -18,7 +18,7 @@ class PanoramaEditorController extends Controller
 
     public function getData(Location $location)
     {
-        $panoramas = $location->panoramas()->with('hotspots')->orderBy('sort_order')->get();
+        $panoramas = $location->panoramas()->with('hotspots')->orderByDesc('is_default')->orderBy('sort_order')->get();
         return response()->json([
             'panoramas' => $panoramas->map(function($p) {
                 return [
@@ -57,6 +57,17 @@ class PanoramaEditorController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function setDefaultScene(Panorama $panorama)
+    {
+        // Set all other panoramas in the same location to false
+        Panorama::where('location_id', $panorama->location_id)->update(['is_default' => false]);
+        
+        // Set this panorama to true
+        $panorama->update(['is_default' => true]);
+        
+        return response()->json(['success' => true]);
+    }
+
     public function addHotspot(Request $request, Panorama $panorama)
     {
         $hotspot = $panorama->hotspots()->create([
@@ -66,7 +77,10 @@ class PanoramaEditorController extends Controller
             'title' => $request->title,
             'content' => $request->content,
             'target_panorama_id' => $request->target,
+            'target_yaw' => $request->target_yaw,
+            'target_pitch' => $request->target_pitch,
             'link_url' => $request->link_url,
+            'scale' => $request->scale ?? 1.0,
         ]);
         return response()->json(['success' => true, 'hotspot' => $hotspot]);
     }
@@ -80,6 +94,9 @@ class PanoramaEditorController extends Controller
         if ($request->has('link_url')) $data['link_url'] = $request->link_url;
         if ($request->has('yaw')) $data['yaw'] = $request->yaw;
         if ($request->has('pitch')) $data['pitch'] = $request->pitch;
+        if ($request->has('scale')) $data['scale'] = $request->scale;
+        if ($request->has('target_yaw')) $data['target_yaw'] = $request->target_yaw;
+        if ($request->has('target_pitch')) $data['target_pitch'] = $request->target_pitch;
         
         $hotspot->update($data);
         return response()->json(['success' => true]);
@@ -111,6 +128,9 @@ class PanoramaEditorController extends Controller
                         if (array_key_exists('target', $item)) $data['target_panorama_id'] = $item['target'] ?: null;
                         if (array_key_exists('yaw', $item)) $data['yaw'] = $item['yaw'];
                         if (array_key_exists('pitch', $item)) $data['pitch'] = $item['pitch'];
+                        if (array_key_exists('scale', $item)) $data['scale'] = $item['scale'];
+                        if (array_key_exists('target_yaw', $item)) $data['target_yaw'] = $item['target_yaw'];
+                        if (array_key_exists('target_pitch', $item)) $data['target_pitch'] = $item['target_pitch'];
                         
                         $hotspot->update($data);
                     }
@@ -129,6 +149,9 @@ class PanoramaEditorController extends Controller
                             'title' => $item['title'] ?? '',
                             'content' => $item['content'] ?? '',
                             'target_panorama_id' => $item['target'] ?: null,
+                            'target_yaw' => $item['target_yaw'] ?? null,
+                            'target_pitch' => $item['target_pitch'] ?? null,
+                            'scale' => $item['scale'] ?? 1.0,
                         ]);
                     }
                 }

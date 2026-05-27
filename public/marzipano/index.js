@@ -181,10 +181,16 @@
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
   }
 
-  function switchScene(scene) {
+  function switchScene(scene, customView) {
     window.currentSceneId = scene.data.id;
     stopAutorotate();
-    scene.view.setParameters(scene.data.initialViewParameters);
+    
+    if (customView) {
+      scene.view.setParameters({ yaw: customView.yaw, pitch: customView.pitch });
+    } else {
+      scene.view.setParameters(scene.data.initialViewParameters);
+    }
+    
     scene.scene.switchTo();
     startAutorotate();
     updateSceneName(scene);
@@ -251,6 +257,7 @@
     wrapper.classList.add('hotspot');
     wrapper.classList.add('link-hotspot');
     wrapper.setAttribute('data-id', hotspot.id);
+    wrapper.style.setProperty('--base-scale', hotspot.scale || 1.0);
 
     // Create dot element.
     var icon = document.createElement('div');
@@ -265,26 +272,26 @@
     }
 
     // Add click event handler.
-    wrapper.addEventListener('click', function () {
+    wrapper.addEventListener('click', function (e) {
       if (window.isEditorMode) {
+        document.querySelectorAll('.hotspot').forEach(function(h) { 
+            h.classList.remove('active-menu'); 
+            h.style.zIndex = '';
+        });
+        wrapper.classList.add('active-menu');
+        wrapper.style.zIndex = '100000';
         return; // Handled by context menu buttons
       }
       var targetScene = findSceneById(hotspot.target);
-      if (targetScene) switchScene(targetScene);
+      if (targetScene) {
+        if (hotspot.target_yaw !== null && hotspot.target_yaw !== undefined) {
+          switchScene(targetScene, { yaw: hotspot.target_yaw, pitch: hotspot.target_pitch });
+        } else {
+          switchScene(targetScene);
+        }
+      }
     });
 
-    // In editor mode, show permanent context menu
-    if (window.isEditorMode) {
-      var menu = document.createElement('div');
-      menu.className = 'hotspot-context-menu';
-      menu.innerHTML = `
-        <div class="context-menu-btn btn-go" title="Đi đến" onclick="event.stopPropagation(); window.onHotspotAction('${hotspot.id}', 'link', 'go')"><i class="fas fa-sign-in-alt"></i></div>
-        <div class="context-menu-btn btn-rotate" title="Đổi hướng" onclick="event.stopPropagation(); window.onHotspotAction('${hotspot.id}', 'link', 'rotate')"><i class="fas fa-sync-alt"></i></div>
-        <div class="context-menu-btn btn-delete" title="Xóa" onclick="event.stopPropagation(); window.onHotspotAction('${hotspot.id}', 'link', 'delete')"><i class="fas fa-trash"></i></div>
-        <div class="context-menu-btn btn-edit" title="Chỉnh sửa" onclick="event.stopPropagation(); window.onHotspotAction('${hotspot.id}', 'link', 'edit')"><i class="fas fa-pencil-alt"></i></div>
-      `;
-      wrapper.appendChild(menu);
-    }
 
     // Prevent touch and scroll events from reaching the parent element.
     // This prevents the view control logic from interfering with the hotspot.
@@ -301,6 +308,19 @@
     wrapper.appendChild(icon);
     wrapper.appendChild(tooltip);
 
+    // In editor mode, append context menu LAST so it stays on top
+    if (window.isEditorMode) {
+      var menu = document.createElement('div');
+      menu.className = 'hotspot-context-menu';
+      menu.innerHTML = `
+        <div class="context-menu-btn btn-go" title="Đi đến" onclick="event.stopPropagation(); window.onHotspotAction('${hotspot.id}', 'link', 'go')"><i class="fas fa-sign-in-alt"></i></div>
+        <div class="context-menu-btn btn-rotate" title="Đổi hướng" onclick="event.stopPropagation(); window.onHotspotAction('${hotspot.id}', 'link', 'rotate')"><i class="fas fa-sync-alt"></i></div>
+        <div class="context-menu-btn btn-delete" title="Xóa" onclick="event.stopPropagation(); window.onHotspotAction('${hotspot.id}', 'link', 'delete')"><i class="fas fa-trash"></i></div>
+        <div class="context-menu-btn btn-edit" title="Chỉnh sửa" onclick="event.stopPropagation(); window.onHotspotAction('${hotspot.id}', 'link', 'edit')"><i class="fas fa-pencil-alt"></i></div>
+      `;
+      wrapper.appendChild(menu);
+    }
+
     return wrapper;
   }
 
@@ -311,6 +331,7 @@
     wrapper.classList.add('hotspot');
     wrapper.classList.add('info-hotspot');
     wrapper.setAttribute('data-id', hotspot.id);
+    wrapper.style.setProperty('--base-scale', hotspot.scale || 1.0);
 
     // Create hotspot/tooltip header.
     var header = document.createElement('div');
@@ -368,7 +389,29 @@
       modal.classList.toggle('visible');
     };
 
-    // In editor mode, show permanent context menu
+
+    // Show content when hotspot is clicked.
+    wrapper.querySelector('.info-hotspot-header').addEventListener('click', function(e) {
+      if (window.isEditorMode) {
+        document.querySelectorAll('.hotspot').forEach(function(h) { 
+            h.classList.remove('active-menu'); 
+            h.style.zIndex = '';
+        });
+        wrapper.classList.add('active-menu');
+        wrapper.style.zIndex = '100000';
+        return;
+      }
+      toggle();
+    });
+
+    // Hide content when close icon is clicked.
+    modal.querySelector('.info-hotspot-close-wrapper').addEventListener('click', toggle);
+
+    // Prevent touch and scroll events from reaching the parent element.
+    // This prevents the view control logic from interfering with the hotspot.
+    stopTouchAndScrollEventPropagation(wrapper);
+
+    // In editor mode, append context menu LAST so it stays on top
     if (window.isEditorMode) {
       var menu = document.createElement('div');
       menu.className = 'hotspot-context-menu';
@@ -378,16 +421,6 @@
       `;
       wrapper.appendChild(menu);
     }
-
-    // Show content when hotspot is clicked.
-    wrapper.querySelector('.info-hotspot-header').addEventListener('click', toggle);
-
-    // Hide content when close icon is clicked.
-    modal.querySelector('.info-hotspot-close-wrapper').addEventListener('click', toggle);
-
-    // Prevent touch and scroll events from reaching the parent element.
-    // This prevents the view control logic from interfering with the hotspot.
-    stopTouchAndScrollEventPropagation(wrapper);
 
     return wrapper;
   }

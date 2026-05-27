@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        :root {
+            --hotspot-color: {{ $location->category->icon_color ?? '#FF512F' }};
+        }
         body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         .viewer-area { width: 100%; height: 100vh; position: relative; background: #000; overflow: hidden; }
@@ -91,7 +94,7 @@
 </head>
 
 @php
-    $scenes = $location->panoramas()->orderBy('sort_order')->get();
+    $scenes = $location->panoramas()->orderByDesc('is_default')->orderBy('sort_order')->get();
     
     $appData = [
         'name' => $location->name,
@@ -117,7 +120,10 @@
                         'yaw' => $h->yaw * pi() / 180,
                         'pitch' => $h->pitch * pi() / 180,
                         'rotation' => 0,
-                        'target' => (string)$h->target_panorama_id
+                        'target' => (string)$h->target_panorama_id,
+                        'target_yaw' => $h->target_yaw !== null ? $h->target_yaw * pi() / 180 : null,
+                        'target_pitch' => $h->target_pitch !== null ? $h->target_pitch * pi() / 180 : null,
+                        'scale' => $h->scale ?? 1.0
                     ];
                 })->values(),
                 'infoHotspots' => $p->hotspots->where('hotspot_type', 'info')->map(function($h) {
@@ -126,7 +132,8 @@
                         'yaw' => $h->yaw * pi() / 180,
                         'pitch' => $h->pitch * pi() / 180,
                         'title' => $h->title,
-                        'text' => $h->content
+                        'text' => $h->content,
+                        'scale' => $h->scale ?? 1.0
                     ];
                 })->values()
             ];

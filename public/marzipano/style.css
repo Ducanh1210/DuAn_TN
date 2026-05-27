@@ -344,6 +344,7 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   opacity: 0.9;
   -webkit-transition: opacity 0.2s;
   transition: opacity 0.2s;
+  pointer-events: none; /* Let clicks pass through the invisible bounding box */
 }
 
 .no-touch .link-hotspot:hover {
@@ -359,75 +360,99 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   width: 100%;
   height: 100%;
   cursor: pointer;
+  pointer-events: auto; /* Re-enable pointer events for the visible icon */
 }
 
 .pulsing-dot {
-  width: 28px;
-  height: 28px;
-  background-color: #007aff;
-  border: 3px solid #ffffff;
+  width: 22px !important;
+  height: 22px !important;
+  background-color: var(--hotspot-color, #FF512F);
+  border: 2px solid rgba(255, 255, 255, 1);
   border-radius: 50%;
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-left: -14px;
-  margin-top: -14px;
+  margin-left: -11px !important;
+  margin-top: -11px !important;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  animation: pulse-ring 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  box-shadow: 0 4px 12px var(--hotspot-color, #FF512F), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  animation: dot-blink 0.8s linear infinite;
+  backdrop-filter: blur(4px);
+  z-index: -1;
+  pointer-events: auto; /* Re-enable pointer events for the visible dot */
 }
 
+/* The inner glowing dot */
 .pulsing-dot::after {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 8px;
-  height: 8px;
-  margin-top: -4px;
-  margin-left: -4px;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  margin-left: -3px;
   background-color: #ffffff;
   border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 1);
+}
+
+@keyframes dot-blink {
+  0% { opacity: 0.8; transform: scale(calc(var(--base-scale, 1) * 0.95)); box-shadow: 0 2px 6px var(--hotspot-color, #FF512F), inset 0 2px 4px rgba(255, 255, 255, 0.4); }
+  15% { opacity: 1; transform: scale(calc(var(--base-scale, 1) * 1.05)); box-shadow: 0 6px 16px var(--hotspot-color, #FF512F), inset 0 2px 4px rgba(255, 255, 255, 0.8); }
+  100% { opacity: 0.8; transform: scale(calc(var(--base-scale, 1) * 0.95)); box-shadow: 0 2px 6px var(--hotspot-color, #FF512F), inset 0 2px 4px rgba(255, 255, 255, 0.4); }
+}
+
+/* The pulsing outward ring */
+.pulsing-dot::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 10px var(--hotspot-color, #FF512F);
+  animation: pulse-ring 0.8s linear infinite;
+  opacity: 0;
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 0 rgba(0, 122, 255, 0.8); }
-  70% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 35px rgba(0, 122, 255, 0); }
-  100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 0 0 rgba(0, 122, 255, 0); }
+  0% { transform: scale(calc(var(--base-scale, 1) * 0.9)); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: scale(calc(var(--base-scale, 1) * 2.8)); opacity: 0; border-width: 0px; }
 }
 
 .link-hotspot-tooltip {
   position: absolute;
-  left: 100%;
+  left: 50%;
   top: 14px; /* ( 60 - (16 + 2*8) ) / 2 */
 
-  margin-left: 3px;
+  margin-left: 0;
 
-  font-size: 16px;
+  font-size: 13px;
 
-  max-width: 300px;
 
-  padding: 8px 10px;
 
-  border-radius: 5px;
+  padding: 6px 14px;
 
-  background-color: rgb(58,68,84);
-  background-color: rgba(58,68,84,0.8);
+  border-radius: 20px;
+
+  background: linear-gradient(to right, color-mix(in srgb, var(--hotspot-color, #FF512F) 40%, black), var(--hotspot-color, #FF512F));
 
   color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 
   white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-
+  
   cursor: pointer;
 
   opacity: 0;
 
-  -ms-transform: translateX(-8px);
-  -webkit-transform: translateX(-8px);
-  transform: translateX(-8px);
+  transform-origin: left center;
+  -ms-transform: translateX(calc(var(--base-scale, 1) * 25px)) scale(var(--base-scale, 1));
+  -webkit-transform: translateX(calc(var(--base-scale, 1) * 25px)) scale(var(--base-scale, 1));
+  transform: translateX(calc(var(--base-scale, 1) * 25px)) scale(var(--base-scale, 1));
 
   -webkit-transition: -ms-transform 0.3s,
                       -webkit-transform 0.3s,
@@ -439,15 +464,26 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
               opacity 0.3s;
 }
 
+.link-hotspot-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: calc(100% - 1px); /* Overlap by 1px to prevent gaps */
+  margin-top: -6px;
+  border-width: 6px 6px 6px 0;
+  border-style: solid;
+  border-color: transparent color-mix(in srgb, var(--hotspot-color, #FF512F) 40%, black) transparent transparent;
+}
+
 .mobile .link-hotspot {
   top: 19px; /* ( 70 - (16 + 2*8) ) / 2 */
 }
 
 .no-touch .link-hotspot:hover .link-hotspot-tooltip {
   opacity: 1;
-  -ms-transform: translateX(0);
-  -webkit-transform: translateX(0);
-  transform: translateX(0);
+  -ms-transform: translateX(calc(var(--base-scale, 1) * 33px)) scale(var(--base-scale, 1));
+  -webkit-transform: translateX(calc(var(--base-scale, 1) * 33px)) scale(var(--base-scale, 1));
+  transform: translateX(calc(var(--base-scale, 1) * 33px)) scale(var(--base-scale, 1));
 }
 
 /* Prevent tooltip from triggering */
@@ -491,6 +527,8 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   border-radius: 20px;
   background-color: rgb(103,115,131);
   cursor: pointer;
+  transform: scale(var(--base-scale, 1));
+  transform-origin: center;
   -webkit-transition: width 0.3s ease-in-out 0.5s,
                       border-radius 0.3s ease-in-out 0.5s;
   transition: width 0.3s ease-in-out 0.5s,

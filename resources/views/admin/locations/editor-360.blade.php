@@ -8,13 +8,16 @@
     
     <!-- Marzipano Original CSS -->
     <link rel="stylesheet" href="{{ asset('marzipano/vendor/reset.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('marzipano/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('marzipano/style.css') }}?v={{ time() }}">
     
     <!-- Bootstrap for Editor Modals -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        :root {
+            --hotspot-color: {{ $location->category->icon_color ?? '#FF512F' }};
+        }
         /* Layout Structure */
         body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         #app { display: flex; height: 100vh; flex-direction: column; }
@@ -89,23 +92,27 @@
         }
 
         /* Permanent Context Menu (Editor Mode) */
-        body.editor-mode .hotspot-context-menu { display: block; }
+        body.editor-mode .hotspot-context-menu { opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; transform: translate(-50%, -50%) scale(0.1); display: block; }
+        body.editor-mode .hotspot.active-menu .hotspot-context-menu { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(clamp(0.7, var(--base-scale, 1), 1.2)); }
+        body.editor-mode .hotspot.active-menu { z-index: 100000 !important; }
         .hotspot-context-menu {
+            --R: 45px;
             display: none;
             position: absolute;
             top: 50%; left: 50%;
             pointer-events: none;
-            z-index: 1000;
+            z-index: 9999 !important;
         }
         .context-menu-btn {
             position: absolute; width: 30px; height: 30px;
             background: rgba(40,40,40,0.85); color: white; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; pointer-events: auto; font-size: 13px;
+            cursor: pointer; font-size: 13px;
             border: 2px solid rgba(255,255,255,0.3);
             transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
             margin-top: -15px; margin-left: -15px; /* Center relative to parent */
             backdrop-filter: blur(4px);
+            z-index: 9999 !important;
         }
         .context-menu-btn:hover {
             background: rgba(80,80,80,0.95);
@@ -113,14 +120,14 @@
             box-shadow: 0 0 8px rgba(255,255,255,0.3);
         }
         
-        .btn-go { transform: translate(-12px, -45px); }
-        .btn-go:hover { transform: translate(-12px, -45px) scale(1.15); background: #333; }
-        .btn-rotate { transform: translate(-42px, -20px); }
-        .btn-rotate:hover { transform: translate(-42px, -20px) scale(1.15); background: #333; }
-        .btn-delete { transform: translate(-42px, 20px); }
-        .btn-delete:hover { transform: translate(-42px, 20px) scale(1.15); background: rgba(200,50,50,0.9); }
-        .btn-edit { transform: translate(-12px, 45px); }
-        .btn-edit:hover { transform: translate(-12px, 45px) scale(1.15); background: rgba(50,130,200,0.9); }
+        .btn-go { transform: translate(calc(-0.258 * var(--R)), calc(-0.965 * var(--R))); }
+        .btn-go:hover { transform: translate(calc(-0.258 * var(--R)), calc(-0.965 * var(--R))) scale(1.15); background: #333; }
+        .btn-rotate { transform: translate(calc(-0.906 * var(--R)), calc(-0.422 * var(--R))); }
+        .btn-rotate:hover { transform: translate(calc(-0.906 * var(--R)), calc(-0.422 * var(--R))) scale(1.15); background: #333; }
+        .btn-delete { transform: translate(calc(-0.906 * var(--R)), calc(0.422 * var(--R))); }
+        .btn-delete:hover { transform: translate(calc(-0.906 * var(--R)), calc(0.422 * var(--R))) scale(1.15); background: rgba(200,50,50,0.9); }
+        .btn-edit { transform: translate(calc(-0.258 * var(--R)), calc(0.965 * var(--R))); }
+        .btn-edit:hover { transform: translate(calc(-0.258 * var(--R)), calc(0.965 * var(--R))) scale(1.15); background: rgba(50,130,200,0.9); }
 
         /* Target Box */
         .target-box {
@@ -161,7 +168,7 @@
 </head>
 
 @php
-    $scenes = $location->panoramas()->orderBy('sort_order')->get();
+    $scenes = $location->panoramas()->orderByDesc('is_default')->orderBy('sort_order')->get();
     
     $appData = [
         'name' => $location->name,
@@ -187,7 +194,8 @@
                         'yaw' => $h->yaw * pi() / 180,
                         'pitch' => $h->pitch * pi() / 180,
                         'rotation' => 0,
-                        'target' => (string)$h->target_panorama_id
+                        'target' => (string)$h->target_panorama_id,
+                        'scale' => $h->scale ?? 1.0
                     ];
                 })->values(),
                 'infoHotspots' => $p->hotspots->where('hotspot_type', 'info')->map(function($h) {
@@ -196,7 +204,8 @@
                         'yaw' => $h->yaw * pi() / 180,
                         'pitch' => $h->pitch * pi() / 180,
                         'title' => $h->title,
-                        'text' => $h->content
+                        'text' => $h->content,
+                        'scale' => $h->scale ?? 1.0
                     ];
                 })->values()
             ];
@@ -238,6 +247,7 @@
                     <img src="{{ Storage::url($scene->image_url) }}" alt="">
                     <div class="name" title="{{ $scene->scene_name }}">{{ $scene->scene_name }}</div>
                     <div class="actions">
+                        <i class="fa-star {{ $scene->is_default ? 'fas text-warning' : 'far text-light' }} me-2" onclick="event.stopPropagation(); setDefaultScene('{{ $scene->id }}')" title="{{ $scene->is_default ? 'Cảnh mặc định' : 'Đặt làm cảnh mặc định' }}"></i>
                         <i class="fas fa-pencil-alt text-light me-2" onclick="event.stopPropagation(); editSceneName('{{ $scene->id }}', '{{ $scene->scene_name }}')" title="Đổi tên"></i>
                         <i class="fas fa-trash text-danger" onclick="event.stopPropagation(); deleteScene('{{ $scene->id }}')" title="Xóa ảnh"></i>
                     </div>
@@ -290,13 +300,22 @@
     </div>
 </div>
 
-    <!-- Link Target Box -->
+<div id="target-view-overlay" style="display:none; position:absolute; top:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:15px 25px; border-radius:30px; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.3); text-align:center; backdrop-filter:blur(5px); border:1px solid rgba(255,255,255,0.2);">
+    <div style="font-size:15px; margin-bottom:10px; font-weight:500;">Hãy xoay camera đến góc nhìn mong muốn cho điểm neo này</div>
+    <button class="btn btn-sm btn-success rounded-pill px-4" onclick="saveTargetView()">Lưu Hướng</button>
+    <button class="btn btn-sm btn-secondary rounded-pill px-4 ms-2" onclick="cancelTargetView()">Hủy</button>
+</div>
+
     <div class="target-box" id="link-target-box" style="width: 180px;">
         <div class="target-box-header">
             <span>Chọn cảnh liên kết</span>
             <span class="close-btn" onclick="closeTargetBox()">&times;</span>
         </div>
-        <div class="target-box-body" style="padding: 0; max-height: 220px; overflow-y: auto;">
+        <div class="target-box-body" style="padding: 0 0 10px 0; max-height: 250px; overflow-y: auto;">
+            <div style="padding: 10px 12px 0;">
+                <label style="font-size: 11px; color: #aaa; margin-bottom: 5px; display: block;">Kích thước: <span id="linkScaleVal">1.0</span>x</label>
+                <input type="range" id="linkScaleInput" min="0.3" max="3" step="0.1" value="1.0" oninput="updateHotspotScale(this.value, 'linkScaleVal')" style="width: 100%;">
+            </div>
             <div class="scene-list-item" onclick="autoSaveLinkHotspot('')">-- Chưa liên kết --</div>
             @foreach($scenes as $scene)
                 <div class="scene-list-item" data-id="{{ $scene->id }}" onclick="autoSaveLinkHotspot('{{ $scene->id }}')">{{ $scene->scene_name }}</div>
@@ -304,13 +323,14 @@
         </div>
     </div>
 
-    <!-- Info Target Box -->
     <div class="target-box" id="info-target-box">
         <div class="target-box-header">
             <span>Edit Information</span>
             <span class="close-btn" onclick="closeTargetBox()">&times;</span>
         </div>
         <div class="target-box-body">
+            <label style="font-size: 11px; color: #aaa; margin-bottom: 5px; display: block;">Kích thước: <span id="infoScaleVal">1.0</span>x</label>
+            <input type="range" id="infoScaleInput" min="0.3" max="3" step="0.1" value="1.0" oninput="updateHotspotScale(this.value, 'infoScaleVal')" style="width: 100%; margin-bottom: 10px;">
             <input type="text" id="infoTitle" placeholder="Tiêu đề">
             <textarea id="infoContent" rows="3" placeholder="Nội dung..."></textarea>
         </div>
@@ -330,7 +350,7 @@
 <script src="{{ asset('marzipano/vendor/marzipano.js') }}" ></script>
 
 <!-- The main Marzipano template script -->
-<script src="{{ asset('marzipano/index.js') }}"></script>
+<script src="{{ asset('marzipano/index.js') }}?v={{ time() }}"></script>
 
 <!-- jQuery and Bootstrap -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -521,18 +541,77 @@
             openTargetBox();
         } else if (action === 'go') {
             let targetSceneId = null;
+            let targetYaw = null;
+            let targetPitch = null;
+            let isTargetViewDegrees = false;
             let idStr = String(hotspotId);
             
             // Try pendingCreates first
             if (idStr.startsWith('temp_')) {
                 let item = pendingCreates.find(h => h.tempId === hotspotId);
-                if (item) targetSceneId = item.target || item.target_panorama_id;
+                if (item) {
+                    targetSceneId = item.target || item.target_panorama_id;
+                    if (item.target_yaw !== undefined) {
+                        targetYaw = item.target_yaw;
+                        isTargetViewDegrees = true;
+                    }
+                    if (item.target_pitch !== undefined) targetPitch = item.target_pitch;
+                }
             } else {
                 // Try pendingUpdates next
+                if (pendingUpdates[hotspotId] && pendingUpdates[hotspotId].target !== undefined) {
+                    targetSceneId = pendingUpdates[hotspotId].target;
+                }
+                if (pendingUpdates[hotspotId] && pendingUpdates[hotspotId].target_yaw !== undefined) {
+                    targetYaw = pendingUpdates[hotspotId].target_yaw;
+                    isTargetViewDegrees = true;
+                }
+                if (pendingUpdates[hotspotId] && pendingUpdates[hotspotId].target_pitch !== undefined) {
+                    targetPitch = pendingUpdates[hotspotId].target_pitch;
+                }
+                
+                // Finally APP_DATA (if not in pending)
+                let sceneData = window.APP_DATA.scenes.find(s => s.id == getCurrentSceneId());
+                if (sceneData && sceneData.linkHotspots) {
+                    let hData = sceneData.linkHotspots.find(h => h.id == hotspotId);
+                    if (hData) {
+                        if (!targetSceneId) targetSceneId = hData.target;
+                        if (targetYaw === null && hData.target_yaw !== undefined && hData.target_yaw !== null) {
+                            targetYaw = hData.target_yaw;
+                            isTargetViewDegrees = false; // APP_DATA is in radians
+                        }
+                        if (targetPitch === null && hData.target_pitch !== undefined && hData.target_pitch !== null) {
+                            targetPitch = hData.target_pitch;
+                        }
+                    }
+                }
+            }
+            
+            if(targetSceneId && window.mzScenes) {
+                let targetSceneObj = window.mzScenes.find(s => s.data.id == targetSceneId);
+                if (targetSceneObj) {
+                    if (targetYaw !== null && targetYaw !== undefined) {
+                        let finalYaw = isTargetViewDegrees ? targetYaw * Math.PI / 180 : targetYaw;
+                        let finalPitch = isTargetViewDegrees ? targetPitch * Math.PI / 180 : targetPitch;
+                        window.switchScene(targetSceneObj, { yaw: finalYaw, pitch: finalPitch });
+                    } else {
+                        window.switchScene(targetSceneObj);
+                    }
+                }
+            } else {
+                alert('Vui lòng chọn cảnh liên kết trước khi đi đến.');
+            }
+        } else if (action === 'rotate') {
+            let targetSceneId = null;
+            let idStr = String(hotspotId);
+            
+            if (idStr.startsWith('temp_')) {
+                let item = pendingCreates.find(h => h.tempId === hotspotId);
+                if (item) targetSceneId = item.target || item.target_panorama_id;
+            } else {
                 if (pendingUpdates[hotspotId] && pendingUpdates[hotspotId].target) {
                     targetSceneId = pendingUpdates[hotspotId].target;
                 } else {
-                    // Finally APP_DATA
                     let sceneData = window.APP_DATA.scenes.find(s => s.id == getCurrentSceneId());
                     if (sceneData && sceneData.linkHotspots) {
                         let hData = sceneData.linkHotspots.find(h => h.id == hotspotId);
@@ -544,31 +623,70 @@
             if(targetSceneId && window.mzScenes) {
                 let targetSceneObj = window.mzScenes.find(s => s.data.id == targetSceneId);
                 if (targetSceneObj && targetSceneObj.scene) {
+                    window.rotatingHotspotId = hotspotId;
+                    window.originalSceneId = getCurrentSceneId();
+                    
                     targetSceneObj.scene.switchTo();
                     window.currentSceneId = targetSceneId;
                     
-                    // Update scene list UI
-                    document.querySelectorAll('#sceneList .scene').forEach(el => {
-                        if (el.getAttribute('data-id') == targetSceneId) {
-                            el.classList.add('current');
-                        } else {
-                            el.classList.remove('current');
-                        }
-                    });
+                    // Show Overlay
+                    document.getElementById('target-view-overlay').style.display = 'block';
                 }
             } else {
-                alert('Vui lòng chọn cảnh liên kết trước khi đi đến.');
+                alert('Vui lòng chọn cảnh liên kết trước khi đặt hướng nhìn!');
             }
-        } else if (action === 'rotate') {
-            // Placeholder for rotate functionality
-            alert('Tính năng đổi hướng đang phát triển');
         }
+    };
+    
+    window.saveTargetView = function() {
+        if (!window.mzViewer || !window.rotatingHotspotId) return;
+        
+        let view = window.mzViewer.view();
+        let yawDeg = view.yaw() * 180 / Math.PI;
+        let pitchDeg = view.pitch() * 180 / Math.PI;
+        
+        let idStr = String(window.rotatingHotspotId);
+        if (idStr.startsWith('temp_')) {
+            let item = pendingCreates.find(h => h.tempId === window.rotatingHotspotId);
+            if (item) {
+                item.target_yaw = yawDeg;
+                item.target_pitch = pitchDeg;
+            }
+        } else {
+            if (!pendingUpdates[window.rotatingHotspotId]) {
+                pendingUpdates[window.rotatingHotspotId] = { id: window.rotatingHotspotId };
+            }
+            pendingUpdates[window.rotatingHotspotId].target_yaw = yawDeg;
+            pendingUpdates[window.rotatingHotspotId].target_pitch = pitchDeg;
+        }
+        
+        setDirty(true);
+        cancelTargetView(); // hide overlay and switch back
+    };
+    
+    window.cancelTargetView = function() {
+        document.getElementById('target-view-overlay').style.display = 'none';
+        
+        if (window.originalSceneId && window.mzScenes) {
+            let originalObj = window.mzScenes.find(s => s.data.id == window.originalSceneId);
+            if (originalObj && originalObj.scene) {
+                originalObj.scene.switchTo();
+                window.currentSceneId = window.originalSceneId;
+            }
+        }
+        
+        window.rotatingHotspotId = null;
+        window.originalSceneId = null;
     };
 
     // Click outside only closes target boxes
     document.addEventListener('click', function(e) {
         if(!e.target.closest('.hotspot')) {
             closeTargetBox();
+            document.querySelectorAll('.hotspot').forEach(el => {
+                el.classList.remove('active-menu');
+                el.style.zIndex = '';
+            });
         }
     });
 
@@ -588,6 +706,11 @@
             
             $('#infoTitle').val(data ? (data.title || '') : '');
             $('#infoContent').val(data ? (data.text || data.content || '') : '');
+            
+            let currentScale = data ? (data.scale || 1.0) : 1.0;
+            $('#infoScaleInput').val(currentScale);
+            $('#infoScaleVal').text(parseFloat(currentScale).toFixed(1));
+
             let box = document.getElementById('info-target-box');
             let hotspotElement = document.querySelector(`.hotspot[data-id="${activeHotspotId}"]`);
             if (hotspotElement) hotspotElement.appendChild(box);
@@ -604,6 +727,11 @@
             }
             
             let currentTarget = data ? (data.target || data.target_panorama_id || '') : '';
+            
+            let currentScale = data ? (data.scale || 1.0) : 1.0;
+            $('#linkScaleInput').val(currentScale);
+            $('#linkScaleVal').text(parseFloat(currentScale).toFixed(1));
+
             document.querySelectorAll('#link-target-box .scene-list-item').forEach(el => {
                 if(el.getAttribute('data-id') == currentTarget || (!currentTarget && !el.hasAttribute('data-id'))) {
                     el.classList.add('active');
@@ -625,6 +753,42 @@
         document.getElementById('info-target-box').classList.remove('active');
     }
 
+    window.updateHotspotScale = function(val, textId) {
+        document.getElementById(textId).innerText = parseFloat(val).toFixed(1);
+        if (!activeHotspotId) return;
+        
+        let hsElement = document.querySelector(`.hotspot[data-id="${activeHotspotId}"]`);
+        if (hsElement) {
+            hsElement.style.setProperty('--base-scale', val);
+        }
+        
+        // Save to data
+        let sceneId = getCurrentSceneId();
+        let idStr = String(activeHotspotId);
+        if (idStr.startsWith('temp_')) {
+            let item = pendingCreates.find(h => h.tempId === activeHotspotId);
+            if (item) item.scale = val;
+        } else {
+            if (!pendingUpdates[activeHotspotId]) {
+                pendingUpdates[activeHotspotId] = { id: activeHotspotId };
+            }
+            pendingUpdates[activeHotspotId].scale = val;
+            
+            // Also update local APP_DATA
+            let sceneData = window.APP_DATA.scenes.find(s => s.id == sceneId);
+            if (sceneData) {
+                let hData = null;
+                if (activeHotspotType === 'info' && sceneData.infoHotspots) {
+                    hData = sceneData.infoHotspots.find(h => h.id == activeHotspotId);
+                } else if (activeHotspotType === 'link' && sceneData.linkHotspots) {
+                    hData = sceneData.linkHotspots.find(h => h.id == activeHotspotId);
+                }
+                if (hData) hData.scale = val;
+            }
+        }
+        setDirty(true);
+    };
+
     function saveInfoHotspot() {
         let sceneId = getCurrentSceneId();
         let titleVal = $('#infoTitle').val();
@@ -636,6 +800,7 @@
             if (item) {
                 item.title = titleVal;
                 item.content = contentVal;
+                item.scale = $('#infoScaleInput').val();
             }
         } else {
             if (!pendingUpdates[activeHotspotId]) {
@@ -643,6 +808,7 @@
             }
             pendingUpdates[activeHotspotId].title = titleVal;
             pendingUpdates[activeHotspotId].content = contentVal;
+            pendingUpdates[activeHotspotId].scale = $('#infoScaleInput').val();
         }
         
         // Update local APP_DATA
@@ -652,6 +818,7 @@
             if (hData) {
                 hData.title = titleVal;
                 hData.text = contentVal;
+                hData.scale = $('#infoScaleInput').val();
             }
         }
         
@@ -678,12 +845,14 @@
             if (item) {
                 item.target = target;
                 item.target_panorama_id = target;
+                item.scale = $('#linkScaleInput').val();
             }
         } else {
             if (!pendingUpdates[activeHotspotId]) {
                 pendingUpdates[activeHotspotId] = { id: activeHotspotId };
             }
             pendingUpdates[activeHotspotId].target = target;
+            pendingUpdates[activeHotspotId].scale = $('#linkScaleInput').val();
         }
         
         // Update local APP_DATA
@@ -692,6 +861,7 @@
             let hData = sceneData.linkHotspots.find(h => h.id == activeHotspotId);
             if (hData) {
                 hData.target = target;
+                hData.scale = $('#linkScaleInput').val();
             }
         }
         
@@ -781,10 +951,17 @@
         // before Marzipano's own drag handler processes them.
         let panoEl = document.querySelector('#pano');
 
+        ['mousedown', 'mousemove', 'touchstart', 'touchmove', 'pointerdown', 'pointermove'].forEach(evt => {
+            panoEl.addEventListener(evt, function(e) {
+                if (e.target.closest('.target-box') || e.target.closest('.hotspot-context-menu')) {
+                    e.stopPropagation();
+                }
+            }, true);
+        });
+
         panoEl.addEventListener('mousedown', function(e) {
             let hs = e.target.closest('.hotspot');
             if (hs) {
-                // DO NOT drag if clicking on the target box inputs or context menu buttons
                 if (e.target.closest('.target-box') || e.target.closest('.hotspot-context-menu')) {
                     return; 
                 }
@@ -920,17 +1097,25 @@
             pitch: h.pitch,
             title: h.title,
             content: h.content,
-            target: h.target || h.target_panorama_id || null
+            target: h.target || h.target_panorama_id || null,
+            target_yaw: h.target_yaw !== undefined ? h.target_yaw : null,
+            target_pitch: h.target_pitch !== undefined ? h.target_pitch : null,
+            scale: h.scale || 1.0
         }));
         
-        let updatesPayload = Object.values(pendingUpdates).map(h => ({
-            id: h.id,
-            yaw: h.yaw,
-            pitch: h.pitch,
-            title: h.title,
-            content: h.content,
-            target: h.target || h.target_panorama_id || null
-        }));
+        let updatesPayload = Object.values(pendingUpdates).map(h => {
+            let payload = { id: h.id };
+            if (h.yaw !== undefined) payload.yaw = h.yaw;
+            if (h.pitch !== undefined) payload.pitch = h.pitch;
+            if (h.title !== undefined) payload.title = h.title;
+            if (h.content !== undefined) payload.content = h.content;
+            if (h.target !== undefined) payload.target = h.target;
+            if (h.target_panorama_id !== undefined) payload.target = h.target_panorama_id;
+            if (h.target_yaw !== undefined) payload.target_yaw = h.target_yaw;
+            if (h.target_pitch !== undefined) payload.target_pitch = h.target_pitch;
+            if (h.scale !== undefined) payload.scale = h.scale;
+            return payload;
+        });
         
         // Show loading state
         let btn = document.getElementById('save-changes-btn');
@@ -967,6 +1152,25 @@
             complete: function() {
                 btn.innerHTML = oldHtml;
                 btn.style.pointerEvents = 'auto';
+            }
+        });
+    }
+
+    function setDefaultScene(sceneId) {
+        if (!confirm('Đặt cảnh này làm màn hình khởi đầu khi xem 360?')) return;
+        
+        $.ajax({
+            url: '/admin/panoramas/' + sceneId + '/set-default',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra.');
+                }
+            },
+            error: function(xhr) {
+                alert('Lỗi kết nối: ' + xhr.responseText);
             }
         });
     }
