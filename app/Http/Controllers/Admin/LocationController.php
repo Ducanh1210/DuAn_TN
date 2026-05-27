@@ -81,6 +81,13 @@ class LocationController extends Controller
         foreach($location->panoramas as $pano) {
             Storage::disk('public')->delete($pano->image_url);
         }
+        if ($location->thumbnail_url) {
+            Storage::disk('public')->delete($location->thumbnail_url);
+        }
+        if ($location->audio_url) {
+            Storage::disk('public')->delete($location->audio_url);
+        }
+        
         $location->delete();
         return redirect()->route('admin.locations.index')->with('success', 'Xóa địa điểm thành công!');
     }
@@ -126,6 +133,38 @@ class LocationController extends Controller
     {
         Storage::disk('public')->delete($panorama->image_url);
         $panorama->delete();
+        return response()->json(['success' => true]);
+    }
+
+    // Ajax Audio Upload for Location
+    public function uploadAudio(Request $request, Location $location)
+    {
+        $request->validate([
+            'audio' => 'required|file|mimes:mp3,wav,ogg,m4a,webm|max:20480',
+        ]);
+
+        // Delete old audio if exists
+        if ($location->audio_url && Storage::disk('public')->exists($location->audio_url)) {
+            Storage::disk('public')->delete($location->audio_url);
+        }
+
+        $path = $request->file('audio')->store('locations/audio', 'public');
+        $location->update(['audio_url' => $path]);
+
+        return response()->json([
+            'success' => true,
+            'audio_url' => asset('storage/' . $path),
+        ]);
+    }
+
+    public function deleteAudio(Location $location)
+    {
+        if ($location->audio_url && Storage::disk('public')->exists($location->audio_url)) {
+            Storage::disk('public')->delete($location->audio_url);
+        }
+
+        $location->update(['audio_url' => null]);
+
         return response()->json(['success' => true]);
     }
 }

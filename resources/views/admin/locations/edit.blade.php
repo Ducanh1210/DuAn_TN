@@ -13,6 +13,9 @@
     <li class="nav-item" role="presentation">
         <button class="nav-link fw-bold text-primary" id="pano-tab" data-bs-toggle="tab" data-bs-target="#pano" type="button" role="tab"><i class="fas fa-vr-cardboard"></i> Dữ liệu 360°</button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold text-warning" id="audio-tab" data-bs-toggle="tab" data-bs-target="#audio" type="button" role="tab"><i class="fas fa-microphone"></i> Audio thuyết minh</button>
+    </li>
 </ul>
 
 <div class="mb-3 d-flex justify-content-end">
@@ -127,6 +130,46 @@
             </a>
         </div>
     </div>
+
+    <!-- AUDIO TAB -->
+    <div class="tab-pane fade" id="audio" role="tabpanel">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-microphone text-warning me-2"></i>Audio thuyết minh địa điểm</h5>
+                <small class="text-muted">Upload file âm thanh thuyết minh giới thiệu về địa điểm. Audio sẽ phát khi người dùng xem chế độ 360°.</small>
+            </div>
+            <div class="card-body">
+                @if($location->audio_url)
+                    <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-light rounded border">
+                        <i class="fas fa-volume-up text-success fs-4"></i>
+                        <div class="flex-grow-1">
+                            <audio controls class="w-100" style="height: 40px;">
+                                <source src="{{ asset('storage/' . $location->audio_url) }}" type="audio/mpeg">
+                            </audio>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" id="btnDeleteAudio">
+                            <i class="fas fa-trash-alt me-1"></i> Xóa audio
+                        </button>
+                    </div>
+                    <div class="alert alert-success py-2 mb-3">
+                        <i class="fas fa-check-circle me-1"></i> Đã có audio thuyết minh cho địa điểm này.
+                    </div>
+                @else
+                    <div class="alert alert-info py-2 mb-3">
+                        <i class="fas fa-info-circle me-1"></i> Chưa có audio thuyết minh. Upload file để người dùng có thể nghe khi xem 360°.
+                    </div>
+                @endif
+
+                <div class="d-flex align-items-center gap-3">
+                    <input type="file" id="audioUploadInput" class="d-none" accept="audio/*">
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('audioUploadInput').click()">
+                        <i class="fas fa-upload me-1"></i> {{ $location->audio_url ? 'Đổi file audio' : 'Upload audio thuyết minh' }}
+                    </button>
+                    <small class="text-muted">Hỗ trợ: MP3, WAV, OGG, M4A (tối đa 20MB)</small>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -180,6 +223,50 @@
             type: 'DELETE',
             success: function(res) {
                 if(res.success) $('#img-' + id).remove();
+            }
+        });
+    });
+
+    // Upload Audio
+    $('#audioUploadInput').change(function() {
+        let file = this.files[0];
+        if (!file) return;
+
+        let formData = new FormData();
+        formData.append('audio', file);
+
+        $.ajax({
+            url: '{{ route("admin.locations.upload_audio", $location->id) }}',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(res) {
+                if (res.success) {
+                    alert('Upload audio thuyết minh thành công!');
+                    location.reload();
+                }
+            },
+            error: function(xhr) {
+                alert('Lỗi upload audio: ' + (xhr.responseJSON?.message || xhr.responseText));
+            }
+        });
+    });
+
+    // Delete Audio
+    $(document).on('click', '#btnDeleteAudio', function() {
+        if (!confirm('Xóa audio thuyết minh của địa điểm này?')) return;
+        $.ajax({
+            url: '{{ route("admin.locations.delete_audio", $location->id) }}',
+            type: 'DELETE',
+            success: function(res) {
+                if (res.success) {
+                    alert('Đã xóa audio thuyết minh!');
+                    location.reload();
+                }
+            },
+            error: function(xhr) {
+                alert('Lỗi xóa audio: ' + xhr.responseText);
             }
         });
     });

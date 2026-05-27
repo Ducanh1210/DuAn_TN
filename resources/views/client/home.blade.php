@@ -210,6 +210,26 @@
             border-bottom: 6px solid transparent;
             border-right: 6px solid color-mix(in srgb, var(--tip-color) 40%, black);
         }
+
+        /* Cluster Coverage Polygon on Hover */
+        .leaflet-cluster-anim .leaflet-marker-icon,
+        .leaflet-cluster-anim .leaflet-marker-shadow {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .marker-cluster {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .marker-cluster:hover {
+            transform: scale(1.1);
+        }
+
+        /* Cluster coverage polygon animation */
+        .cluster-coverage-polygon {
+            transition: opacity 0.3s ease;
+        }
+        .leaflet-overlay-pane svg path {
+            transition: fill-opacity 0.3s ease, stroke-opacity 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -342,11 +362,19 @@
 
         // Render markers for locations
         const locations = @json($locations);
+
+        // Tạo pane riêng cho coverage polygon (z-index cao hơn dimPane)
+        map.createPane('coveragePane');
+        map.getPane('coveragePane').style.zIndex = 460;
+        const coverageSvgRenderer = L.svg({ pane: 'coveragePane' });
+
+        let coveragePolygon = null;
+
         const markers = L.markerClusterGroup({
-            maxClusterRadius: 45,
+            maxClusterRadius: 80,
             spiderfyOnMaxZoom: true,
-            showCoverageOnHover: false,
-            zoomToBoundsOnClick: true,
+            showCoverageOnHover: false, // Tự implement thủ công
+            zoomToBoundsOnClick: false,
             iconCreateFunction: function(cluster) {
                 const count = cluster.getChildCount();
                 let size = 'small';
@@ -358,6 +386,66 @@
                     iconSize: L.point(40, 40)
                 });
             }
+        });
+
+        // Custom hover coverage polygon
+        function convexHull(points) {
+            // Graham scan
+            if (points.length < 3) return points.slice();
+            points = points.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+            const cross = (O, A, B) => (A[0]-O[0])*(B[1]-O[1]) - (A[1]-O[1])*(B[0]-O[0]);
+            const lower = [];
+            for (const p of points) { while (lower.length >= 2 && cross(lower[lower.length-2], lower[lower.length-1], p) <= 0) lower.pop(); lower.push(p); }
+            const upper = [];
+            for (let i = points.length - 1; i >= 0; i--) { const p = points[i]; while (upper.length >= 2 && cross(upper[upper.length-2], upper[upper.length-1], p) <= 0) upper.pop(); upper.push(p); }
+            upper.pop(); lower.pop();
+            return lower.concat(upper);
+        }
+
+        markers.on('clustermouseover', function(e) {
+            if (coveragePolygon) { map.removeLayer(coveragePolygon); coveragePolygon = null; }
+
+            const childMarkers = e.layer.getAllChildMarkers();
+            const points = childMarkers.map(m => {
+                const ll = m.getLatLng();
+                return [ll.lat, ll.lng];
+            });
+
+            if (points.length < 2) return;
+
+            let latlngs;
+            if (points.length === 2) {
+                latlngs = points.map(p => L.latLng(p[0], p[1]));
+            } else {
+                const hull = convexHull(points);
+                latlngs = hull.map(p => L.latLng(p[0], p[1]));
+            }
+
+            coveragePolygon = L.polygon(latlngs, {
+                pane: 'coveragePane',
+                renderer: coverageSvgRenderer,
+                fillColor: '#3388ff',
+                fillOpacity: 0.15,
+                weight: 2.5,
+                opacity: 0.7,
+                color: '#3388ff',
+                smoothFactor: 1,
+                interactive: false,
+                className: 'cluster-coverage-polygon'
+            }).addTo(map);
+        });
+
+        markers.on('clustermouseout', function(e) {
+            if (coveragePolygon) {
+                map.removeLayer(coveragePolygon);
+                coveragePolygon = null;
+            }
+        });
+
+        markers.on('clusterclick', function (a) {
+            if (coveragePolygon) { map.removeLayer(coveragePolygon); coveragePolygon = null; }
+            // Giới hạn chỉ zoom cận cảnh tối đa 2 level mỗi lần click để đỡ bị ngợp
+            a.layer.zoomToBounds({ padding: [20, 20], maxZoom: map.getZoom() + 2 });
         });
 
         locations.forEach(loc => {
