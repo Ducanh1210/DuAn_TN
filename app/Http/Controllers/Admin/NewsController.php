@@ -70,7 +70,7 @@ class NewsController extends Controller
             $data['published_at'] = now();
         }
 
-        $data['content'] = $this->processContentImages($request->content);
+        $data['content'] = $this->processContentImages($request->input('content'));
 
         News::create($data);
 
@@ -96,8 +96,8 @@ class NewsController extends Controller
 
         $data = $request->except('featured_image');
 
-        if ($request->name !== $news->title) {
-            $data['slug'] = Str::slug($request->title) . '-' . time();
+        if ($request->input('title') !== $news->title) {
+            $data['slug'] = Str::slug($request->input('title')) . '-' . time();
         }
 
         if ($request->hasFile('featured_image')) {
@@ -114,7 +114,7 @@ class NewsController extends Controller
             $data['published_at'] = now();
         }
 
-        $processedContent = $this->processContentImages($request->content);
+        $processedContent = $this->processContentImages($request->input('content'));
         $data['content'] = $processedContent;
 
         // Handle unused content images deletion
