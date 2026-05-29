@@ -481,24 +481,100 @@
         setDirty(true);
     }
     
+    // Upload Progress Overlay
+    function showUploadProgress() {
+        let overlay = document.getElementById('upload-progress-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'upload-progress-overlay';
+            overlay.innerHTML = `
+                <div style="background:rgba(0,0,0,0.7); position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; display:flex; align-items:center; justify-content:center;">
+                    <div style="background:#2c3e50; border-radius:4px; padding:25px 30px; min-width:340px; border:1px solid #3d566e;">
+                        <div style="color:#ecf0f1; font-size:14px; font-weight:bold; margin-bottom:15px; text-transform:uppercase;">
+                            <i class="fas fa-upload" style="margin-right:8px; color:#1abc9c;"></i>Đang tải ảnh 360°
+                        </div>
+                        <div id="upload-file-name" style="color:#95a5a6; font-size:12px; margin-bottom:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:300px;">Đang tải lên...</div>
+                        <div style="background:#34495e; border-radius:3px; height:14px; overflow:hidden; margin-bottom:8px;">
+                            <div id="upload-progress-bar" style="background:#1abc9c; height:100%; width:0%; border-radius:3px; transition:width 0.2s ease;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div id="upload-progress-text" style="color:#ecf0f1; font-size:14px; font-weight:bold;">0%</div>
+                            <div id="upload-file-counter" style="color:#7f8c8d; font-size:11px;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        overlay.style.display = 'block';
+    }
+
+    function updateUploadProgress(percent, fileName, current, total) {
+        document.getElementById('upload-progress-bar').style.width = percent + '%';
+        document.getElementById('upload-progress-text').textContent = Math.round(percent) + '%';
+        if (fileName) {
+            document.getElementById('upload-file-name').textContent = fileName;
+        }
+        if (total > 1) {
+            document.getElementById('upload-file-counter').textContent = `Ảnh ${current} / ${total}`;
+        }
+    }
+
+    function hideUploadProgress() {
+        let overlay = document.getElementById('upload-progress-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+
+    function uploadPanoFile(file, locationId, current, total) {
+        return new Promise((resolve, reject) => {
+            let formData = new FormData();
+            formData.append('file', file);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', `/admin/locations/${locationId}/upload-pano`, true);
+            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    let percent = (e.loaded / e.total) * 100;
+                    updateUploadProgress(percent, file.name, current, total);
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(new Error('Upload thất bại: ' + xhr.statusText));
+                }
+            };
+
+            xhr.onerror = function() {
+                reject(new Error('Lỗi kết nối khi upload'));
+            };
+
+            xhr.send(formData);
+        });
+    }
+
     // Upload
-    $('#panoUploadInput').change(function() {
+    $('#panoUploadInput').change(async function() {
         let files = this.files;
         if(files.length === 0) return;
         let locationId = {{ $location->id }};
-        
-        for(let i=0; i<files.length; i++) {
-            let formData = new FormData();
-            formData.append('file', files[i]);
-            $.ajax({
-                url: `/admin/locations/${locationId}/upload-pano`,
-                type: 'POST',
-                data: formData,
-                contentType: false, processData: false,
-                success: function() { 
-                    if (i === files.length - 1) location.reload();
-                }
-            });
+
+        showUploadProgress();
+
+        try {
+            for(let i = 0; i < files.length; i++) {
+                updateUploadProgress(0, files[i].name, i + 1, files.length);
+                await uploadPanoFile(files[i], locationId, i + 1, files.length);
+            }
+            updateUploadProgress(100, 'Hoàn tất! Đang tải lại trang...', files.length, files.length);
+            setTimeout(() => location.reload(), 500);
+        } catch(err) {
+            hideUploadProgress();
+            alert('Lỗi upload: ' + err.message);
         }
     });
 

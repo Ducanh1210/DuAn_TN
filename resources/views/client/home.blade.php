@@ -444,8 +444,15 @@
 
         markers.on('clusterclick', function (a) {
             if (coveragePolygon) { map.removeLayer(coveragePolygon); coveragePolygon = null; }
-            // Giới hạn chỉ zoom cận cảnh tối đa 2 level mỗi lần click để đỡ bị ngợp
-            a.layer.zoomToBounds({ padding: [20, 20], maxZoom: map.getZoom() + 2 });
+
+            // Zoom dần dần: mỗi lần click tăng tối đa 3 level
+            // Dùng vị trí cluster (chỗ anh bấm) thay vì tâm bounds để zoom thẳng vào, không bị lệch
+            var clusterLatLng = a.layer.getLatLng();
+            var currentZoom = map.getZoom();
+            var maxZoom = map.getMaxZoom() || 20;
+            var targetZoom = Math.min(currentZoom + 3, maxZoom);
+
+            map.setView(clusterLatLng, targetZoom, { animate: true, duration: 0.4 });
         });
 
         locations.forEach(loc => {

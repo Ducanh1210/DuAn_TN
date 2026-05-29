@@ -117,8 +117,55 @@ class LocationController extends Controller
     // Ajax Panorama Upload
     public function uploadPanorama(Request $request, Location $location)
     {
-        $request->validate(['file' => 'required|image|max:10240']);
-        $path = $request->file('file')->store('locations/panoramas', 'public');
+        $request->validate(['file' => 'required|image|max:51200']);
+        
+        $file = $request->file('file');
+        
+        // Increase memory limit and max execution time for massive images (e.g. 18K panoramas)
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', '300');
+        
+        $maxWidth = 11264; // 11K limit
+        $info = getimagesize($file->getRealPath());
+        
+        if ($info && $info[0] > $maxWidth) {
+            $path = $file->hashName('locations/panoramas');
+            $absolutePath = storage_path('app/public/' . $path);
+            
+            // Ensure directory exists
+            if (!file_exists(dirname($absolutePath))) {
+                mkdir(dirname($absolutePath), 0755, true);
+            }
+            
+            $width = $info[0];
+            $height = $info[1];
+            $mime = $info['mime'];
+            
+            $newWidth = $maxWidth;
+            $newHeight = (int)(($height / $width) * $newWidth);
+            
+            $newImage = imagecreatetruecolor($newWidth, $newHeight);
+            $sourceImage = null;
+            
+            if ($mime == 'image/jpeg') {
+                $sourceImage = imagecreatefromjpeg($file->getRealPath());
+                imagecopyresampled($newImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                imagejpeg($newImage, $absolutePath, 90);
+            } elseif ($mime == 'image/png') {
+                $sourceImage = imagecreatefrompng($file->getRealPath());
+                imagecopyresampled($newImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                imagepng($newImage, $absolutePath, 9);
+            } else {
+                $path = $file->store('locations/panoramas', 'public');
+            }
+            
+            if ($sourceImage) {
+                imagedestroy($sourceImage);
+                imagedestroy($newImage);
+            }
+        } else {
+            $path = $file->store('locations/panoramas', 'public');
+        }
 
         $pano = $location->panoramas()->create([
             'scene_name' => 'Scene ' . time(),
