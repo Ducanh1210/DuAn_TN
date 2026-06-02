@@ -230,12 +230,122 @@
         .leaflet-overlay-pane svg path {
             transition: fill-opacity 0.3s ease, stroke-opacity 0.3s ease;
         }
+
+        /* Custom Locate Control integrated into Leaflet Zoom block */
+        .leaflet-control-zoom a.leaflet-control-locate {
+            border-bottom: none !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .leaflet-control-zoom a.leaflet-control-locate.loading span {
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Pulsing User Location Marker */
+        .user-location-marker {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid #fff;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .user-location-marker::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+            opacity: 0;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+            80%, 100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        /* Toast Notification Styling */
+        .toast-container {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            width: max-content;
+            max-width: 90%;
+        }
+
+        .toast {
+            pointer-events: auto;
+            background: rgba(24, 24, 27, 0.88); /* translucent deep charcoal */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: #ffffff;
+            transform: translateY(-12px);
+            opacity: 0;
+            width: max-content;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .toast-content {
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+
+        .toast-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
 
     <!-- Map Container -->
     <div id="map"></div>
+
+
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
 
     <!-- Leaflet JS & MarkerCluster JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -539,6 +649,224 @@
         });
 
         map.addLayer(markers);
+
+        let loadingToast = null;
+
+        // Toast Notification System with GSAP
+        function showToast(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            if (type === 'loading') {
+                toast.innerHTML = `<div class="toast-spinner"></div><div class="toast-content">${message}</div>`;
+            } else {
+                toast.innerHTML = `<div class="toast-content">${message}</div>`;
+            }
+            
+            container.appendChild(toast);
+
+            // GSAP Enter Animation
+            gsap.to(toast, {
+                y: 0,
+                opacity: 1,
+                duration: 0.3,
+                ease: 'power2.out'
+            });
+
+            let autoDismissTimeout = null;
+
+            // Auto dismiss after duration if duration > 0
+            if (duration > 0) {
+                autoDismissTimeout = setTimeout(() => {
+                    dismissToast(toast);
+                }, duration);
+            }
+
+            // Custom dismiss function
+            toast.dismiss = () => {
+                if (autoDismissTimeout) clearTimeout(autoDismissTimeout);
+                dismissToast(toast);
+            };
+
+            return toast;
+        }
+
+        function dismissToast(toast) {
+            gsap.to(toast, {
+                y: -15,
+                opacity: 0,
+                duration: 0.25,
+                ease: 'power2.in',
+                onComplete: () => {
+                    toast.remove();
+                }
+            });
+        }
+
+        // Global variables for user location
+        let userCoords = null;
+        let userMarker = null;
+        let isLocatingInProgress = false;
+        let pendingFlyTo = false;
+
+        // Function to update user location marker
+        function updateUserMarker(lat, lng) {
+            const latlng = L.latLng(lat, lng);
+            if (userMarker) {
+                userMarker.setLatLng(latlng);
+            } else {
+                const userIcon = L.divIcon({
+                    className: '',
+                    html: '<div class="user-location-marker"></div>',
+                    iconSize: [26, 26],
+                    iconAnchor: [13, 13]
+                });
+                userMarker = L.marker(latlng, { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
+            }
+        }
+
+        // Function to request user location
+        function requestUserLocation(silent = false) {
+            if (!navigator.geolocation) {
+                if (!silent) showToast('Trình duyệt của bạn không hỗ trợ định vị.', 'error');
+                return;
+            }
+
+            const btn = document.querySelector('.leaflet-control-locate');
+            
+            isLocatingInProgress = true;
+            if (!silent && btn) {
+                btn.classList.add('loading');
+                pendingFlyTo = true;
+            }
+
+            // If user-initiated, show loading toast
+            if (!silent) {
+                if (loadingToast) {
+                    loadingToast.dismiss();
+                }
+                loadingToast = showToast('Đang xác định vị trí của bạn...', 'loading', 0);
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    userCoords = { lat: latitude, lng: longitude };
+                    isLocatingInProgress = false;
+                    
+                    if (btn) {
+                        btn.classList.remove('loading');
+                    }
+
+                    if (loadingToast) {
+                        loadingToast.dismiss();
+                        loadingToast = null;
+                    }
+                    
+                    if (pendingFlyTo) {
+                        pendingFlyTo = false;
+                        updateUserMarker(latitude, longitude);
+                        flyToUserLocation();
+                    }
+                },
+                (error) => {
+                    isLocatingInProgress = false;
+                    if (btn) {
+                        btn.classList.remove('loading');
+                    }
+
+                    if (loadingToast) {
+                        loadingToast.dismiss();
+                        loadingToast = null;
+                    }
+
+                    const wasPending = pendingFlyTo;
+                    pendingFlyTo = false;
+
+                    console.warn('Geolocation error:', error.message);
+                    if (!silent || wasPending) {
+                        let msg = 'Không thể lấy vị trí của bạn.';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            msg = 'Vui lòng cấp quyền vị trí trong cài đặt trình duyệt để sử dụng tính năng này.';
+                        }
+                        showToast(msg, 'warning');
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 8000,
+                    maximumAge: 30000 // Cache position for 30 seconds to make subsequent clicks instant
+                }
+            );
+        }
+
+        // Function to fly map to user location
+        function flyToUserLocation() {
+            const btn = document.querySelector('.leaflet-control-locate');
+            
+            if (userCoords) {
+                if (loadingToast) {
+                    loadingToast.dismiss();
+                    loadingToast = null;
+                }
+                
+                updateUserMarker(userCoords.lat, userCoords.lng);
+                map.setView([userCoords.lat, userCoords.lng], 16, {
+                    animate: true,
+                    duration: 1.2
+                });
+
+                // Check if user is inside Ha Nam province
+                if (haNamGeo && !isInsideHaNam(userCoords.lat, userCoords.lng)) {
+                    showToast('Bạn đang ở ngoài khu vực Hà Nam.', 'warning');
+                } else {
+                    showToast('Đã định vị thành công vị trí của bạn.', 'success');
+                }
+                return;
+            }
+
+            // If a request is already running, wait for it
+            if (isLocatingInProgress) {
+                pendingFlyTo = true;
+                if (btn) {
+                    btn.classList.add('loading');
+                }
+                if (!loadingToast) {
+                    loadingToast = showToast('Đang xác định vị trí của bạn...', 'loading', 0);
+                }
+                return;
+            }
+
+            // If no request is running and no coordinates are saved, start new request
+            requestUserLocation(false);
+        }
+
+        // Create and append Locate Button to Leaflet Zoom Control container
+        const zoomContainer = document.querySelector('.leaflet-control-zoom');
+        if (zoomContainer) {
+            const locateBtn = document.createElement('a');
+            locateBtn.className = 'leaflet-control-locate';
+            locateBtn.href = '#';
+            locateBtn.title = 'Vị trí của tôi';
+            locateBtn.role = 'button';
+            locateBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 18px; vertical-align: middle; line-height: 30px;">my_location</span>';
+            
+            // Prevent map dragging/clicking when clicking the control button
+            L.DomEvent.disableClickPropagation(locateBtn);
+            
+            locateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                flyToUserLocation();
+            });
+            
+            zoomContainer.appendChild(locateBtn);
+        }
+
+        // Request user location automatically on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            requestUserLocation(true);
+        });
 
     </script>
 </body>
