@@ -352,12 +352,708 @@
             margin-right: 8px;
             flex-shrink: 0;
         }
+
+        /* Top Floating Search Panel */
+        .top-search-panel {
+            position: absolute;
+            top: 16px;
+            left: 24px;
+            right: 24px;
+            z-index: 1000; /* Above map */
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: none; /* Let clicks pass through empty areas */
+        }
+
+        .search-box-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            pointer-events: auto;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            padding: 2px 4px 2px 14px;
+            height: 36px;
+            box-sizing: border-box;
+            width: 260px;
+            flex-shrink: 0;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 8px 32px 0 rgba(0, 114, 255, 0.25);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 15px;
+            color: #333;
+            background: transparent;
+        }
+        
+        .search-input::placeholder {
+            color: #666;
+        }
+
+        .search-actions {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #555;
+            transition: background 0.2s;
+        }
+
+        .icon-btn span {
+            font-size: 20px;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0,0,0,0.05);
+            color: var(--primary);
+        }
+
+        .icon-btn.primary {
+            background: var(--primary);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            transform: rotate(45deg);
+            margin: 0 6px;
+            box-shadow: 0 2px 8px rgba(0, 114, 255, 0.4);
+            transition: transform 0.2s, filter 0.2s;
+        }
+        
+        .icon-btn.primary:hover {
+            filter: brightness(1.1);
+            transform: rotate(45deg) scale(1.05);
+        }
+
+        .icon-btn.primary span {
+            color: white;
+            font-size: 20px;
+            transform: rotate(-45deg);
+        }
+
+        .search-box .divider {
+            width: 1px;
+            height: 24px;
+            background: rgba(0,0,0,0.1);
+            margin: 0 6px;
+        }
+
+        /* Search Suggestions */
+        .search-suggestions {
+            position: absolute;
+            top: 42px;
+            left: 0;
+            width: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 12px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            max-height: 320px;
+            overflow-y: auto;
+            z-index: 1001;
+        }
+
+        /* Mini Status Bar Wrapper & Dropdown Banner */
+        .mini-status-bar-wrapper {
+            position: absolute;
+            top: 16px;
+            right: 24px;
+            z-index: 1000;
+        }
+
+        .mini-status-bar {
+            background: #ffffff;
+            border-radius: 8px; /* Vuông vắn, chuyên nghiệp */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 260px;
+            box-sizing: border-box;
+            padding: 8px 12px;
+            gap: 14px;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 1002;
+        }
+
+        .mini-status-bar-wrapper:hover .mini-status-bar {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Mũi tên chĩa xuống từ thanh trạng thái (chỉ hiện khi click mở tin tức) */
+        .mini-status-bar::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 34px; /* Căn thẳng với nút chevron */
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            transform: rotate(45deg);
+            border-right: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 2px 2px 3px rgba(0,0,0,0.05);
+            z-index: -1; /* Nằm dưới nền trắng của thanh trạng thái */
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+
+        .mini-status-bar-wrapper.active .mini-status-bar::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+        .msb-weather {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #111827;
+        }
+
+        .msb-weather .material-symbols-rounded {
+            font-size: 18px;
+            color: #f59e0b;
+        }
+
+        .msb-divider {
+            width: 1px;
+            height: 16px;
+            background: #d1d5db;
+        }
+
+        .msb-news {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .msb-news .material-symbols-rounded {
+            font-size: 18px;
+            color: #ef4444;
+        }
+
+        .msb-news-text {
+            max-width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .msb-chevron {
+            font-size: 18px !important;
+            color: #9ca3af !important;
+            transition: transform 0.3s;
+        }
+
+        .mini-status-bar-wrapper.active .msb-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Dropdown Banner Thời tiết */
+        .weather-dropdown-banner {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            margin-right: 12px;
+            width: 260px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(15px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 1000;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .mini-status-bar-wrapper.weather-active .weather-dropdown-banner {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .weather-big-icon {
+            font-size: 42px;
+            color: #f59e0b;
+        }
+
+        .weather-temp-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .weather-temp-box #weather-detail-temp {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1;
+        }
+
+        .weather-desc {
+            font-size: 13px;
+            color: #4b5563;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        .weather-metrics {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .w-metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .w-metric .material-symbols-rounded {
+            font-size: 20px;
+            color: #3b82f6;
+        }
+
+        .w-metric span:not(.material-symbols-rounded) {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .w-metric small {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        /* Dropdown Banner - Không khoảng trắng, ảnh tràn viền 100% */
+        .news-dropdown-banner {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px; /* Cách mũi tên một khoảng nhỏ tinh tế */
+            width: 260px;
+            height: 150px;
+            border-radius: 6px;
+            overflow: hidden; /* Cắt gọn ảnh tràn góc */
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 1000;
+            background: #111827;
+        }
+
+        .mini-status-bar-wrapper.active .news-dropdown-banner {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .banner-track {
+            display: flex;
+            width: 400%; /* 4 items (3 real + 1 clone) */
+            height: 100%;
+            animation: bannerSlide 12s infinite ease-in-out;
+        }
+
+        .banner-track:hover {
+            animation-play-state: paused; /* Dừng cuộn khi di chuột vào banner */
+        }
+
+        .banner-item {
+            width: 25%; /* 100% / 4 */
+            height: 100%;
+            position: relative;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        .banner-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .banner-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .banner-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+            padding: 30px 12px 10px 12px;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .banner-title {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .banner-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 10px;
+            margin-top: 6px;
+            font-weight: 400;
+        }
+
+        .meta-left {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .banner-meta .material-symbols-rounded {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .meta-left .material-symbols-rounded {
+            font-size: 11px;
+            opacity: 1;
+        }
+
+        @keyframes bannerSlide {
+            0%, 30% { transform: translateX(0); }
+            33.33%, 63.33% { transform: translateX(-25%); }
+            66.66%, 96.66% { transform: translateX(-50%); }
+            100% { transform: translateX(-75%); } /* Lướt nhanh trong 0.4s */
+        }
+
+        .search-suggestions.active {
+            display: flex;
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        .suggestion-item:hover {
+            background: rgba(0, 114, 255, 0.08);
+        }
+        .suggestion-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+        .suggestion-icon span {
+            font-size: 18px;
+        }
+        .suggestion-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .suggestion-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .suggestion-cat {
+            font-size: 12px;
+            color: #666;
+        }
+        .no-results {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+
+        .categories-scroll {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            pointer-events: auto;
+            padding: 4px 0;
+            /* Hide scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .categories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            padding: 0 14px;
+            height: 36px;
+            box-sizing: border-box;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+
+        .category-pill:hover, .category-pill.active {
+            background: #fff;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 114, 255, 0.15);
+        }
+
+        .category-pill span {
+            font-size: 18px;
+            color: inherit;
+        }
+        
+        /* Custom Leaflet Zoom Controls */
+        .leaflet-control-zoom {
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15) !important;
+            border-radius: 8px !important;
+            overflow: hidden;
+            margin-bottom: 24px !important;
+            margin-right: 24px !important;
+        }
+
+        .leaflet-control-zoom a {
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #374151 !important;
+            border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+            width: 38px !important;
+            height: 38px !important;
+            line-height: 38px !important;
+            font-size: 18px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        .leaflet-control-zoom a:last-child {
+            border-bottom: none !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background-color: #ffffff !important;
+            color: #3b82f6 !important;
+        }
+
+        /* Reposition toast container so it doesn't overlap search */
+        .toast-container {
+            top: 80px !important;
+        }
     </style>
 </head>
 <body>
 
     <!-- Map Container -->
     <div id="map"></div>
+
+    <!-- Top Floating Search Panel -->
+    <div class="top-search-panel">
+        <div class="search-box-container">
+            <div class="search-box">
+                <input type="text" id="map-search-input" placeholder="Tìm kiếm địa điểm..." class="search-input" autocomplete="off">
+                <div class="search-actions">
+                    <button class="icon-btn" title="Tìm kiếm"><span class="material-symbols-rounded">search</span></button>
+                </div>
+            </div>
+            
+            <!-- Dropdown Gợi ý tìm kiếm -->
+            <div class="search-suggestions" id="search-suggestions">
+                <!-- Nội dung được sinh ra bằng Javascript -->
+            </div>
+        </div>
+        
+        <div class="categories-scroll" id="map-categories">
+            <!-- Render danh mục bằng Javascript từ dữ liệu thật -->
+        </div>
+    </div>
+
+    <!-- Mini Status Bar Wrapper -->
+    <div class="mini-status-bar-wrapper active" id="news-widget-wrapper">
+        <!-- Thanh Mini gọn nhẹ nằm ngang -->
+        <div class="mini-status-bar" id="news-widget-toggle">
+            <div class="msb-weather" id="weather-toggle-btn" title="Xem chi tiết thời tiết">
+                <span class="material-symbols-rounded" id="weather-icon">hourglass_empty</span>
+                <span id="weather-temp">...</span>
+            </div>
+            <div class="msb-divider"></div>
+            <div class="msb-news" id="news-toggle-btn" title="Nhấn để ẩn/hiện tin tức">
+                <span class="material-symbols-rounded">campaign</span>
+                <span class="msb-news-text">Tin tức nổi bật</span>
+                <span class="material-symbols-rounded msb-chevron">expand_more</span>
+            </div>
+        </div>
+        
+        <!-- Dropdown Thời tiết -->
+        <div class="weather-dropdown-banner">
+            <div class="weather-main">
+                <span class="material-symbols-rounded weather-big-icon" id="weather-detail-icon">partly_cloudy_day</span>
+                <div class="weather-temp-box">
+                    <span id="weather-detail-temp">--°C</span>
+                    <span class="weather-desc" id="weather-detail-desc">Đang cập nhật...</span>
+                </div>
+            </div>
+            <div class="weather-metrics">
+                <div class="w-metric">
+                    <span class="material-symbols-rounded">water_drop</span>
+                    <span id="weather-humidity">--%</span>
+                    <small>Độ ẩm</small>
+                </div>
+                <div class="w-metric">
+                    <span class="material-symbols-rounded">air</span>
+                    <span id="weather-wind">-- km/h</span>
+                    <small>Gió</small>
+                </div>
+                <div class="w-metric">
+                    <span class="material-symbols-rounded">thermostat</span>
+                    <span id="weather-feels">--°C</span>
+                    <small>Cảm giác</small>
+                </div>
+            </div>
+        </div>
+        
+        @if(isset($newsList) && $newsList->count() > 0)
+        <!-- Dropdown Banner tự động chạy -->
+        <div class="news-dropdown-banner">
+            <div class="banner-track">
+                @foreach($newsList as $news)
+                <a href="#" class="banner-item">
+                    <img src="{{ $news->featured_image ? asset('storage/' . $news->featured_image) : 'https://placehold.co/260x150/1e293b/f8fafc?text=NEWS' }}" alt="{{ $news->title }}">
+                    <div class="banner-overlay">
+                        <div class="banner-title">{{ $news->title }}</div>
+                        <div class="banner-meta">
+                            <div class="meta-left">
+                                <span class="material-symbols-rounded">calendar_today</span>
+                                {{ $news->published_at ? $news->published_at->format('d/m/Y') : $news->created_at->format('d/m/Y') }}
+                            </div>
+                            <span class="material-symbols-rounded">arrow_forward</span>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+                
+                <!-- Clone of first item for seamless infinite loop -->
+                @php $firstNews = $newsList->first(); @endphp
+                <a href="#" class="banner-item" aria-hidden="true">
+                    <img src="{{ $firstNews->featured_image ? asset('storage/' . $firstNews->featured_image) : 'https://placehold.co/260x150/1e293b/f8fafc?text=NEWS' }}" alt="{{ $firstNews->title }} Clone">
+                    <div class="banner-overlay">
+                        <div class="banner-title">{{ $firstNews->title }}</div>
+                        <div class="banner-meta">
+                            <div class="meta-left">
+                                <span class="material-symbols-rounded">calendar_today</span>
+                                {{ $firstNews->published_at ? $firstNews->published_at->format('d/m/Y') : $firstNews->created_at->format('d/m/Y') }}
+                            </div>
+                            <span class="material-symbols-rounded">arrow_forward</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        @endif
+    </div>
 
 
 
@@ -397,7 +1093,7 @@
             maxZoom: 20,
         }).addTo(map);
 
-        L.control.zoom({ position: 'bottomleft' }).addTo(map);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
 
 
@@ -631,13 +1327,139 @@
                 
                 marker.bindPopup(popupHtml, { minWidth: 260, maxWidth: 260, closeButton: false });
                 
-
+                // Lưu lại marker vào object loc để dùng cho chức năng tìm kiếm
+                loc.marker = marker;
 
                 markers.addLayer(marker);
             }
         });
 
         map.addLayer(markers);
+
+        // --- Logic Tìm kiếm và Danh mục ---
+        const searchInput = document.getElementById('map-search-input');
+        const suggestionsBox = document.getElementById('search-suggestions');
+        const categoriesScroll = document.getElementById('map-categories');
+
+        // Lấy danh sách danh mục duy nhất từ locations
+        const uniqueCategories = [];
+        const catMap = {};
+        locations.forEach(loc => {
+            if (loc.category && !catMap[loc.category.id]) {
+                catMap[loc.category.id] = true;
+                uniqueCategories.push(loc.category);
+            }
+        });
+
+        // Render category pills
+        uniqueCategories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'category-pill';
+            // Giả lập icon từ google font, nếu có icon url thì dùng img, ở đây dùng tạm một icon chung nếu không parse được
+            const iconColor = cat.icon_color || 'var(--primary)';
+            btn.innerHTML = `<span class="material-symbols-rounded" style="color: ${iconColor};">location_on</span> ${cat.name}`;
+            
+            btn.addEventListener('click', () => {
+                // Nếu đang active thì bấm để bỏ lọc (hiển thị tất cả)
+                if (btn.classList.contains('active')) {
+                    btn.classList.remove('active');
+                    markers.clearLayers();
+                    locations.forEach(loc => {
+                        if (loc.marker) {
+                            markers.addLayer(loc.marker);
+                        }
+                    });
+                    return;
+                }
+
+                // Remove active class from all
+                document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Filter markers
+                markers.clearLayers();
+                locations.forEach(loc => {
+                    if (loc.category && loc.category.id === cat.id && loc.marker) {
+                        markers.addLayer(loc.marker);
+                    }
+                });
+            });
+            categoriesScroll.appendChild(btn);
+        });
+
+        // Hàm loại bỏ dấu tiếng Việt
+        function removeAccents(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D');
+        }
+
+        // Xử lý tìm kiếm gợi ý
+        searchInput.addEventListener('input', function() {
+            const val = this.value.toLowerCase().trim();
+            const valNoAccent = removeAccents(val);
+            suggestionsBox.innerHTML = '';
+            
+            if (val.length === 0) {
+                suggestionsBox.classList.remove('active');
+                return;
+            }
+
+            const results = locations.filter(loc => {
+                const nameNoAccent = removeAccents(loc.name.toLowerCase());
+                return nameNoAccent.includes(valNoAccent);
+            });
+            
+            if (results.length > 0) {
+                results.slice(0, 10).forEach(loc => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    const color = loc.category?.icon_color || 'var(--primary)';
+                    
+                    item.innerHTML = `
+                        <div class="suggestion-icon" style="background: ${color};">
+                            <span class="material-symbols-rounded">location_on</span>
+                        </div>
+                        <div class="suggestion-info">
+                            <div class="suggestion-name">${loc.name}</div>
+                            <div class="suggestion-cat">${loc.category?.name || 'Chưa phân loại'}</div>
+                        </div>
+                    `;
+                    
+                    item.addEventListener('click', () => {
+                        suggestionsBox.classList.remove('active');
+                        searchInput.value = loc.name;
+                        
+                        // Đảm bảo marker đang hiển thị (nếu đang filter)
+                        if (!markers.hasLayer(loc.marker)) {
+                            markers.addLayer(loc.marker);
+                        }
+                        
+                        // Zoom và mở popup
+                        markers.zoomToShowLayer(loc.marker, () => {
+                            // Đưa marker ra chính giữa màn hình
+                            map.setView([loc.lat, loc.lng], 17, { animate: true, duration: 0.5 });
+                            
+                            // Đợi bay đến giữa rồi mới mở popup để tránh giật hình
+                            setTimeout(() => {
+                                loc.marker.openPopup();
+                            }, 500);
+                        });
+                    });
+                    
+                    suggestionsBox.appendChild(item);
+                });
+            } else {
+                suggestionsBox.innerHTML = '<div class="no-results">Không tìm thấy địa điểm nào</div>';
+            }
+            
+            suggestionsBox.classList.add('active');
+        });
+
+        // Ẩn gợi ý khi click ra ngoài
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.classList.remove('active');
+            }
+        });
 
         let loadingToast = null;
 
@@ -852,11 +1674,106 @@
             zoomContainer.appendChild(locateBtn);
         }
 
+        // Fetch real weather data for Ha Nam (Phu Ly coordinates: ~20.5453, 105.9122)
+        function fetchWeatherForHaNam() {
+            const url = 'https://api.open-meteo.com/v1/forecast?latitude=20.5453&longitude=105.9122&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code,is_day';
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.current) {
+                        const temp = Math.round(data.current.temperature_2m) + '°C';
+                        const code = data.current.weather_code;
+                        const isDay = data.current.is_day; // 0 or 1
+                        
+                        document.getElementById('weather-temp').textContent = temp;
+                        document.getElementById('weather-detail-temp').textContent = temp;
+                        document.getElementById('weather-humidity').textContent = data.current.relative_humidity_2m + '%';
+                        document.getElementById('weather-wind').textContent = data.current.wind_speed_10m + ' km/h';
+                        document.getElementById('weather-feels').textContent = Math.round(data.current.apparent_temperature) + '°C';
+                        
+                        let icon = 'partly_cloudy_day';
+                        let desc = 'Có mây';
+                        // WMO Weather interpretation codes
+                        if (code === 0) { icon = isDay ? 'sunny' : 'clear_night'; desc = 'Quang đãng'; }
+                        else if (code === 1 || code === 2) { icon = isDay ? 'partly_cloudy_day' : 'partly_cloudy_night'; desc = 'Ít mây'; }
+                        else if (code === 3) { icon = 'cloudy'; desc = 'Nhiều mây'; }
+                        else if (code >= 45 && code <= 48) { icon = 'foggy'; desc = 'Sương mù'; }
+                        else if (code >= 51 && code <= 67) { icon = 'rainy'; desc = 'Có mưa'; }
+                        else if (code >= 71 && code <= 77) { icon = 'ac_unit'; desc = 'Tuyết rơi'; }
+                        else if (code >= 80 && code <= 82) { icon = 'rainy'; desc = 'Mưa rào'; }
+                        else if (code >= 95 && code <= 99) { icon = 'thunderstorm'; desc = 'Mưa dông'; }
+                        
+                        document.getElementById('weather-icon').textContent = icon;
+                        document.getElementById('weather-detail-icon').textContent = icon;
+                        document.getElementById('weather-detail-desc').textContent = desc;
+                    }
+                })
+                .catch(err => {
+                    console.error('Weather API error:', err);
+                    document.getElementById('weather-temp').textContent = '--°C';
+                });
+        }
+
         // Request user location automatically on page load
         window.addEventListener('DOMContentLoaded', () => {
             requestUserLocation(true);
+            fetchWeatherForHaNam(); // Kích hoạt lấy thời tiết thực tế
         });
 
+        // ==========================================
+        // TIN TỨC & THỜI TIẾT DROPDOWN TOGGLE
+        // ==========================================
+        const newsToggleBtn = document.getElementById('news-toggle-btn');
+        const weatherToggleBtn = document.getElementById('weather-toggle-btn');
+        const newsWidgetWrapper = document.getElementById('news-widget-wrapper');
+        const newsWidgetToggle = document.getElementById('news-widget-toggle'); // Container của 2 nút
+        
+        if (newsWidgetWrapper) {
+            if (newsToggleBtn) {
+                newsToggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    newsWidgetWrapper.classList.toggle('active');
+                });
+            }
+            if (weatherToggleBtn) {
+                weatherToggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    newsWidgetWrapper.classList.toggle('weather-active');
+                });
+            }
+            
+            // Ngăn sự kiện click bên trong các banner truyền ra ngoài
+            const dropdownBanner = newsWidgetWrapper.querySelector('.news-dropdown-banner');
+            if(dropdownBanner) {
+                dropdownBanner.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                L.DomEvent.disableClickPropagation(dropdownBanner);
+                L.DomEvent.disableScrollPropagation(dropdownBanner);
+            }
+            
+            const weatherBanner = newsWidgetWrapper.querySelector('.weather-dropdown-banner');
+            if(weatherBanner) {
+                weatherBanner.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                L.DomEvent.disableClickPropagation(weatherBanner);
+                L.DomEvent.disableScrollPropagation(weatherBanner);
+            }
+            
+            // Ngăn chặn click vào thanh mini truyền qua bản đồ
+            if(newsWidgetToggle) {
+                L.DomEvent.disableClickPropagation(newsWidgetToggle);
+                L.DomEvent.disableScrollPropagation(newsWidgetToggle);
+            }
+        }
+
+        // Click ra ngoài bản đồ để đóng bảng thời tiết (nhưng giữ nguyên bảng tin tức)
+        document.addEventListener('click', function(e) {
+            if (newsWidgetWrapper && !newsWidgetWrapper.contains(e.target)) {
+                newsWidgetWrapper.classList.remove('weather-active');
+            }
+        });
     </script>
 </body>
 </html>
