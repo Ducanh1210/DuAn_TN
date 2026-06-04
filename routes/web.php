@@ -16,6 +16,21 @@ use App\Http\Controllers\Admin\EventController;
 |
 */
 
+// Fix lỗi không hiển thị ảnh (symlink) khi chạy `php artisan serve` trên Windows
+if (app()->environment('local') || php_sapi_name() == 'cli-server') {
+    Route::get('/storage/{path}', function ($path) {
+        $filePath = storage_path('app/public/' . $path);
+        if (file_exists($filePath)) {
+            $mimeType = mime_content_type($filePath);
+            return response()->file($filePath, [
+                'Content-Type' => $mimeType,
+                'Cache-Control' => 'public, max-age=86400'
+            ]);
+        }
+        abort(404);
+    })->where('path', '.*');
+}
+
 Route::get('/', function () {
     $locations = \App\Models\Location::with(['category', 'images'])->where('status', 'published')->get();
     if($locations->isEmpty()){
@@ -36,7 +51,21 @@ Route::get('/', function () {
         }
     });
 
-    return view('client.home', compact('locations'));
+    // Lấy 3 tin tức mới nhất cho banner
+    $newsList = \App\Models\News::where('status', 'published')
+                                ->orderBy('published_at', 'desc')
+                                ->take(3)
+                                ->get();
+                                
+    // Đảm bảo luôn có 3 item để không hỏng hiệu ứng CSS Animation 400%
+    if ($newsList->count() > 0 && $newsList->count() < 3) {
+        $padCount = 3 - $newsList->count();
+        for ($i = 0; $i < $padCount; $i++) {
+            $newsList->push($newsList[$i % $newsList->count()]);
+        }
+    }
+
+    return view('client.home', compact('locations', 'newsList'));
 })->name('home');
 
 // Client 360 Viewer
