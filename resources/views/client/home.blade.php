@@ -180,10 +180,26 @@
             z-index: 999 !important;
             border-radius: 50% !important;
         }
-        
+        .custom-map-pin svg, .leaflet-container .leaflet-marker-pane .pin-icon-img {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Hiệu ứng hover CSS thuần - Khắc phục lỗi kẹt tooltip */
+        .leaflet-marker-icon:has(.custom-map-pin:hover) {
+            z-index: 10000 !important;
+        }
+        .custom-map-pin:hover svg, 
+        .custom-map-pin:hover .pin-icon-img {
+            transform: scale(1.05) translateY(-3px);
+        }
+        .custom-map-pin:hover .custom-pin-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(10px, -50%);
+        }
         .custom-pin-tooltip {
             position: absolute;
-            top: 50%;
+            top: 15px; /* Căn giữa theo phần thân tròn của icon (cao 30px) */
             left: 100%;
             transform: translate(0px, -50%);
             background: linear-gradient(to right, color-mix(in srgb, var(--tip-color) 40%, black), var(--tip-color));
@@ -198,6 +214,7 @@
             visibility: hidden;
             pointer-events: none;
             z-index: 10001;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
         .custom-pin-tooltip::before {
@@ -370,18 +387,14 @@
         map.createPane('dimPane');
         map.getPane('dimPane').style.zIndex = 450;
 
-        // Tăng padding để render vùng tối (canvas) rộng hơn hẳn màn hình
-        // Giúp khi người dùng kéo bản đồ sẽ không bị lộ phần chưa render
-        const vectorRenderer = L.canvas({ padding: 2.0 });
-        // Thêm Base Map — tải tile ngay khi kéo, không đợi thả chuột
+        // Giữ padding ở mức vừa phải (0.5) để tối ưu hiệu năng render khi zoom
+        // Padding quá cao (như 2.0) sẽ tạo ra canvas khổng lồ (gấp 25 lần màn hình) gây giật lag
+        const vectorRenderer = L.canvas({ padding: 0.5 });
+        // Thêm Base Map
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 20,
-            updateWhenIdle: false,
-            updateWhenZooming: true,
-            keepBuffer: 4,
-            fadeAnimation: false,
         }).addTo(map);
 
         L.control.zoom({ position: 'bottomleft' }).addTo(map);
@@ -512,6 +525,17 @@
             return lower.concat(upper);
         }
 
+        // Tự động xóa polygon khi bản đồ bắt đầu di chuyển hoặc zoom
+        // Khắc phục lỗi kẹt polygon khi click vào cluster hoặc kéo map nhanh
+        function clearCoveragePolygon() {
+            if (coveragePolygon) {
+                map.removeLayer(coveragePolygon);
+                coveragePolygon = null;
+            }
+        }
+        map.on('zoomstart', clearCoveragePolygon);
+        map.on('movestart', clearCoveragePolygon);
+
         markers.on('clustermouseover', function(e) {
             if (coveragePolygon) { map.removeLayer(coveragePolygon); coveragePolygon = null; }
 
@@ -607,42 +631,7 @@
                 
                 marker.bindPopup(popupHtml, { minWidth: 260, maxWidth: 260, closeButton: false });
                 
-                // GSAP Animations on Hover
-                marker.on('mouseover', function(e) {
-                    const el = e.target.getElement();
-                    if (el) {
-                        const tooltip = el.querySelector('.custom-pin-tooltip');
-                        const pinSvg = el.querySelector('.pin-svg');
-                        const pinImg = el.querySelector('.pin-icon-img');
-                        
-                        // Bring element to front while hovering
-                        el.style.zIndex = 10000;
-                        
-                        // Tooltip fade in and slide right
-                        gsap.to(tooltip, { overwrite: true, autoAlpha: 1, x: 10, y: "-50%", duration: 0.3, ease: "back.out(1.5)" });
-                        
-                        // Pin bounce/scale slightly
-                        gsap.to([pinSvg, pinImg], { overwrite: true, scale: 1.15, y: -5, duration: 0.3, ease: "back.out(2)" });
-                    }
-                });
 
-                marker.on('mouseout', function(e) {
-                    const el = e.target.getElement();
-                    if (el) {
-                        const tooltip = el.querySelector('.custom-pin-tooltip');
-                        const pinSvg = el.querySelector('.pin-svg');
-                        const pinImg = el.querySelector('.pin-icon-img');
-                        
-                        // Reset z-index
-                        el.style.zIndex = '';
-                        
-                        // Tooltip fade out and slide left
-                        gsap.to(tooltip, { overwrite: true, autoAlpha: 0, x: 0, y: "-50%", duration: 0.2, ease: "power2.in" });
-                        
-                        // Pin return to normal
-                        gsap.to([pinSvg, pinImg], { overwrite: true, scale: 1, y: 0, duration: 0.2, ease: "power2.in" });
-                    }
-                });
 
                 markers.addLayer(marker);
             }
