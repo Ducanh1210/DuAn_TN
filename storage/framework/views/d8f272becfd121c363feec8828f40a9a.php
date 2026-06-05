@@ -56,6 +56,16 @@
 
 
         /* Customizes Leaflet Zoom Control */
+        .leaflet-bottom.leaflet-right {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-40px); /* Tránh đè nút khi đóng */
+            z-index: 999;
+        }
+
+        body.drawer-open .leaflet-bottom.leaflet-right {
+            transform: translateY(-180px); /* Đẩy lên cao khi mở khay */
+        }
+
         .leaflet-control-zoom {
             border: none !important;
             box-shadow: var(--glass-shadow) !important;
@@ -572,7 +582,7 @@
 
         .msb-news .material-symbols-rounded {
             font-size: 18px;
-            color: #ef4444;
+            color: #6b7280;
         }
 
         .msb-news-text {
@@ -620,6 +630,152 @@
             visibility: visible;
             transform: translateX(0);
             pointer-events: auto;
+        }
+
+        /* Bottom Featured Drawer (Full Width Glassmorphism Theme) */
+        .bottom-drawer-wrapper {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        .drawer-toggle-btn {
+            pointer-events: auto;
+            align-self: flex-end; /* Căn phải */
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 8px 16px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #111827;
+            cursor: pointer;
+            margin-right: 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-bottom: none;
+        }
+
+        .drawer-toggle-btn:hover {
+            background: #ffffff;
+        }
+
+        .drawer-toggle-btn .material-symbols-rounded {
+            font-size: 18px !important;
+            color: var(--primary);
+        }
+
+        .drawer-chevron {
+            transition: transform 0.3s;
+            color: #6b7280 !important;
+        }
+
+        .bottom-drawer-wrapper.open .drawer-chevron {
+            transform: rotate(180deg);
+        }
+
+        .drawer-content {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            width: 100%;
+            height: 0;
+            opacity: 0;
+            visibility: hidden;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            position: relative;
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .bottom-drawer-wrapper.open .drawer-content {
+            height: 160px; /* Chiều cao thẻ hình ảnh */
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .featured-loc-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.4) transparent;
+            padding: 16px;
+            padding-bottom: 20px;
+        }
+        .featured-loc-scroll::-webkit-scrollbar { height: 6px; }
+        .featured-loc-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 4px; }
+
+        .featured-loc-card {
+            position: relative;
+            width: 200px;
+            height: 120px;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 2px solid transparent;
+        }
+
+        .featured-loc-card:hover {
+            transform: translateY(-4px);
+            border-color: #ffffff;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+        }
+
+        .featured-loc-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .featured-loc-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 10px 8px 10px;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-sizing: border-box;
+        }
+
+        .featured-loc-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .featured-loc-info .material-symbols-rounded {
+            font-size: 16px;
+            color: #ffffff;
         }
 
         .weather-main {
@@ -980,11 +1136,11 @@
                 <span id="weather-temp">...</span>
             </div>
             <div class="msb-divider"></div>
-            <div class="msb-news" id="news-toggle-btn" title="Nhấn để ẩn/hiện tin tức">
-                <span class="material-symbols-rounded">campaign</span>
-                <span class="msb-news-text">Tin tức nổi bật</span>
-                <span class="material-symbols-rounded msb-chevron">expand_more</span>
-            </div>
+            <a href="/tin-tuc" class="msb-news" id="news-toggle-btn" title="Xem tất cả tin tức" style="text-decoration: none; color: inherit;">
+                <span class="material-symbols-rounded">newspaper</span>
+                <span class="msb-news-text">Tin tức và sự kiện</span>
+                <span class="material-symbols-rounded msb-chevron" style="transform: rotate(-45deg);">arrow_forward</span>
+            </a>
         </div>
         
         <!-- Dropdown Thời tiết -->
@@ -1055,6 +1211,28 @@
             </div>
         </div>
         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+    </div>
+
+    <!-- Bottom Featured Drawer (Full Width) -->
+    <div class="bottom-drawer-wrapper open" id="featured-drawer">
+        <div class="drawer-toggle-btn" id="drawer-toggle-btn" title="Địa điểm nổi bật">
+            <span class="material-symbols-rounded">star</span>
+            <span class="drawer-title">Địa điểm nổi bật</span>
+            <span class="material-symbols-rounded drawer-chevron">expand_less</span>
+        </div>
+        <div class="drawer-content">
+            <div class="featured-loc-scroll">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $locations->sortByDesc('view_count')->take(10); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $loc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <a href="#" class="featured-loc-card" onclick="flyToLocation(<?php echo e($loc->id); ?>); return false;">
+                    <img src="<?php echo e($loc->thumbnail_url ?: 'https://placehold.co/300x200/1e3a8a/ffffff?text=No+Image'); ?>" alt="<?php echo e($loc->name); ?>" class="featured-loc-img">
+                    <div class="featured-loc-info">
+                        <span class="material-symbols-rounded">account_balance</span>
+                        <div class="featured-loc-title"><?php echo e($loc->name); ?></div>
+                    </div>
+                </a>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </div>
+        </div>
     </div>
 
 
@@ -1435,15 +1613,21 @@
                             markers.addLayer(loc.marker);
                         }
                         
-                        // Zoom và mở popup
-                        markers.zoomToShowLayer(loc.marker, () => {
-                            // Đưa marker ra chính giữa màn hình
-                            map.setView([loc.lat, loc.lng], 17, { animate: true, duration: 0.5 });
+                        // Zoom từng cấp cụm một (step-by-step) thay vì nhảy vọt
+                        stepZoomToMarker(loc, () => {
+                            let targetZoom = Math.max(18, map.getZoom());
+                            let dist = map.getCenter().distanceTo([loc.lat, loc.lng]);
+                            
+                            if (dist > 500) {
+                                map.flyTo([loc.lat, loc.lng], targetZoom, { duration: 1.2 });
+                            } else {
+                                map.setView([loc.lat, loc.lng], targetZoom, { animate: true, duration: 1.2 });
+                            }
                             
                             // Đợi bay đến giữa rồi mới mở popup để tránh giật hình
                             setTimeout(() => {
                                 loc.marker.openPopup();
-                            }, 500);
+                            }, 800);
                         });
                     });
                     
@@ -1731,12 +1915,7 @@
         const newsWidgetToggle = document.getElementById('news-widget-toggle'); // Container của 2 nút
         
         if (newsWidgetWrapper) {
-            if (newsToggleBtn) {
-                newsToggleBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    newsWidgetWrapper.classList.toggle('active');
-                });
-            }
+            // Nút tin tức giờ đã thành thẻ <a> để chuyển hướng, không còn dùng JS để đóng mở nữa
             if (weatherToggleBtn) {
                 weatherToggleBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1775,6 +1954,113 @@
             if (newsWidgetWrapper && !newsWidgetWrapper.contains(e.target)) {
                 newsWidgetWrapper.classList.remove('weather-active');
             }
+        });
+
+        // ==========================================
+        // FEATURED DRAWER TOGGLE
+        // ==========================================
+        const drawerToggleBtn = document.getElementById('drawer-toggle-btn');
+        const featuredDrawer = document.getElementById('featured-drawer');
+        
+        if (drawerToggleBtn && featuredDrawer) {
+            // Đồng bộ trạng thái ban đầu
+            if(featuredDrawer.classList.contains('open')) {
+                document.body.classList.add('drawer-open');
+            }
+
+            drawerToggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                featuredDrawer.classList.toggle('open');
+                document.body.classList.toggle('drawer-open', featuredDrawer.classList.contains('open'));
+            });
+        }
+        
+        // Prevent map click when clicking drawer
+        if(featuredDrawer) {
+            featuredDrawer.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            L.DomEvent.disableClickPropagation(featuredDrawer);
+            L.DomEvent.disableScrollPropagation(featuredDrawer);
+        }
+
+        // Hàm đệ quy để zoom mở từng lớp cụm (cluster) một
+        function stepZoomToMarker(loc, finalCallback) {
+            if (!markers.hasLayer(loc.marker)) {
+                markers.addLayer(loc.marker);
+            }
+
+            function step() {
+                let parent = markers.getVisibleParent(loc.marker);
+                
+                if (parent && parent.getChildCount) {
+                    let bounds = parent.getBounds();
+                    let targetZoom = map.getBoundsZoom(bounds, false, [40, 40]);
+                    let currentZoom = map.getZoom();
+                    
+                    if (currentZoom >= targetZoom || currentZoom >= map.getMaxZoom()) {
+                        parent.spiderfy();
+                        setTimeout(finalCallback, 450);
+                        return;
+                    }
+
+                    let moved = false;
+                    function onMoveEnd() {
+                        if (moved) return;
+                        moved = true;
+                        map.off('moveend', onMoveEnd);
+                        setTimeout(step, 450); // Dừng 0.45s ở mỗi cấp cụm để người dùng nhìn rõ
+                    }
+                    
+                    map.on('moveend', onMoveEnd);
+                    parent.zoomToBounds({ padding: [40, 40] });
+                    
+                    setTimeout(() => {
+                        if (!moved) onMoveEnd();
+                    }, 1500); // fallback
+                } else {
+                    finalCallback();
+                }
+            }
+            
+            step();
+        }
+
+        // Helper function to fly to a location from the featured drawer
+        function flyToLocation(id) {
+            const loc = locations.find(l => l.id === id);
+            if (!loc || !loc.marker) return;
+
+            if(featuredDrawer) featuredDrawer.classList.remove('open');
+            document.body.classList.remove('drawer-open');
+            
+            // Zoom từng lớp cụm một y hệt như tìm kiếm
+            stepZoomToMarker(loc, () => {
+                // Đưa marker ra chính giữa màn hình nhưng KHÔNG BAO GIỜ thu nhỏ lại
+                let targetZoom = Math.max(18, map.getZoom());
+                let dist = map.getCenter().distanceTo([loc.lat, loc.lng]);
+                
+                if (dist > 500) {
+                    map.flyTo([loc.lat, loc.lng], targetZoom, { duration: 1.2 });
+                } else {
+                    map.setView([loc.lat, loc.lng], targetZoom, { animate: true, duration: 1.2 });
+                }
+                
+                // Đợi bay đến giữa rồi mới mở popup để tránh giật hình
+                setTimeout(() => {
+                    loc.marker.openPopup();
+                }, 800);
+            });
+        }
+        // Cho phép cuộn ngang bằng con lăn chuột (mouse wheel)
+        const horizontalScrolls = document.querySelectorAll('.featured-loc-scroll, .categories-scroll');
+        horizontalScrolls.forEach(container => {
+            container.addEventListener('wheel', (evt) => {
+                if (evt.deltaY !== 0) {
+                    evt.preventDefault(); // Ngăn cuộn trang dọc
+                    container.scrollLeft += evt.deltaY; // Chuyển sang cuộn ngang
+                }
+            });
         });
     </script>
 </body>
