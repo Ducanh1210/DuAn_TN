@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Client\NewsController as ClientNewsController;
+use App\Http\Controllers\Client\EventController as ClientEventController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +75,11 @@ Route::get('locations/{location:slug}/360', function(\App\Models\Location $locat
     return view('client.360', compact('location'));
 })->name('client.locations.360');
 
+// Client News & Events
+Route::get('/tin-tuc', [ClientNewsController::class, 'index'])->name('client.news.index');
+Route::get('/tin-tuc/{slug}', [ClientNewsController::class, 'show'])->name('client.news.show');
+Route::get('/su-kien', [ClientEventController::class, 'index'])->name('client.events.index');
+Route::get('/su-kien/{slug}', [ClientEventController::class, 'show'])->name('client.events.show');
 
 // Admin Auth Routes
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login.form');

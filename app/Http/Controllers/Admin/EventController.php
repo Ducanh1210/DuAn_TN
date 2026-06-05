@@ -62,7 +62,7 @@ class EventController extends Controller
         ]);
 
         $data = $request->except('featured_image');
-        $data['slug'] = Str::slug($request->name) . '-' . time();
+        $data['slug'] = Str::slug($request->name) . '-' . uniqid();
         $data['created_by'] = Auth::id();
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
@@ -101,7 +101,7 @@ class EventController extends Controller
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->name !== $event->name) {
-            $data['slug'] = Str::slug($request->name) . '-' . time();
+            $data['slug'] = Str::slug($request->name) . '-' . uniqid();
         }
 
         if ($request->hasFile('featured_image')) {

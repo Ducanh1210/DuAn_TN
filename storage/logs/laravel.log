@@ -1427,3 +1427,311 @@
 #4 D:/laragon/www/datnv2/DuAn_TN/artisan(37): Illuminate/Foundation/Console/Kernel->handle(Object(Symfony/Component/Console/Input/ArgvInput), Object(Symfony/Component/Console/Output/ConsoleOutput))
 #5 {main}
 "} 
+[2026-06-05 04:30:59] local.ERROR: View [client.news.index] not found. {"exception":"[object] (InvalidArgumentException(code: 0): View [client.news.index] not found. at D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/FileViewFinder.php:137)
+[stacktrace]
+#0 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/FileViewFinder.php(79): Illuminate/View/FileViewFinder->findInPaths('client.news.ind...', Array)
+#1 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/Factory.php(137): Illuminate/View/FileViewFinder->find('client.news.ind...')
+#2 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php(1020): Illuminate/View/Factory->make('client.news.ind...', Array, Array)
+#3 D:/laragon/www/Du_An_TN/app/Http/Controllers/Client/NewsController.php(16): view('client.news.ind...', Array)
+#4 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App/Http/Controllers/Client/NewsController->index()
+#5 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate/Routing/Controller->callAction('index', Array)
+#6 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Route.php(259): Illuminate/Routing/ControllerDispatcher->dispatch(Object(Illuminate/Routing/Route), Object(App/Http/Controllers/Client/NewsController), 'index')
+#7 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Route.php(205): Illuminate/Routing/Route->runController()
+#8 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(806): Illuminate/Routing/Route->run()
+#9 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate/Routing/Router->Illuminate/Routing/{closure}(Object(Illuminate/Http/Request))
+#10 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#11 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Routing/Middleware/SubstituteBindings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#12 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php(78): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#13 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/VerifyCsrfToken->handle(Object(Illuminate/Http/Request), Object(Closure))
+#14 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(49): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#15 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/View/Middleware/ShareErrorsFromSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#16 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(121): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#17 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(64): Illuminate/Session/Middleware/StartSession->handleStatefulRequest(Object(Illuminate/Http/Request), Object(Illuminate/Session/Store), Object(Closure))
+#18 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Session/Middleware/StartSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#19 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(37): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#20 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse->handle(Object(Illuminate/Http/Request), Object(Closure))
+#21 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(67): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#22 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Cookie/Middleware/EncryptCookies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#23 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#24 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(805): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#25 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(784): Illuminate/Routing/Router->runRouteWithinStack(Object(Illuminate/Routing/Route), Object(Illuminate/Http/Request))
+#26 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(748): Illuminate/Routing/Router->runRoute(Object(Illuminate/Http/Request), Object(Illuminate/Routing/Route))
+#27 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(737): Illuminate/Routing/Router->dispatchToRoute(Object(Illuminate/Http/Request))
+#28 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate/Routing/Router->dispatch(Object(Illuminate/Http/Request))
+#29 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate/Foundation/Http/Kernel->Illuminate/Foundation/Http/{closure}(Object(Illuminate/Http/Request))
+#30 D:/laragon/www/Du_An_TN/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#31 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Livewire/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware->handle(Object(Illuminate/Http/Request), Object(Closure))
+#32 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#33 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#34 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull->handle(Object(Illuminate/Http/Request), Object(Closure))
+#35 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#36 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(40): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#37 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/TrimStrings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#38 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ValidatePostSize.php(27): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#39 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/ValidatePostSize->handle(Object(Illuminate/Http/Request), Object(Closure))
+#40 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(99): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#41 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance->handle(Object(Illuminate/Http/Request), Object(Closure))
+#42 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(49): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#43 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Http/Middleware/HandleCors->handle(Object(Illuminate/Http/Request), Object(Closure))
+#44 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(39): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#45 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Http/Middleware/TrustProxies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#46 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#47 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#48 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate/Foundation/Http/Kernel->sendRequestThroughRouter(Object(Illuminate/Http/Request))
+#49 D:/laragon/www/Du_An_TN/public/index.php(51): Illuminate/Foundation/Http/Kernel->handle(Object(Illuminate/Http/Request))
+#50 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(16): require_once('D://laragon//www//...')
+#51 {main}
+"} 
+[2026-06-05 04:31:00] local.ERROR: View [client.news.index] not found. {"exception":"[object] (InvalidArgumentException(code: 0): View [client.news.index] not found. at D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/FileViewFinder.php:137)
+[stacktrace]
+#0 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/FileViewFinder.php(79): Illuminate/View/FileViewFinder->findInPaths('client.news.ind...', Array)
+#1 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/Factory.php(137): Illuminate/View/FileViewFinder->find('client.news.ind...')
+#2 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php(1020): Illuminate/View/Factory->make('client.news.ind...', Array, Array)
+#3 D:/laragon/www/Du_An_TN/app/Http/Controllers/Client/NewsController.php(16): view('client.news.ind...', Array)
+#4 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App/Http/Controllers/Client/NewsController->index()
+#5 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate/Routing/Controller->callAction('index', Array)
+#6 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Route.php(259): Illuminate/Routing/ControllerDispatcher->dispatch(Object(Illuminate/Routing/Route), Object(App/Http/Controllers/Client/NewsController), 'index')
+#7 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Route.php(205): Illuminate/Routing/Route->runController()
+#8 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(806): Illuminate/Routing/Route->run()
+#9 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate/Routing/Router->Illuminate/Routing/{closure}(Object(Illuminate/Http/Request))
+#10 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#11 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Routing/Middleware/SubstituteBindings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#12 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php(78): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#13 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/VerifyCsrfToken->handle(Object(Illuminate/Http/Request), Object(Closure))
+#14 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(49): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#15 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/View/Middleware/ShareErrorsFromSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#16 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(121): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#17 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(64): Illuminate/Session/Middleware/StartSession->handleStatefulRequest(Object(Illuminate/Http/Request), Object(Illuminate/Session/Store), Object(Closure))
+#18 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Session/Middleware/StartSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#19 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(37): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#20 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse->handle(Object(Illuminate/Http/Request), Object(Closure))
+#21 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(67): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#22 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Cookie/Middleware/EncryptCookies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#23 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#24 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(805): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#25 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(784): Illuminate/Routing/Router->runRouteWithinStack(Object(Illuminate/Routing/Route), Object(Illuminate/Http/Request))
+#26 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(748): Illuminate/Routing/Router->runRoute(Object(Illuminate/Http/Request), Object(Illuminate/Routing/Route))
+#27 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(737): Illuminate/Routing/Router->dispatchToRoute(Object(Illuminate/Http/Request))
+#28 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate/Routing/Router->dispatch(Object(Illuminate/Http/Request))
+#29 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate/Foundation/Http/Kernel->Illuminate/Foundation/Http/{closure}(Object(Illuminate/Http/Request))
+#30 D:/laragon/www/Du_An_TN/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#31 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Livewire/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware->handle(Object(Illuminate/Http/Request), Object(Closure))
+#32 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#33 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#34 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull->handle(Object(Illuminate/Http/Request), Object(Closure))
+#35 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#36 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(40): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#37 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/TrimStrings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#38 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ValidatePostSize.php(27): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#39 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/ValidatePostSize->handle(Object(Illuminate/Http/Request), Object(Closure))
+#40 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(99): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#41 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance->handle(Object(Illuminate/Http/Request), Object(Closure))
+#42 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(49): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#43 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Http/Middleware/HandleCors->handle(Object(Illuminate/Http/Request), Object(Closure))
+#44 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(39): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#45 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Http/Middleware/TrustProxies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#46 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#47 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#48 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate/Foundation/Http/Kernel->sendRequestThroughRouter(Object(Illuminate/Http/Request))
+#49 D:/laragon/www/Du_An_TN/public/index.php(51): Illuminate/Foundation/Http/Kernel->handle(Object(Illuminate/Http/Request))
+#50 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(16): require_once('D://laragon//www//...')
+#51 {main}
+"} 
+[2026-06-05 05:02:58] local.ERROR: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'phim-co-thai-hoa-khong-ban-duoc-ve-nao-1780635778' for key 'events.events_slug_unique' (Connection: mysql, SQL: insert into `events` (`name`, `description`, `program`, `start_time`, `end_time`, `location_text`, `location_id`, `status`, `slug`, `created_by`, `is_featured`, `featured_image`, `updated_at`, `created_at`) values (Phim có Thái Hòa không bán được vé nào, Trong khi nhiều phim Việt chật vật tìm khán giả, thậm chí có tác phẩm không bán nổi một vé dù vẫn còn 7 suất chiếu, “Ma xó” bất ngờ vượt mặt loạt đối thủ để vươn lên dẫn đầu phòng vé., <h2 id="article_sapo" class="cate-24h-foot-arti-deta-sum ctTp tuht_show"><strong>Trong khi nhiều phim Việt chật vật t&igrave;m kh&aacute;n giả, thậm ch&iacute; c&oacute; t&aacute;c phẩm kh&ocirc;ng b&aacute;n nổi một v&eacute; d&ugrave; vẫn c&ograve;n 7 suất chiếu, &ldquo;Ma x&oacute;&rdquo; bất ngờ vượt mặt loạt đối thủ để vươn l&ecirc;n dẫn đầu ph&ograve;ng v&eacute;.</strong></h2>
+<h3 class="tuht_show"><strong>'Ma x&oacute;' cắt mạch thống trị của phim ngoại</strong></h3>
+<p>Theo Box Office Vietnam, t&iacute;nh đến trưa 4/6, Ma x&oacute; dẫn đầu doanh thu ph&ograve;ng v&eacute; với 2,2 tỷ đồng trong ng&agrave;y, b&aacute;n gần 30.000 v&eacute; tr&ecirc;n hơn 2.600 suất chiếu. Bộ phim tạo khoảng c&aacute;ch đ&aacute;ng kể với t&aacute;c phẩm xếp sau l&agrave; Doraemon Movie 45 (835 triệu đồng).</p>
+<p>Kết quả n&agrave;y g&acirc;y ch&uacute; &yacute; bởi suốt nhiều tuần qua, doanh thu ph&ograve;ng v&eacute; Việt gần như nằm trong tay c&aacute;c phim ngoại. Đặc biệt, Doraemon Movie 45 li&ecirc;n tục giữ vị tr&iacute; số một v&agrave; hiện đ&atilde; thu về hơn 166 tỷ đồng sau hai tuần ph&aacute;t h&agrave;nh.</p>
+<p align="center"><img class="news-image initial loaded" src="https://icdn.24h.com.vn/upload/2-2026/images/2026-06-04/1780563182-8e9f09572b-ma-xo-widthheight.avif" alt="Một cảnh trong phim Ma x&oacute;." width="740" data-original="https://icdn.24h.com.vn/upload/2-2026/images/2026-06-04/1780563182-8e9f09572b-ma-xo-widthheight.avif" data-was-processed="true"></p>
+<p class="img_chu_thich_0407">Một cảnh trong phim Ma x&oacute;.</p>
+<p>Lấy cảm hứng từ h&igrave;nh tượng ma x&oacute; trong d&acirc;n gian Nam Bộ, bộ phim của đạo diễn Phan B&aacute; Hỷ kh&ocirc;ng chỉ khai th&aacute;c yếu tố kinh dị m&agrave; c&ograve;n lồng gh&eacute;p c&acirc;u chuyện về gia đ&igrave;nh, nh&acirc;n quả v&agrave; những lựa chọn của con người khi đứng trước nghịch cảnh. Sau c&aacute;c suất chiếu sớm, phim đ&atilde; thu hơn 3,1 tỷ đồng v&agrave; cho thấy sức h&uacute;t đ&aacute;ng kể trước ng&agrave;y khởi chiếu ch&iacute;nh thức.</p>
+<p>Th&agrave;nh c&ocirc;ng bước đầu của Ma x&oacute; tiếp tục cho thấy đề t&agrave;i kinh dị vẫn l&agrave; thể loại c&oacute; lợi thế lớn tại thị trường Việt Nam. Những năm gần đ&acirc;y, nhiều t&aacute;c phẩm kinh dị nội địa đạt doanh thu cao nhờ khai th&aacute;c chất liệu văn h&oacute;a d&acirc;n gian quen thuộc, đồng thời đ&aacute;p ứng nhu cầu giải tr&iacute; của nh&oacute;m kh&aacute;n giả trẻ.</p>
+<h3 class="tuht_show"><strong>Nhiều phim Việt thất thế</strong></h3>
+<p>Tr&aacute;i ngược với t&iacute;n hiệu khả quan từ Ma x&oacute;, nhiều dự &aacute;n Việt đang rơi v&agrave;o cảnh đ&igrave;u hiu. Ốc mượn hồn chỉ thu khoảng 120 triệu đồng trong ng&agrave;y 4/6 d&ugrave; vẫn c&ograve;n khoảng 1.000 suất chiếu. Trong khi đ&oacute;, Một thời ta đ&atilde; y&ecirc;u gần như chuẩn bị r&uacute;t rạp sau ba tuần ph&aacute;t h&agrave;nh. Bộ phim chỉ b&aacute;n được 5 v&eacute; trong ng&agrave;y, n&acirc;ng tổng doanh thu l&ecirc;n khoảng 2 tỷ đồng - con số được đ&aacute;nh gi&aacute; rất thấp so với chi ph&iacute; sản xuất v&agrave; ph&aacute;t h&agrave;nh.</p>
+<p align="center"><img class="news-image loaded" src="https://icdn.24h.com.vn/upload/2-2026/images/2026-06-04/1780563182-6ce1433170-thai-hoa-widthheight.avif" alt="Phim c&oacute; Th&aacute;i H&ograve;a kh&ocirc;ng b&aacute;n được v&eacute; n&agrave;o." width="740" data-original="https://icdn.24h.com.vn/upload/2-2026/images/2026-06-04/1780563182-6ce1433170-thai-hoa-widthheight.avif" data-was-processed="true"></p>
+<p class="img_chu_thich_0407">Phim c&oacute; Th&aacute;i H&ograve;a kh&ocirc;ng b&aacute;n được v&eacute; n&agrave;o.</p>
+<p>Đ&aacute;ng ch&uacute; &yacute; nhất l&agrave; trường hợp của Anh h&ugrave;ng. Bộ phim c&oacute; sự tham gia của Th&aacute;i H&ograve;a - một trong những ng&ocirc;i sao ph&ograve;ng v&eacute; h&agrave;ng đầu Việt Nam - nhưng kh&ocirc;ng b&aacute;n được v&eacute; n&agrave;o t&iacute;nh đến trưa 4/6 d&ugrave; vẫn c&ograve;n 7 suất chiếu.</p>
+<p>T&igrave;nh trạng phim Việt kh&ocirc;ng b&aacute;n được v&eacute; n&agrave;o trước khi rời rạp kh&ocirc;ng hi hữu, từng rơi v&agrave;o c&aacute;c dự &aacute;n như Thẩm mỹ viện &acirc;m phủ, Đại tiệc trăng m&aacute;u 8...</p>
+<p>Thực tế n&agrave;y cho thấy t&ecirc;n tuổi diễn vi&ecirc;n kh&ocirc;ng c&ograve;n l&agrave; yếu tố đảm bảo th&agrave;nh c&ocirc;ng thương mại. Kh&aacute;n giả ng&agrave;y c&agrave;ng khắt khe hơn với chất lượng kịch bản, t&iacute;nh mới mẻ của c&acirc;u chuyện v&agrave; hiệu ứng truyền miệng sau khi phim ra mắt.</p>
+<p>B&ecirc;n cạnh đ&oacute;, việc qu&aacute; nhiều phim Việt c&ugrave;ng ra rạp trong thời gian ngắn khiến thị trường trở n&ecirc;n chật chội. Những t&aacute;c phẩm thiếu điểm nhấn về nội dung hoặc chiến dịch quảng b&aacute; kh&oacute; tạo được sức bật trước sức &eacute;p từ c&aacute;c bom tấn ngoại nhập v&agrave; những thương hiệu đ&atilde; c&oacute; lượng người h&acirc;m mộ sẵn c&oacute;.</p>
+<p>D&ugrave; vậy, sự bứt ph&aacute; của Ma x&oacute; l&agrave; t&iacute;n hiệu khả quan cho phim Việt trong th&aacute;ng 6. Sau giai đoạn chứng kiến h&agrave;ng loạt t&aacute;c phẩm doanh thu thấp v&agrave; nhanh ch&oacute;ng rời rạp, ph&ograve;ng v&eacute; nội địa đang chờ xem liệu bộ phim kinh dị n&agrave;y c&oacute; đủ sức duy tr&igrave; sức n&oacute;ng, trở th&agrave;nh c&uacute; h&iacute;ch mới cho điện ảnh Việt hay kh&ocirc;ng.</p>
+<div id="zone_banner_sponser_product"></div>
+<div class="bv-lq">
+<div class="bv-lq-inner">&nbsp;</div>
+</div>, 2026-06-05 12:02:00, 2026-06-11 12:02:00, ?, 11, active, phim-co-thai-hoa-khong-ban-duoc-ve-nao-1780635778, 1, 0, events/7B9zqVHB0QBOtn0gZY79210ugYvIKlAX5avmMOPr.png, 2026-06-05 05:02:58, 2026-06-05 05:02:58)) {"userId":1,"exception":"[object] (Illuminate\\Database\\UniqueConstraintViolationException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'phim-co-thai-hoa-khong-ban-duoc-ve-nao-1780635778' for key 'events.events_slug_unique' (Connection: mysql, SQL: insert into `events` (`name`, `description`, `program`, `start_time`, `end_time`, `location_text`, `location_id`, `status`, `slug`, `created_by`, `is_featured`, `featured_image`, `updated_at`, `created_at`) values (Phim có Thái Hòa không bán được vé nào, Trong khi nhiều phim Việt chật vật tìm khán giả, thậm chí có tác phẩm không bán nổi một vé dù vẫn còn 7 suất chiếu, “Ma xó” bất ngờ vượt mặt loạt đối thủ để vươn lên dẫn đầu phòng vé., <h2 id=\"article_sapo\" class=\"cate-24h-foot-arti-deta-sum ctTp tuht_show\"><strong>Trong khi nhiều phim Việt chật vật t&igrave;m kh&aacute;n giả, thậm ch&iacute; c&oacute; t&aacute;c phẩm kh&ocirc;ng b&aacute;n nổi một v&eacute; d&ugrave; vẫn c&ograve;n 7 suất chiếu, &ldquo;Ma x&oacute;&rdquo; bất ngờ vượt mặt loạt đối thủ để vươn l&ecirc;n dẫn đầu ph&ograve;ng v&eacute;.</strong></h2>
+
+<h3 class=\"tuht_show\"><strong>'Ma x&oacute;' cắt mạch thống trị của phim ngoại</strong></h3>
+
+<p>Theo Box Office Vietnam, t&iacute;nh đến trưa 4/6, Ma x&oacute; dẫn đầu doanh thu ph&ograve;ng v&eacute; với 2,2 tỷ đồng trong ng&agrave;y, b&aacute;n gần 30.000 v&eacute; tr&ecirc;n hơn 2.600 suất chiếu. Bộ phim tạo khoảng c&aacute;ch đ&aacute;ng kể với t&aacute;c phẩm xếp sau l&agrave; Doraemon Movie 45 (835 triệu đồng).</p>
+
+<p>Kết quả n&agrave;y g&acirc;y ch&uacute; &yacute; bởi suốt nhiều tuần qua, doanh thu ph&ograve;ng v&eacute; Việt gần như nằm trong tay c&aacute;c phim ngoại. Đặc biệt, Doraemon Movie 45 li&ecirc;n tục giữ vị tr&iacute; số một v&agrave; hiện đ&atilde; thu về hơn 166 tỷ đồng sau hai tuần ph&aacute;t h&agrave;nh.</p>
+
+<p align=\"center\"><img class=\"news-image initial loaded\" src=\"https://icdn.24h.com.vn/upload/2-2026/images/2026-06-04/1780563182-8e9f09572b-ma-xo-widthheight.avif\" alt=\"Một cảnh trong phim Ma x&oacute;.\" width=\"740\" data-original=\"https://icdn.24h.com.vn/upload/2-2026/images/2026-06-04/1780563182-8e9f09572b-ma-xo-widthheight.avif\" data-was-processed=\"true\"></p>
+
+<p class=\"img_chu_thich_0407\">Một cảnh trong phim Ma x&oacute;.</p>
+
+<p>Lấy cảm hứng từ h&igrave;nh tượng ma x&oacute; trong d&acirc;n gian Nam Bộ, bộ phim của đạo diễn Phan B&aacute; Hỷ kh&ocirc;ng chỉ khai th&aacute;c yếu tố kinh dị m&agrave; c&ograve;n lồng gh&eacute;p c&acirc;u chuyện về gia đ&igrave;nh, nh&acirc;n quả v&agrave; những lựa chọn của con người khi đứng trước nghịch cảnh. Sau c&aacute;c suất chiếu sớm, phim đ&atilde; thu hơn 3,1 tỷ đồng v&agrave; cho thấy sức h&uacute;t đ&aacute;ng kể trước ng&agrave;y khởi chiếu ch&iacute;nh thức.</p>
+
+<p>Th&agrave;nh c&ocirc;ng bước đầu của Ma x&oacute; tiếp tục cho thấy đề t&agrave;i kinh dị vẫn l&agrave; thể loại c&oacute; lợi thế lớn tại thị trường Việt Nam. Những năm gần đ&acirc;y, nhiều t&aacute;c phẩm kinh dị nội địa đạt doanh thu cao nhờ khai th&aacute;c chất liệu văn h&oacute;a d&acirc;n gian quen thuộc, đồng thời đ&aacute;p ứng nhu cầu giải tr&iacute; của nh&oacute;m kh&aacute;n giả trẻ.</p>
+
+<h3 class=\"tuht_show\"><strong>Nhiều phim Việt thất thế</strong></h3>
+
+<p>Tr&aacute;i ngược với t&iacute;n hiệu khả quan từ Ma x&oacute;, nhiều dự &aacute;n Việt đang rơi v&agrave;o cảnh đ&igrave;u hiu. Ốc mượn hồn chỉ thu khoảng 120 triệu đồng trong ng&agrave;y 4/6 d&ugrave; vẫn c&ograve;n khoảng 1.000 suất chiếu. Trong khi đ&oacute;, Một thời ta đ&atilde; y&ecirc;u gần như chuẩn bị r&uacute;t rạp sau ba tuần ph&aacute;t h&agrave;nh. Bộ phim chỉ b&aacute;n được 5 v&eacute; trong ng&agrave;y, n&acirc;ng tổng doanh thu l&ecirc;n khoảng 2 tỷ đồng - con số được đ&aacute;nh gi&aacute; rất thấp so với chi ph&iacute; sản xuất v&agrave; ph&aacute;t h&agrave;nh.</p>
+
+<p align=\"center\"><img class=\"news-image loaded\" src=\"https://icdn.24h.com.vn/upload/2-2026/images/2026-06-04/1780563182-6ce1433170-thai-hoa-widthheight.avif\" alt=\"Phim c&oacute; Th&aacute;i H&ograve;a kh&ocirc;ng b&aacute;n được v&eacute; n&agrave;o.\" width=\"740\" data-original=\"https://icdn.24h.com.vn/upload/2-2026/images/2026-06-04/1780563182-6ce1433170-thai-hoa-widthheight.avif\" data-was-processed=\"true\"></p>
+
+<p class=\"img_chu_thich_0407\">Phim c&oacute; Th&aacute;i H&ograve;a kh&ocirc;ng b&aacute;n được v&eacute; n&agrave;o.</p>
+
+<p>Đ&aacute;ng ch&uacute; &yacute; nhất l&agrave; trường hợp của Anh h&ugrave;ng. Bộ phim c&oacute; sự tham gia của Th&aacute;i H&ograve;a - một trong những ng&ocirc;i sao ph&ograve;ng v&eacute; h&agrave;ng đầu Việt Nam - nhưng kh&ocirc;ng b&aacute;n được v&eacute; n&agrave;o t&iacute;nh đến trưa 4/6 d&ugrave; vẫn c&ograve;n 7 suất chiếu.</p>
+
+<p>T&igrave;nh trạng phim Việt kh&ocirc;ng b&aacute;n được v&eacute; n&agrave;o trước khi rời rạp kh&ocirc;ng hi hữu, từng rơi v&agrave;o c&aacute;c dự &aacute;n như Thẩm mỹ viện &acirc;m phủ, Đại tiệc trăng m&aacute;u 8...</p>
+
+<p>Thực tế n&agrave;y cho thấy t&ecirc;n tuổi diễn vi&ecirc;n kh&ocirc;ng c&ograve;n l&agrave; yếu tố đảm bảo th&agrave;nh c&ocirc;ng thương mại. Kh&aacute;n giả ng&agrave;y c&agrave;ng khắt khe hơn với chất lượng kịch bản, t&iacute;nh mới mẻ của c&acirc;u chuyện v&agrave; hiệu ứng truyền miệng sau khi phim ra mắt.</p>
+
+<p>B&ecirc;n cạnh đ&oacute;, việc qu&aacute; nhiều phim Việt c&ugrave;ng ra rạp trong thời gian ngắn khiến thị trường trở n&ecirc;n chật chội. Những t&aacute;c phẩm thiếu điểm nhấn về nội dung hoặc chiến dịch quảng b&aacute; kh&oacute; tạo được sức bật trước sức &eacute;p từ c&aacute;c bom tấn ngoại nhập v&agrave; những thương hiệu đ&atilde; c&oacute; lượng người h&acirc;m mộ sẵn c&oacute;.</p>
+
+<p>D&ugrave; vậy, sự bứt ph&aacute; của Ma x&oacute; l&agrave; t&iacute;n hiệu khả quan cho phim Việt trong th&aacute;ng 6. Sau giai đoạn chứng kiến h&agrave;ng loạt t&aacute;c phẩm doanh thu thấp v&agrave; nhanh ch&oacute;ng rời rạp, ph&ograve;ng v&eacute; nội địa đang chờ xem liệu bộ phim kinh dị n&agrave;y c&oacute; đủ sức duy tr&igrave; sức n&oacute;ng, trở th&agrave;nh c&uacute; h&iacute;ch mới cho điện ảnh Việt hay kh&ocirc;ng.</p>
+
+<div id=\"zone_banner_sponser_product\"></div>
+
+<div class=\"bv-lq\">
+
+<div class=\"bv-lq-inner\">&nbsp;</div>
+
+</div>, 2026-06-05 12:02:00, 2026-06-11 12:02:00, ?, 11, active, phim-co-thai-hoa-khong-ban-duoc-ve-nao-1780635778, 1, 0, events/7B9zqVHB0QBOtn0gZY79210ugYvIKlAX5avmMOPr.png, 2026-06-05 05:02:58, 2026-06-05 05:02:58)) at D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824)
+[stacktrace]
+#0 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate/Database/Connection->runQueryCallback('insert into `ev...', Array, Object(Closure))
+#1 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(34): Illuminate/Database/Connection->run('insert into `ev...', Array, Object(Closure))
+#2 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate/Database/MySqlConnection->insert('insert into `ev...', Array, 'id')
+#3 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3549): Illuminate/Database/Query/Processors/MySqlProcessor->processInsertGetId(Object(Illuminate/Database/Query/Builder), 'insert into `ev...', Array, 'id')
+#4 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1982): Illuminate/Database/Query/Builder->insertGetId(Array, 'id')
+#5 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1334): Illuminate/Database/Eloquent/Builder->__call('insertGetId', Array)
+#6 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1299): Illuminate/Database/Eloquent/Model->insertAndSetId(Object(Illuminate/Database/Eloquent/Builder), Array)
+#7 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1138): Illuminate/Database/Eloquent/Model->performInsert(Object(Illuminate/Database/Eloquent/Builder))
+#8 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1025): Illuminate/Database/Eloquent/Model->save()
+#9 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Support/helpers.php(320): Illuminate/Database/Eloquent/Builder->Illuminate/Database/Eloquent/{closure}(Object(App/Models/Event))
+#10 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1024): tap(Object(App/Models/Event), Object(Closure))
+#11 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate/Database/Eloquent/Builder->create(Array)
+#12 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2335): Illuminate/Database/Eloquent/Model->forwardCallTo(Object(Illuminate/Database/Eloquent/Builder), 'create', Array)
+#13 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2347): Illuminate/Database/Eloquent/Model->__call('create', Array)
+#14 D:/laragon/www/Du_An_TN/app/Http/Controllers/Admin/EventController.php(74): Illuminate/Database/Eloquent/Model::__callStatic('create', Array)
+#15 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App/Http/Controllers/Admin/EventController->store(Object(Illuminate/Http/Request))
+#16 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate/Routing/Controller->callAction('store', Array)
+#17 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Route.php(259): Illuminate/Routing/ControllerDispatcher->dispatch(Object(Illuminate/Routing/Route), Object(App/Http/Controllers/Admin/EventController), 'store')
+#18 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Route.php(205): Illuminate/Routing/Route->runController()
+#19 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(806): Illuminate/Routing/Route->run()
+#20 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate/Routing/Router->Illuminate/Routing/{closure}(Object(Illuminate/Http/Request))
+#21 D:/laragon/www/Du_An_TN/app/Http/Middleware/CheckRole.php(39): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#22 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): App/Http/Middleware/CheckRole->handle(Object(Illuminate/Http/Request), Object(Closure), 'admin', 'moderator')
+#23 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#24 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Routing/Middleware/SubstituteBindings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#25 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php(78): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#26 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/VerifyCsrfToken->handle(Object(Illuminate/Http/Request), Object(Closure))
+#27 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(49): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#28 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/View/Middleware/ShareErrorsFromSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#29 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(121): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#30 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(64): Illuminate/Session/Middleware/StartSession->handleStatefulRequest(Object(Illuminate/Http/Request), Object(Illuminate/Session/Store), Object(Closure))
+#31 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Session/Middleware/StartSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#32 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(37): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#33 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse->handle(Object(Illuminate/Http/Request), Object(Closure))
+#34 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(67): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#35 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Cookie/Middleware/EncryptCookies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#36 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#37 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(805): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#38 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(784): Illuminate/Routing/Router->runRouteWithinStack(Object(Illuminate/Routing/Route), Object(Illuminate/Http/Request))
+#39 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(748): Illuminate/Routing/Router->runRoute(Object(Illuminate/Http/Request), Object(Illuminate/Routing/Route))
+#40 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(737): Illuminate/Routing/Router->dispatchToRoute(Object(Illuminate/Http/Request))
+#41 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate/Routing/Router->dispatch(Object(Illuminate/Http/Request))
+#42 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate/Foundation/Http/Kernel->Illuminate/Foundation/Http/{closure}(Object(Illuminate/Http/Request))
+#43 D:/laragon/www/Du_An_TN/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#44 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Livewire/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware->handle(Object(Illuminate/Http/Request), Object(Closure))
+#45 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#46 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#47 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull->handle(Object(Illuminate/Http/Request), Object(Closure))
+#48 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#49 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(40): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#50 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/TrimStrings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#51 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ValidatePostSize.php(27): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#52 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/ValidatePostSize->handle(Object(Illuminate/Http/Request), Object(Closure))
+#53 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(99): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#54 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance->handle(Object(Illuminate/Http/Request), Object(Closure))
+#55 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(49): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#56 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Http/Middleware/HandleCors->handle(Object(Illuminate/Http/Request), Object(Closure))
+#57 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(39): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#58 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Http/Middleware/TrustProxies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#59 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#60 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#61 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate/Foundation/Http/Kernel->sendRequestThroughRouter(Object(Illuminate/Http/Request))
+#62 D:/laragon/www/Du_An_TN/public/index.php(51): Illuminate/Foundation/Http/Kernel->handle(Object(Illuminate/Http/Request))
+#63 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(16): require_once('D://laragon//www//...')
+#64 {main}
+
+[previous exception] [object] (PDOException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'phim-co-thai-hoa-khong-ban-duoc-ve-nao-1780635778' for key 'events.events_slug_unique' at D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php:45)
+[stacktrace]
+#0 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(45): PDOStatement->execute()
+#1 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Connection.php(816): Illuminate/Database/MySqlConnection->Illuminate/Database/{closure}('insert into `ev...', Array)
+#2 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Connection.php(783): Illuminate/Database/Connection->runQueryCallback('insert into `ev...', Array, Object(Closure))
+#3 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/MySqlConnection.php(34): Illuminate/Database/Connection->run('insert into `ev...', Array, Object(Closure))
+#4 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/MySqlProcessor.php(35): Illuminate/Database/MySqlConnection->insert('insert into `ev...', Array, 'id')
+#5 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php(3549): Illuminate/Database/Query/Processors/MySqlProcessor->processInsertGetId(Object(Illuminate/Database/Query/Builder), 'insert into `ev...', Array, 'id')
+#6 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1982): Illuminate/Database/Query/Builder->insertGetId(Array, 'id')
+#7 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1334): Illuminate/Database/Eloquent/Builder->__call('insertGetId', Array)
+#8 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1299): Illuminate/Database/Eloquent/Model->insertAndSetId(Object(Illuminate/Database/Eloquent/Builder), Array)
+#9 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(1138): Illuminate/Database/Eloquent/Model->performInsert(Object(Illuminate/Database/Eloquent/Builder))
+#10 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1025): Illuminate/Database/Eloquent/Model->save()
+#11 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Support/helpers.php(320): Illuminate/Database/Eloquent/Builder->Illuminate/Database/Eloquent/{closure}(Object(App/Models/Event))
+#12 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php(1024): tap(Object(App/Models/Event), Object(Closure))
+#13 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php(23): Illuminate/Database/Eloquent/Builder->create(Array)
+#14 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2335): Illuminate/Database/Eloquent/Model->forwardCallTo(Object(Illuminate/Database/Eloquent/Builder), 'create', Array)
+#15 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php(2347): Illuminate/Database/Eloquent/Model->__call('create', Array)
+#16 D:/laragon/www/Du_An_TN/app/Http/Controllers/Admin/EventController.php(74): Illuminate/Database/Eloquent/Model::__callStatic('create', Array)
+#17 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Controller.php(54): App/Http/Controllers/Admin/EventController->store(Object(Illuminate/Http/Request))
+#18 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(43): Illuminate/Routing/Controller->callAction('store', Array)
+#19 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Route.php(259): Illuminate/Routing/ControllerDispatcher->dispatch(Object(Illuminate/Routing/Route), Object(App/Http/Controllers/Admin/EventController), 'store')
+#20 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Route.php(205): Illuminate/Routing/Route->runController()
+#21 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(806): Illuminate/Routing/Route->run()
+#22 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate/Routing/Router->Illuminate/Routing/{closure}(Object(Illuminate/Http/Request))
+#23 D:/laragon/www/Du_An_TN/app/Http/Middleware/CheckRole.php(39): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#24 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): App/Http/Middleware/CheckRole->handle(Object(Illuminate/Http/Request), Object(Closure), 'admin', 'moderator')
+#25 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#26 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Routing/Middleware/SubstituteBindings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#27 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/VerifyCsrfToken.php(78): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#28 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/VerifyCsrfToken->handle(Object(Illuminate/Http/Request), Object(Closure))
+#29 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(49): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#30 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/View/Middleware/ShareErrorsFromSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#31 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(121): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#32 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(64): Illuminate/Session/Middleware/StartSession->handleStatefulRequest(Object(Illuminate/Http/Request), Object(Illuminate/Session/Store), Object(Closure))
+#33 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Session/Middleware/StartSession->handle(Object(Illuminate/Http/Request), Object(Closure))
+#34 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(37): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#35 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse->handle(Object(Illuminate/Http/Request), Object(Closure))
+#36 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(67): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#37 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Cookie/Middleware/EncryptCookies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#38 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#39 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(805): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#40 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(784): Illuminate/Routing/Router->runRouteWithinStack(Object(Illuminate/Routing/Route), Object(Illuminate/Http/Request))
+#41 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(748): Illuminate/Routing/Router->runRoute(Object(Illuminate/Http/Request), Object(Illuminate/Routing/Route))
+#42 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Routing/Router.php(737): Illuminate/Routing/Router->dispatchToRoute(Object(Illuminate/Http/Request))
+#43 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate/Routing/Router->dispatch(Object(Illuminate/Http/Request))
+#44 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(144): Illuminate/Foundation/Http/Kernel->Illuminate/Foundation/Http/{closure}(Object(Illuminate/Http/Request))
+#45 D:/laragon/www/Du_An_TN/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php(19): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#46 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Livewire/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware->handle(Object(Illuminate/Http/Request), Object(Closure))
+#47 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#48 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#49 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull->handle(Object(Illuminate/Http/Request), Object(Closure))
+#50 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#51 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(40): Illuminate/Foundation/Http/Middleware/TransformsRequest->handle(Object(Illuminate/Http/Request), Object(Closure))
+#52 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/TrimStrings->handle(Object(Illuminate/Http/Request), Object(Closure))
+#53 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ValidatePostSize.php(27): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#54 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/ValidatePostSize->handle(Object(Illuminate/Http/Request), Object(Closure))
+#55 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(99): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#56 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance->handle(Object(Illuminate/Http/Request), Object(Closure))
+#57 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(49): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#58 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Http/Middleware/HandleCors->handle(Object(Illuminate/Http/Request), Object(Closure))
+#59 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(39): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#60 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(183): Illuminate/Http/Middleware/TrustProxies->handle(Object(Illuminate/Http/Request), Object(Closure))
+#61 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(119): Illuminate/Pipeline/Pipeline->Illuminate/Pipeline/{closure}(Object(Illuminate/Http/Request))
+#62 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate/Pipeline/Pipeline->then(Object(Closure))
+#63 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate/Foundation/Http/Kernel->sendRequestThroughRouter(Object(Illuminate/Http/Request))
+#64 D:/laragon/www/Du_An_TN/public/index.php(51): Illuminate/Foundation/Http/Kernel->handle(Object(Illuminate/Http/Request))
+#65 D:/laragon/www/Du_An_TN/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(16): require_once('D://laragon//www//...')
+#66 {main}
+"} 

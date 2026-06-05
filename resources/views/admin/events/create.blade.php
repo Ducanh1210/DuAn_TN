@@ -16,6 +16,8 @@
 .btn-submit{background:linear-gradient(135deg,#8b5cf6,#6d28d9);border:none;padding:10px 28px;font-weight:600;border-radius:8px;transition:.3s}
 .btn-submit:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(139,92,246,.4)}
 .form-check-input:checked{background-color:#f59e0b;border-color:#f59e0b}
+/* TinyMCE customizations */
+.tox-tinymce { border-radius: 8px !important; border-color: #cbd5e1 !important; }
 </style>
 @endpush
 
@@ -60,9 +62,9 @@
     <div class="form-card card mb-4">
         <div class="card-header"><h6><i class="fas fa-image me-2"></i>Ảnh sự kiện</h6></div>
         <div class="card-body">
-            <div class="img-preview-box mb-2" onclick="document.getElementById('featured_image').click()">
+            <div class="img-preview-box mb-2" onclick="document.getElementById('featured_image').click()" title="Có thể ấn Ctrl+V để dán ảnh">
                 <img id="imgPrev" src="" style="display:none">
-                <div class="ph" id="imgPh"><i class="fas fa-cloud-upload-alt d-block mb-2"></i><span>Click để chọn ảnh</span></div>
+                <div class="ph" id="imgPh"><i class="fas fa-cloud-upload-alt d-block mb-2"></i><span>Click hoặc ấn Ctrl+V dán ảnh</span></div>
             </div>
             <input type="file" class="d-none" id="featured_image" name="featured_image" accept="image/*" onchange="prevImg(event)">
         </div>
@@ -112,7 +114,86 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js"></script>
 <script>
 function prevImg(e){var f=e.target.files[0];if(f){var r=new FileReader();r.onload=function(ev){document.getElementById('imgPrev').src=ev.target.result;document.getElementById('imgPrev').style.display='block';document.getElementById('imgPh').style.display='none'};r.readAsDataURL(f)}}
+
+// Paste image support
+document.addEventListener('paste', function(e) {
+    var ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable || ae.tagName === 'IFRAME')) {
+        return; 
+    }
+    if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length > 0) {
+        var file = e.clipboardData.files[0];
+        if (file.type.indexOf('image/') !== -1) {
+            e.preventDefault();
+            var fi = document.getElementById('featured_image');
+            var dt = new DataTransfer();
+            dt.items.add(file);
+            fi.files = dt.files;
+            var evt = new Event('change');
+            fi.dispatchEvent(evt);
+        }
+    }
+});
+
+$(document).ready(function() {
+    tinymce.init({
+        selector: '#program',
+        plugins: 'image link media table code lists fullscreen preview',
+        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | link image media | table | fullscreen preview code',
+        height: 500,
+        image_title: true,
+        automatic_uploads: true,
+        promotion: false,
+        branding: false,
+        statusbar: false,
+        images_upload_handler: function (blobInfo, progress) {
+            return new Promise((resolve, reject) => {
+                var xhr, formData;
+                xhr = new XMLHttpRequest();
+                xhr.withCredentials = false;
+                xhr.open('POST', '{{ route('admin.news.upload_image') }}');
+                xhr.setRequestHeader("X-CSRF-TOKEN", "{{ csrf_token() }}");
+
+                xhr.upload.onprogress = function (e) {
+                    progress(e.loaded / e.total * 100);
+                };
+
+                xhr.onload = function() {
+                    if (xhr.status === 403) {
+                        reject('HTTP Error: ' + xhr.status, { remove: true });
+                        return;
+                    }
+                    if (xhr.status < 200 || xhr.status >= 300) {
+                        reject('HTTP Error: ' + xhr.status);
+                        return;
+                    }
+                    var json = JSON.parse(xhr.responseText);
+                    if (!json || typeof json.url != 'string') {
+                        reject('Invalid JSON: ' + xhr.responseText);
+                        return;
+                    }
+                    resolve(json.url);
+                };
+
+                xhr.onerror = function () {
+                    reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+                };
+
+                formData = new FormData();
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+                xhr.send(formData);
+            });
+        },
+        setup: function (editor) {
+            editor.on('change', function () {
+                tinymce.triggerSave();
+            });
+        }
+    });
+});
 </script>
 @endpush

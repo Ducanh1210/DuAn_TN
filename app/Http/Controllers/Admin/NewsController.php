@@ -57,7 +57,7 @@ class NewsController extends Controller
         ]);
 
         $data = $request->except('featured_image');
-        $data['slug'] = Str::slug($request->title) . '-' . time();
+        $data['slug'] = Str::slug($request->title) . '-' . uniqid();
         $data['author_id'] = Auth::id();
 
         if ($request->hasFile('featured_image')) {
@@ -97,7 +97,7 @@ class NewsController extends Controller
         $data = $request->except('featured_image');
 
         if ($request->input('title') !== $news->title) {
-            $data['slug'] = Str::slug($request->input('title')) . '-' . time();
+            $data['slug'] = Str::slug($request->input('title')) . '-' . uniqid();
         }
 
         if ($request->hasFile('featured_image')) {
