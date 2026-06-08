@@ -3,17 +3,51 @@
 @section('title', 'Quản lý Địa điểm')
 
 @section('actions')
-    <a href="{{ route('admin.locations.create') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm mới</a>
+    <a href="{{ route('admin.locations.create', request()->query()) }}" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm mới</a>
 @endsection
 
 @section('content')
+<!-- Form Lọc & Tìm kiếm -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form action="{{ route('admin.locations.index') }}" method="GET" class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên địa điểm (nhấn Enter)..." value="{{ request('search') }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <select name="category_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Tất cả danh mục --</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card shadow-sm border-0">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0 align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th width="50" class="text-center">ID</th>
+                        <th width="80" class="text-center">
+                            <a href="{{ request()->fullUrlWithQuery(['sort_dir' => $sortDir === 'desc' ? 'asc' : 'desc', 'page' => null]) }}" class="text-dark text-decoration-none d-inline-flex align-items-center justify-content-center">
+                                ID 
+                                @if($sortDir === 'asc')
+                                    <i class="fas fa-sort-up ms-1 text-muted opacity-50" style="font-size: 0.8em;"></i>
+                                @else
+                                    <i class="fas fa-sort-down ms-1 text-muted opacity-50" style="font-size: 0.8em;"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th width="100">Ảnh</th>
                         <th>Tên Địa điểm</th>
                         <th>Danh mục</th>
                         <th>Tọa độ (Lat, Lng)</th>
@@ -25,6 +59,13 @@
                     @forelse($locations as $item)
                         <tr>
                             <td class="text-center">{{ $item->id }}</td>
+                            <td>
+                                @if($item->thumbnail_url)
+                                    <img src="{{ asset('storage/' . $item->thumbnail_url) }}" class="rounded shadow-sm border" style="width: 65px; height: 40px; object-fit: cover;" alt="{{ $item->name }}">
+                                @else
+                                    <img src="https://placehold.co/400x250/e2e8f0/475569?text=No+Image" class="rounded shadow-sm border" style="width: 65px; height: 40px; object-fit: cover;" alt="No Image">
+                                @endif
+                            </td>
                             <td class="fw-bold">{{ $item->name }}</td>
                             <td>{{ $item->category->name ?? 'N/A' }}</td>
                             <td><small class="text-muted">{{ $item->lat }}, {{ $item->lng }}</small></td>
@@ -38,7 +79,7 @@
                                 @endif
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('admin.locations.edit', $item->id) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                                <a href="{{ route('admin.locations.edit', [$item->id] + request()->query()) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
                                 <form action="{{ route('admin.locations.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa điểm này?');">
                                     @csrf
                                     @method('DELETE')
@@ -48,7 +89,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4">Chưa có địa điểm nào.</td>
+                            <td colspan="7" class="text-center py-4">Chưa có địa điểm nào.</td>
                         </tr>
                     @endforelse
                 </tbody>

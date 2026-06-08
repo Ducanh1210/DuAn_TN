@@ -5,7 +5,7 @@
 @section('content')
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
-        <form action="{{ route('admin.locations.store') }}" method="POST">
+        <form action="{{ route('admin.locations.store', request()->query()) }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             <div class="row">
@@ -59,14 +59,36 @@
                             <option value="hidden" {{ old('status') == 'hidden' ? 'selected' : '' }}>Ẩn</option>
                         </select>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="thumbnail" class="form-label fw-bold">Ảnh đại diện (Thumbnail)</label>
+                        <input type="file" class="form-control @error('thumbnail') is-invalid @enderror" id="thumbnail" name="thumbnail" accept="image/*">
+                        @error('thumbnail') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-end gap-2 mt-4">
-                <a href="{{ route('admin.locations.index') }}" class="btn btn-secondary">Hủy bỏ</a>
+                <a href="{{ route('admin.locations.index', request()->query()) }}" class="btn btn-secondary">Hủy bỏ</a>
                 <button type="submit" class="btn btn-primary">Lưu và Tiếp tục thêm Ảnh</button>
             </div>
         </form>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Tự động tách tọa độ khi dán định dạng "lat, lng" vào ô Lat
+    document.getElementById('lat').addEventListener('input', function() {
+        let val = this.value;
+        if (val.includes(',')) {
+            let parts = val.split(',');
+            if (parts.length >= 2) {
+                this.value = parts[0].trim();
+                document.getElementById('lng').value = parts[1].trim();
+            }
+        }
+    });
+</script>
+@endpush
