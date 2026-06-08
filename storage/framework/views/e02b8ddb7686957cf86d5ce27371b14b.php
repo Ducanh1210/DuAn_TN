@@ -3,7 +3,7 @@
 <?php $__env->startSection('content'); ?>
 <div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
-        <form action="<?php echo e(route('admin.locations.store')); ?>" method="POST">
+        <form action="<?php echo e(route('admin.locations.store', request()->query())); ?>" method="POST">
             <?php echo csrf_field(); ?>
             
             <div class="row">
@@ -117,12 +117,28 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
             </div>
 
             <div class="d-flex justify-content-end gap-2 mt-4">
-                <a href="<?php echo e(route('admin.locations.index')); ?>" class="btn btn-secondary">Hủy bỏ</a>
+                <a href="<?php echo e(route('admin.locations.index', request()->query())); ?>" class="btn btn-secondary">Hủy bỏ</a>
                 <button type="submit" class="btn btn-primary">Lưu và Tiếp tục thêm Ảnh</button>
             </div>
         </form>
     </div>
 </div>
 <?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+    // Tự động tách tọa độ khi dán định dạng "lat, lng" vào ô Lat
+    document.getElementById('lat').addEventListener('input', function() {
+        let val = this.value;
+        if (val.includes(',')) {
+            let parts = val.split(',');
+            if (parts.length >= 2) {
+                this.value = parts[0].trim();
+                document.getElementById('lng').value = parts[1].trim();
+            }
+        }
+    });
+</script>
+<?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('admin.layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH D:\laragon\www\datnv2\DuAn_TN\resources\views/admin/locations/create.blade.php ENDPATH**/ ?>

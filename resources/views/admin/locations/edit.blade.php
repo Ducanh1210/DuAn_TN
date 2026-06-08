@@ -19,7 +19,7 @@
 </ul>
 
 <div class="mb-3 d-flex justify-content-end">
-    <a href="{{ route('admin.locations.360_editor', $location->id) }}" class="btn btn-warning fw-bold text-dark shadow-sm">
+    <a href="{{ route('admin.locations.360_editor', [$location->id] + request()->query()) }}" class="btn btn-warning fw-bold text-dark shadow-sm">
         <i class="fas fa-external-link-alt"></i> Mở Trình chỉnh sửa Tour 360° nâng cao
     </a>
 </div>
@@ -29,7 +29,7 @@
     <div class="tab-pane fade show active" id="info" role="tabpanel">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body">
-                <form action="{{ route('admin.locations.update', $location->id) }}" method="POST">
+                <form action="{{ route('admin.locations.update', [$location->id] + request()->query()) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     
@@ -81,11 +81,23 @@
                                     <option value="hidden" {{ old('status', $location->status) == 'hidden' ? 'selected' : '' }}>Ẩn</option>
                                 </select>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="thumbnail" class="form-label fw-bold">Ảnh đại diện (Thumbnail)</label>
+                                <input type="file" class="form-control @error('thumbnail') is-invalid @enderror" id="thumbnail" name="thumbnail" accept="image/*">
+                                @error('thumbnail') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                @if($location->thumbnail_url)
+                                    <div class="mt-2">
+                                        <small class="text-muted d-block mb-1">Ảnh đại diện hiện tại:</small>
+                                        <img src="{{ asset('storage/' . $location->thumbnail_url) }}" class="img-thumbnail" style="max-height: 120px;" alt="Thumbnail">
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{{ route('admin.locations.index') }}" class="btn btn-secondary">Quay lại</a>
+                        <a href="{{ route('admin.locations.index', request()->query()) }}" class="btn btn-secondary">Quay lại</a>
                         <button type="submit" class="btn btn-primary">Cập nhật Thông tin</button>
                     </div>
                 </form>
@@ -178,6 +190,18 @@
     // CSRF Token Setup
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+    });
+
+    // Tự động tách tọa độ khi dán định dạng "lat, lng" vào ô Lat
+    document.getElementById('lat').addEventListener('input', function() {
+        let val = this.value;
+        if (val.includes(',')) {
+            let parts = val.split(',');
+            if (parts.length >= 2) {
+                this.value = parts[0].trim();
+                document.getElementById('lng').value = parts[1].trim();
+            }
+        }
     });
 
     // Upload Image
