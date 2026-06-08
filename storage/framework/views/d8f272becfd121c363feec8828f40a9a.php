@@ -196,7 +196,7 @@
 
         /* Hiệu ứng hover CSS thuần - Khắc phục lỗi kẹt tooltip */
         .leaflet-marker-icon:has(.custom-map-pin:hover) {
-            z-index: 10000 !important;
+            z-index: 99999999 !important;
         }
         .custom-map-pin:hover svg, 
         .custom-map-pin:hover .pin-icon-img {
@@ -236,6 +236,14 @@
             border-top: 6px solid transparent;
             border-bottom: 6px solid transparent;
             border-right: 6px solid color-mix(in srgb, var(--tip-color) 40%, black);
+        }
+
+        /* Đảm bảo marker đang hover luôn nổi lên trên cùng */
+        .my-custom-marker {
+            transition: z-index 0.2s;
+        }
+        .my-custom-marker:hover {
+            z-index: 99999999 !important;
         }
 
         /* Cluster Coverage Polygon on Hover */
@@ -1455,13 +1463,22 @@
         markers.on('clusterclick', function (a) {
             if (coveragePolygon) { map.removeLayer(coveragePolygon); coveragePolygon = null; }
 
-            // Zoom dần dần: mỗi lần click tăng tối đa 3 level
-            // Dùng vị trí cluster (chỗ anh bấm) thay vì tâm bounds để zoom thẳng vào, không bị lệch
             var clusterLatLng = a.layer.getLatLng();
             var currentZoom = map.getZoom();
             var maxZoom = map.getMaxZoom() || 20;
-            var targetZoom = Math.min(currentZoom + 3, maxZoom);
 
+            // Tính khoảng cách thực tế (mét) giữa 2 góc bounds
+            var bounds = a.layer.getBounds();
+            var boundsDistance = bounds.getNorthEast().distanceTo(bounds.getSouthWest());
+
+            // Nếu đã zoom max, hoặc tất cả marker nằm trong bán kính 50m → spiderfy ngay
+            if (currentZoom >= maxZoom || boundsDistance < 50) {
+                a.layer.spiderfy();
+                return;
+            }
+
+            // Zoom dần dần: mỗi lần click tăng tối đa 3 level
+            var targetZoom = Math.min(currentZoom + 3, maxZoom);
             map.setView(clusterLatLng, targetZoom, { animate: true, duration: 0.4 });
         });
 
@@ -1481,7 +1498,7 @@
                         + '</div>';
 
                     const customIcon = L.divIcon({
-                        className: '',
+                        className: 'my-custom-marker',
                         html: pinHtml,
                         iconSize: [30, 40],
                         iconAnchor: [15, 40],
@@ -1491,6 +1508,20 @@
                 }
 
                 const marker = L.marker([loc.lat, loc.lng], markerOptions);
+
+                // Đẩy z-index DOM trực tiếp khi hover (Lưu lại z-index gốc của Leaflet vốn có trị số lên tới hàng triệu dựa trên Latitude)
+                marker.on('mouseover', function() {
+                    if (this._icon) {
+                        this._originalZIndex = this._icon.style.zIndex;
+                        this._icon.style.zIndex = 99999999;
+                    }
+                });
+                marker.on('mouseout', function() {
+                    if (this._icon) {
+                        this._icon.style.zIndex = this._originalZIndex || '';
+                    }
+                });
+
                 const thumbUrl = loc.thumbnail_url ? loc.thumbnail_url : 'https://placehold.co/400x250/e2e8f0/475569?text=No+Image';
                 const iconColor = loc.category && loc.category.icon_color ? loc.category.icon_color : '#ef4444';
                 

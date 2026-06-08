@@ -14,10 +14,27 @@ use Illuminate\Support\Facades\Auth;
 
 class LocationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $locations = Location::with('category')->latest()->paginate(10);
-        return view('admin.locations.index', compact('locations'));
+        $sortDir = $request->input('sort_dir', 'desc');
+        if (!in_array(strtolower($sortDir), ['asc', 'desc'])) {
+            $sortDir = 'desc';
+        }
+
+        $query = Location::with('category')->orderBy('id', $sortDir);
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $locations = $query->paginate(20)->withQueryString();
+        $categories = Category::where('status', 'active')->get();
+
+        return view('admin.locations.index', compact('locations', 'categories', 'sortDir'));
     }
 
     public function create()
@@ -33,6 +50,7 @@ class LocationController extends Controller
             'category_id' => 'required|exists:categories,id',
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:20480',
         ]);
 
         $data = $request->all();
@@ -40,9 +58,14 @@ class LocationController extends Controller
         $data['created_by'] = Auth::id();
         $data['updated_by'] = Auth::id();
 
+        if ($request->hasFile('thumbnail')) {
+            $path = $this->compressAndSaveImage($request->file('thumbnail'), 'locations/thumbnails');
+            $data['thumbnail_url'] = $path;
+        }
+
         $location = Location::create($data);
 
-        return redirect()->route('admin.locations.edit', $location->id)->with('success', 'Thêm địa điểm thành công! Vui lòng tiếp tục cập nhật hình ảnh và 360.');
+        return redirect()->route('admin.locations.edit', [$location->id] + $request->query())->with('success', 'Thêm địa điểm thành công! Vui lòng tiếp tục cập nhật hình ảnh và 360.');
     }
 
     public function edit(Location $location)
@@ -60,6 +83,7 @@ class LocationController extends Controller
             'category_id' => 'required|exists:categories,id',
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:20480',
         ]);
 
         $data = $request->all();
@@ -67,6 +91,15 @@ class LocationController extends Controller
             $data['slug'] = Str::slug($request->name) . '-' . time();
         }
         $data['updated_by'] = Auth::id();
+
+        if ($request->hasFile('thumbnail')) {
+            // Xóa ảnh đại diện cũ nếu có
+            if ($location->thumbnail_url) {
+                Storage::disk('public')->delete($location->thumbnail_url);
+            }
+            $path = $this->compressAndSaveImage($request->file('thumbnail'), 'locations/thumbnails');
+            $data['thumbnail_url'] = $path;
+        }
 
         $location->update($data);
 
@@ -89,14 +122,14 @@ class LocationController extends Controller
         }
         
         $location->delete();
-        return redirect()->route('admin.locations.index')->with('success', 'Xóa địa điểm thành công!');
+        return back()->with('success', 'Xóa địa điểm thành công!');
     }
 
     // Ajax Image Upload
     public function uploadImage(Request $request, Location $location)
     {
-        $request->validate(['file' => 'required|image|max:5120']);
-        $path = $request->file('file')->store('locations/images', 'public');
+        $request->validate(['file' => 'required|image|max:20480']);
+        $path = $this->compressAndSaveImage($request->file('file'), 'locations/images');
 
         $image = $location->images()->create([
             'image_url' => $path,
@@ -213,5 +246,82 @@ class LocationController extends Controller
         $location->update(['audio_url' => null]);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Nén ảnh bằng thư viện GD và lưu dưới dạng WebP
+     */
+    private function compressAndSaveImage($file, $folder, $maxWidth = 1200, $quality = 75)
+    {
+        $imageInfo = @getimagesize($file->getRealPath());
+        if (!$imageInfo) {
+            return $file->store($folder, 'public');
+        }
+
+        $width = $imageInfo[0];
+        $height = $imageInfo[1];
+        $mime = $imageInfo['mime'];
+
+        switch ($mime) {
+            case 'image/jpeg':
+            case 'image/jpg':
+                $sourceImage = @imagecreatefromjpeg($file->getRealPath());
+                break;
+            case 'image/png':
+                $sourceImage = @imagecreatefrompng($file->getRealPath());
+                break;
+            case 'image/webp':
+                $sourceImage = @imagecreatefromwebp($file->getRealPath());
+                break;
+            case 'image/gif':
+                $sourceImage = @imagecreatefromgif($file->getRealPath());
+                break;
+            default:
+                $sourceImage = null;
+        }
+
+        if (!$sourceImage) {
+            return $file->store($folder, 'public');
+        }
+
+        // Tính toán kích thước mới duy trì tỉ lệ khung hình
+        if ($width > $maxWidth) {
+            $newWidth = $maxWidth;
+            $newHeight = (int)(($height / $width) * $newWidth);
+        } else {
+            $newWidth = $width;
+            $newHeight = $height;
+        }
+
+        $targetImage = imagecreatetruecolor($newWidth, $newHeight);
+
+        // Giữ độ trong suốt cho ảnh PNG và WebP
+        if ($mime == 'image/png' || $mime == 'image/webp') {
+            imagealphablending($targetImage, false);
+            imagesavealpha($targetImage, true);
+            $transparent = imagecolorallocatealpha($targetImage, 255, 255, 255, 127);
+            imagefilledrectangle($targetImage, 0, 0, $newWidth, $newHeight, $transparent);
+        }
+
+        imagecopyresampled($targetImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        // Đặt tên file ngẫu nhiên đuôi .webp
+        $filename = Str::random(40) . '.webp';
+        $relativeStoragePath = $folder . '/' . $filename;
+        $absolutePath = storage_path('app/public/' . $relativeStoragePath);
+
+        // Tạo thư mục nếu chưa có
+        $dir = dirname($absolutePath);
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        // Xuất ảnh nén WebP
+        imagewebp($targetImage, $absolutePath, $quality);
+
+        imagedestroy($sourceImage);
+        imagedestroy($targetImage);
+
+        return $relativeStoragePath;
     }
 }

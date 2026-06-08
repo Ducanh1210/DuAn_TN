@@ -17,7 +17,7 @@
 </ul>
 
 <div class="mb-3 d-flex justify-content-end">
-    <a href="<?php echo e(route('admin.locations.360_editor', $location->id)); ?>" class="btn btn-warning fw-bold text-dark shadow-sm">
+    <a href="<?php echo e(route('admin.locations.360_editor', [$location->id] + request()->query())); ?>" class="btn btn-warning fw-bold text-dark shadow-sm">
         <i class="fas fa-external-link-alt"></i> Mở Trình chỉnh sửa Tour 360° nâng cao
     </a>
 </div>
@@ -27,7 +27,7 @@
     <div class="tab-pane fade show active" id="info" role="tabpanel">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body">
-                <form action="<?php echo e(route('admin.locations.update', $location->id)); ?>" method="POST">
+                <form action="<?php echo e(route('admin.locations.update', [$location->id] + request()->query())); ?>" method="POST" enctype="multipart/form-data">
                     <?php echo csrf_field(); ?>
                     <?php echo method_field('PUT'); ?>
                     
@@ -121,11 +121,37 @@ unset($__errorArgs, $__bag); ?>" id="lng" name="lng" value="<?php echo e(old('ln
                                     <option value="hidden" <?php echo e(old('status', $location->status) == 'hidden' ? 'selected' : ''); ?>>Ẩn</option>
                                 </select>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="thumbnail" class="form-label fw-bold">Ảnh đại diện (Thumbnail)</label>
+                                <input type="file" class="form-control <?php $__errorArgs = ['thumbnail'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" id="thumbnail" name="thumbnail" accept="image/*">
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['thumbnail'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <div class="invalid-feedback"><?php echo e($message); ?></div> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($location->thumbnail_url): ?>
+                                    <div class="mt-2">
+                                        <small class="text-muted d-block mb-1">Ảnh đại diện hiện tại:</small>
+                                        <img src="<?php echo e(asset('storage/' . $location->thumbnail_url)); ?>" class="img-thumbnail" style="max-height: 120px;" alt="Thumbnail">
+                                    </div>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            </div>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="<?php echo e(route('admin.locations.index')); ?>" class="btn btn-secondary">Quay lại</a>
+                        <a href="<?php echo e(route('admin.locations.index', request()->query())); ?>" class="btn btn-secondary">Quay lại</a>
                         <button type="submit" class="btn btn-primary">Cập nhật Thông tin</button>
                     </div>
                 </form>
@@ -219,6 +245,18 @@ unset($__errorArgs, $__bag); ?>" id="lng" name="lng" value="<?php echo e(old('ln
     // CSRF Token Setup
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' }
+    });
+
+    // Tự động tách tọa độ khi dán định dạng "lat, lng" vào ô Lat
+    document.getElementById('lat').addEventListener('input', function() {
+        let val = this.value;
+        if (val.includes(',')) {
+            let parts = val.split(',');
+            if (parts.length >= 2) {
+                this.value = parts[0].trim();
+                document.getElementById('lng').value = parts[1].trim();
+            }
+        }
     });
 
     // Upload Image
