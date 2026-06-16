@@ -644,12 +644,18 @@
         .bottom-drawer-wrapper {
             position: absolute;
             bottom: 0;
-            left: 0;
+            left: 70px; /* Offset for collapsed sidebar */
+            right: 0;
             z-index: 1000;
-            width: 100%;
+            width: auto; /* Changed from 100% to auto to stretch between left and right */
             display: flex;
             flex-direction: column;
             pointer-events: none;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.sidebar-expanded .bottom-drawer-wrapper {
+            left: 260px; /* Offset for expanded sidebar */
         }
 
         .drawer-toggle-btn {
@@ -1107,9 +1113,387 @@
         .toast-container {
             top: 80px !important;
         }
+
+        /* ========================================= */
+        /* USER SIDEBAR MENU (Admin Style for Map)   */
+        /* ========================================= */
+
+        .user-sidebar-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 2000;
+            pointer-events: none;
+        }
+
+        .user-sidebar {
+            position: relative;
+            width: 260px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            /* overflow: hidden removed to allow tooltips to show */
+            border-right: none; /* Removed to seamlessly merge with toggle tab */
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            pointer-events: auto;
+        }
+
+        /* Collapsed State */
+        .user-sidebar.collapsed {
+            width: 70px;
+        }
+
+        .user-sidebar .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 15px; /* 15px padding + 40px avatar = 55px. Avatar centers nicely in 70px */
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            min-height: 80px;
+            box-sizing: border-box;
+            cursor: pointer;
+            white-space: nowrap; /* Prevent wrapping during transition */
+        }
+
+        .user-sidebar .sidebar-header:hover {
+            background: rgba(0,0,0,0.02);
+        }
+
+        .user-sidebar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: gap 0.3s ease;
+        }
+
+        .user-sidebar.collapsed .user-info {
+            gap: 0;
+        }
+
+        .user-sidebar .user-avatar {
+            box-sizing: border-box;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid var(--primary);
+            padding: 2px;
+            background: white;
+            transition: transform 0.2s;
+        }
+        
+        .user-sidebar .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 114, 255, 0.3);
+        }
+
+        .user-sidebar .user-details {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-width: 200px;
+            opacity: 1;
+            visibility: visible;
+            transition: max-width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .user-sidebar .user-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .user-sidebar .user-role {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+        
+        /* Smooth hiding of text */
+        .user-sidebar.collapsed .user-details {
+            max-width: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-width 0.2s ease, opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .user-sidebar .sidebar-menu {
+            list-style: none;
+            padding: 15px 0;
+            margin: 0;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .user-sidebar .sidebar-menu::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .user-sidebar.collapsed .sidebar-menu::-webkit-scrollbar {
+            width: 0px;
+            display: none;
+        }
+        
+        .user-sidebar.collapsed .sidebar-menu {
+            overflow-y: hidden;
+            overflow-x: hidden;
+        }
+
+        .user-sidebar .sidebar-menu::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        .user-sidebar .sidebar-menu li {
+            margin-bottom: 5px;
+            padding: 0 15px; /* Match header left padding */
+        }
+
+        .user-sidebar .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            color: #4b5563;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+            white-space: nowrap;
+            border-radius: 8px;
+            position: relative;
+            width: 100%;
+        }
+
+        .user-sidebar .menu-item:hover, 
+        .user-sidebar .menu-item.active {
+            background: rgba(0, 114, 255, 0.08);
+            color: var(--primary);
+        }
+
+        .user-sidebar .menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            width: 4px;
+            background: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .user-sidebar .menu-icon {
+            width: 40px; /* Match avatar width */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-sidebar .menu-icon .material-symbols-rounded {
+            font-size: 22px;
+        }
+
+        .user-sidebar .menu-text {
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px; /* Match gap of header */
+            overflow: hidden;
+            max-width: 200px;
+            opacity: 1;
+            visibility: visible;
+            transition: max-width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, margin 0.3s ease;
+        }
+
+        .user-sidebar.collapsed .menu-text {
+            max-width: 0;
+            margin-left: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-width 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, margin 0.2s ease;
+        }
+
+        /* Tooltip for collapsed state */
+        .user-sidebar .menu-item .tooltip {
+            position: absolute;
+            left: 55px; /* Offset nicely from the icon */
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1f2937;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .user-sidebar .menu-item .tooltip::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 5px 5px 5px 0;
+            border-style: solid;
+            border-color: transparent #1f2937 transparent transparent;
+        }
+
+        .user-sidebar.collapsed .menu-item:hover .tooltip {
+            opacity: 1;
+            left: 55px; /* Nice slight slide effect */
+        }
+
+        /* Edge Toggle Button (Seamless Tab) */
+        .sidebar-edge-toggle {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 260px; /* default expanded width */
+            margin-left: -1px; /* overlap the sidebar border */
+            width: 16px; /* Flatter width */
+            height: 52px; /* Adjusted height */
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-left: none; /* seamlessly merge with sidebar */
+            border-radius: 0 8px 8px 0; /* flat left, less rounded right */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2001; /* Above the sidebar */
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.05); /* Softer shadow */
+            transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.2s, color 0.2s, width 0.2s;
+            pointer-events: auto;
+            color: #666;
+            padding: 0;
+            outline: none;
+        }
+
+        .sidebar-edge-toggle:hover {
+            color: var(--primary);
+        }
+
+        body.sidebar-collapsed .sidebar-edge-toggle {
+            left: 70px;
+        }
+
+        .sidebar-edge-toggle .icon-arrow {
+            font-size: 18px; /* Scaled down slightly */
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform: rotate(180deg); /* Left pointing when expanded */
+        }
+
+        body.sidebar-collapsed .sidebar-edge-toggle .icon-arrow {
+            transform: rotate(0deg); /* Right pointing when collapsed */
+        }
+
+        /* Adjust top search panel when sidebar is expanded */
+        .top-search-panel {
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            left: 94px; /* default with collapsed sidebar: 70px + 24px */
+        }
+        
+        body.sidebar-expanded .top-search-panel {
+            left: 284px; /* 260px + 24px */
+        }
     </style>
 </head>
-<body>
+<body class="sidebar-collapsed">
+
+    <!-- User Sidebar Menu -->
+    <div class="user-sidebar-wrapper" id="userSidebarWrapper">
+        <div class="user-sidebar collapsed" id="userSidebar">
+            <div class="sidebar-header">
+                <?php if(auth()->guard()->check()): ?>
+                <div class="user-info">
+                    <img src="<?php echo e(Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->display_name ?? Auth::user()->username).'&background=0072FF&color=fff'); ?>" alt="User Avatar" class="user-avatar">
+                    <div class="user-details">
+                        <span class="user-name"><?php echo e(Auth::user()->display_name ?? Auth::user()->username); ?></span>
+                        <span class="user-role"><?php echo e(Auth::user()->role === 'admin' ? 'Quản trị viên' : (Auth::user()->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên')); ?></span>
+                    </div>
+                </div>
+                <?php else: ?>
+                <div class="user-info">
+                    <div class="user-avatar" style="display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-color: #d1d5db;">
+                        <span class="material-symbols-rounded" style="color: #9ca3af; font-size: 24px; margin: 0;">person</span>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name">Khách truy cập</span>
+                        <span class="user-role">Chưa đăng nhập</span>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+            <ul class="sidebar-menu">
+                <?php if(auth()->guard()->check()): ?>
+                <li>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-rounded">favorite</span></span>
+                        <span class="menu-text">Địa điểm yêu thích</span>
+                        <span class="tooltip">Địa điểm yêu thích</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-rounded">history</span></span>
+                        <span class="menu-text">Lịch sử xem</span>
+                        <span class="tooltip">Lịch sử xem</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-rounded">settings</span></span>
+                        <span class="menu-text">Cài đặt</span>
+                        <span class="tooltip">Cài đặt</span>
+                    </a>
+                </li>
+                <li style="margin-top: auto; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px;">
+                    <form action="<?php echo e(route('client.logout')); ?>" method="POST" style="display: none;" id="logout-form">
+                        <?php echo csrf_field(); ?>
+                    </form>
+                    <a href="#" class="menu-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <span class="menu-icon"><span class="material-symbols-rounded" style="color: #ef4444;">logout</span></span>
+                        <span class="menu-text" style="color: #ef4444;">Đăng xuất</span>
+                        <span class="tooltip">Đăng xuất</span>
+                    </a>
+                </li>
+                <?php else: ?>
+                <li>
+                    <a href="<?php echo e(route('client.login')); ?>" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-rounded" style="color: var(--primary);">login</span></span>
+                        <span class="menu-text" style="color: var(--primary); font-weight: 700;">Đăng nhập</span>
+                        <span class="tooltip">Đăng nhập</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo e(route('client.register')); ?>" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-rounded">person_add</span></span>
+                        <span class="menu-text">Đăng ký tài khoản</span>
+                        <span class="tooltip">Đăng ký tài khoản</span>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </div>
+        <!-- Edge Toggle Button -->
+        <button class="sidebar-edge-toggle" id="sidebarToggle" title="Thu gọn/Mở rộng">
+            <span class="material-symbols-rounded icon-arrow">chevron_right</span>
+        </button>
+    </div>
 
     <!-- Map Container -->
     <div id="map"></div>
@@ -1179,11 +1563,11 @@
             </div>
         </div>
         
-        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($newsList) && $newsList->count() > 0): ?>
+        <?php if(isset($newsList) && $newsList->count() > 0): ?>
         <!-- Dropdown Banner tự động chạy -->
         <div class="news-dropdown-banner">
             <div class="banner-track">
-                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $newsList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $news): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $__currentLoopData = $newsList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $news): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <a href="#" class="banner-item">
                     <img src="<?php echo e($news->featured_image ? asset('storage/' . $news->featured_image) : 'https://placehold.co/260x150/1e293b/f8fafc?text=NEWS'); ?>" alt="<?php echo e($news->title); ?>">
                     <div class="banner-overlay">
@@ -1198,7 +1582,7 @@
                         </div>
                     </div>
                 </a>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 
                 <!-- Clone of first item for seamless infinite loop -->
                 <?php $firstNews = $newsList->first(); ?>
@@ -1218,7 +1602,7 @@
                 </a>
             </div>
         </div>
-        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        <?php endif; ?>
     </div>
 
     <!-- Bottom Featured Drawer (Full Width) -->
@@ -1230,7 +1614,7 @@
         </div>
         <div class="drawer-content">
             <div class="featured-loc-scroll">
-                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $locations->sortByDesc('view_count')->take(10); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $loc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $__currentLoopData = $locations->sortByDesc('view_count')->take(10); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $loc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <a href="#" class="featured-loc-card" onclick="flyToLocation(<?php echo e($loc->id); ?>); return false;">
                     <img src="<?php echo e($loc->thumbnail_url ?: 'https://placehold.co/300x200/1e3a8a/ffffff?text=No+Image'); ?>" alt="<?php echo e($loc->name); ?>" class="featured-loc-img">
                     <div class="featured-loc-info">
@@ -1238,7 +1622,7 @@
                         <div class="featured-loc-title"><?php echo e($loc->name); ?></div>
                     </div>
                 </a>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </div>
     </div>
@@ -2093,6 +2477,31 @@
                 }
             });
         });
+        // Sidebar Toggle Logic
+        const sidebar = document.getElementById('userSidebar');
+        const sidebarToggleBtn = document.getElementById('sidebarToggle');
+        
+        if (sidebar && sidebarToggleBtn) {
+            sidebarToggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                
+                if(sidebar.classList.contains('collapsed')) {
+                    document.body.classList.remove('sidebar-expanded');
+                    document.body.classList.add('sidebar-collapsed');
+                } else {
+                    document.body.classList.add('sidebar-expanded');
+                    document.body.classList.remove('sidebar-collapsed');
+                }
+            });
+            
+            // Tự động thu gọn trên màn hình nhỏ
+            if(window.innerWidth <= 1024) {
+                sidebar.classList.add('collapsed');
+                document.body.classList.remove('sidebar-expanded');
+                document.body.classList.add('sidebar-collapsed');
+            }
+        }
+
     </script>
 </body>
 </html>
