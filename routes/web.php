@@ -81,6 +81,19 @@ Route::get('/tin-tuc/{slug}', [ClientNewsController::class, 'show'])->name('clie
 Route::get('/su-kien', [ClientEventController::class, 'index'])->name('client.events.index');
 Route::get('/su-kien/{slug}', [ClientEventController::class, 'show'])->name('client.events.show');
 
+// Client Auth Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [\App\Http\Controllers\Client\AuthController::class, 'showLoginForm'])->name('client.login');
+    Route::post('/login', [\App\Http\Controllers\Client\AuthController::class, 'login']);
+    Route::get('/register', [\App\Http\Controllers\Client\AuthController::class, 'showRegisterForm'])->name('client.register');
+    Route::post('/register', [\App\Http\Controllers\Client\AuthController::class, 'register']);
+    
+    // Google OAuth
+    Route::get('/auth/google', [\App\Http\Controllers\Client\AuthController::class, 'redirectToGoogle'])->name('client.login.google');
+    Route::get('/auth/google/callback', [\App\Http\Controllers\Client\AuthController::class, 'handleGoogleCallback']);
+});
+Route::post('/logout', [\App\Http\Controllers\Client\AuthController::class, 'logout'])->name('client.logout');
+
 // Admin Auth Routes
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login.form');
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
