@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\NewsController as ClientNewsController;
 use App\Http\Controllers\Client\EventController as ClientEventController;
 
@@ -55,6 +56,7 @@ Route::get('/', function () {
 
     // Lấy 3 tin tức mới nhất cho banner
     $newsList = \App\Models\News::where('status', 'published')
+                                ->where('type', '!=', 'event')
                                 ->orderBy('published_at', 'desc')
                                 ->take(3)
                                 ->get();
@@ -81,23 +83,18 @@ Route::get('/tin-tuc/{slug}', [ClientNewsController::class, 'show'])->name('clie
 Route::get('/su-kien', [ClientEventController::class, 'index'])->name('client.events.index');
 Route::get('/su-kien/{slug}', [ClientEventController::class, 'show'])->name('client.events.show');
 
-// Client Auth Routes
+// Auth Routes
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [\App\Http\Controllers\Client\AuthController::class, 'showLoginForm'])->name('client.login');
+    Route::get('/login', [\App\Http\Controllers\Client\AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [\App\Http\Controllers\Client\AuthController::class, 'login']);
-    Route::get('/register', [\App\Http\Controllers\Client\AuthController::class, 'showRegisterForm'])->name('client.register');
+    Route::get('/register', [\App\Http\Controllers\Client\AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [\App\Http\Controllers\Client\AuthController::class, 'register']);
     
     // Google OAuth
     Route::get('/auth/google', [\App\Http\Controllers\Client\AuthController::class, 'redirectToGoogle'])->name('client.login.google');
     Route::get('/auth/google/callback', [\App\Http\Controllers\Client\AuthController::class, 'handleGoogleCallback']);
 });
-Route::post('/logout', [\App\Http\Controllers\Client\AuthController::class, 'logout'])->name('client.logout');
-
-// Admin Auth Routes
-Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login.form');
-Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
-Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+Route::post('/logout', [\App\Http\Controllers\Client\AuthController::class, 'logout'])->name('logout');
 
 // Admin Protected Routes
 Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->group(function () {
@@ -142,5 +139,9 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Panorama Audio
     Route::post('locations/{location}/upload-audio', [\App\Http\Controllers\Admin\LocationController::class, 'uploadAudio'])->name('locations.upload_audio');
     Route::delete('locations/{location}/delete-audio', [\App\Http\Controllers\Admin\LocationController::class, 'deleteAudio'])->name('locations.delete_audio');
+
+    // Users Management
+    Route::resource('users', UserController::class);
+    Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle_status');
 });
 
