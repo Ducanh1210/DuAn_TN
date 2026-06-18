@@ -37,4 +37,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
+    'vieneu_tts' => [
+        'url' => env('VIENEU_TTS_URL', 'http://127.0.0.1:8001'),
+    ],
+
 ];
