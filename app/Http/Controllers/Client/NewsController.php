@@ -11,17 +11,19 @@ class NewsController extends Controller
     public function index()
     {
         $newsList = News::where('status', 'published')
+                    ->where('type', '!=', 'event')
                     ->orderBy('published_at', 'desc')
                     ->paginate(10);
                     
         $popularNews = News::where('status', 'published')
+                    ->where('type', '!=', 'event')
                     ->orderBy('view_count', 'desc')
                     ->take(5)
                     ->get();
                     
-        $upcomingEvents = \App\Models\Event::where('status', '!=', 'hidden')
-                    ->where('start_time', '>', now())
-                    ->orderBy('start_time', 'asc')
+        $upcomingEvents = News::where('status', 'published')
+                    ->where('type', 'event')
+                    ->orderBy('published_at', 'desc')
                     ->take(4)
                     ->get();
                     
@@ -32,9 +34,11 @@ class NewsController extends Controller
     {
         $news = News::where('slug', $slug)
                     ->where('status', 'published')
+                    ->where('type', '!=', 'event')
                     ->firstOrFail();
                     
         $relatedNews = News::where('status', 'published')
+                            ->where('type', '!=', 'event')
                             ->where('id', '!=', $news->id)
                             ->orderBy('published_at', 'desc')
                             ->take(3)

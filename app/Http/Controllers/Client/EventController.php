@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Event;
+use App\Models\News;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -11,14 +11,9 @@ class EventController extends Controller
 {
     public function index()
     {
-        $now = Carbon::now();
-        // Sắp xếp ưu tiên: đang diễn ra, sắp diễn ra, đã kết thúc
-        $events = Event::where('status', '!=', 'hidden')
-                    ->orderByRaw("CASE 
-                        WHEN start_time <= ? AND end_time >= ? THEN 1 
-                        WHEN start_time > ? THEN 2 
-                        ELSE 3 END", [$now, $now, $now])
-                    ->orderBy('start_time', 'asc')
+        $events = News::where('type', 'event')
+                    ->where('status', 'published')
+                    ->orderBy('published_at', 'desc')
                     ->paginate(9);
                     
         return view('client.events.index', compact('events'));
@@ -26,13 +21,15 @@ class EventController extends Controller
 
     public function show($slug)
     {
-        $event = Event::where('slug', $slug)
-                    ->where('status', '!=', 'hidden')
+        $event = News::where('slug', $slug)
+                    ->where('type', 'event')
+                    ->where('status', 'published')
                     ->firstOrFail();
                     
-        $relatedEvents = Event::where('status', '!=', 'hidden')
+        $relatedEvents = News::where('type', 'event')
+                            ->where('status', 'published')
                             ->where('id', '!=', $event->id)
-                            ->orderBy('start_time', 'desc')
+                            ->orderBy('published_at', 'desc')
                             ->take(3)
                             ->get();
                             

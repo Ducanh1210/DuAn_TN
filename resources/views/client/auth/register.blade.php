@@ -227,7 +227,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('client.register') }}">
+        <form method="POST" action="{{ route('register') }}">
             @csrf
             
             <div class="form-group">
@@ -268,7 +268,7 @@
         </a>
 
         <div class="auth-links">
-            Đã có tài khoản? <a href="{{ route('client.login') }}">Đăng nhập</a>
+            Đã có tài khoản? <a href="{{ route('login') }}">Đăng nhập</a>
         </div>
         <div class="auth-links" style="margin-top: 10px;">
             <a href="{{ route('home') }}" style="color: var(--text-muted); font-weight: normal;"><i class="fa-solid fa-arrow-left"></i> Quay lại bản đồ</a>

@@ -37,10 +37,10 @@
                 <i class="fas fa-map-marker-alt nav-icon"></i> Quản lý Địa điểm
             </a>
             <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
-                <i class="fas fa-newspaper nav-icon"></i> Quản lý Tin tức
+                <i class="fas fa-newspaper nav-icon"></i> Quản lý Tin tức & Sự kiện
             </a>
-            <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.*') ? 'active' : '' }}">
-                <i class="fas fa-calendar-alt nav-icon"></i> Quản lý Sự kiện
+            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <i class="fas fa-users nav-icon"></i> Quản lý Người dùng
             </a>
         </nav>
     </div>
@@ -53,7 +53,7 @@
                 <button class="btn btn-outline-secondary d-md-none me-2" id="toggleSidebar"><i class="fas fa-bars"></i></button>
                 <div class="ms-auto d-flex align-items-center">
                     <span class="me-3 fw-bold">{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
-                    <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
+                    <form action="{{ route('logout') }}" method="POST" class="m-0">
                         @csrf
                         <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
                     </form>

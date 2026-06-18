@@ -45,6 +45,7 @@
     }
     .badge-type-news { background: linear-gradient(135deg, #3b82f6, #2563eb); }
     .badge-type-guide { background: linear-gradient(135deg, #10b981, #059669); }
+    .badge-type-event { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
     .badge-type-announcement { background: linear-gradient(135deg, #f59e0b, #d97706); }
     .badge-status-published { background: linear-gradient(135deg, #10b981, #059669); }
     .badge-status-draft { background: linear-gradient(135deg, #94a3b8, #64748b); }
@@ -164,6 +165,7 @@
             <select name="type" class="form-select">
                 <option value="">Tất cả</option>
                 <option value="news" {{ request('type') == 'news' ? 'selected' : '' }}>Tin tức</option>
+                <option value="event" {{ request('type') == 'event' ? 'selected' : '' }}>Sự kiện</option>
                 <option value="guide" {{ request('type') == 'guide' ? 'selected' : '' }}>Cẩm nang</option>
                 <option value="announcement" {{ request('type') == 'announcement' ? 'selected' : '' }}>Thông báo</option>
             </select>

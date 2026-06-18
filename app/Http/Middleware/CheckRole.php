@@ -17,7 +17,7 @@ class CheckRole
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!Auth::check()) {
-            return redirect()->route('admin.login.form');
+            return redirect()->route('login');
         }
 
         $user = Auth::user();
@@ -25,7 +25,7 @@ class CheckRole
         // Check if user is active
         if ($user->status !== 'active') {
             Auth::logout();
-            return redirect()->route('admin.login.form')->withErrors(['status' => 'Tài khoản của bạn đã bị khóa hoặc không hoạt động.']);
+            return redirect()->route('login')->withErrors(['status' => 'Tài khoản của bạn đã bị khóa hoặc không hoạt động.']);
         }
 
         if (empty($roles)) {

@@ -49,6 +49,7 @@ class News extends Model
     {
         return match ($this->type) {
             'news' => 'Tin tức',
+            'event' => 'Sự kiện',
             'guide' => 'Cẩm nang',
             'announcement' => 'Thông báo',
             default => $this->type,

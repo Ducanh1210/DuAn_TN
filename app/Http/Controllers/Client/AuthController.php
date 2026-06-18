@@ -44,6 +44,10 @@ class AuthController extends Controller
                 ])->onlyInput('username');
             }
 
+            if (in_array($user->role, ['admin', 'moderator'])) {
+                return redirect()->intended(route('admin.dashboard'))->with('success', 'Đăng nhập thành công!');
+            }
+
             return redirect()->intended(route('home'))->with('success', 'Đăng nhập thành công!');
         }
 
@@ -140,12 +144,15 @@ class AuthController extends Controller
                 }
                 
                 if ($user->status !== 'active') {
-                    return redirect()->route('client.login')->withErrors([
+                    return redirect()->route('login')->withErrors([
                         'status' => 'Tài khoản của bạn đã bị khóa hoặc không hoạt động.',
                     ]);
                 }
 
                 Auth::login($user);
+                if (in_array($user->role, ['admin', 'moderator'])) {
+                    return redirect()->intended(route('admin.dashboard'))->with('success', 'Đăng nhập thành công!');
+                }
                 return redirect()->intended(route('home'))->with('success', 'Đăng nhập thành công!');
             }
 
@@ -169,7 +176,7 @@ class AuthController extends Controller
             return redirect()->route('home')->with('success', 'Đăng ký tài khoản thành công qua Google!');
 
         } catch (\Exception $e) {
-            return redirect()->route('client.login')->withErrors([
+            return redirect()->route('login')->withErrors([
                 'error' => 'Đăng nhập bằng Google thất bại. Vui lòng thử lại sau.',
             ]);
         }

@@ -84,6 +84,7 @@
                 <label for="type" class="form-label">Loại bài viết</label>
                 <select class="form-select" id="type" name="type">
                     <option value="news" {{ old('type',$news->type)=='news'?'selected':'' }}>📰 Tin tức</option>
+                    <option value="event" {{ old('type',$news->type)=='event'?'selected':'' }}>📅 Sự kiện</option>
                     <option value="guide" {{ old('type',$news->type)=='guide'?'selected':'' }}>📖 Cẩm nang</option>
                     <option value="announcement" {{ old('type',$news->type)=='announcement'?'selected':'' }}>📢 Thông báo</option>
                 </select>
