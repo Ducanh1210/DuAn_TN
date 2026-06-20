@@ -236,6 +236,7 @@ Requires-Dist: huggingface_hub
 Requires-Dist: PyYAML
 Requires-Dist: gradio>=5.49.1
 Requires-Dist: perth>=0.2.0
+Requires-Dist: trafilatura>=2.0.0
 Provides-Extra: gpu
 Requires-Dist: torch; extra == "gpu"
 Requires-Dist: torchaudio; extra == "gpu"
