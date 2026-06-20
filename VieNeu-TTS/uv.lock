@@ -5479,6 +5479,7 @@ dependencies = [
     { name = "soundfile" },
     { name = "soxr" },
     { name = "tokenizers" },
+    { name = "trafilatura" },
 ]
 
 [package.optional-dependencies]
@@ -5558,6 +5559,7 @@ requires-dist = [
     { name = "torch", marker = "sys_platform != 'darwin' and extra == 'gpu'", index = "https://download.pytorch.org/whl/cu128" },
     { name = "torchaudio", marker = "sys_platform == 'darwin' and extra == 'gpu'", index = "https://pypi.org/simple" },
     { name = "torchaudio", marker = "sys_platform != 'darwin' and extra == 'gpu'", index = "https://download.pytorch.org/whl/cu128" },
+    { name = "trafilatura", specifier = ">=2.0.0" },
     { name = "transformers", marker = "extra == 'gpu'" },
     { name = "triton", marker = "sys_platform == 'linux' and extra == 'gpu'" },
     { name = "triton-windows", marker = "sys_platform == 'win32' and extra == 'gpu'" },
