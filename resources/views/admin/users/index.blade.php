@@ -29,7 +29,7 @@
                             <td>{{ $user->id }}</td>
                             <td>
                                 @if($user->avatar_url)
-                                    <img src="{{ str_starts_with($user->avatar_url, 'http') ? $user->avatar_url : asset($user->avatar_url) }}" alt="Avatar" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <img src="{{ str_starts_with($user->avatar_url, 'http') ? $user->avatar_url : asset('storage/' . $user->avatar_url) }}" alt="Avatar" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
                                 @else
                                     <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                                         {{ strtoupper(substr($user->display_name ?? $user->username, 0, 1)) }}

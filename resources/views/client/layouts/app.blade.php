@@ -135,6 +135,27 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Bản đồ</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('client.news.*') ? 'active' : '' }}" href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('client.events.*') ? 'active' : '' }}" href="{{ route('client.events.index') }}">Sự kiện nổi bật</a></li>
+                    
+                    @auth
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: var(--primary); background: rgba(0, 102, 255, 0.08);">
+                                <img src="{{ Auth::user()->avatar_url ? (str_starts_with(Auth::user()->avatar_url, 'http') ? Auth::user()->avatar_url : asset('storage/' . Auth::user()->avatar_url)) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->display_name ?? Auth::user()->username).'&background=0072FF&color=fff' }}" alt="User Avatar" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+                                <span>{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="navbarUserDropdown">
+                                <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.favorites.index') }}"><i class="fa-solid fa-heart me-2 text-danger"></i>Địa điểm yêu thích</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item py-2 fw-semibold text-danger"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @else
+                        <li class="nav-item ms-lg-3"><a class="nav-link btn text-white px-4 py-2" style="background: var(--primary); border-radius: 8px; font-weight: 600;" href="{{ route('login') }}">Đăng nhập</a></li>
+                    @endauth
                 </ul>
             </div>
         </div>
