@@ -113,6 +113,9 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Categories
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     
+    // Locations TTS
+    Route::get('locations/tts-voices', [\App\Http\Controllers\Admin\LocationController::class, 'getTtsVoices'])->name('locations.tts_voices');
+
     // Locations
     Route::resource('locations', \App\Http\Controllers\Admin\LocationController::class);
     
@@ -147,7 +150,6 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Panorama Audio
     Route::post('locations/{location}/upload-audio', [\App\Http\Controllers\Admin\LocationController::class, 'uploadAudio'])->name('locations.upload_audio');
     Route::delete('locations/{location}/delete-audio', [\App\Http\Controllers\Admin\LocationController::class, 'deleteAudio'])->name('locations.delete_audio');
-
     // Users Management
     Route::resource('users', UserController::class);
     Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle_status');

@@ -220,7 +220,7 @@
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="<?php echo e(route('client.login')); ?>">
+        <form method="POST" action="<?php echo e(route('login')); ?>">
             <?php echo csrf_field(); ?>
             <div class="form-group">
                 <label for="username">Tên đăng nhập</label>
@@ -245,7 +245,7 @@
         </a>
 
         <div class="auth-links">
-            Chưa có tài khoản? <a href="<?php echo e(route('client.register')); ?>">Đăng ký ngay</a>
+            Chưa có tài khoản? <a href="<?php echo e(route('register')); ?>">Đăng ký ngay</a>
         </div>
         <div class="auth-links" style="margin-top: 10px;">
             <a href="<?php echo e(route('home')); ?>" style="color: var(--text-muted); font-weight: normal;"><i class="fa-solid fa-arrow-left"></i> Quay lại bản đồ</a>

@@ -1,0 +1,30 @@
+sea-g2p>=0.7.6
+onnxruntime>=1.20.0
+numpy
+soundfile
+soxr
+tokenizers>=0.20
+huggingface_hub
+PyYAML
+gradio>=5.49.1
+perth>=0.2.0
+
+[gpu]
+torch
+torchaudio
+transformers
+librosa>=0.11.0
+neucodec>=0.0.4
+llama-cpp-python==0.3.16
+
+[gpu:sys_platform != "darwin"]
+lmdeploy
+
+[gpu:sys_platform == "darwin"]
+accelerate
+
+[gpu:sys_platform == "linux"]
+triton
+
+[gpu:sys_platform == "win32"]
+triton-windows

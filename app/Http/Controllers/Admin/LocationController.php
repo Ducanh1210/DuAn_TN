@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class LocationController extends Controller
 {
@@ -229,7 +230,16 @@ class LocationController extends Controller
         }
 
         $path = $request->file('audio')->store('locations/audio', 'public');
-        $location->update(['audio_url' => $path]);
+        
+        $attributes = $location->attributes ?? [];
+        if (isset($attributes['tts_text'])) {
+            unset($attributes['tts_text']);
+        }
+        
+        $location->update([
+            'audio_url' => $path,
+            'attributes' => $attributes
+        ]);
 
         return response()->json([
             'success' => true,
@@ -243,9 +253,99 @@ class LocationController extends Controller
             Storage::disk('public')->delete($location->audio_url);
         }
 
-        $location->update(['audio_url' => null]);
+        $attributes = $location->attributes ?? [];
+        if (isset($attributes['tts_text'])) {
+            unset($attributes['tts_text']);
+        }
+
+        $location->update([
+            'audio_url' => null,
+            'attributes' => $attributes
+        ]);
 
         return response()->json(['success' => true]);
+    }
+
+    public function getTtsVoices()
+    {
+        try {
+            $url = config('services.vieneu_tts.url') . '/voices';
+            $response = Http::timeout(5)->get($url);
+            
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+            
+            return response()->json([
+                ['id' => 'error', 'name' => '⚠️ Máy chủ TTS báo lỗi hoặc chưa tải xong model.']
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                ['id' => 'error', 'name' => '⚠️ Không thể kết nối tới máy chủ VieNeu-TTS (Cổng 8001).']
+            ]);
+        }
+    }
+
+    public function generateTtsAudio(Request $request, Location $location)
+    {
+        $request->validate([
+            'text' => 'required|string|max:5000',
+            'voice_id' => 'nullable|string',
+        ]);
+
+        try {
+            $url = config('services.vieneu_tts.url') . '/stream';
+            
+            // Gửi yêu cầu POST để tạo âm thanh cho các đoạn văn bản dài
+            $response = Http::timeout(120)->post($url, [
+                'text' => $request->text,
+                'voice_id' => $request->voice_id,
+                'emotion' => $request->input('emotion', 'natural'),
+                'temperature' => (float) $request->input('temperature', 0.8),
+                'top_k' => (int) $request->input('top_k', 25),
+                'top_p' => (float) $request->input('top_p', 0.95),
+                'repetition_penalty' => (float) $request->input('repetition_penalty', 1.2),
+            ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lỗi từ máy chủ TTS: ' . $response->status(),
+                ], 500);
+            }
+
+            // Xóa file audio cũ nếu có
+            if ($location->audio_url && Storage::disk('public')->exists($location->audio_url)) {
+                Storage::disk('public')->delete($location->audio_url);
+            }
+
+            // Tạo tên file ngẫu nhiên đuôi .wav
+            $filename = 'tts_' . $location->id . '_' . time() . '.wav';
+            $path = 'locations/audio/' . $filename;
+
+            // Lưu file âm thanh nhị phân
+            Storage::disk('public')->put($path, $response->body());
+
+            // Cập nhật đường dẫn và text tts vào DB
+            $attributes = $location->attributes ?? [];
+            $attributes['tts_text'] = $request->text;
+            
+            $location->update([
+                'audio_url' => $path,
+                'attributes' => $attributes
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'audio_url' => asset('storage/' . $path),
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể kết nối đến máy chủ VieNeu-TTS: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

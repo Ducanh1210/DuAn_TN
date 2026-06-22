@@ -1462,7 +1462,7 @@
                     </a>
                 </li>
                 <li style="margin-top: auto; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px;">
-                    <form action="<?php echo e(route('client.logout')); ?>" method="POST" style="display: none;" id="logout-form">
+                    <form action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;" id="logout-form">
                         <?php echo csrf_field(); ?>
                     </form>
                     <a href="#" class="menu-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -1473,14 +1473,14 @@
                 </li>
                 <?php else: ?>
                 <li>
-                    <a href="<?php echo e(route('client.login')); ?>" class="menu-item">
+                    <a href="<?php echo e(route('login')); ?>" class="menu-item">
                         <span class="menu-icon"><span class="material-symbols-rounded" style="color: var(--primary);">login</span></span>
                         <span class="menu-text" style="color: var(--primary); font-weight: 700;">Đăng nhập</span>
                         <span class="tooltip">Đăng nhập</span>
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo e(route('client.register')); ?>" class="menu-item">
+                    <a href="<?php echo e(route('register')); ?>" class="menu-item">
                         <span class="menu-icon"><span class="material-symbols-rounded">person_add</span></span>
                         <span class="menu-text">Đăng ký tài khoản</span>
                         <span class="tooltip">Đăng ký tài khoản</span>
