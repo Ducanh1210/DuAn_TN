@@ -1420,7 +1420,7 @@
             <div class="sidebar-header">
                 @auth
                 <div class="user-info">
-                    <img src="{{ Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->display_name ?? Auth::user()->username).'&background=0072FF&color=fff' }}" alt="User Avatar" class="user-avatar">
+                    <img src="{{ Auth::user()->avatar_url ? (str_starts_with(Auth::user()->avatar_url, 'http') ? Auth::user()->avatar_url : asset('storage/' . Auth::user()->avatar_url)) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->display_name ?? Auth::user()->username).'&background=0072FF&color=fff' }}" alt="User Avatar" class="user-avatar">
                     <div class="user-details">
                         <span class="user-name">{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
                         <span class="user-role">{{ Auth::user()->role === 'admin' ? 'Quản trị viên' : (Auth::user()->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên') }}</span>
@@ -1441,7 +1441,7 @@
             <ul class="sidebar-menu">
                 @auth
                 <li>
-                    <a href="#" class="menu-item">
+                    <a href="{{ route('client.favorites.index') }}" class="menu-item">
                         <span class="menu-icon"><span class="material-symbols-rounded">favorite</span></span>
                         <span class="menu-text">Địa điểm yêu thích</span>
                         <span class="tooltip">Địa điểm yêu thích</span>

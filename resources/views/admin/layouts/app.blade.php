@@ -42,6 +42,9 @@
             <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                 <i class="fas fa-users nav-icon"></i> Quản lý Người dùng
             </a>
+            <a href="{{ route('admin.comments.index') }}" class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
+                <i class="fas fa-comments nav-icon"></i> Quản lý Bình luận
+            </a>
         </nav>
     </div>
 

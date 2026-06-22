@@ -83,6 +83,14 @@ Route::get('/tin-tuc/{slug}', [ClientNewsController::class, 'show'])->name('clie
 Route::get('/su-kien', [ClientEventController::class, 'index'])->name('client.events.index');
 Route::get('/su-kien/{slug}', [ClientEventController::class, 'show'])->name('client.events.show');
 
+// Client Interactions
+Route::middleware('auth')->group(function () {
+    Route::post('/locations/{location}/favorite', [\App\Http\Controllers\Client\InteractionController::class, 'toggleFavorite'])->name('client.locations.favorite');
+    Route::post('/locations/{location}/comment', [\App\Http\Controllers\Client\InteractionController::class, 'storeComment'])->name('client.locations.comment');
+    Route::delete('/comments/{comment}', [\App\Http\Controllers\Client\InteractionController::class, 'deleteComment'])->name('client.comments.destroy');
+    Route::get('/ca-nhan/dia-diem-yeu-thich', [\App\Http\Controllers\Client\InteractionController::class, 'myFavorites'])->name('client.favorites.index');
+});
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [\App\Http\Controllers\Client\AuthController::class, 'showLoginForm'])->name('login');
@@ -143,5 +151,10 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Users Management
     Route::resource('users', UserController::class);
     Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle_status');
+    Route::post('locations/{location}/generate-tts', [\App\Http\Controllers\Admin\LocationController::class, 'generateTtsAudio'])->name('locations.generate_tts');
+
+    // Comments Management
+    Route::resource('comments', \App\Http\Controllers\Admin\CommentController::class)->only(['index', 'destroy']);
+    Route::patch('comments/{comment}/toggle-status', [\App\Http\Controllers\Admin\CommentController::class, 'toggleStatus'])->name('comments.toggle_status');
 });
 

@@ -53,4 +53,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         // 'password_hash' => 'hashed', // Disable default hashing casting since we use custom MD5
     ];
+
+    public function favoriteLocations()
+    {
+        return $this->hasMany(FavoriteLocation::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }
