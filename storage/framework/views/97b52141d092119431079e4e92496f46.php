@@ -8,9 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #00b4d8;
-            --primary-dark: #0f4c81;
-            --primary-gradient: linear-gradient(135deg, #00b4d8 0%, #0f4c81 100%);
+            --primary: #0072FF;
+            --primary-hover: #005ce6;
             --text-dark: #1f2937;
             --text-muted: #6b7280;
         }
@@ -64,9 +63,6 @@
             font-size: 28px;
             font-weight: 800;
             color: var(--primary);
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -116,7 +112,7 @@
         .btn-submit {
             width: 100%;
             padding: 14px;
-            background: var(--primary-gradient);
+            background: var(--primary);
             color: #fff;
             border: none;
             border-radius: 12px;
@@ -125,12 +121,12 @@
             cursor: pointer;
             transition: all 0.3s;
             margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
         }
 
         .btn-submit:hover {
+            background: var(--primary-hover);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(15, 76, 129, 0.4);
+            box-shadow: 0 8px 15px rgba(0, 114, 255, 0.3);
         }
 
         .auth-links {
@@ -231,7 +227,7 @@
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="<?php echo e(route('client.register')); ?>">
+        <form method="POST" action="<?php echo e(route('register')); ?>">
             <?php echo csrf_field(); ?>
             
             <div class="form-group">
@@ -272,7 +268,7 @@
         </a>
 
         <div class="auth-links">
-            Đã có tài khoản? <a href="<?php echo e(route('client.login')); ?>">Đăng nhập</a>
+            Đã có tài khoản? <a href="<?php echo e(route('login')); ?>">Đăng nhập</a>
         </div>
         <div class="auth-links" style="margin-top: 10px;">
             <a href="<?php echo e(route('home')); ?>" style="color: var(--text-muted); font-weight: normal;"><i class="fa-solid fa-arrow-left"></i> Quay lại bản đồ</a>

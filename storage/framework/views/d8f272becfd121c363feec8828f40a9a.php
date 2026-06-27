@@ -1419,13 +1419,13 @@
         <div class="user-sidebar collapsed" id="userSidebar">
             <div class="sidebar-header">
                 <?php if(auth()->guard()->check()): ?>
-                <div class="user-info">
+                <a href="<?php echo e(route('client.profile')); ?>" class="user-info" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px; width: 100%;">
                     <img src="<?php echo e(Auth::user()->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->display_name ?? Auth::user()->username).'&background=0072FF&color=fff'); ?>" alt="User Avatar" class="user-avatar">
                     <div class="user-details">
                         <span class="user-name"><?php echo e(Auth::user()->display_name ?? Auth::user()->username); ?></span>
                         <span class="user-role"><?php echo e(Auth::user()->role === 'admin' ? 'Quản trị viên' : (Auth::user()->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên')); ?></span>
                     </div>
-                </div>
+                </a>
                 <?php else: ?>
                 <div class="user-info">
                     <div class="user-avatar" style="display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-color: #d1d5db;">
@@ -1441,7 +1441,7 @@
             <ul class="sidebar-menu">
                 <?php if(auth()->guard()->check()): ?>
                 <li>
-                    <a href="#" class="menu-item">
+                    <a href="<?php echo e(route('client.profile')); ?>#tab-favorites" class="menu-item">
                         <span class="menu-icon"><span class="material-symbols-rounded">favorite</span></span>
                         <span class="menu-text">Địa điểm yêu thích</span>
                         <span class="tooltip">Địa điểm yêu thích</span>
@@ -1455,7 +1455,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="menu-item">
+                    <a href="<?php echo e(route('client.profile')); ?>#tab-profile" class="menu-item">
                         <span class="menu-icon"><span class="material-symbols-rounded">settings</span></span>
                         <span class="menu-text">Cài đặt</span>
                         <span class="tooltip">Cài đặt</span>

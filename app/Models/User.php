@@ -53,4 +53,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         // 'password_hash' => 'hashed', // Disable default hashing casting since we use custom MD5
     ];
+
+    /**
+     * Get the locations favorited by the user.
+     */
+    public function favorites()
+    {
+        return $this->belongsToMany(Location::class, 'favorites', 'user_id', 'location_id')
+                    ->withPivot('created_at');
+    }
+
+    /**
+     * Get the comments created by the user.
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->orderBy('created_at', 'desc');
+    }
 }

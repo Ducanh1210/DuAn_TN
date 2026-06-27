@@ -96,6 +96,17 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/logout', [\App\Http\Controllers\Client\AuthController::class, 'logout'])->name('logout');
 
+// Client Profile & Settings Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [\App\Http\Controllers\Client\ProfileController::class, 'index'])->name('client.profile');
+    Route::post('/profile/update', [\App\Http\Controllers\Client\ProfileController::class, 'update'])->name('client.profile.update');
+    Route::post('/profile/password', [\App\Http\Controllers\Client\ProfileController::class, 'updatePassword'])->name('client.profile.password');
+    Route::post('/profile/avatar', [\App\Http\Controllers\Client\ProfileController::class, 'updateAvatar'])->name('client.profile.avatar');
+    Route::post('/profile/delete', [\App\Http\Controllers\Client\ProfileController::class, 'deleteAccount'])->name('client.profile.delete');
+    Route::post('/profile/favorite/toggle', [\App\Http\Controllers\Client\ProfileController::class, 'toggleFavorite'])->name('client.profile.favorite.toggle');
+    Route::delete('/profile/comments/{comment}', [\App\Http\Controllers\Client\ProfileController::class, 'destroyComment'])->name('client.profile.comments.destroy');
+});
+
 // Admin Protected Routes
 Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->group(function () {
     Route::get('/', function () {
