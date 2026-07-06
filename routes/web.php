@@ -94,6 +94,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/google', [\App\Http\Controllers\Client\AuthController::class, 'redirectToGoogle'])->name('client.login.google');
     Route::get('/auth/google/callback', [\App\Http\Controllers\Client\AuthController::class, 'handleGoogleCallback']);
 });
+
 Route::post('/logout', [\App\Http\Controllers\Client\AuthController::class, 'logout'])->name('logout');
 
 // Client Profile & Settings Routes
@@ -103,6 +104,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/password', [\App\Http\Controllers\Client\ProfileController::class, 'updatePassword'])->name('client.profile.password');
     Route::post('/profile/avatar', [\App\Http\Controllers\Client\ProfileController::class, 'updateAvatar'])->name('client.profile.avatar');
     Route::post('/profile/delete', [\App\Http\Controllers\Client\ProfileController::class, 'deleteAccount'])->name('client.profile.delete');
+    Route::get('/profile/business/upgrade', [\App\Http\Controllers\Client\ProfileController::class, 'showBusinessUpgradeForm'])->name('client.profile.business.upgrade');
+    Route::post('/profile/business/register', [\App\Http\Controllers\Client\ProfileController::class, 'businessRegister'])->name('client.profile.business.register');
+    Route::post('/profile/business/upload-photo', [\App\Http\Controllers\Client\ProfileController::class, 'uploadBusinessPhoto'])->name('client.profile.business.upload_photo');
+    Route::post('/profile/business/cancel', [\App\Http\Controllers\Client\ProfileController::class, 'cancelBusinessRegistration'])->name('client.profile.business.cancel');
     Route::post('/profile/favorite/toggle', [\App\Http\Controllers\Client\ProfileController::class, 'toggleFavorite'])->name('client.profile.favorite.toggle');
     Route::delete('/profile/comments/{comment}', [\App\Http\Controllers\Client\ProfileController::class, 'destroyComment'])->name('client.profile.comments.destroy');
 });
@@ -159,4 +164,3 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
 
     Route::post('locations/{location}/generate-tts', [\App\Http\Controllers\Admin\LocationController::class, 'generateTtsAudio'])->name('locations.generate_tts');
 });
-

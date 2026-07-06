@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
         :root {
@@ -619,6 +621,411 @@
             color: #0f172a;
             border-color: #38bdf8;
         }
+
+        /* Business Account tab styles */
+        .biz-type-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+        .biz-type-card:hover {
+            border-color: var(--primary);
+            background-color: rgba(0, 112, 255, 0.02);
+        }
+        .biz-type-card.selected {
+            border-color: var(--primary);
+            background-color: rgba(0, 112, 255, 0.05);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+        .biz-type-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-sub);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .selected .biz-type-icon {
+            background-color: rgba(0, 112, 255, 0.1);
+            color: var(--primary);
+        }
+        .biz-type-info {
+            flex: 1;
+        }
+        .biz-type-name {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+            font-size: 0.95rem;
+        }
+        .biz-type-desc {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+        .biz-type-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: all 0.15s ease;
+        }
+        .selected .biz-type-checkbox {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Phone Mockup Styling */
+        .phone-mockup-wrapper {
+            position: sticky;
+            top: 20px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .phone-mockup {
+            width: 310px;
+            height: 570px;
+            border: 10px solid #1e293b;
+            border-radius: 36px;
+            background-color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            color: #3c4043;
+        }
+        .phone-notch {
+            width: 120px;
+            height: 16px;
+            background-color: #1e293b;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            z-index: 100;
+        }
+        .phone-screen {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            padding-top: 24px;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+            font-size: 0.75rem;
+        }
+        .mock-google-search {
+            background: white;
+            border-radius: 16px;
+            padding: 5px 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .mock-google-logo {
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .mock-google-logo span:nth-child(1) { color: #4285F4; }
+        .mock-google-logo span:nth-child(2) { color: #EA4335; }
+        .mock-google-logo span:nth-child(3) { color: #FBBC05; }
+        .mock-google-logo span:nth-child(4) { color: #4285F4; }
+        .mock-google-logo span:nth-child(5) { color: #34A853; }
+        .mock-google-logo span:nth-child(6) { color: #EA4335; }
+        .mock-search-text {
+            flex: 1;
+            color: #202124;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.7rem;
+        }
+        .mock-business-card {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.3);
+            margin-bottom: 10px;
+        }
+        .mock-biz-name {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #202124;
+            margin-bottom: 2px;
+        }
+        .mock-biz-rating {
+            color: #fbbc05;
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+        }
+        .mock-biz-category {
+            color: #70757a;
+            font-size: 0.7rem;
+            margin-bottom: 6px;
+        }
+        .mock-action-buttons {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #f1f3f4;
+            border-bottom: 1px solid #f1f3f4;
+            padding: 6px 0;
+            margin-bottom: 8px;
+        }
+        .mock-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #1a73e8;
+            font-size: 0.65rem;
+            gap: 3px;
+        }
+        .mock-action-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #e8f0fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mock-info-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .mock-info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            color: #3c4043;
+            font-size: 0.7rem;
+        }
+        .mock-info-icon {
+            color: #70757a;
+            width: 14px;
+            text-align: center;
+            margin-top: 1px;
+        }
+        .mock-photos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .mock-photo-item {
+            aspect-ratio: 1.5;
+            background-color: #e8eaed;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #dadce0;
+        }
+        .mock-photo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Drag and Drop Uploader */
+        .dropzone-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: rgba(248, 250, 252, 0.5);
+            margin-bottom: 20px;
+        }
+        .dropzone-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(0, 112, 255, 0.01);
+        }
+        .dropzone-icon {
+            font-size: 2.2rem;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+        }
+        .upload-previews {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .preview-thumbnail {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .preview-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            background: rgba(239, 68, 68, 0.85);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            cursor: pointer;
+        }
+
+        /* Stepper navigation progress bar */
+        .step-progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .step-progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-color);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        .step-progress-fill {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transform: translateY(-50%);
+            z-index: 2;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .step-progress-node {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 3;
+            color: var(--text-sub);
+            transition: all 0.3s ease;
+        }
+        .step-progress-node.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        .step-progress-node.completed {
+            border-color: var(--primary);
+            background-color: var(--card-bg);
+            color: var(--primary);
+        }
+
+        /* Autocomplete dropdown for categories */
+        .category-autocomplete {
+            position: relative;
+        }
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1050;
+            display: none;
+        }
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            transition: background-color 0.15s ease;
+        }
+        .autocomplete-item:hover {
+            background-color: #f1f5f9;
+        }
+        .dark-mode-active .autocomplete-item:hover {
+            background-color: #1e293b;
+        }
+
+        /* Map styling */
+        #businessMap {
+            height: 250px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            z-index: 1;
+        }
+
+        /* Responsive mockup layouts */
+        .wizard-row {
+            display: flex;
+            gap: 30px;
+        }
+        .wizard-form-col {
+            flex: 1;
+        }
+        .wizard-mockup-col {
+            width: 310px;
+            flex-shrink: 0;
+        }
+        @media (max-width: 991px) {
+            .wizard-row {
+                flex-direction: column-reverse;
+            }
+            .wizard-mockup-col {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -691,6 +1098,18 @@
             <button class="nav-link" id="tab-comments-btn" data-bs-toggle="pill" data-bs-target="#tab-comments" type="button" role="tab" aria-selected="false">
                 <span>Nhận xét của tôi</span>
                 <span class="menu-count-badge" id="commentsCountBadge">{{ $comments->count() }}</span>
+            </button>
+            <button class="nav-link" id="tab-business-btn" data-bs-toggle="pill" data-bs-target="#tab-business" type="button" role="tab" aria-selected="false">
+                <span>Tài khoản doanh nghiệp</span>
+                @if(isset($businessProfile))
+                    @if($businessProfile->status === 'pending')
+                        <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">Chờ duyệt</span>
+                    @elseif($businessProfile->status === 'approved')
+                        <span class="badge bg-success" style="font-size: 0.65rem;">Doanh nghiệp</span>
+                    @elseif($businessProfile->status === 'rejected')
+                        <span class="badge bg-danger" style="font-size: 0.65rem;">Bị từ chối</span>
+                    @endif
+                @endif
             </button>
             <button class="nav-link" id="tab-preferences-btn" data-bs-toggle="pill" data-bs-target="#tab-preferences" type="button" role="tab" aria-selected="false">
                 <span>Tùy chỉnh hệ thống</span>
@@ -895,6 +1314,150 @@
                 </div>
             </div>
 
+            <!-- Tab: Business Account -->
+            <div class="tab-pane fade" id="tab-business" role="tabpanel">
+                @if(isset($businessProfile))
+                    @if($businessProfile->status === 'pending')
+                        <div class="content-panel">
+                            <div class="section-title">Yêu cầu nâng cấp tài khoản doanh nghiệp</div>
+                            <div class="alert alert-warning rounded-3 border-0 p-4 mb-4 text-center">
+                                <div class="fs-4 mb-2">Yêu cầu đang được chờ phê duyệt</div>
+                                <p class="text-secondary mb-0 small">Chúng tôi đang xác minh thông tin doanh nghiệp của bạn. Thời gian xử lý thường từ 24h - 48h làm việc.</p>
+                            </div>
+                            <!-- Display filled details -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="fw-semibold text-secondary small">Tên doanh nghiệp</div>
+                                    <div class="fw-bold fs-5 mt-1 text-primary">{{ $businessProfile->business_name }}</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="fw-semibold text-secondary small">Danh mục</div>
+                                    <div class="fw-bold fs-5 mt-1">{{ $businessProfile->category ? $businessProfile->category->name : 'N/A' }}</div>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <div class="fw-semibold text-secondary small">Địa chỉ</div>
+                                    <div class="mt-1">{{ $businessProfile->address_street }}, {{ $businessProfile->address_city }}, {{ $businessProfile->address_province }}</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="fw-semibold text-secondary small font-monospace">Tọa độ: [{{ $businessProfile->lat }}, {{ $businessProfile->lng }}]</div>
+                                </div>
+                                <div class="col-12 mt-4 text-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm px-4 rounded-3" id="cancelBusinessRequestBtn">
+                                        Hủy yêu cầu đăng ký
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($businessProfile->status === 'approved')
+                        <div class="content-panel">
+                            <div class="section-title">Quản lý tài khoản doanh nghiệp</div>
+                            <div class="alert alert-success rounded-3 border-0 p-4 mb-4 text-center">
+                                <div class="fs-4 mb-2">Đã nâng cấp lên Tài khoản doanh nghiệp!</div>
+                                <p class="text-secondary mb-0 small">Chúc mừng! Bạn đã sở hữu tài khoản doanh nghiệp. Địa điểm của bạn đã được đưa lên hệ thống.</p>
+                            </div>
+                            <div class="card border border-success bg-success bg-opacity-10 p-3 rounded-3 mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="fw-bold mb-1 text-success">{{ $businessProfile->business_name }}</h6>
+                                        <p class="text-secondary mb-0 small">Danh mục: {{ $businessProfile->category ? $businessProfile->category->name : 'N/A' }}</p>
+                                    </div>
+                                    <span class="badge bg-success">Đã kích hoạt</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded-3 text-center mb-3">
+                                        <div class="fw-bold text-primary mb-1" style="font-size:1.5rem;">●</div>
+                                        <div class="fw-semibold small mb-1">Xem trang địa điểm</div>
+                                        <p class="text-secondary small mb-2">Xem hiển thị thực tế trên bản đồ Hà Nam POI</p>
+                                        @php
+                                            $loc = \App\Models\Location::where('created_by', $user->id)->first();
+                                        @endphp
+                                        @if($loc)
+                                            <a href="{{ route('location.detail', $loc->slug ?? $loc->id) }}" target="_blank" class="btn btn-outline-primary btn-sm px-3 rounded-2">Xem chi tiết</a>
+                                        @else
+                                            <span class="text-muted small">Đang đồng bộ dữ liệu địa điểm...</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded-3 text-center mb-3">
+                                        <div class="fw-bold text-primary mb-1" style="font-size:1.5rem;">●</div>
+                                        <div class="fw-semibold small mb-1">Trang quản trị</div>
+                                        <p class="text-secondary small mb-2">Truy cập Dashboard dành cho chủ doanh nghiệp</p>
+                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-sm px-3 rounded-2">Vào trang quản trị</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($businessProfile->status === 'rejected')
+                        <div class="content-panel">
+                            <div class="section-title">Đăng ký tài khoản doanh nghiệp</div>
+                            <div class="alert alert-danger rounded-3 border-0 p-4 mb-4 text-center">
+                                <div class="fs-5 mb-2 fw-semibold">Yêu cầu của bạn đã bị từ chối</div>
+                                <p class="text-secondary mb-3 small"><strong>Lý do từ chối:</strong> {{ $businessProfile->reject_reason ?? 'Thông tin cung cấp chưa chính xác hoặc không đủ điều kiện.' }}</p>
+                                <a href="{{ route('client.profile.business.upgrade') }}" class="btn btn-danger btn-sm rounded-3 px-4 py-2 fw-semibold">Đăng ký lại</a>
+                            </div>
+                        </div>
+                    @endif
+                @else
+                    <div class="content-panel">
+                        <div class="section-title">Nâng cấp tài khoản doanh nghiệp</div>
+                        <div class="text-center py-4">
+
+                            <h5 class="fw-bold mb-3">Đưa địa điểm kinh doanh của bạn lên bản đồ Hà Nam POI</h5>
+                            <p class="text-secondary mx-auto mb-4" style="max-width: 600px;">
+                                Quảng bá nhà hàng, khách sạn, cửa hàng hoặc dịch vụ của bạn hoàn toàn miễn phí. Tiếp cận hàng ngàn người dùng tìm kiếm địa điểm du lịch, ăn uống, và dịch vụ tại Hà Nam mỗi ngày.
+                            </p>
+                            
+                            <div class="row g-3 mx-auto text-start mb-4" style="max-width: 600px;">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
+                                        <div>
+                                            <div class="fw-semibold small">Xuất hiện trên Bản đồ</div>
+                                            <p class="text-secondary small mb-0">Hiển thị vị trí chính xác trên bản đồ vệ tinh Hà Nam POI.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
+                                        <div>
+                                            <div class="fw-semibold small">Trình bày hình ảnh</div>
+                                            <p class="text-secondary small mb-0">Đăng tải ảnh mặt tiền, phòng nghỉ hoặc thực đơn của cửa hàng.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
+                                        <div>
+                                            <div class="fw-semibold small">Tương tác trực tiếp</div>
+                                            <p class="text-secondary small mb-0">Trả lời bình luận, nhận phản hồi chất lượng từ người dùng.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
+                                        <div>
+                                            <div class="fw-semibold small">Trang quản trị (Admin)</div>
+                                            <p class="text-secondary small mb-0">Quản lý nội dung, theo dõi thống kê số liệu tương tác địa điểm.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="{{ route('client.profile.business.upgrade') }}" class="btn btn-primary px-5 py-2.5 rounded-3 fw-bold">
+                                Bắt đầu đăng ký ngay
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
             <!-- Tab 5: Preferences -->
             <div class="tab-pane fade" id="tab-preferences" role="tabpanel">
                 <div class="content-panel">
@@ -986,6 +1549,28 @@
     </div>
 </div>
 
+<!-- Cancel Business Registration Modal -->
+<div class="modal fade" id="cancelBusinessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content rounded-3">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold">Xác nhận hủy</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-3">
+                <p class="text-secondary small mb-0">Bạn có chắc chắn muốn hủy yêu cầu nâng cấp tài khoản doanh nghiệp? Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-2 btn-sm px-3" data-bs-dismiss="modal">Không</button>
+                <button type="button" class="btn btn-danger rounded-2 btn-sm px-3" id="confirmCancelBizBtn">
+                    <span class="spinner-border spinner-border-sm d-none me-1" id="cancelBizSpinner" role="status"></span>
+                    Hủy yêu cầu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Avatar View & Edit Modal -->
 <div class="modal fade" id="avatarViewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
@@ -1015,6 +1600,8 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <!-- Scripts -->
 <script>
@@ -1123,7 +1710,14 @@
                         body: formData,
                         headers: { 'Accept': 'application/json' }
                     })
-                    .then(res => res.json())
+                    .then(res => {
+                        if (res.status === 419) {
+                            showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
+                            setTimeout(() => window.location.reload(), 2000);
+                            throw new Error('CSRF token mismatch (419)');
+                        }
+                        return res.json();
+                    })
                     .then(data => {
                         uploadSpinner.style.display = 'none';
                         if (data.success) {
@@ -1191,7 +1785,14 @@
                     },
                     body: JSON.stringify({ display_name: newValue })
                 })
-                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 419) {
+                        showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
+                        setTimeout(() => window.location.reload(), 2000);
+                        throw new Error('CSRF token mismatch (419)');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     displayNameInput.disabled = false;
                     displayNameInput.classList.add('d-none');
@@ -1256,7 +1857,14 @@
                     },
                     body: JSON.stringify({ location_id: locationId })
                 })
-                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 419) {
+                        showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
+                        setTimeout(() => window.location.reload(), 2000);
+                        throw new Error('CSRF token mismatch (419)');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     if (data.success && !data.is_favorited) {
                         showToast('Đã bỏ thích địa điểm.', true);
@@ -1310,7 +1918,14 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     }
                 })
-                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 419) {
+                        showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
+                        setTimeout(() => window.location.reload(), 2000);
+                        throw new Error('CSRF token mismatch (419)');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     if (data.success) {
                         showToast(data.message, true);
@@ -1404,7 +2019,14 @@
                     },
                     body: JSON.stringify(bodyData)
                 })
-                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 419) {
+                        showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
+                        setTimeout(() => window.location.reload(), 2000);
+                        throw new Error('CSRF token mismatch (419)');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     deactivateSpinner.classList.add('d-none');
                     confirmDeactivationBtn.disabled = false;
@@ -1429,6 +2051,63 @@
                     console.error(err);
                 });
             });
+        }
+
+        // Cancel pending request logic
+        const cancelRequestBtn = document.getElementById('cancelBusinessRequestBtn');
+        const cancelBizModalEl = document.getElementById('cancelBusinessModal');
+        const confirmCancelBizBtn = document.getElementById('confirmCancelBizBtn');
+        const cancelBizSpinner = document.getElementById('cancelBizSpinner');
+
+        if (cancelRequestBtn && cancelBizModalEl) {
+            const cancelBizModal = new bootstrap.Modal(cancelBizModalEl);
+
+            cancelRequestBtn.addEventListener('click', function() {
+                cancelBizModal.show();
+            });
+
+            if (confirmCancelBizBtn) {
+                confirmCancelBizBtn.addEventListener('click', function() {
+                    confirmCancelBizBtn.disabled = true;
+                    if (cancelBizSpinner) cancelBizSpinner.classList.remove('d-none');
+
+                    fetch("{{ route('client.profile.business.cancel') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(res => {
+                        if (res.status === 419) {
+                            showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
+                            setTimeout(() => window.location.reload(), 2000);
+                            throw new Error('CSRF token mismatch');
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        confirmCancelBizBtn.disabled = false;
+                        if (cancelBizSpinner) cancelBizSpinner.classList.add('d-none');
+                        cancelBizModal.hide();
+
+                        if (data.success) {
+                            localStorage.removeItem('biz_wizard_state');
+                            showToast(data.message, true);
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showToast(data.message || 'Lỗi hủy yêu cầu.', false);
+                        }
+                    })
+                    .catch(err => {
+                        confirmCancelBizBtn.disabled = false;
+                        if (cancelBizSpinner) cancelBizSpinner.classList.add('d-none');
+                        showToast('Đã xảy ra lỗi khi hủy yêu cầu.', false);
+                        console.error(err);
+                    });
+                });
+            }
         }
     });
 </script>

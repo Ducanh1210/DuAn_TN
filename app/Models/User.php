@@ -70,4 +70,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class)->orderBy('created_at', 'desc');
     }
+
+    /**
+     * Get the business profile associated with the user.
+     */
+    public function businessProfile()
+    {
+        return $this->hasOne(BusinessProfile::class);
+    }
 }

@@ -11,6 +11,10 @@ use Illuminate\Validation\ValidationException;
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\Location;
+use App\Models\Category;
+use App\Models\BusinessProfile;
+use Illuminate\Support\Str;
+
 
 class ProfileController extends Controller
 {
@@ -46,7 +50,27 @@ class ProfileController extends Controller
             ->with('location')
             ->get();
 
-        return view('client.profile', compact('user', 'favorites', 'comments'));
+        // Load categories and business profile
+        $categories = Category::where('status', 'active')->get();
+        $businessProfile = BusinessProfile::where('user_id', $user->id)->with('category')->first();
+
+        return view('client.profile', compact('user', 'favorites', 'comments', 'categories', 'businessProfile'));
+    }
+
+    /**
+     * Show the dedicated business account upgrade page.
+     */
+    public function showBusinessUpgradeForm()
+    {
+        $user = Auth::user();
+        $businessProfile = BusinessProfile::where('user_id', $user->id)->first();
+
+        if ($businessProfile && in_array($businessProfile->status, ['pending', 'approved'])) {
+            return redirect()->route('client.profile')->with('info', 'Bạn đã gửi yêu cầu nâng cấp hoặc đã có tài khoản doanh nghiệp.');
+        }
+
+        $categories = Category::where('status', 'active')->get();
+        return view('client.business_upgrade', compact('user', 'categories', 'businessProfile'));
     }
 
     /**
@@ -261,4 +285,242 @@ class ProfileController extends Controller
             'redirect_url' => route('home'),
         ]);
     }
+
+    /**
+     * Handle business photo uploads during registration.
+     */
+    public function uploadBusinessPhoto(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
+        ], [
+            'file.required' => 'Vui lòng chọn hình ảnh.',
+            'file.image' => 'Định dạng phải là hình ảnh.',
+            'file.max' => 'Kích thước tối đa là 10MB.',
+        ]);
+
+        try {
+            $path = $this->compressAndSaveImage($request->file('file'), 'business/photos');
+            return response()->json([
+                'success' => true,
+                'path' => $path,
+                'url' => asset('storage/' . $path)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi tải ảnh lên: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Handle business account registration.
+     */
+    public function businessRegister(Request $request)
+    {
+        $user = Auth::user();
+
+        // Check if user already has an active or pending business profile
+        $existing = BusinessProfile::where('user_id', $user->id)->first();
+        if ($existing && in_array($existing->status, ['pending', 'approved'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn đã gửi yêu cầu nâng cấp hoặc đã có tài khoản doanh nghiệp.'
+            ], 400);
+        }
+
+        $validated = $request->validate([
+            'business_name' => 'required|string|max:255',
+            'business_types' => 'required|array|min:1',
+            'category_id' => 'required|exists:categories,id',
+            'address_country' => 'required|string|max:100',
+            'address_street' => 'required|string|max:255',
+            'address_city' => 'required|string|max:255',
+            'address_province' => 'required|string|max:255',
+            'address_postal_code' => 'required|string|max:20',
+            'phone' => 'required|string|max:30',
+            'website' => 'nullable|string|max:255',
+            'lat' => 'required|numeric',
+            'lng' => 'required|numeric',
+            'receive_tips' => 'nullable|boolean',
+            'receive_surveys' => 'nullable|boolean',
+            'description' => 'nullable|string|max:750',
+            'menu_photos' => 'nullable|array',
+            'storefront_photos' => 'nullable|array',
+        ], [
+            'business_name.required' => 'Vui lòng nhập tên doanh nghiệp.',
+            'business_types.required' => 'Vui lòng chọn loại hình doanh nghiệp.',
+            'category_id.required' => 'Vui lòng chọn danh mục kinh doanh.',
+            'address_street.required' => 'Vui lòng nhập địa chỉ đường phố.',
+            'address_city.required' => 'Vui lòng nhập thành phố.',
+            'address_province.required' => 'Vui lòng nhập tỉnh/bang.',
+            'address_postal_code.required' => 'Vui lòng nhập mã bưu chính.',
+            'phone.required' => 'Vui lòng nhập số điện thoại liên hệ.',
+            'lat.required' => 'Vui lòng chọn tọa độ bản đồ.',
+            'lng.required' => 'Vui lòng chọn tọa độ bản đồ.',
+        ]);
+
+        if ($existing) {
+            // Update the existing rejected one
+            $existing->update([
+                'business_name' => $validated['business_name'],
+                'business_types' => $validated['business_types'],
+                'category_id' => $validated['category_id'],
+                'address_country' => $validated['address_country'],
+                'address_street' => $validated['address_street'],
+                'address_city' => $validated['address_city'],
+                'address_province' => $validated['address_province'],
+                'address_postal_code' => $validated['address_postal_code'],
+                'phone' => $validated['phone'],
+                'website' => $validated['website'] ?? null,
+                'lat' => $validated['lat'],
+                'lng' => $validated['lng'],
+                'receive_tips' => (bool)($validated['receive_tips'] ?? false),
+                'receive_surveys' => (bool)($validated['receive_surveys'] ?? false),
+                'description' => $validated['description'] ?? null,
+                'menu_photos' => $validated['menu_photos'] ?? [],
+                'storefront_photos' => $validated['storefront_photos'] ?? [],
+                'status' => 'pending',
+                'reject_reason' => null,
+            ]);
+            $business = $existing;
+        } else {
+            // Create a new business profile
+            $business = BusinessProfile::create([
+                'user_id' => $user->id,
+                'business_name' => $validated['business_name'],
+                'business_types' => $validated['business_types'],
+                'category_id' => $validated['category_id'],
+                'address_country' => $validated['address_country'],
+                'address_street' => $validated['address_street'],
+                'address_city' => $validated['address_city'],
+                'address_province' => $validated['address_province'],
+                'address_postal_code' => $validated['address_postal_code'],
+                'phone' => $validated['phone'],
+                'website' => $validated['website'] ?? null,
+                'lat' => $validated['lat'],
+                'lng' => $validated['lng'],
+                'receive_tips' => (bool)($validated['receive_tips'] ?? false),
+                'receive_surveys' => (bool)($validated['receive_surveys'] ?? false),
+                'description' => $validated['description'] ?? null,
+                'menu_photos' => $validated['menu_photos'] ?? [],
+                'storefront_photos' => $validated['storefront_photos'] ?? [],
+                'status' => 'pending',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đăng ký tài khoản doanh nghiệp thành công! Yêu cầu đang được chờ phê duyệt.',
+            'business' => $business
+        ]);
+    }
+
+    /**
+     * Cancel a pending business profile registration.
+     */
+    public function cancelBusinessRegistration()
+    {
+        $user = Auth::user();
+        
+        $profile = BusinessProfile::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if (!$profile) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy yêu cầu nâng cấp nào đang ở trạng thái chờ duyệt.'
+            ], 404);
+        }
+
+        // Clean up uploaded files in local storage if they exist
+        $photos = array_merge($profile->menu_photos ?? [], $profile->storefront_photos ?? []);
+        foreach ($photos as $photo) {
+            if (Storage::disk('public')->exists($photo)) {
+                Storage::disk('public')->delete($photo);
+            }
+        }
+
+        $profile->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã hủy yêu cầu đăng ký doanh nghiệp thành công.'
+        ]);
+    }
+
+    /**
+     * Compress image using GD and save as WebP.
+     */
+    private function compressAndSaveImage($file, $folder, $maxWidth = 1200, $quality = 75)
+    {
+        $imageInfo = @getimagesize($file->getRealPath());
+        if (!$imageInfo) {
+            return $file->store($folder, 'public');
+        }
+
+        $width = $imageInfo[0];
+        $height = $imageInfo[1];
+        $mime = $imageInfo['mime'];
+
+        switch ($mime) {
+            case 'image/jpeg':
+            case 'image/jpg':
+                $sourceImage = @imagecreatefromjpeg($file->getRealPath());
+                break;
+            case 'image/png':
+                $sourceImage = @imagecreatefrompng($file->getRealPath());
+                break;
+            case 'image/webp':
+                $sourceImage = @imagecreatefromwebp($file->getRealPath());
+                break;
+            case 'image/gif':
+                $sourceImage = @imagecreatefromgif($file->getRealPath());
+                break;
+            default:
+                $sourceImage = null;
+        }
+
+        if (!$sourceImage) {
+            return $file->store($folder, 'public');
+        }
+
+        if ($width > $maxWidth) {
+            $newWidth = $maxWidth;
+            $newHeight = (int)(($height / $width) * $newWidth);
+        } else {
+            $newWidth = $width;
+            $newHeight = $height;
+        }
+
+        $targetImage = imagecreatetruecolor($newWidth, $newHeight);
+
+        if ($mime == 'image/png' || $mime == 'image/webp') {
+            imagealphablending($targetImage, false);
+            imagesavealpha($targetImage, true);
+            $transparent = imagecolorallocatealpha($targetImage, 255, 255, 255, 127);
+            imagefilledrectangle($targetImage, 0, 0, $newWidth, $newHeight, $transparent);
+        }
+
+        imagecopyresampled($targetImage, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        $filename = Str::random(40) . '.webp';
+        $relativeStoragePath = $folder . '/' . $filename;
+        $absolutePath = storage_path('app/public/' . $relativeStoragePath);
+
+        $dir = dirname($absolutePath);
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        imagewebp($targetImage, $absolutePath, $quality);
+
+        imagedestroy($sourceImage);
+        imagedestroy($targetImage);
+
+        return $relativeStoragePath;
+    }
 }
+

@@ -264,15 +264,21 @@
             <!-- Tạo bằng AI -->
             <div class="col-md-7">
                 <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="mb-0 fw-bold"><i class="fas fa-robot text-warning me-2"></i>Cách 2: Tạo bằng AI Text-to-Speech (VieNeu-TTS)</h6>
-                        <small class="text-muted">Chuyển đổi văn bản tiếng Việt thành giọng nói tự động sử dụng AI.</small>
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-robot text-warning me-2"></i>Cách 2: Tạo bằng AI Text-to-Speech (VieNeu-TTS)</h6>
+                            <small class="text-muted">Chuyển đổi văn bản tiếng Việt thành giọng nói tự động sử dụng AI.</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span id="ttsConnectionBadge" class="badge bg-secondary py-2 px-3" style="font-size: 12px; border-radius: 20px;">
+                                <i class="fas fa-circle-notch fa-spin me-1"></i> Đang kiểm tra...
+                            </span>
+                            <button type="button" id="btnRetryTtsConnection" class="btn btn-sm btn-outline-secondary p-1 border-0" title="Kiểm tra lại kết nối" style="line-height: 1; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <!-- Cảnh báo kết nối TTS server -->
-                        <div id="ttsConnectionWarning" class="alert alert-danger py-2 mb-3 d-none">
-                            <i class="fas fa-exclamation-triangle me-1"></i> Không thể kết nối tới máy chủ VieNeu-TTS. Vui lòng kiểm tra xem dịch vụ ở cổng 8001 đã bật chưa.
-                        </div>
 
                         <div class="mb-3">
                             <label for="ttsVoiceSelect" class="form-label fw-bold small">Chọn giọng đọc (AI Voice) <span class="text-danger">*</span></label>
@@ -283,9 +289,8 @@
 
                         <div class="mb-3">
                             <label for="ttsTextInput" class="form-label fw-bold small">Văn bản thuyết minh <span class="text-danger">*</span></label>
-                            <textarea id="ttsTextInput" class="form-control" rows="4" placeholder="Nhập đoạn thuyết minh giới thiệu về địa danh tại đây (Tối đa 5000 ký tự)...">{{ old('short_description', $location->short_description) }}</textarea>
-                            <div class="form-text d-flex justify-content-between">
-                                <span>Gợi ý: Dùng văn bản mô tả ngắn gọn và trôi chảy để AI đọc hay hơn.</span>
+                            <textarea id="ttsTextInput" class="form-control" rows="4" placeholder="Nhập đoạn thuyết minh giới thiệu về địa danh tại đây (Tối đa 5000 ký tự)...">{{ old('tts_text', $location->attributes['tts_text'] ?? $location->short_description) }}</textarea>
+                            <div class="form-text d-flex justify-content-end">
                                 <span id="ttsCharCount">0/5000</span>
                             </div>
                         </div>
@@ -348,9 +353,8 @@
                             <div class="progress" style="height: 10px; border-radius: 5px;">
                                 <div id="ttsProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                            <div class="d-flex justify-content-between mt-1 text-muted" style="font-size: 11px;">
+                            <div class="mt-1 text-muted" style="font-size: 11px;">
                                 <span id="ttsProgressTimer">Đã chạy: 0.0s</span>
-                                <span id="ttsProgressEstimate">Dự kiến: ~0.0s</span>
                             </div>
                         </div>
 
@@ -480,6 +484,12 @@
     // Fetch voices list for VieNeu-TTS
     function loadTtsVoices() {
         let voiceSelect = $('#ttsVoiceSelect');
+        let badge = $('#ttsConnectionBadge');
+        
+        badge.removeClass('bg-success bg-danger').addClass('bg-secondary')
+             .html('<i class="fas fa-circle-notch fa-spin me-1"></i> Đang kết nối...')
+             .attr('title', 'Đang kiểm tra kết nối tới máy chủ VieNeu-TTS...');
+             
         $.ajax({
             url: '{{ route("admin.locations.tts_voices") }}',
             type: 'GET',
@@ -489,13 +499,24 @@
                 // Check if connection failed or error
                 if (res.length === 0 || (res.length === 1 && res[0].id === 'error')) {
                     voiceSelect.append('<option value="">⚠️ Không có giọng đọc (Server Offline)</option>');
-                    $('#ttsConnectionWarning').removeClass('d-none');
                     $('#btnGenerateTts').prop('disabled', true);
+                    
+                    let errorMsg = 'Không thể kết nối tới máy chủ VieNeu-TTS.';
+                    if (res.length === 1 && res[0].name) {
+                        errorMsg = res[0].name.replace('⚠️ ', '');
+                    }
+                    
+                    badge.removeClass('bg-secondary bg-success').addClass('bg-danger')
+                         .html('<i class="fas fa-exclamation-circle me-1"></i> Lỗi kết nối')
+                         .attr('title', errorMsg);
                     return;
                 }
                 
-                $('#ttsConnectionWarning').addClass('d-none');
                 $('#btnGenerateTts').prop('disabled', false);
+                
+                badge.removeClass('bg-secondary bg-danger').addClass('bg-success')
+                     .html('<i class="fas fa-check-circle me-1"></i> Kết nối tốt')
+                     .attr('title', 'Đã kết nối thành công tới máy chủ VieNeu-TTS.');
                 
                 let savedVoice = localStorage.getItem('vieneu_tts_voice');
                 res.forEach(function(voice) {
@@ -511,13 +532,28 @@
                 
                 updateTtsCharCount();
             },
-            error: function() {
+            error: function(xhr) {
                 voiceSelect.empty().append('<option value="">⚠️ Lỗi kết nối tới máy chủ TTS</option>');
-                $('#ttsConnectionWarning').removeClass('d-none');
                 $('#btnGenerateTts').prop('disabled', true);
+                
+                badge.removeClass('bg-secondary bg-success').addClass('bg-danger')
+                     .html('<i class="fas fa-times-circle me-1"></i> Mất kết nối')
+                     .attr('title', 'Không thể kết nối tới máy chủ VieNeu-TTS (Cổng 8001). Vui lòng kiểm tra xem dịch vụ đã được khởi chạy chưa.');
             }
         });
     }
+
+    // Retry TTS Connection
+    $(document).on('click', '#btnRetryTtsConnection', function() {
+        let btn = $(this);
+        btn.prop('disabled', true).find('i').addClass('fa-spin');
+        
+        loadTtsVoices();
+        
+        setTimeout(function() {
+            btn.prop('disabled', false).find('i').removeClass('fa-spin');
+        }, 1000);
+    });
 
     // Restore active tab from localStorage on load
     let activeTabId = localStorage.getItem('active_location_tab');
@@ -661,13 +697,12 @@
         // Calculate expected time based on character length
         // V3 Turbo CPU averages around 40-50 chars per second of generation time.
         let charLen = text.length;
-        let expectedSec = Math.max(3, Math.ceil(charLen / 45)); 
+        let expectedSec = Math.max(3, Math.ceil(charLen / 45)) + 3; 
         
         $('#ttsProgressContainer').removeClass('d-none');
         $('#ttsProgressPercent').text('0%');
         $('#ttsProgressBar').css('width', '0%').attr('aria-valuenow', 0);
         $('#ttsProgressTimer').text('Đã chạy: 0.0s');
-        $('#ttsProgressEstimate').text('Dự kiến: ~' + expectedSec + ' giây');
         
         let start = Date.now();
         let progressInterval = setInterval(function() {
