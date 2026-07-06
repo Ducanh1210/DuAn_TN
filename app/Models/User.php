@@ -55,12 +55,20 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the locations favorited by the user.
+     * Get the locations favorited by the user (Many-to-Many).
      */
     public function favorites()
     {
         return $this->belongsToMany(Location::class, 'favorites', 'user_id', 'location_id')
                     ->withPivot('created_at');
+    }
+
+    /**
+     * Get the favorite locations models (One-to-Many).
+     */
+    public function favoriteLocations()
+    {
+        return $this->hasMany(FavoriteLocation::class);
     }
 
     /**

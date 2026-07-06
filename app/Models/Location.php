@@ -60,4 +60,14 @@ class Location extends Model
     {
         return $this->hasMany(Panorama::class)->orderBy('sort_order', 'asc');
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(FavoriteLocation::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->where('status', 'visible')->orderBy('created_at', 'desc');
+    }
 }
