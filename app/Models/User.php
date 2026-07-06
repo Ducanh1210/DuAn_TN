@@ -54,13 +54,36 @@ class User extends Authenticatable
         // 'password_hash' => 'hashed', // Disable default hashing casting since we use custom MD5
     ];
 
+    /**
+     * Get the locations favorited by the user (Many-to-Many).
+     */
+    public function favorites()
+    {
+        return $this->belongsToMany(Location::class, 'favorites', 'user_id', 'location_id')
+                    ->withPivot('created_at');
+    }
+
+    /**
+     * Get the favorite locations models (One-to-Many).
+     */
     public function favoriteLocations()
     {
         return $this->hasMany(FavoriteLocation::class);
     }
 
+    /**
+     * Get the comments created by the user.
+     */
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get the business profile associated with the user.
+     */
+    public function businessProfile()
+    {
+        return $this->hasOne(BusinessProfile::class);
     }
 }
