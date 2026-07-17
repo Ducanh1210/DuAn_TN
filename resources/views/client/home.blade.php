@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,16 +10,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
+        rel="stylesheet" />
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- MarkerCluster CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-    
+
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
@@ -33,7 +35,8 @@
             --region-dim: #94a3b8;
         }
 
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -58,73 +61,85 @@
         /* Customizes Leaflet Zoom Control */
         .leaflet-bottom.leaflet-right {
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateY(-40px); /* Tránh đè nút khi đóng */
+            transform: translateY(-40px);
+            /* Tránh đè nút khi đóng */
             z-index: 999;
         }
 
         body.drawer-open .leaflet-bottom.leaflet-right {
-            transform: translateY(-180px); /* Đẩy lên cao khi mở khay */
+            transform: translateY(-180px);
+            /* Đẩy lên cao khi mở khay */
         }
 
         .leaflet-control-zoom {
             border: none !important;
             box-shadow: var(--glass-shadow) !important;
         }
+
         .leaflet-control-zoom a {
             background: var(--glass-bg) !important;
             backdrop-filter: blur(12px) !important;
             color: #333 !important;
-            border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
         }
+
         .leaflet-control-zoom a:hover {
             background: #fff !important;
             color: var(--primary) !important;
         }
-        
+
         /* Custom Popup Styling */
         .leaflet-popup-content-wrapper {
             border-radius: 4px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             padding: 0;
             overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
+
         .leaflet-popup-content {
             font-family: 'Outfit', sans-serif;
             margin: 0;
             width: 260px !important;
         }
+
         .leaflet-popup-close-button {
             color: white !important;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.8) !important;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8) !important;
             font-size: 22px !important;
             padding: 4px 8px !important;
             z-index: 10;
         }
+
         .leaflet-popup-close-button:hover {
             color: #f1f5f9 !important;
             background: transparent !important;
         }
+
         .poi-popup-inner {
             display: flex;
             flex-direction: column;
             text-align: center;
         }
+
         .poi-thumbnail {
             width: 100%;
             height: 140px;
             object-fit: cover;
             background: #f1f5f9;
         }
+
         .poi-content {
             padding: 16px;
         }
+
         .poi-title {
             font-weight: 700;
             font-size: 17px;
             color: #1a1a1a;
             margin-bottom: 6px;
         }
+
         .poi-desc {
             font-size: 13px;
             color: #555;
@@ -135,6 +150,7 @@
             overflow: hidden;
             line-height: 1.5;
         }
+
         .poi-btn-360 {
             display: inline-flex;
             align-items: center;
@@ -152,10 +168,12 @@
             width: 100%;
             box-sizing: border-box;
         }
+
         .poi-btn-360:hover {
             filter: brightness(0.85);
             transform: translateY(-1px);
         }
+
         .poi-rate {
             display: inline-block;
             background: #f0fdf4;
@@ -171,13 +189,15 @@
             position: relative;
             width: 30px;
             height: 40px;
-            filter: drop-shadow(0px 3px 4px rgba(0,0,0,0.35));
+            filter: drop-shadow(0px 3px 4px rgba(0, 0, 0, 0.35));
         }
+
         .custom-map-pin svg {
             position: absolute;
             top: 0;
             left: 0;
         }
+
         .leaflet-container .leaflet-marker-pane .pin-icon-img {
             position: absolute !important;
             top: 4px !important;
@@ -190,7 +210,9 @@
             z-index: 999 !important;
             border-radius: 50% !important;
         }
-        .custom-map-pin svg, .leaflet-container .leaflet-marker-pane .pin-icon-img {
+
+        .custom-map-pin svg,
+        .leaflet-container .leaflet-marker-pane .pin-icon-img {
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -198,18 +220,22 @@
         .leaflet-marker-icon:has(.custom-map-pin:hover) {
             z-index: 99999999 !important;
         }
-        .custom-map-pin:hover svg, 
+
+        .custom-map-pin:hover svg,
         .custom-map-pin:hover .pin-icon-img {
             transform: scale(1.05) translateY(-3px);
         }
+
         .custom-map-pin:hover .custom-pin-tooltip {
             opacity: 1;
             visibility: visible;
             transform: translate(10px, -50%);
         }
+
         .custom-pin-tooltip {
             position: absolute;
-            top: 15px; /* Căn giữa theo phần thân tròn của icon (cao 30px) */
+            top: 15px;
+            /* Căn giữa theo phần thân tròn của icon (cao 30px) */
             left: 100%;
             transform: translate(0px, -50%);
             background: linear-gradient(to right, color-mix(in srgb, var(--tip-color) 40%, black), var(--tip-color));
@@ -219,14 +245,14 @@
             font-size: 13px;
             font-weight: 600;
             white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
             z-index: 10001;
             transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
+
         .custom-pin-tooltip::before {
             content: '';
             position: absolute;
@@ -242,6 +268,7 @@
         .my-custom-marker {
             transition: z-index 0.2s;
         }
+
         .my-custom-marker:hover {
             z-index: 99999999 !important;
         }
@@ -251,9 +278,11 @@
         .leaflet-cluster-anim .leaflet-marker-shadow {
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
+
         .marker-cluster {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
         .marker-cluster:hover {
             transform: scale(1.1);
         }
@@ -262,6 +291,7 @@
         .cluster-coverage-polygon {
             transition: opacity 0.3s ease;
         }
+
         .leaflet-overlay-pane svg path {
             transition: fill-opacity 0.3s ease, stroke-opacity 0.3s ease;
         }
@@ -279,8 +309,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Pulsing User Location Marker */
@@ -312,7 +347,9 @@
                 transform: scale(0.95);
                 opacity: 0.8;
             }
-            80%, 100% {
+
+            80%,
+            100% {
                 transform: scale(2.5);
                 opacity: 0;
             }
@@ -335,7 +372,8 @@
 
         .toast {
             pointer-events: auto;
-            background: rgba(24, 24, 27, 0.88); /* translucent deep charcoal */
+            background: rgba(24, 24, 27, 0.88);
+            /* translucent deep charcoal */
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -376,12 +414,14 @@
             position: absolute;
             top: 16px;
             left: 24px;
-            right: 24px;
-            z-index: 1000; /* Above map */
+            right: 342px;
+            z-index: 1000;
+            /* Above map */
             display: flex;
             align-items: center;
             gap: 12px;
-            pointer-events: none; /* Let clicks pass through empty areas */
+            pointer-events: none;
+            /* Let clicks pass through empty areas */
         }
 
         .search-box-container {
@@ -422,7 +462,7 @@
             color: #333;
             background: transparent;
         }
-        
+
         .search-input::placeholder {
             color: #666;
         }
@@ -452,7 +492,7 @@
         }
 
         .icon-btn:hover {
-            background: rgba(0,0,0,0.05);
+            background: rgba(0, 0, 0, 0.05);
             color: var(--primary);
         }
 
@@ -466,7 +506,7 @@
             box-shadow: 0 2px 8px rgba(0, 114, 255, 0.4);
             transition: transform 0.2s, filter 0.2s;
         }
-        
+
         .icon-btn.primary:hover {
             filter: brightness(1.1);
             transform: rotate(45deg) scale(1.05);
@@ -481,7 +521,7 @@
         .search-box .divider {
             width: 1px;
             height: 24px;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             margin: 0 6px;
         }
 
@@ -515,8 +555,9 @@
 
         .mini-status-bar {
             background: #ffffff;
-            border-radius: 8px; /* Vuông vắn, chuyên nghiệp */
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            /* Vuông vắn, chuyên nghiệp */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -532,7 +573,7 @@
         }
 
         .mini-status-bar-wrapper:hover .mini-status-bar {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         /* Mũi tên chĩa xuống từ thanh trạng thái (chỉ hiện khi click mở tin tức) */
@@ -540,15 +581,17 @@
             content: '';
             position: absolute;
             bottom: -5px;
-            right: 34px; /* Căn thẳng với nút chevron */
+            right: 34px;
+            /* Căn thẳng với nút chevron */
             width: 10px;
             height: 10px;
             background: #ffffff;
             transform: rotate(45deg);
             border-right: 1px solid #e5e7eb;
             border-bottom: 1px solid #e5e7eb;
-            box-shadow: 2px 2px 3px rgba(0,0,0,0.05);
-            z-index: -1; /* Nằm dưới nền trắng của thanh trạng thái */
+            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.05);
+            z-index: -1;
+            /* Nằm dưới nền trắng của thanh trạng thái */
             opacity: 0;
             visibility: hidden;
             transition: all 0.2s;
@@ -621,7 +664,7 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.4);
             opacity: 0;
             visibility: hidden;
@@ -644,10 +687,12 @@
         .bottom-drawer-wrapper {
             position: absolute;
             bottom: 0;
-            left: 70px; /* Offset for collapsed sidebar */
+            left: 70px;
+            /* Offset for collapsed sidebar */
             right: 0;
             z-index: 1000;
-            width: auto; /* Changed from 100% to auto to stretch between left and right */
+            width: auto;
+            /* Changed from 100% to auto to stretch between left and right */
             display: flex;
             flex-direction: column;
             pointer-events: none;
@@ -655,18 +700,20 @@
         }
 
         body.sidebar-expanded .bottom-drawer-wrapper {
-            left: 260px; /* Offset for expanded sidebar */
+            left: 260px;
+            /* Offset for expanded sidebar */
         }
 
         .drawer-toggle-btn {
             pointer-events: auto;
-            align-self: flex-end; /* Căn phải */
+            align-self: flex-end;
+            /* Căn phải */
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             padding: 8px 16px;
             border-radius: 8px 8px 0 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -709,7 +756,7 @@
             visibility: hidden;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             box-sizing: border-box;
@@ -718,7 +765,8 @@
         }
 
         .bottom-drawer-wrapper.open .drawer-content {
-            height: 160px; /* Chiều cao thẻ hình ảnh */
+            height: 160px;
+            /* Chiều cao thẻ hình ảnh */
             opacity: 1;
             visibility: visible;
         }
@@ -731,12 +779,19 @@
             height: 100%;
             align-items: center;
             scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.4) transparent;
+            scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
             padding: 16px;
             padding-bottom: 20px;
         }
-        .featured-loc-scroll::-webkit-scrollbar { height: 6px; }
-        .featured-loc-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 4px; }
+
+        .featured-loc-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .featured-loc-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+        }
 
         .featured-loc-card {
             position: relative;
@@ -749,14 +804,14 @@
             color: inherit;
             transition: transform 0.2s, box-shadow 0.2s;
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             border: 2px solid transparent;
         }
 
         .featured-loc-card:hover {
             transform: translateY(-4px);
             border-color: #ffffff;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
         }
 
         .featured-loc-img {
@@ -771,7 +826,7 @@
             left: 0;
             width: 100%;
             padding: 30px 10px 8px 10px;
-            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -798,7 +853,7 @@
             gap: 16px;
             margin-bottom: 16px;
             padding-bottom: 16px;
-            border-bottom: 1px solid rgba(0,0,0,0.08);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         }
 
         .weather-big-icon {
@@ -858,12 +913,14 @@
             position: absolute;
             top: 100%;
             right: 0;
-            margin-top: 10px; /* Cách mũi tên một khoảng nhỏ tinh tế */
+            margin-top: 10px;
+            /* Cách mũi tên một khoảng nhỏ tinh tế */
             width: 260px;
             height: 150px;
             border-radius: 6px;
-            overflow: hidden; /* Cắt gọn ảnh tràn góc */
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            overflow: hidden;
+            /* Cắt gọn ảnh tràn góc */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
@@ -871,6 +928,58 @@
             pointer-events: none;
             z-index: 1000;
             background: #111827;
+        }
+
+        /* Bảng Nhiệm Vụ Tích Điểm - Tách riêng biệt */
+        .mission-widget-wrapper {
+            position: absolute;
+            top: 220px;
+            right: 0;
+            width: 260px;
+            z-index: 1000;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+            pointer-events: auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Di chuyển cụm zoom & định vị lên trên bên trái của widget thời tiết */
+        .leaflet-top.leaflet-right {
+            top: 16px !important;
+            right: 292px !important;
+            margin: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+        }
+
+        .mission-widget-wrapper.collapsed .mission-list-container {
+            max-height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            overflow: hidden;
+            border-top: none !important;
+        }
+
+        .mission-widget-wrapper .mission-header {
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .mission-widget-wrapper .mission-header:hover {
+            background-color: #f9fafb;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .mission-widget-wrapper.collapsed .mission-header:hover {
+            border-radius: 8px;
         }
 
         .mini-status-bar-wrapper.active .news-dropdown-banner {
@@ -882,17 +991,20 @@
 
         .banner-track {
             display: flex;
-            width: 400%; /* 4 items (3 real + 1 clone) */
+            width: 400%;
+            /* 4 items (3 real + 1 clone) */
             height: 100%;
             animation: bannerSlide 12s infinite ease-in-out;
         }
 
         .banner-track:hover {
-            animation-play-state: paused; /* Dừng cuộn khi di chuột vào banner */
+            animation-play-state: paused;
+            /* Dừng cuộn khi di chuột vào banner */
         }
 
         .banner-item {
-            width: 25%; /* 100% / 4 */
+            width: 25%;
+            /* 100% / 4 */
             height: 100%;
             position: relative;
             flex-shrink: 0;
@@ -915,7 +1027,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 50%, transparent 100%);
             padding: 30px 12px 10px 12px;
             box-sizing: border-box;
             pointer-events: none;
@@ -930,7 +1042,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
         }
 
         .banner-meta {
@@ -960,10 +1072,27 @@
         }
 
         @keyframes bannerSlide {
-            0%, 30% { transform: translateX(0); }
-            33.33%, 63.33% { transform: translateX(-25%); }
-            66.66%, 96.66% { transform: translateX(-50%); }
-            100% { transform: translateX(-75%); } /* Lướt nhanh trong 0.4s */
+
+            0%,
+            30% {
+                transform: translateX(0);
+            }
+
+            33.33%,
+            63.33% {
+                transform: translateX(-25%);
+            }
+
+            66.66%,
+            96.66% {
+                transform: translateX(-50%);
+            }
+
+            100% {
+                transform: translateX(-75%);
+            }
+
+            /* Lướt nhanh trong 0.4s */
         }
 
         .search-suggestions.active {
@@ -977,14 +1106,17 @@
             gap: 14px;
             cursor: pointer;
             transition: background 0.2s;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
+
         .suggestion-item:last-child {
             border-bottom: none;
         }
+
         .suggestion-item:hover {
             background: rgba(0, 114, 255, 0.08);
         }
+
         .suggestion-icon {
             width: 32px;
             height: 32px;
@@ -995,14 +1127,17 @@
             color: white;
             flex-shrink: 0;
         }
+
         .suggestion-icon span {
             font-size: 18px;
         }
+
         .suggestion-info {
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
+
         .suggestion-name {
             font-size: 14px;
             font-weight: 600;
@@ -1011,10 +1146,12 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .suggestion-cat {
             font-size: 12px;
             color: #666;
         }
+
         .no-results {
             padding: 16px 20px;
             font-size: 14px;
@@ -1033,7 +1170,7 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
-        
+
         .categories-scroll::-webkit-scrollbar {
             display: none;
         }
@@ -1056,11 +1193,12 @@
             color: #374151;
             cursor: pointer;
             white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: all 0.2s;
         }
 
-        .category-pill:hover, .category-pill.active {
+        .category-pill:hover,
+        .category-pill.active {
             background: #fff;
             border-color: var(--primary);
             color: var(--primary);
@@ -1072,15 +1210,15 @@
             font-size: 18px;
             color: inherit;
         }
-        
+
         /* Custom Leaflet Zoom Controls */
         .leaflet-control-zoom {
             border: none !important;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
             border-radius: 8px !important;
             overflow: hidden;
             margin-bottom: 24px !important;
-            margin-right: 24px !important;
+            margin-right: 0 !important;
         }
 
         .leaflet-control-zoom a {
@@ -1088,7 +1226,7 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             color: #374151 !important;
-            border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
             width: 38px !important;
             height: 38px !important;
             line-height: 38px !important;
@@ -1099,7 +1237,7 @@
             align-items: center !important;
             justify-content: center !important;
         }
-        
+
         .leaflet-control-zoom a:last-child {
             border-bottom: none !important;
         }
@@ -1138,7 +1276,8 @@
             display: flex;
             flex-direction: column;
             /* overflow: hidden removed to allow tooltips to show */
-            border-right: none; /* Removed to seamlessly merge with toggle tab */
+            border-right: none;
+            /* Removed to seamlessly merge with toggle tab */
             transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             pointer-events: auto;
         }
@@ -1151,16 +1290,18 @@
         .user-sidebar .sidebar-header {
             display: flex;
             align-items: center;
-            padding: 20px 15px; /* 15px padding + 40px avatar = 55px. Avatar centers nicely in 70px */
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 20px 15px;
+            /* 15px padding + 40px avatar = 55px. Avatar centers nicely in 70px */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             min-height: 80px;
             box-sizing: border-box;
             cursor: pointer;
-            white-space: nowrap; /* Prevent wrapping during transition */
+            white-space: nowrap;
+            /* Prevent wrapping during transition */
         }
 
         .user-sidebar .sidebar-header:hover {
-            background: rgba(0,0,0,0.02);
+            background: rgba(0, 0, 0, 0.02);
         }
 
         .user-sidebar .user-info {
@@ -1186,7 +1327,7 @@
             background: white;
             transition: transform 0.2s;
         }
-        
+
         .user-sidebar .user-avatar:hover {
             transform: scale(1.05);
             box-shadow: 0 2px 8px rgba(0, 114, 255, 0.3);
@@ -1216,7 +1357,7 @@
             margin-top: 2px;
             white-space: nowrap;
         }
-        
+
         /* Smooth hiding of text */
         .user-sidebar.collapsed .user-details {
             max-width: 0;
@@ -1242,20 +1383,21 @@
             width: 0px;
             display: none;
         }
-        
+
         .user-sidebar.collapsed .sidebar-menu {
             overflow-y: hidden;
             overflow-x: hidden;
         }
 
         .user-sidebar .sidebar-menu::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 4px;
         }
 
         .user-sidebar .sidebar-menu li {
             margin-bottom: 5px;
-            padding: 0 15px; /* Match header left padding */
+            padding: 0 15px;
+            /* Match header left padding */
         }
 
         .user-sidebar .menu-item {
@@ -1271,7 +1413,7 @@
             width: 100%;
         }
 
-        .user-sidebar .menu-item:hover, 
+        .user-sidebar .menu-item:hover,
         .user-sidebar .menu-item.active {
             background: rgba(0, 114, 255, 0.08);
             color: var(--primary);
@@ -1290,7 +1432,8 @@
         }
 
         .user-sidebar .menu-icon {
-            width: 40px; /* Match avatar width */
+            width: 40px;
+            /* Match avatar width */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1304,7 +1447,8 @@
         .user-sidebar .menu-text {
             font-size: 14px;
             font-weight: 600;
-            margin-left: 12px; /* Match gap of header */
+            margin-left: 12px;
+            /* Match gap of header */
             overflow: hidden;
             max-width: 200px;
             opacity: 1;
@@ -1323,7 +1467,8 @@
         /* Tooltip for collapsed state */
         .user-sidebar .menu-item .tooltip {
             position: absolute;
-            left: 55px; /* Offset nicely from the icon */
+            left: 55px;
+            /* Offset nicely from the icon */
             top: 50%;
             transform: translateY(-50%);
             background: #1f2937;
@@ -1335,7 +1480,7 @@
             opacity: 0;
             pointer-events: none;
             transition: 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             z-index: 100;
         }
 
@@ -1352,7 +1497,8 @@
 
         .user-sidebar.collapsed .menu-item:hover .tooltip {
             opacity: 1;
-            left: 55px; /* Nice slight slide effect */
+            left: 55px;
+            /* Nice slight slide effect */
         }
 
         /* Edge Toggle Button (Seamless Tab) */
@@ -1360,22 +1506,30 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            left: 260px; /* default expanded width */
-            margin-left: -1px; /* overlap the sidebar border */
-            width: 16px; /* Flatter width */
-            height: 52px; /* Adjusted height */
+            left: 260px;
+            /* default expanded width */
+            margin-left: -1px;
+            /* overlap the sidebar border */
+            width: 16px;
+            /* Flatter width */
+            height: 52px;
+            /* Adjusted height */
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            border-left: none; /* seamlessly merge with sidebar */
-            border-radius: 0 8px 8px 0; /* flat left, less rounded right */
+            border-left: none;
+            /* seamlessly merge with sidebar */
+            border-radius: 0 8px 8px 0;
+            /* flat left, less rounded right */
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 2001; /* Above the sidebar */
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.05); /* Softer shadow */
+            z-index: 2001;
+            /* Above the sidebar */
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.05);
+            /* Softer shadow */
             transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.2s, color 0.2s, width 0.2s;
             pointer-events: auto;
             color: #666;
@@ -1392,26 +1546,32 @@
         }
 
         .sidebar-edge-toggle .icon-arrow {
-            font-size: 18px; /* Scaled down slightly */
+            font-size: 18px;
+            /* Scaled down slightly */
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            transform: rotate(180deg); /* Left pointing when expanded */
+            transform: rotate(180deg);
+            /* Left pointing when expanded */
         }
 
         body.sidebar-collapsed .sidebar-edge-toggle .icon-arrow {
-            transform: rotate(0deg); /* Right pointing when collapsed */
+            transform: rotate(0deg);
+            /* Right pointing when collapsed */
         }
 
         /* Adjust top search panel when sidebar is expanded */
         .top-search-panel {
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            left: 94px; /* default with collapsed sidebar: 70px + 24px */
+            left: 94px;
+            /* default with collapsed sidebar: 70px + 24px */
         }
-        
+
         body.sidebar-expanded .top-search-panel {
-            left: 284px; /* 260px + 24px */
+            left: 284px;
+            /* 260px + 24px */
         }
     </style>
 </head>
+
 <body class="sidebar-collapsed">
 
     <!-- User Sidebar Menu -->
@@ -1427,15 +1587,17 @@
                     </div>
                 </a>
                 @else
-                <div class="user-info">
-                    <div class="user-avatar" style="display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-color: #d1d5db;">
-                        <span class="material-symbols-rounded" style="color: #9ca3af; font-size: 24px; margin: 0;">person</span>
+                    <div class="user-info">
+                        <div class="user-avatar"
+                            style="display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-color: #d1d5db;">
+                            <span class="material-symbols-rounded"
+                                style="color: #9ca3af; font-size: 24px; margin: 0;">person</span>
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">Khách truy cập</span>
+                            <span class="user-role">Chưa đăng nhập</span>
+                        </div>
                     </div>
-                    <div class="user-details">
-                        <span class="user-name">Khách truy cập</span>
-                        <span class="user-role">Chưa đăng nhập</span>
-                    </div>
-                </div>
                 @endauth
             </div>
             <ul class="sidebar-menu">
@@ -1472,20 +1634,21 @@
                     </a>
                 </li>
                 @else
-                <li>
-                    <a href="{{ route('login') }}" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded" style="color: var(--primary);">login</span></span>
-                        <span class="menu-text" style="color: var(--primary); font-weight: 700;">Đăng nhập</span>
-                        <span class="tooltip">Đăng nhập</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('register') }}" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded">person_add</span></span>
-                        <span class="menu-text">Đăng ký tài khoản</span>
-                        <span class="tooltip">Đăng ký tài khoản</span>
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ route('login') }}" class="menu-item">
+                            <span class="menu-icon"><span class="material-symbols-rounded"
+                                    style="color: var(--primary);">login</span></span>
+                            <span class="menu-text" style="color: var(--primary); font-weight: 700;">Đăng nhập</span>
+                            <span class="tooltip">Đăng nhập</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('register') }}" class="menu-item">
+                            <span class="menu-icon"><span class="material-symbols-rounded">person_add</span></span>
+                            <span class="menu-text">Đăng ký tài khoản</span>
+                            <span class="tooltip">Đăng ký tài khoản</span>
+                        </a>
+                    </li>
                 @endauth
             </ul>
         </div>
@@ -1502,18 +1665,20 @@
     <div class="top-search-panel">
         <div class="search-box-container">
             <div class="search-box">
-                <input type="text" id="map-search-input" placeholder="Tìm kiếm địa điểm..." class="search-input" autocomplete="off">
+                <input type="text" id="map-search-input" placeholder="Tìm kiếm địa điểm..." class="search-input"
+                    autocomplete="off">
                 <div class="search-actions">
-                    <button class="icon-btn" title="Tìm kiếm"><span class="material-symbols-rounded">search</span></button>
+                    <button class="icon-btn" title="Tìm kiếm"><span
+                            class="material-symbols-rounded">search</span></button>
                 </div>
             </div>
-            
+
             <!-- Dropdown Gợi ý tìm kiếm -->
             <div class="search-suggestions" id="search-suggestions">
                 <!-- Nội dung được sinh ra bằng Javascript -->
             </div>
         </div>
-        
+
         <div class="categories-scroll" id="map-categories">
             <!-- Render danh mục bằng Javascript từ dữ liệu thật -->
         </div>
@@ -1528,17 +1693,20 @@
                 <span id="weather-temp">...</span>
             </div>
             <div class="msb-divider"></div>
-            <a href="/tin-tuc" class="msb-news" id="news-toggle-btn" title="Xem tất cả tin tức" style="text-decoration: none; color: inherit;">
+            <a href="/tin-tuc" class="msb-news" id="news-toggle-btn" title="Xem tất cả tin tức"
+                style="text-decoration: none; color: inherit;">
                 <span class="material-symbols-rounded">newspaper</span>
                 <span class="msb-news-text">Tin tức và sự kiện</span>
-                <span class="material-symbols-rounded msb-chevron" style="transform: rotate(-45deg);">arrow_forward</span>
+                <span class="material-symbols-rounded msb-chevron"
+                    style="transform: rotate(-45deg);">arrow_forward</span>
             </a>
         </div>
-        
+
         <!-- Dropdown Thời tiết -->
         <div class="weather-dropdown-banner">
             <div class="weather-main">
-                <span class="material-symbols-rounded weather-big-icon" id="weather-detail-icon">partly_cloudy_day</span>
+                <span class="material-symbols-rounded weather-big-icon"
+                    id="weather-detail-icon">partly_cloudy_day</span>
                 <div class="weather-temp-box">
                     <span id="weather-detail-temp">--°C</span>
                     <span class="weather-desc" id="weather-detail-desc">Đang cập nhật...</span>
@@ -1562,45 +1730,131 @@
                 </div>
             </div>
         </div>
-        
+
         @if(isset($newsList) && $newsList->count() > 0)
-        <!-- Dropdown Banner tự động chạy -->
-        <div class="news-dropdown-banner">
-            <div class="banner-track">
-                @foreach($newsList as $news)
-                <a href="#" class="banner-item">
-                    <img src="{{ $news->featured_image ? asset('storage/' . $news->featured_image) : 'https://placehold.co/260x150/1e293b/f8fafc?text=NEWS' }}" alt="{{ $news->title }}">
-                    <div class="banner-overlay">
-                        <div class="banner-title">{{ $news->title }}</div>
-                        <div class="banner-meta">
-                            <div class="meta-left">
-                                <span class="material-symbols-rounded">calendar_today</span>
-                                {{ $news->published_at ? $news->published_at->format('d/m/Y') : $news->created_at->format('d/m/Y') }}
+            <!-- Dropdown Banner tự động chạy -->
+            <div class="news-dropdown-banner">
+                <div class="banner-track">
+                    @foreach($newsList as $news)
+                        <a href="/tin-tuc/{{ $news->slug }}" class="banner-item">
+                            <img src="{{ $news->featured_image ? asset('storage/' . $news->featured_image) : 'https://placehold.co/260x150/1e293b/f8fafc?text=NEWS' }}"
+                                alt="{{ $news->title }}">
+                            <div class="banner-overlay">
+                                <div class="banner-title">{{ $news->title }}</div>
+                                <div class="banner-meta">
+                                    <div class="meta-left">
+                                        <span class="material-symbols-rounded">calendar_today</span>
+                                        {{ $news->published_at ? $news->published_at->format('d/m/Y') : $news->created_at->format('d/m/Y') }}
+                                    </div>
+                                    <span class="material-symbols-rounded">arrow_forward</span>
+                                </div>
                             </div>
-                            <span class="material-symbols-rounded">arrow_forward</span>
+                        </a>
+                    @endforeach
+
+                    <!-- Clone of first item for seamless infinite loop -->
+                    @php $firstNews = $newsList->first(); @endphp
+                    <a href="/tin-tuc/{{ $firstNews->slug }}" class="banner-item" aria-hidden="true">
+                        <img src="{{ $firstNews->featured_image ? asset('storage/' . $firstNews->featured_image) : 'https://placehold.co/260x150/1e293b/f8fafc?text=NEWS' }}"
+                            alt="{{ $firstNews->title }} Clone">
+                        <div class="banner-overlay">
+                            <div class="banner-title">{{ $firstNews->title }}</div>
+                            <div class="banner-meta">
+                                <div class="meta-left">
+                                    <span class="material-symbols-rounded">calendar_today</span>
+                                    {{ $firstNews->published_at ? $firstNews->published_at->format('d/m/Y') : $firstNews->created_at->format('d/m/Y') }}
+                                </div>
+                                <span class="material-symbols-rounded">arrow_forward</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        @endif
+
+        <!-- Bảng Nhiệm Vụ Tích Điểm - Tách biệt hoàn toàn -->
+        <div class="mission-widget-wrapper" id="mission-widget-wrapper">
+            <!-- Header có nút thu gọn/mở rộng -->
+            <div class="mission-header" id="mission-widget-header">
+                <span class="fw-bold text-dark" style="font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 4px; color: #1f2937;">
+                    <span class="material-symbols-rounded text-warning" style="font-size: 16px; vertical-align: middle;">emoji_events</span> NHIỆM VỤ TÍCH ĐIỂM
+                </span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    @auth
+                        <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size: 0.65rem; background-color: rgba(245, 158, 11, 0.1); color: #d97706; padding: 2px 6px; border-radius: 4px; font-weight: 600;" id="widgetPoints">{{ Auth::user()->points }} điểm</span>
+                    @endauth
+                    <span class="material-symbols-rounded text-muted" id="mission-toggle-arrow" style="font-size: 16px; transition: transform 0.3s;">expand_less</span>
+                </div>
+            </div>
+
+            <!-- List nhiệm vụ -->
+            <div class="mission-list-container" style="background: #ffffff; padding: 12px; border-top: 1px solid #f3f4f6; transition: max-height 0.3s ease;">
+                @auth
+                    <div class="d-flex flex-column gap-2" style="max-height: 220px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Nhiệm vụ 1: Điểm danh -->
+                        <div class="widget-mission-item" style="font-size: 0.72rem; padding: 6px 8px; border: 1px solid #f3f4f6; border-radius: 6px; background-color: #f9fafb; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <div style="display: flex; flex-direction: column; text-align: left;">
+                                <span class="fw-semibold text-dark" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-rounded text-success" style="font-size: 15px; vertical-align: middle;">today</span> Điểm danh hằng ngày
+                                </span>
+                                <span class="text-muted" style="font-size: 0.65rem; color: #6b7280;">+10 điểm / ngày</span>
+                            </div>
+                            @if(Auth::user()->last_daily_bonus_at && \Carbon\Carbon::parse(Auth::user()->last_daily_bonus_at)->isToday())
+                                <button class="btn btn-xs btn-success border-0 px-2 py-0.5 rounded-pill fw-semibold" style="font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; background-color: #10b981; color: white;" disabled>Đã nhận</button>
+                            @else
+                                <button type="button" id="widgetClaimDailyBtn" class="btn btn-xs btn-primary border-0 px-2 py-0.5 rounded-pill fw-semibold" style="font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; background-color: var(--primary); color: white;">Nhận</button>
+                            @endif
+                        </div>
+
+                        <!-- Nhiệm vụ 2: Trực tuyến -->
+                        <div class="widget-mission-item" style="font-size: 0.72rem; padding: 6px 8px; border: 1px solid #f3f4f6; border-radius: 6px; background-color: #f9fafb; display: flex; flex-direction: column; text-align: left; gap: 4px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                <span class="fw-semibold text-dark" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-rounded text-primary" style="font-size: 15px; vertical-align: middle;">schedule</span> Trực tuyến tích lũy
+                                </span>
+                                @php
+                                    $sessionPoints = \App\Models\PointTransaction::where('user_id', Auth::id())
+                                        ->where('action', 'active_session')
+                                        ->whereDate('created_at', \Carbon\Carbon::today())
+                                        ->sum('amount');
+                                @endphp
+                                <span class="text-primary fw-bold" id="widgetSessionText" style="font-size: 0.68rem; font-weight: 700;">{{ $sessionPoints }}/60 phút</span>
+                            </div>
+                            <div class="progress" style="height: 4px; margin-bottom: 2px; background-color: #e5e7eb; border-radius: 4px; overflow: hidden; width: 100%;">
+                                <div id="widgetSessionBar" class="progress-bar bg-primary" role="progressbar" style="width: {{ min(100, ($sessionPoints / 60) * 100) }}%; background-color: var(--primary); height: 100%;" aria-valuenow="{{ $sessionPoints }}" aria-valuemin="0" aria-valuemax="60"></div>
+                            </div>
+                        </div>
+
+                        <!-- Nhiệm vụ 3: Bình luận -->
+                        <div class="widget-mission-item" style="font-size: 0.72rem; padding: 6px 8px; border: 1px solid #f3f4f6; border-radius: 6px; background-color: #f9fafb; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <div style="display: flex; flex-direction: column; text-align: left;">
+                                <span class="fw-semibold text-dark" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-rounded text-info" style="font-size: 15px; vertical-align: middle;">chat</span> Đóng góp ý kiến
+                                </span>
+                                <span class="text-muted" style="font-size: 0.65rem; color: #6b7280;">+5 điểm / bình luận</span>
+                            </div>
+                            <a href="#" class="btn btn-xs btn-outline-primary px-2 py-0.5 rounded-pill fw-semibold" onclick="alert('Nhấn vào một địa điểm bất kỳ trên bản đồ rồi viết bình luận để tích lũy điểm!'); return false;" style="font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(0, 114, 255, 0.3); color: var(--primary); text-decoration: none;">Làm</a>
+                        </div>
+
+                        <!-- Nhiệm vụ 4: Yêu thích -->
+                        <div class="widget-mission-item" style="font-size: 0.72rem; padding: 6px 8px; border: 1px solid #f3f4f6; border-radius: 6px; background-color: #f9fafb; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <div style="display: flex; flex-direction: column; text-align: left;">
+                                <span class="fw-semibold text-dark" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-rounded text-danger" style="font-size: 15px; vertical-align: middle;">favorite</span> Yêu thích địa điểm
+                                </span>
+                                <span class="text-muted" style="font-size: 0.65rem; color: #6b7280;">+2 điểm / lượt lưu</span>
+                            </div>
+                            <a href="#" class="btn btn-xs btn-outline-primary px-2 py-0.5 rounded-pill fw-semibold" onclick="alert('Nhấn vào địa điểm bất kỳ trên bản đồ rồi lưu Yêu thích để tích lũy điểm!'); return false;" style="font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(0, 114, 255, 0.3); color: var(--primary); text-decoration: none;">Làm</a>
                         </div>
                     </div>
-                </a>
-                @endforeach
-                
-                <!-- Clone of first item for seamless infinite loop -->
-                @php $firstNews = $newsList->first(); @endphp
-                <a href="#" class="banner-item" aria-hidden="true">
-                    <img src="{{ $firstNews->featured_image ? asset('storage/' . $firstNews->featured_image) : 'https://placehold.co/260x150/1e293b/f8fafc?text=NEWS' }}" alt="{{ $firstNews->title }} Clone">
-                    <div class="banner-overlay">
-                        <div class="banner-title">{{ $firstNews->title }}</div>
-                        <div class="banner-meta">
-                            <div class="meta-left">
-                                <span class="material-symbols-rounded">calendar_today</span>
-                                {{ $firstNews->published_at ? $firstNews->published_at->format('d/m/Y') : $firstNews->created_at->format('d/m/Y') }}
-                            </div>
-                            <span class="material-symbols-rounded">arrow_forward</span>
-                        </div>
+                @else
+                    <div class="text-center py-2" style="text-align: center;">
+                        <p class="text-muted mb-2" style="font-size: 0.7rem; color: #6b7280; margin-bottom: 8px;">Đăng nhập để làm nhiệm vụ tích điểm!</p>
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-xs px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.68rem; background-color: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; text-decoration: none; display: inline-block;">Đăng nhập</a>
                     </div>
-                </a>
+                @endauth
             </div>
         </div>
-        @endif
     </div>
 
     <!-- Bottom Featured Drawer (Full Width) -->
@@ -1613,13 +1867,14 @@
         <div class="drawer-content">
             <div class="featured-loc-scroll">
                 @foreach($locations->sortByDesc('view_count')->take(10) as $loc)
-                <a href="#" class="featured-loc-card" onclick="flyToLocation({{ $loc->id }}); return false;">
-                    <img src="{{ $loc->thumbnail_url ?: 'https://placehold.co/300x200/1e3a8a/ffffff?text=No+Image' }}" alt="{{ $loc->name }}" class="featured-loc-img">
-                    <div class="featured-loc-info">
-                        <span class="material-symbols-rounded">account_balance</span>
-                        <div class="featured-loc-title">{{ $loc->name }}</div>
-                    </div>
-                </a>
+                    <a href="#" class="featured-loc-card" onclick="flyToLocation({{ $loc->id }}); return false;">
+                        <img src="{{ $loc->thumbnail_url ?: 'https://placehold.co/300x200/1e3a8a/ffffff?text=No+Image' }}"
+                            alt="{{ $loc->name }}" class="featured-loc-img">
+                        <div class="featured-loc-info">
+                            <span class="material-symbols-rounded">account_balance</span>
+                            <div class="featured-loc-title">{{ $loc->name }}</div>
+                        </div>
+                    </a>
                 @endforeach
             </div>
         </div>
@@ -1663,7 +1918,7 @@
             maxZoom: 20,
         }).addTo(map);
 
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        L.control.zoom({ position: 'topright' }).addTo(map);
 
 
 
@@ -1729,13 +1984,13 @@
                 const bounds = border.getBounds();
                 // Căn giữa bản đồ vào Hà Nam
                 map.fitBounds(bounds);
-                
+
                 // Mặc định zoom cận cảnh hơn 1 mức (như trong ảnh bạn yêu cầu)
                 map.setZoom(map.getZoom() + 1);
-                
+
                 // Khóa không cho zoom out xa hơn mức mặc định này
                 map.setMinZoom(map.getZoom());
-                
+
                 // Nới rộng giới hạn kéo thả để người dùng xem được các vùng lân cận rộng hơn
                 map.setMaxBounds(bounds.pad(0.5));
 
@@ -1764,7 +2019,7 @@
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false, // Tự implement thủ công
             zoomToBoundsOnClick: false,
-            iconCreateFunction: function(cluster) {
+            iconCreateFunction: function (cluster) {
                 const count = cluster.getChildCount();
                 let size = 'small';
                 if (count >= 10) size = 'medium';
@@ -1782,11 +2037,11 @@
             // Graham scan
             if (points.length < 3) return points.slice();
             points = points.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-            const cross = (O, A, B) => (A[0]-O[0])*(B[1]-O[1]) - (A[1]-O[1])*(B[0]-O[0]);
+            const cross = (O, A, B) => (A[0] - O[0]) * (B[1] - O[1]) - (A[1] - O[1]) * (B[0] - O[0]);
             const lower = [];
-            for (const p of points) { while (lower.length >= 2 && cross(lower[lower.length-2], lower[lower.length-1], p) <= 0) lower.pop(); lower.push(p); }
+            for (const p of points) { while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop(); lower.push(p); }
             const upper = [];
-            for (let i = points.length - 1; i >= 0; i--) { const p = points[i]; while (upper.length >= 2 && cross(upper[upper.length-2], upper[upper.length-1], p) <= 0) upper.pop(); upper.push(p); }
+            for (let i = points.length - 1; i >= 0; i--) { const p = points[i]; while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop(); upper.push(p); }
             upper.pop(); lower.pop();
             return lower.concat(upper);
         }
@@ -1802,7 +2057,7 @@
         map.on('zoomstart', clearCoveragePolygon);
         map.on('movestart', clearCoveragePolygon);
 
-        markers.on('clustermouseover', function(e) {
+        markers.on('clustermouseover', function (e) {
             if (coveragePolygon) { map.removeLayer(coveragePolygon); coveragePolygon = null; }
 
             const childMarkers = e.layer.getAllChildMarkers();
@@ -1835,7 +2090,7 @@
             }).addTo(map);
         });
 
-        markers.on('clustermouseout', function(e) {
+        markers.on('clustermouseout', function (e) {
             if (coveragePolygon) {
                 map.removeLayer(coveragePolygon);
                 coveragePolygon = null;
@@ -1892,13 +2147,13 @@
                 const marker = L.marker([loc.lat, loc.lng], markerOptions);
 
                 // Đẩy z-index DOM trực tiếp khi hover (Lưu lại z-index gốc của Leaflet vốn có trị số lên tới hàng triệu dựa trên Latitude)
-                marker.on('mouseover', function() {
+                marker.on('mouseover', function () {
                     if (this._icon) {
                         this._originalZIndex = this._icon.style.zIndex;
                         this._icon.style.zIndex = 99999999;
                     }
                 });
-                marker.on('mouseout', function() {
+                marker.on('mouseout', function () {
                     if (this._icon) {
                         this._icon.style.zIndex = this._originalZIndex || '';
                     }
@@ -1906,7 +2161,7 @@
 
                 const thumbUrl = loc.thumbnail_url ? loc.thumbnail_url : 'https://placehold.co/400x250/e2e8f0/475569?text=No+Image';
                 const iconColor = loc.category && loc.category.icon_color ? loc.category.icon_color : '#ef4444';
-                
+
                 const popupHtml = '<div class="poi-popup-inner" style="--poi-color: ' + iconColor + ';">'
                     + '<img src="' + thumbUrl + '" class="poi-thumbnail" alt="' + loc.name + '">'
                     + '<div class="poi-content">'
@@ -1917,9 +2172,9 @@
                     + '</a>'
                     + '</div>'
                     + '</div>';
-                
+
                 marker.bindPopup(popupHtml, { minWidth: 260, maxWidth: 260, closeButton: false });
-                
+
                 // Lưu lại marker vào object loc để dùng cho chức năng tìm kiếm
                 loc.marker = marker;
 
@@ -1951,7 +2206,7 @@
             // Giả lập icon từ google font, nếu có icon url thì dùng img, ở đây dùng tạm một icon chung nếu không parse được
             const iconColor = cat.icon_color || 'var(--primary)';
             btn.innerHTML = `<span class="material-symbols-rounded" style="color: ${iconColor};">location_on</span> ${cat.name}`;
-            
+
             btn.addEventListener('click', () => {
                 // Nếu đang active thì bấm để bỏ lọc (hiển thị tất cả)
                 if (btn.classList.contains('active')) {
@@ -1968,7 +2223,7 @@
                 // Remove active class from all
                 document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
                 btn.classList.add('active');
-                
+
                 // Filter markers
                 markers.clearLayers();
                 locations.forEach(loc => {
@@ -1986,11 +2241,11 @@
         }
 
         // Xử lý tìm kiếm gợi ý
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             const val = this.value.toLowerCase().trim();
             const valNoAccent = removeAccents(val);
             suggestionsBox.innerHTML = '';
-            
+
             if (val.length === 0) {
                 suggestionsBox.classList.remove('active');
                 return;
@@ -2000,13 +2255,13 @@
                 const nameNoAccent = removeAccents(loc.name.toLowerCase());
                 return nameNoAccent.includes(valNoAccent);
             });
-            
+
             if (results.length > 0) {
                 results.slice(0, 10).forEach(loc => {
                     const item = document.createElement('div');
                     item.className = 'suggestion-item';
                     const color = loc.category?.icon_color || 'var(--primary)';
-                    
+
                     item.innerHTML = `
                         <div class="suggestion-icon" style="background: ${color};">
                             <span class="material-symbols-rounded">location_on</span>
@@ -2016,40 +2271,40 @@
                             <div class="suggestion-cat">${loc.category?.name || 'Chưa phân loại'}</div>
                         </div>
                     `;
-                    
+
                     item.addEventListener('click', () => {
                         suggestionsBox.classList.remove('active');
                         searchInput.value = loc.name;
-                        
+
                         // Đảm bảo marker đang hiển thị (nếu đang filter)
                         if (!markers.hasLayer(loc.marker)) {
                             markers.addLayer(loc.marker);
                         }
-                        
+
                         // Zoom từng cấp cụm một (step-by-step) thay vì nhảy vọt
                         stepZoomToMarker(loc, () => {
                             let targetZoom = Math.max(18, map.getZoom());
                             let dist = map.getCenter().distanceTo([loc.lat, loc.lng]);
-                            
+
                             if (dist > 500) {
                                 map.flyTo([loc.lat, loc.lng], targetZoom, { duration: 1.2 });
                             } else {
                                 map.setView([loc.lat, loc.lng], targetZoom, { animate: true, duration: 1.2 });
                             }
-                            
+
                             // Đợi bay đến giữa rồi mới mở popup để tránh giật hình
                             setTimeout(() => {
                                 loc.marker.openPopup();
                             }, 800);
                         });
                     });
-                    
+
                     suggestionsBox.appendChild(item);
                 });
             } else {
                 suggestionsBox.innerHTML = '<div class="no-results">Không tìm thấy địa điểm nào</div>';
             }
-            
+
             suggestionsBox.classList.add('active');
         });
 
@@ -2067,13 +2322,13 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            
+
             if (type === 'loading') {
                 toast.innerHTML = `<div class="toast-spinner"></div><div class="toast-content">${message}</div>`;
             } else {
                 toast.innerHTML = `<div class="toast-content">${message}</div>`;
             }
-            
+
             container.appendChild(toast);
 
             // GSAP Enter Animation
@@ -2144,7 +2399,7 @@
             }
 
             const btn = document.querySelector('.leaflet-control-locate');
-            
+
             isLocatingInProgress = true;
             if (!silent && btn) {
                 btn.classList.add('loading');
@@ -2164,7 +2419,7 @@
                     const { latitude, longitude } = position.coords;
                     userCoords = { lat: latitude, lng: longitude };
                     isLocatingInProgress = false;
-                    
+
                     if (btn) {
                         btn.classList.remove('loading');
                     }
@@ -2173,7 +2428,7 @@
                         loadingToast.dismiss();
                         loadingToast = null;
                     }
-                    
+
                     if (pendingFlyTo) {
                         pendingFlyTo = false;
                         updateUserMarker(latitude, longitude);
@@ -2214,13 +2469,13 @@
         // Function to fly map to user location
         function flyToUserLocation() {
             const btn = document.querySelector('.leaflet-control-locate');
-            
+
             if (userCoords) {
                 if (loadingToast) {
                     loadingToast.dismiss();
                     loadingToast = null;
                 }
-                
+
                 updateUserMarker(userCoords.lat, userCoords.lng);
                 map.setView([userCoords.lat, userCoords.lng], 16, {
                     animate: true,
@@ -2261,15 +2516,15 @@
             locateBtn.title = 'Vị trí của tôi';
             locateBtn.role = 'button';
             locateBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 18px; vertical-align: middle; line-height: 30px;">my_location</span>';
-            
+
             // Prevent map dragging/clicking when clicking the control button
             L.DomEvent.disableClickPropagation(locateBtn);
-            
+
             locateBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 flyToUserLocation();
             });
-            
+
             zoomContainer.appendChild(locateBtn);
         }
 
@@ -2283,13 +2538,13 @@
                         const temp = Math.round(data.current.temperature_2m) + '°C';
                         const code = data.current.weather_code;
                         const isDay = data.current.is_day; // 0 or 1
-                        
+
                         document.getElementById('weather-temp').textContent = temp;
                         document.getElementById('weather-detail-temp').textContent = temp;
                         document.getElementById('weather-humidity').textContent = data.current.relative_humidity_2m + '%';
                         document.getElementById('weather-wind').textContent = data.current.wind_speed_10m + ' km/h';
                         document.getElementById('weather-feels').textContent = Math.round(data.current.apparent_temperature) + '°C';
-                        
+
                         let icon = 'partly_cloudy_day';
                         let desc = 'Có mây';
                         // WMO Weather interpretation codes
@@ -2301,7 +2556,7 @@
                         else if (code >= 71 && code <= 77) { icon = 'ac_unit'; desc = 'Tuyết rơi'; }
                         else if (code >= 80 && code <= 82) { icon = 'rainy'; desc = 'Mưa rào'; }
                         else if (code >= 95 && code <= 99) { icon = 'thunderstorm'; desc = 'Mưa dông'; }
-                        
+
                         document.getElementById('weather-icon').textContent = icon;
                         document.getElementById('weather-detail-icon').textContent = icon;
                         document.getElementById('weather-detail-desc').textContent = desc;
@@ -2326,44 +2581,44 @@
         const weatherToggleBtn = document.getElementById('weather-toggle-btn');
         const newsWidgetWrapper = document.getElementById('news-widget-wrapper');
         const newsWidgetToggle = document.getElementById('news-widget-toggle'); // Container của 2 nút
-        
+
         if (newsWidgetWrapper) {
             // Nút tin tức giờ đã thành thẻ <a> để chuyển hướng, không còn dùng JS để đóng mở nữa
             if (weatherToggleBtn) {
-                weatherToggleBtn.addEventListener('click', function(e) {
+                weatherToggleBtn.addEventListener('click', function (e) {
                     e.stopPropagation();
                     newsWidgetWrapper.classList.toggle('weather-active');
                 });
             }
-            
+
             // Ngăn sự kiện click bên trong các banner truyền ra ngoài
             const dropdownBanner = newsWidgetWrapper.querySelector('.news-dropdown-banner');
-            if(dropdownBanner) {
-                dropdownBanner.addEventListener('click', function(e) {
+            if (dropdownBanner) {
+                dropdownBanner.addEventListener('click', function (e) {
                     e.stopPropagation();
                 });
                 L.DomEvent.disableClickPropagation(dropdownBanner);
                 L.DomEvent.disableScrollPropagation(dropdownBanner);
             }
-            
+
             const weatherBanner = newsWidgetWrapper.querySelector('.weather-dropdown-banner');
-            if(weatherBanner) {
-                weatherBanner.addEventListener('click', function(e) {
+            if (weatherBanner) {
+                weatherBanner.addEventListener('click', function (e) {
                     e.stopPropagation();
                 });
                 L.DomEvent.disableClickPropagation(weatherBanner);
                 L.DomEvent.disableScrollPropagation(weatherBanner);
             }
-            
+
             // Ngăn chặn click vào thanh mini truyền qua bản đồ
-            if(newsWidgetToggle) {
+            if (newsWidgetToggle) {
                 L.DomEvent.disableClickPropagation(newsWidgetToggle);
                 L.DomEvent.disableScrollPropagation(newsWidgetToggle);
             }
         }
 
         // Click ra ngoài bản đồ để đóng bảng thời tiết (nhưng giữ nguyên bảng tin tức)
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (newsWidgetWrapper && !newsWidgetWrapper.contains(e.target)) {
                 newsWidgetWrapper.classList.remove('weather-active');
             }
@@ -2374,23 +2629,23 @@
         // ==========================================
         const drawerToggleBtn = document.getElementById('drawer-toggle-btn');
         const featuredDrawer = document.getElementById('featured-drawer');
-        
+
         if (drawerToggleBtn && featuredDrawer) {
             // Đồng bộ trạng thái ban đầu
-            if(featuredDrawer.classList.contains('open')) {
+            if (featuredDrawer.classList.contains('open')) {
                 document.body.classList.add('drawer-open');
             }
 
-            drawerToggleBtn.addEventListener('click', function(e) {
+            drawerToggleBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 featuredDrawer.classList.toggle('open');
                 document.body.classList.toggle('drawer-open', featuredDrawer.classList.contains('open'));
             });
         }
-        
+
         // Prevent map click when clicking drawer
-        if(featuredDrawer) {
-            featuredDrawer.addEventListener('click', function(e) {
+        if (featuredDrawer) {
+            featuredDrawer.addEventListener('click', function (e) {
                 e.stopPropagation();
             });
             L.DomEvent.disableClickPropagation(featuredDrawer);
@@ -2405,12 +2660,12 @@
 
             function step() {
                 let parent = markers.getVisibleParent(loc.marker);
-                
+
                 if (parent && parent.getChildCount) {
                     let bounds = parent.getBounds();
                     let targetZoom = map.getBoundsZoom(bounds, false, [40, 40]);
                     let currentZoom = map.getZoom();
-                    
+
                     if (currentZoom >= targetZoom || currentZoom >= map.getMaxZoom()) {
                         parent.spiderfy();
                         setTimeout(finalCallback, 450);
@@ -2424,10 +2679,10 @@
                         map.off('moveend', onMoveEnd);
                         setTimeout(step, 450); // Dừng 0.45s ở mỗi cấp cụm để người dùng nhìn rõ
                     }
-                    
+
                     map.on('moveend', onMoveEnd);
                     parent.zoomToBounds({ padding: [40, 40] });
-                    
+
                     setTimeout(() => {
                         if (!moved) onMoveEnd();
                     }, 1500); // fallback
@@ -2435,7 +2690,7 @@
                     finalCallback();
                 }
             }
-            
+
             step();
         }
 
@@ -2444,21 +2699,21 @@
             const loc = locations.find(l => l.id === id);
             if (!loc || !loc.marker) return;
 
-            if(featuredDrawer) featuredDrawer.classList.remove('open');
+            if (featuredDrawer) featuredDrawer.classList.remove('open');
             document.body.classList.remove('drawer-open');
-            
+
             // Zoom từng lớp cụm một y hệt như tìm kiếm
             stepZoomToMarker(loc, () => {
                 // Đưa marker ra chính giữa màn hình nhưng KHÔNG BAO GIỜ thu nhỏ lại
                 let targetZoom = Math.max(18, map.getZoom());
                 let dist = map.getCenter().distanceTo([loc.lat, loc.lng]);
-                
+
                 if (dist > 500) {
                     map.flyTo([loc.lat, loc.lng], targetZoom, { duration: 1.2 });
                 } else {
                     map.setView([loc.lat, loc.lng], targetZoom, { animate: true, duration: 1.2 });
                 }
-                
+
                 // Đợi bay đến giữa rồi mới mở popup để tránh giật hình
                 setTimeout(() => {
                     loc.marker.openPopup();
@@ -2478,12 +2733,12 @@
         // Sidebar Toggle Logic
         const sidebar = document.getElementById('userSidebar');
         const sidebarToggleBtn = document.getElementById('sidebarToggle');
-        
+
         if (sidebar && sidebarToggleBtn) {
-            sidebarToggleBtn.addEventListener('click', function() {
+            sidebarToggleBtn.addEventListener('click', function () {
                 sidebar.classList.toggle('collapsed');
-                
-                if(sidebar.classList.contains('collapsed')) {
+
+                if (sidebar.classList.contains('collapsed')) {
                     document.body.classList.remove('sidebar-expanded');
                     document.body.classList.add('sidebar-collapsed');
                 } else {
@@ -2491,15 +2746,94 @@
                     document.body.classList.remove('sidebar-collapsed');
                 }
             });
-            
+
             // Tự động thu gọn trên màn hình nhỏ
-            if(window.innerWidth <= 1024) {
+            if (window.innerWidth <= 1024) {
                 sidebar.classList.add('collapsed');
                 document.body.classList.remove('sidebar-expanded');
                 document.body.classList.add('sidebar-collapsed');
             }
         }
 
+        // Claim Daily Bonus from map widget
+        @auth
+        const widgetClaimDailyBtn = document.getElementById("widgetClaimDailyBtn");
+        if (widgetClaimDailyBtn) {
+            widgetClaimDailyBtn.addEventListener("click", function() {
+                widgetClaimDailyBtn.disabled = true;
+                widgetClaimDailyBtn.innerHTML = "Đang nhận...";
+
+                fetch("{{ route('client.profile.claim_daily') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        widgetClaimDailyBtn.className = "btn btn-xs btn-success border-0 px-2 py-0.5 rounded-pill fw-semibold";
+                        widgetClaimDailyBtn.style.backgroundColor = "#10b981";
+                        widgetClaimDailyBtn.style.color = "white";
+                        widgetClaimDailyBtn.innerHTML = "Đã nhận";
+                        widgetClaimDailyBtn.disabled = true;
+                        
+                        // Update points displays
+                        const widgetPoints = document.getElementById("widgetPoints");
+                        if (widgetPoints) {
+                            widgetPoints.textContent = data.points + " điểm";
+                        }
+                        const headerPoints = document.getElementById("navbarUserPoints");
+                        if (headerPoints) {
+                            headerPoints.textContent = data.points + " điểm";
+                        }
+                        alert(data.message);
+                    } else {
+                        widgetClaimDailyBtn.disabled = false;
+                        widgetClaimDailyBtn.innerHTML = "Nhận";
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    widgetClaimDailyBtn.disabled = false;
+                    widgetClaimDailyBtn.innerHTML = "Nhận";
+                    console.error("Error claiming daily bonus:", error);
+                    alert("Có lỗi xảy ra, vui lòng thử lại sau.");
+                });
+            });
+        }
+        @endauth
+
+        // Toggle Mission Widget Collapse/Expand
+        const missionWidget = document.getElementById("mission-widget-wrapper");
+        const missionHeader = document.getElementById("mission-widget-header");
+        const missionArrow = document.getElementById("mission-toggle-arrow");
+
+        if (missionWidget && missionHeader) {
+            missionHeader.addEventListener("click", function(e) {
+                missionWidget.classList.toggle("collapsed");
+                if (missionArrow) {
+                    if (missionWidget.classList.contains("collapsed")) {
+                        missionArrow.textContent = "expand_more";
+                    } else {
+                        missionArrow.textContent = "expand_less";
+                    }
+                }
+            });
+
+            // Prevent Leaflet Map events from propagating when clicking or scrolling inside the mission widget
+            L.DomEvent.disableClickPropagation(missionWidget);
+            L.DomEvent.disableScrollPropagation(missionWidget);
+        }
+
     </script>
 </body>
+
+</html>
+});
+
+</script>
+</body>
+
 </html>

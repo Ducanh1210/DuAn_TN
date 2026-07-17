@@ -143,6 +143,9 @@
                                 <span>{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="navbarUserDropdown">
+                                <li><span class="dropdown-item-text py-2 fw-bold text-muted small"><i class="fa-solid fa-coins me-2 text-warning"></i><span id="navbarUserPoints">{{ Auth::user()->points }} điểm</span></span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.profile') }}"><i class="fa-solid fa-user me-2 text-primary"></i>Trang cá nhân</a></li>
                                 <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.favorites.index') }}"><i class="fa-solid fa-heart me-2 text-danger"></i>Địa điểm yêu thích</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
@@ -161,6 +164,16 @@
         </div>
     </nav>
 
+    @if(session('success_points'))
+        <div class="container mt-3">
+            <div class="alert alert-success alert-dismissible fade show border-0 rounded-3 shadow-sm d-flex align-items-center gap-2" role="alert" style="background-color: #d1e7dd; color: #0f5132; padding: 12px 20px;">
+                <i class="fa-solid fa-circle-check fs-5"></i>
+                <div>{{ session('success_points') }}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    @endif
+
     @yield('content')
 
     <footer>
@@ -171,5 +184,70 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    @auth
+    <script>
+        // Track session duration activity
+        (function() {
+            // Send heartbeat every 60 seconds (1 minute)
+            const intervalTime = 60000; 
+
+            // Function to send heartbeat
+            function sendHeartbeat() {
+                fetch("{{ route('client.profile.heartbeat') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Heartbeat sent: " + data.message + " Current points: " + data.points);
+                        const pointsElement = document.getElementById("navbarUserPoints");
+                        if (pointsElement) {
+                            pointsElement.textContent = data.points + " điểm";
+                        }
+                        const sidebarPoints = document.getElementById("sidebarMissionPoints");
+                        if (sidebarPoints) {
+                            sidebarPoints.textContent = data.points + " điểm";
+                        }
+                        const widgetPoints = document.getElementById("widgetPoints");
+                        if (widgetPoints) {
+                            widgetPoints.textContent = data.points + " điểm";
+                        }
+                        const progressText = document.getElementById("missionSessionProgressText");
+                        const progressBar = document.getElementById("missionSessionProgressBar");
+                        if (progressText && progressBar) {
+                            let currentVal = parseInt(progressText.textContent) || 0;
+                            if (currentVal < 60) {
+                                currentVal += 1;
+                                progressText.textContent = currentVal + "/60 phút";
+                                progressBar.style.width = ((currentVal / 60) * 100) + "%";
+                                progressBar.setAttribute("aria-valuenow", currentVal);
+                            }
+                        }
+                        const widgetSessionText = document.getElementById("widgetSessionText");
+                        const widgetSessionBar = document.getElementById("widgetSessionBar");
+                        if (widgetSessionText && widgetSessionBar) {
+                            let currentVal = parseInt(widgetSessionText.textContent) || 0;
+                            if (currentVal < 60) {
+                                currentVal += 1;
+                                widgetSessionText.textContent = currentVal + "/60 phút";
+                                widgetSessionBar.style.width = ((currentVal / 60) * 100) + "%";
+                                widgetSessionBar.setAttribute("aria-valuenow", currentVal);
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error("Error sending heartbeat:", error));
+            }
+
+            // Start heartbeat tracker
+            setInterval(sendHeartbeat, intervalTime);
+        })();
+    </script>
+    @endauth
 </body>
 </html>

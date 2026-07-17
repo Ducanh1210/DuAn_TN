@@ -182,6 +182,37 @@
         .auth-prompt { text-align: center; color: rgba(255,255,255,0.7); font-size: 14px; }
         .auth-prompt a { color: var(--hotspot-color); text-decoration: none; font-weight: 600; }
         .auth-prompt a:hover { text-decoration: underline; }
+
+        /* Report Modal Styles */
+        .report-modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); z-index: 10000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .report-modal-overlay.active { display: flex; }
+        .report-modal {
+            background: #1e293b; border-radius: 16px; width: 400px; max-width: 90%;
+            padding: 24px; color: white; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            animation: modalPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPopIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .report-modal h4 { margin-top: 0; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px; font-size: 18px; color: #f87171;}
+        .report-modal label { display: block; margin-bottom: 8px; font-size: 13px; color: rgba(255,255,255,0.7); }
+        .report-modal select, .report-modal textarea {
+            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 10px 12px; color: white; margin-bottom: 16px; font-family: inherit; font-size: 14px;
+        }
+        .report-modal select:focus, .report-modal textarea:focus { border-color: #ef4444; outline: none; }
+        .report-modal select option { background: #1e293b; color: white; }
+        .report-modal textarea { resize: none; }
+        .report-modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        .btn-report-cancel { background: rgba(255,255,255,0.1); border: none; padding: 10px 16px; border-radius: 8px; color: white; cursor: pointer; transition: 0.2s;}
+        .btn-report-cancel:hover { background: rgba(255,255,255,0.2); }
+        .btn-report-submit { background: #ef4444; border: none; padding: 10px 16px; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; transition: 0.2s;}
+        .btn-report-submit:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);}
+        .btn-report-submit:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 
@@ -253,6 +284,9 @@
         <button class="interaction-btn {{ $isFavorited ? 'active' : '' }}" id="btnToggleFavorite" title="Yêu thích">
             <i class="{{ $isFavorited ? 'fa-solid' : 'fa-regular' }} fa-heart"></i>
         </button>
+        <button class="interaction-btn" title="Báo cáo địa điểm" onclick="openReportModal({{ $location->id }}, 'Location')">
+            <i class="fa-solid fa-flag"></i>
+        </button>
         <button class="interaction-btn" id="btnToggleComments" title="Bình luận">
             <i class="fa-regular fa-comment-dots"></i>
             <span class="interaction-badge" id="commentsCountBadge">{{ $location->comments->count() }}</span>
@@ -271,8 +305,11 @@
                     <img src="{{ $comment->user->avatar_url ? (str_starts_with($comment->user->avatar_url, 'http') ? $comment->user->avatar_url : asset('storage/' . $comment->user->avatar_url)) : 'https://ui-avatars.com/api/?name='.urlencode($comment->user->display_name ?? $comment->user->username).'&background=0072FF&color=fff' }}" alt="{{ $comment->user->display_name ?? $comment->user->username }}" class="comment-avatar">
                     <div class="comment-body">
                         <div class="comment-author">
-                            {{ $comment->user->display_name ?? $comment->user->username }}
-                            <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>
+                            <span>{{ $comment->user->display_name ?? $comment->user->username }}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>
+                                <button class="btn btn-sm text-danger p-0 border-0 bg-transparent" title="Báo cáo bình luận" onclick="openReportModal({{ $comment->id }}, 'Comment')"><i class="fa-solid fa-flag" style="font-size: 12px;"></i></button>
+                            </div>
                         </div>
                         <p class="comment-text">{{ $comment->content }}</p>
                     </div>
@@ -294,6 +331,29 @@
                     Vui lòng <a href="{{ route('login') }}">đăng nhập</a> để để lại bình luận và lưu địa điểm yêu thích.
                 </div>
             @endauth
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="report-modal-overlay" id="reportModalOverlay">
+        <div class="report-modal">
+            <h4><i class="fa-solid fa-triangle-exclamation"></i> Báo cáo vi phạm</h4>
+            <label>Lý do báo cáo</label>
+            <select id="reportReason">
+                <option value="Nội dung rác, quảng cáo">Nội dung rác, quảng cáo</option>
+                <option value="Thông tin sai sự thật">Thông tin sai sự thật</option>
+                <option value="Ngôn từ kích động, thù địch">Ngôn từ kích động, thù địch</option>
+                <option value="Hình ảnh phản cảm">Hình ảnh phản cảm</option>
+                <option value="Lừa đảo">Lừa đảo</option>
+                <option value="Khác">Lý do khác...</option>
+            </select>
+            <label>Mô tả chi tiết (Tùy chọn)</label>
+            <textarea id="reportDescription" rows="3" placeholder="Nhập thêm thông tin để quản trị viên dễ dàng xử lý..."></textarea>
+            
+            <div class="report-modal-actions">
+                <button class="btn-report-cancel" onclick="closeReportModal()">Hủy</button>
+                <button class="btn-report-submit" id="btnSubmitReport" onclick="submitReport()">Gửi báo cáo</button>
+            </div>
         </div>
     </div>
 
@@ -544,8 +604,11 @@
                                 <img src="${c.user.avatar_url}" alt="${c.user.display_name}" class="comment-avatar">
                                 <div class="comment-body">
                                     <div class="comment-author">
-                                        ${c.user.display_name}
-                                        <span class="comment-time">Vừa xong</span>
+                                        <span>${c.user.display_name}</span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="comment-time">Vừa xong</span>
+                                            <button class="btn btn-sm text-danger p-0 border-0 bg-transparent" title="Báo cáo bình luận" onclick="openReportModal(${c.id}, 'Comment')"><i class="fa-solid fa-flag" style="font-size: 12px;"></i></button>
+                                        </div>
                                     </div>
                                     <p class="comment-text">${c.content}</p>
                                 </div>
@@ -570,6 +633,71 @@
             });
         }
     });
+
+    // Report Logic
+    let currentReportId = null;
+    let currentReportType = null;
+
+    function openReportModal(id, type) {
+        const checkAuth = {{ Auth::check() ? 'true' : 'false' }};
+        if (!checkAuth) {
+            window.location.href = "{{ route('login') }}";
+            return;
+        }
+        currentReportId = id;
+        currentReportType = type;
+        document.getElementById('reportReason').value = 'Nội dung rác, quảng cáo';
+        document.getElementById('reportDescription').value = '';
+        document.getElementById('reportModalOverlay').classList.add('active');
+    }
+
+    function closeReportModal() {
+        document.getElementById('reportModalOverlay').classList.remove('active');
+        currentReportId = null;
+        currentReportType = null;
+    }
+
+    function submitReport() {
+        if (!currentReportId || !currentReportType) return;
+        
+        const btn = document.getElementById('btnSubmitReport');
+        const reason = document.getElementById('reportReason').value;
+        const desc = document.getElementById('reportDescription').value;
+        const csrfToken = '{{ csrf_token() }}';
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi...';
+
+        fetch("{{ route('client.report') }}", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                reportable_id: currentReportId,
+                reportable_type: currentReportType,
+                reason: reason,
+                description: desc
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi báo cáo';
+            alert(data.message);
+            if (data.success) {
+                closeReportModal();
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi báo cáo';
+            alert('Có lỗi kết nối. Vui lòng thử lại sau.');
+        });
+    }
 </script>
 
 </body>
