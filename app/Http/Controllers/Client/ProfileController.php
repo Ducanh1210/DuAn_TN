@@ -522,5 +522,57 @@ class ProfileController extends Controller
 
         return $relativeStoragePath;
     }
+
+    /**
+     * Track user activity and award points for time spent on site.
+     */
+    public function heartbeat(Request $request)
+    {
+        $user = Auth::user();
+        $today = \Carbon\Carbon::today();
+
+        // Count points gained from active session today
+        $todayPoints = \App\Models\PointTransaction::where('user_id', $user->id)
+            ->where('action', 'active_session')
+            ->whereDate('created_at', $today)
+            ->sum('amount');
+
+        // Cap active session points to 60 per day (1 point per minute for 1 hour)
+        if ($todayPoints < 60) {
+            \App\Services\PointService::awardPoints($user, 1, 'active_session', 'Tích lũy thời gian hoạt động');
+            return response()->json([
+                'success' => true,
+                'points' => $user->points,
+                'message' => 'Cộng +1 điểm hoạt động.'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Đã đạt giới hạn điểm hoạt động hôm nay.'
+        ]);
+    }
+
+    /**
+     * Claim daily login bonus points.
+     */
+    public function claimDaily(Request $request)
+    {
+        $user = Auth::user();
+        $awarded = \App\Services\PointService::checkDailyLoginBonus($user);
+
+        if ($awarded) {
+            return response()->json([
+                'success' => true,
+                'points' => $user->points,
+                'message' => 'Chúc mừng! Bạn đã nhận được +10 điểm cho hoạt động điểm danh hằng ngày!'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Hôm nay bạn đã nhận điểm danh rồi.'
+        ], 400);
+    }
 }
 

@@ -150,4 +150,24 @@ class UserController extends Controller
         $action = $user->status === 'banned' ? 'Khóa' : 'Mở khóa';
         return redirect()->route('admin.users.index')->with('success', "{$action} tài khoản thành công.");
     }
+
+    /**
+     * Adjust user points (Award or subtract)
+     */
+    public function adjustPoints(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'amount' => 'required|integer',
+            'description' => 'required|string|max:255',
+        ]);
+
+        $amount = (int) $request->input('amount');
+        $description = $request->input('description');
+
+        \App\Services\PointService::awardPoints($user, $amount, 'manual_adjust', $description);
+
+        return redirect()->route('admin.users.show', $user->id)->with('success', 'Điểm số của người dùng đã được cập nhật.');
+    }
 }

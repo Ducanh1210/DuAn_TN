@@ -18,6 +18,7 @@
                         <th>Tên hiển thị</th>
                         <th>Username</th>
                         <th>Email</th>
+                        <th>Điểm</th>
                         <th>Vai trò</th>
                         <th>Trạng thái</th>
                         <th width="150">Hành động</th>
@@ -39,6 +40,7 @@
                             <td><strong>{{ $user->display_name }}</strong></td>
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->email }}</td>
+                            <td><strong class="text-primary">{{ $user->points }}</strong></td>
                             <td>
                                 @if($user->role == 'admin')
                                     <span class="badge bg-danger">Admin</span>

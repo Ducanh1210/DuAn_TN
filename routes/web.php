@@ -36,16 +36,16 @@ if (app()->environment('local') || php_sapi_name() == 'cli-server') {
 
 Route::get('/', function () {
     $locations = \App\Models\Location::with(['category', 'images'])->where('status', 'published')->get();
-    if($locations->isEmpty()){
+    if ($locations->isEmpty()) {
         $locations = \App\Models\Location::with(['category', 'images'])->get();
     }
-    
+
     // Resolve full asset URLs for icons to ensure they load correctly on any port/domain
-    $locations->each(function($loc) {
+    $locations->each(function ($loc) {
         if ($loc->category && $loc->category->icon) {
             $loc->category->icon_url = asset($loc->category->icon);
         }
-        
+
         if ($loc->thumbnail_url && !str_starts_with($loc->thumbnail_url, 'http')) {
             $loc->thumbnail_url = asset('storage/' . ltrim($loc->thumbnail_url, '/'));
         } elseif ($loc->images && $loc->images->count() > 0) {
@@ -56,11 +56,11 @@ Route::get('/', function () {
 
     // Lấy 3 tin tức mới nhất cho banner
     $newsList = \App\Models\News::where('status', 'published')
-                                ->where('type', '!=', 'event')
-                                ->orderBy('published_at', 'desc')
-                                ->take(3)
-                                ->get();
-                                
+        ->where('type', '!=', 'event')
+        ->orderBy('published_at', 'desc')
+        ->take(3)
+        ->get();
+
     // Đảm bảo luôn có 3 item để không hỏng hiệu ứng CSS Animation 400%
     if ($newsList->count() > 0 && $newsList->count() < 3) {
         $padCount = 3 - $newsList->count();
@@ -73,7 +73,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Client 360 Viewer
-Route::get('locations/{location:slug}/360', function(\App\Models\Location $location) {
+Route::get('locations/{location:slug}/360', function (\App\Models\Location $location) {
     return view('client.360', compact('location'));
 })->name('client.locations.360');
 
@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/comment', [\App\Http\Controllers\Client\InteractionController::class, 'storeComment'])->name('client.locations.comment');
     Route::delete('/comments/{comment}', [\App\Http\Controllers\Client\InteractionController::class, 'deleteComment'])->name('client.comments.destroy');
     Route::get('/ca-nhan/dia-diem-yeu-thich', [\App\Http\Controllers\Client\InteractionController::class, 'myFavorites'])->name('client.favorites.index');
+    Route::post('/report', [\App\Http\Controllers\Client\InteractionController::class, 'report'])->name('client.report');
 });
 
 // Auth Routes
@@ -97,7 +98,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [\App\Http\Controllers\Client\AuthController::class, 'login']);
     Route::get('/register', [\App\Http\Controllers\Client\AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [\App\Http\Controllers\Client\AuthController::class, 'register']);
-    
+
     // Google OAuth
     Route::get('/auth/google', [\App\Http\Controllers\Client\AuthController::class, 'redirectToGoogle'])->name('client.login.google');
     Route::get('/auth/google/callback', [\App\Http\Controllers\Client\AuthController::class, 'handleGoogleCallback']);
@@ -118,27 +119,29 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/business/cancel', [\App\Http\Controllers\Client\ProfileController::class, 'cancelBusinessRegistration'])->name('client.profile.business.cancel');
     Route::post('/profile/favorite/toggle', [\App\Http\Controllers\Client\ProfileController::class, 'toggleFavorite'])->name('client.profile.favorite.toggle');
     Route::delete('/profile/comments/{comment}', [\App\Http\Controllers\Client\ProfileController::class, 'destroyComment'])->name('client.profile.comments.destroy');
+    Route::post('/profile/heartbeat', [\App\Http\Controllers\Client\ProfileController::class, 'heartbeat'])->name('client.profile.heartbeat');
+    Route::post('/profile/claim-daily', [\App\Http\Controllers\Client\ProfileController::class, 'claimDaily'])->name('client.profile.claim_daily');
 });
 
 // Admin Protected Routes
 Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->group(function () {
     Route::get('/', function () {
-        return view('admin.layouts.app');
+        return view('admin.dashboard');
     })->name('dashboard');
 
     // Categories
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
-    
     // Locations TTS
     Route::get('locations/tts-voices', [\App\Http\Controllers\Admin\LocationController::class, 'getTtsVoices'])->name('locations.tts_voices');
 
+
     // Locations
     Route::resource('locations', \App\Http\Controllers\Admin\LocationController::class);
-    
+
     // Location Images Ajax
     Route::post('locations/{location}/upload-image', [\App\Http\Controllers\Admin\LocationController::class, 'uploadImage'])->name('locations.upload_image');
     Route::delete('locations/image/{image}', [\App\Http\Controllers\Admin\LocationController::class, 'deleteImage'])->name('locations.delete_image');
-    
+
     // Location Panoramas Ajax
     Route::post('locations/{location}/upload-pano', [\App\Http\Controllers\Admin\LocationController::class, 'uploadPanorama'])->name('locations.upload_pano');
     Route::delete('locations/pano/{panorama}', [\App\Http\Controllers\Admin\LocationController::class, 'deletePanorama'])->name('locations.delete_pano');
@@ -169,9 +172,15 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Users Management
     Route::resource('users', UserController::class);
     Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle_status');
+    Route::patch('users/{user}/adjust-points', [UserController::class, 'adjustPoints'])->name('users.adjust_points');
     Route::post('locations/{location}/generate-tts', [\App\Http\Controllers\Admin\LocationController::class, 'generateTtsAudio'])->name('locations.generate_tts');
 
     // Comments Management
     Route::resource('comments', \App\Http\Controllers\Admin\CommentController::class)->only(['index', 'destroy']);
     Route::patch('comments/{comment}/toggle-status', [\App\Http\Controllers\Admin\CommentController::class, 'toggleStatus'])->name('comments.toggle_status');
+
+    // Reports Management
+    Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class)->only(['index']);
+    Route::patch('reports/{report}/status', [\App\Http\Controllers\Admin\ReportController::class, 'updateStatus'])->name('reports.update_status');
+    Route::delete('reports/{report}/content', [\App\Http\Controllers\Admin\ReportController::class, 'deleteReportedContent'])->name('reports.delete_content');
 });

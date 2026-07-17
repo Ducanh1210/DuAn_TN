@@ -27,6 +27,8 @@ class User extends Authenticatable
         'status',
         'provider',
         'provider_id',
+        'points',
+        'last_daily_bonus_at',
     ];
 
     public function getAuthPassword()
@@ -51,15 +53,24 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'last_daily_bonus_at' => 'datetime',
         // 'password_hash' => 'hashed', // Disable default hashing casting since we use custom MD5
     ];
+
+    /**
+     * Get the point transactions for the user.
+     */
+    public function pointTransactions()
+    {
+        return $this->hasMany(PointTransaction::class)->orderBy('created_at', 'desc');
+    }
 
     /**
      * Get the locations favorited by the user (Many-to-Many).
      */
     public function favorites()
     {
-        return $this->belongsToMany(Location::class, 'favorites', 'user_id', 'location_id')
+        return $this->belongsToMany(Location::class, 'favorite_locations', 'user_id', 'location_id')
                     ->withPivot('created_at');
     }
 
@@ -85,5 +96,13 @@ class User extends Authenticatable
     public function businessProfile()
     {
         return $this->hasOne(BusinessProfile::class);
+    }
+
+    /**
+     * Get the reports submitted by the user.
+     */
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'reporter_id');
     }
 }

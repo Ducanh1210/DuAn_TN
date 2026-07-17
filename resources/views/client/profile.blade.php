@@ -1081,6 +1081,11 @@
             <span class="user-role-badge">
                 {{ $user->role === 'admin' ? 'Quản trị viên' : ($user->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên') }}
             </span>
+            <div class="mt-2">
+                <span class="badge bg-primary text-white" style="font-size: 0.8rem; padding: 6px 12px; border-radius: 20px; font-weight: 600;">
+                     {{ $user->points }} điểm tích lũy
+                </span>
+            </div>
         </div>
 
         <!-- Navigation Tabs -->
@@ -1090,6 +1095,9 @@
             </button>
             <button class="nav-link" id="tab-security-btn" data-bs-toggle="pill" data-bs-target="#tab-security" type="button" role="tab" aria-selected="false">
                 <span>Bảo mật & Mật khẩu</span>
+            </button>
+            <button class="nav-link" id="tab-points-btn" data-bs-toggle="pill" data-bs-target="#tab-points" type="button" role="tab" aria-selected="false">
+                <span>Lịch sử tích điểm</span>
             </button>
             <button class="nav-link" id="tab-favorites-btn" data-bs-toggle="pill" data-bs-target="#tab-favorites" type="button" role="tab" aria-selected="false">
                 <span>Địa điểm đã lưu</span>
@@ -1170,6 +1178,11 @@
                         </div>
 
                         <div class="info-item">
+                            <div class="info-label">Điểm tích lũy</div>
+                            <div class="info-value text-primary fw-semibold">{{ $user->points }} điểm</div>
+                        </div>
+
+                        <div class="info-item">
                             <div class="info-label">Nhóm quyền</div>
                             <div class="info-value">
                                 {{ $user->role === 'admin' ? 'Quản trị viên' : ($user->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên') }}
@@ -1182,6 +1195,56 @@
                                 <span class="status-dot active"></span> {{ $user->status === 'active' ? 'Đang hoạt động' : 'Bị khóa' }}
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Lịch sử tích điểm -->
+            <div class="tab-pane fade" id="tab-points" role="tabpanel">
+                <div class="content-panel">
+                    <div class="section-title">Lịch sử tích điểm</div>
+                    
+                    <div class="alert alert-info rounded-3 border-0 p-3 mb-4 small" style="background-color: rgba(0, 114, 255, 0.05); color: var(--primary); border: 1px solid rgba(0, 114, 255, 0.1);">
+                        Bạn có thể tích lũy điểm thưởng bằng cách đăng nhập mỗi ngày (+10 điểm), bình luận về địa điểm (+5 điểm), hoặc lưu địa điểm yêu thích (+2 điểm).
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="clean-table">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Hành động</th>
+                                    <th>Số điểm</th>
+                                    <th>Nội dung chi tiết</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($user->pointTransactions as $tx)
+                                <tr>
+                                    <td>{{ $tx->created_at->format('H:i d/m/Y') }}</td>
+                                    <td>
+                                        @if($tx->action === 'daily_login')
+                                            <span class="badge bg-success bg-opacity-10 text-success border-0 px-2 py-1" style="font-size: 0.75rem;">Điểm danh</span>
+                                        @elseif($tx->action === 'comment')
+                                            <span class="badge bg-primary bg-opacity-10 text-primary border-0 px-2 py-1" style="font-size: 0.75rem;">Bình luận</span>
+                                        @elseif($tx->action === 'favorite')
+                                            <span class="badge bg-info bg-opacity-10 text-info border-0 px-2 py-1" style="font-size: 0.75rem;">Yêu thích</span>
+                                        @else
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border-0 px-2 py-1" style="font-size: 0.75rem;">Khác</span>
+                                        @endif
+                                    </td>
+                                    <td class="fw-bold {{ $tx->amount >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {{ $tx->amount >= 0 ? '+' : '' }}{{ $tx->amount }}
+                                    </td>
+                                    <td>{{ $tx->description }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">Chưa có lịch sử giao dịch điểm.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
