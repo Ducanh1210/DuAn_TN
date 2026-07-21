@@ -9,7 +9,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
@@ -23,6 +23,9 @@
 
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Avatar Frames CSS -->
+    <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
 
 
     <style>
@@ -41,7 +44,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             overflow: hidden;
             background-color: #f0f2f5;
         }
@@ -187,25 +190,26 @@
         /* Custom Map Pin */
         .custom-map-pin {
             position: relative;
-            width: 30px;
-            height: 40px;
-            filter: drop-shadow(0px 3px 4px rgba(0, 0, 0, 0.35));
+            width: 26px;
+            height: 35px;
         }
 
         .custom-map-pin svg {
             position: absolute;
             top: 0;
             left: 0;
+            width: 26px;
+            height: 35px;
         }
 
         .leaflet-container .leaflet-marker-pane .pin-icon-img {
             position: absolute !important;
-            top: 4px !important;
-            left: 4px !important;
-            width: 22px !important;
-            height: 22px !important;
-            max-width: 22px !important;
-            max-height: 22px !important;
+            top: 3px !important;
+            left: 3px !important;
+            width: 20px !important;
+            height: 20px !important;
+            max-width: 20px !important;
+            max-height: 20px !important;
             object-fit: cover !important;
             z-index: 999 !important;
             border-radius: 50% !important;
@@ -223,29 +227,29 @@
 
         .custom-map-pin:hover svg,
         .custom-map-pin:hover .pin-icon-img {
-            transform: scale(1.05) translateY(-3px);
+            transform: scale(1.08) translateY(-2px);
         }
 
         .custom-map-pin:hover .custom-pin-tooltip {
             opacity: 1;
             visibility: visible;
-            transform: translate(10px, -50%);
+            transform: translate(6px, -50%);
         }
 
         .custom-pin-tooltip {
             position: absolute;
-            top: 15px;
-            /* Căn giữa theo phần thân tròn của icon (cao 30px) */
-            left: 100%;
+            top: 16px;
+            /* Căn giữa theo phần thân tròn của icon */
+            left: calc(100% - 2px);
             transform: translate(0px, -50%);
             background: linear-gradient(to right, color-mix(in srgb, var(--tip-color) 40%, black), var(--tip-color));
             color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 4px 11px;
+            border-radius: 16px;
+            font-size: 12px;
             font-weight: 600;
             white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -257,10 +261,10 @@
             content: '';
             position: absolute;
             top: 50%;
-            left: -5px;
+            left: -3px;
             transform: translateY(-50%);
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
             border-right: 6px solid color-mix(in srgb, var(--tip-color) 40%, black);
         }
 
@@ -281,10 +285,30 @@
 
         .marker-cluster {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .marker-cluster div {
+            width: 78% !important;
+            height: 78% !important;
+            margin: 0 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center;
+            border-radius: 50%;
+            font-size: 13px !important;
+            font-weight: 700;
+        }
+
+        .marker-cluster div span {
+            line-height: 22px !important;
         }
 
         .marker-cluster:hover {
-            transform: scale(1.1);
+            transform: scale(1.15);
         }
 
         /* Cluster coverage polygon animation */
@@ -412,16 +436,14 @@
         /* Top Floating Search Panel */
         .top-search-panel {
             position: absolute;
-            top: 16px;
-            left: 24px;
-            right: 342px;
+            top: 12px;
+            left: 72px;
+            right: 260px;
             z-index: 1000;
-            /* Above map */
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             pointer-events: none;
-            /* Let clicks pass through empty areas */
         }
 
         .search-box-container {
@@ -439,10 +461,10 @@
             -webkit-backdrop-filter: blur(12px);
             border-radius: 20px;
             box-shadow: var(--glass-shadow);
-            padding: 2px 4px 2px 14px;
-            height: 36px;
+            padding: 2px 4px 2px 12px;
+            height: 32px;
             box-sizing: border-box;
-            width: 260px;
+            width: 210px;
             flex-shrink: 0;
             border: 1px solid var(--glass-border);
             transition: all 0.3s ease;
@@ -450,7 +472,7 @@
 
         .search-box:focus-within {
             border-color: var(--primary);
-            box-shadow: 0 8px 32px 0 rgba(0, 114, 255, 0.25);
+            box-shadow: 0 6px 24px 0 rgba(0, 114, 255, 0.2);
         }
 
         .search-input {
@@ -458,7 +480,7 @@
             border: none;
             outline: none;
             font-family: inherit;
-            font-size: 15px;
+            font-size: 13px;
             color: #333;
             background: transparent;
         }
@@ -476,8 +498,8 @@
         .icon-btn {
             background: transparent;
             border: none;
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -488,7 +510,7 @@
         }
 
         .icon-btn span {
-            font-size: 20px;
+            font-size: 17px;
         }
 
         .icon-btn:hover {
@@ -498,12 +520,12 @@
 
         .icon-btn.primary {
             background: var(--primary);
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
             transform: rotate(45deg);
-            margin: 0 6px;
-            box-shadow: 0 2px 8px rgba(0, 114, 255, 0.4);
+            margin: 0 4px;
+            box-shadow: 0 2px 6px rgba(0, 114, 255, 0.3);
             transition: transform 0.2s, filter 0.2s;
         }
 
@@ -514,21 +536,21 @@
 
         .icon-btn.primary span {
             color: white;
-            font-size: 20px;
+            font-size: 16px;
             transform: rotate(-45deg);
         }
 
         .search-box .divider {
             width: 1px;
-            height: 24px;
+            height: 18px;
             background: rgba(0, 0, 0, 0.1);
-            margin: 0 6px;
+            margin: 0 4px;
         }
 
         /* Search Suggestions */
         .search-suggestions {
             position: absolute;
-            top: 42px;
+            top: 36px;
             left: 0;
             width: 100%;
             background: var(--glass-bg);
@@ -540,7 +562,7 @@
             overflow: hidden;
             display: none;
             flex-direction: column;
-            max-height: 320px;
+            max-height: 280px;
             overflow-y: auto;
             z-index: 1001;
         }
@@ -548,23 +570,22 @@
         /* Mini Status Bar Wrapper & Dropdown Banner */
         .mini-status-bar-wrapper {
             position: absolute;
-            top: 16px;
-            right: 24px;
+            top: 12px;
+            right: 8px;
             z-index: 1000;
         }
 
         .mini-status-bar {
             background: #ffffff;
             border-radius: 8px;
-            /* Vuông vắn, chuyên nghiệp */
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 260px;
+            width: 220px;
             box-sizing: border-box;
-            padding: 8px 12px;
-            gap: 14px;
+            padding: 5px 10px;
+            gap: 8px;
             border: 1px solid #e5e7eb;
             cursor: pointer;
             transition: all 0.2s;
@@ -573,25 +594,22 @@
         }
 
         .mini-status-bar-wrapper:hover .mini-status-bar {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
         }
 
-        /* Mũi tên chĩa xuống từ thanh trạng thái (chỉ hiện khi click mở tin tức) */
         .mini-status-bar::after {
             content: '';
             position: absolute;
             bottom: -5px;
-            right: 34px;
-            /* Căn thẳng với nút chevron */
-            width: 10px;
-            height: 10px;
+            right: 24px;
+            width: 8px;
+            height: 8px;
             background: #ffffff;
             transform: rotate(45deg);
             border-right: 1px solid #e5e7eb;
             border-bottom: 1px solid #e5e7eb;
             box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.05);
             z-index: -1;
-            /* Nằm dưới nền trắng của thanh trạng thái */
             opacity: 0;
             visibility: hidden;
             transition: all 0.2s;
@@ -602,49 +620,48 @@
             visibility: visible;
         }
 
-
         .msb-weather {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             color: #111827;
         }
 
         .msb-weather .material-symbols-rounded {
-            font-size: 18px;
+            font-size: 15px;
             color: #f59e0b;
         }
 
         .msb-divider {
             width: 1px;
-            height: 16px;
+            height: 14px;
             background: #d1d5db;
         }
 
         .msb-news {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 13px;
+            gap: 4px;
+            font-size: 12px;
             color: #4b5563;
         }
 
         .msb-news .material-symbols-rounded {
-            font-size: 18px;
+            font-size: 15px;
             color: #6b7280;
         }
 
         .msb-news-text {
-            max-width: 140px;
+            max-width: 110px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .msb-chevron {
-            font-size: 18px !important;
+            font-size: 15px !important;
             color: #9ca3af !important;
             transition: transform 0.3s;
         }
@@ -658,21 +675,21 @@
             position: absolute;
             top: 0;
             right: 100%;
-            margin-right: 12px;
-            width: 260px;
+            margin-right: 8px;
+            width: 220px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.4);
             opacity: 0;
             visibility: hidden;
-            transform: translateX(15px);
+            transform: translateX(10px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
             z-index: 1000;
-            padding: 16px;
+            padding: 12px;
             box-sizing: border-box;
         }
 
@@ -687,12 +704,11 @@
         .bottom-drawer-wrapper {
             position: absolute;
             bottom: 0;
-            left: 70px;
+            left: 56px;
             /* Offset for collapsed sidebar */
             right: 0;
             z-index: 1000;
             width: auto;
-            /* Changed from 100% to auto to stretch between left and right */
             display: flex;
             flex-direction: column;
             pointer-events: none;
@@ -707,18 +723,17 @@
         .drawer-toggle-btn {
             pointer-events: auto;
             align-self: flex-end;
-            /* Căn phải */
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 8px 16px;
-            border-radius: 8px 8px 0 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            padding: 6px 12px;
+            border-radius: 6px 6px 0 0;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
             color: #111827;
             cursor: pointer;
             margin-right: 20px;
@@ -765,7 +780,7 @@
         }
 
         .bottom-drawer-wrapper.open .drawer-content {
-            height: 160px;
+            height: 135px;
             /* Chiều cao thẻ hình ảnh */
             opacity: 1;
             visibility: visible;
@@ -773,19 +788,18 @@
 
         .featured-loc-scroll {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             overflow-x: auto;
             width: 100%;
             height: 100%;
             align-items: center;
             scrollbar-width: thin;
             scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
-            padding: 16px;
-            padding-bottom: 20px;
+            padding: 10px 12px;
         }
 
         .featured-loc-scroll::-webkit-scrollbar {
-            height: 6px;
+            height: 4px;
         }
 
         .featured-loc-scroll::-webkit-scrollbar-thumb {
@@ -795,8 +809,8 @@
 
         .featured-loc-card {
             position: relative;
-            width: 200px;
-            height: 120px;
+            width: 160px;
+            height: 105px;
             border-radius: 6px;
             overflow: hidden;
             display: flex;
@@ -809,7 +823,7 @@
         }
 
         .featured-loc-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
             border-color: #ffffff;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
         }
@@ -825,16 +839,16 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 30px 10px 8px 10px;
+            padding: 20px 8px 6px 8px;
             background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             box-sizing: border-box;
         }
 
         .featured-loc-title {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             color: #ffffff;
             white-space: nowrap;
@@ -843,7 +857,7 @@
         }
 
         .featured-loc-info .material-symbols-rounded {
-            font-size: 16px;
+            font-size: 14px;
             color: #ffffff;
         }
 
@@ -913,73 +927,67 @@
             position: absolute;
             top: 100%;
             right: 0;
-            margin-top: 10px;
-            /* Cách mũi tên một khoảng nhỏ tinh tế */
-            width: 260px;
-            height: 150px;
+            margin-top: 8px;
+            width: 220px;
+            height: 130px;
             border-radius: 6px;
             overflow: hidden;
-            /* Cắt gọn ảnh tràn góc */
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
             z-index: 1000;
             background: #111827;
         }
 
-        /* Bảng Nhiệm Vụ Tích Điểm - Tách riêng biệt */
+        /* Bảng Nhiệm Vụ Tích Điểm - Compact cream theme */
         .mission-widget-wrapper {
             position: absolute;
-            top: 220px;
-            right: 0;
-            width: 260px;
+            top: 195px;
+            right: 2px;
+            width: 220px;
             z-index: 1000;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: #fffcf8;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+            border: 1px solid #fef3c7;
             box-sizing: border-box;
             pointer-events: auto;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Di chuyển cụm zoom & định vị lên trên bên trái của widget thời tiết */
-        .leaflet-top.leaflet-right {
-            top: 16px !important;
-            right: 292px !important;
-            margin: 0 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 4px !important;
-        }
-
-        .mission-widget-wrapper.collapsed .mission-list-container {
-            max-height: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
             overflow: hidden;
-            border-top: none !important;
+            padding: 10px 10px 8px 10px;
+        }
+
+        .mission-widget-wrapper.collapsed {
+            border-radius: 18px;
+            padding-bottom: 8px;
         }
 
         .mission-widget-wrapper .mission-header {
-            padding: 10px 12px;
+            padding: 0 2px 8px 2px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;
             user-select: none;
+            background: transparent;
         }
 
-        .mission-widget-wrapper .mission-header:hover {
-            background-color: #f9fafb;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .mission-widget-wrapper.collapsed .mission-header:hover {
-            border-radius: 8px;
+        .quest-coin-badge-3d {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #fef08a, #f59e0b 60%, #b45309 100%);
+            box-shadow: 0 4px 10px rgba(217, 119, 6, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 18px;
+            border: 2px solid #fffbea;
+            z-index: 2;
         }
 
         .mini-status-bar-wrapper.active .news-dropdown-banner {
@@ -1178,22 +1186,22 @@
         .category-pill {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: var(--glass-bg);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border: 1px solid var(--glass-border);
-            padding: 0 14px;
-            height: 36px;
+            padding: 0 10px;
+            height: 30px;
             box-sizing: border-box;
             border-radius: 20px;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
             color: #374151;
             cursor: pointer;
             white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             transition: all 0.2s;
         }
 
@@ -1203,21 +1211,27 @@
             border-color: var(--primary);
             color: var(--primary);
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(0, 114, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 114, 255, 0.12);
         }
 
         .category-pill span {
-            font-size: 18px;
+            font-size: 15px;
             color: inherit;
         }
 
         /* Custom Leaflet Zoom Controls */
+        .leaflet-top.leaflet-right {
+            top: auto !important;
+            bottom: 65px !important;
+            right: 8px !important;
+        }
+
         .leaflet-control-zoom {
             border: none !important;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
             border-radius: 8px !important;
             overflow: hidden;
-            margin-bottom: 24px !important;
+            margin-bottom: 0 !important;
             margin-right: 0 !important;
         }
 
@@ -1227,10 +1241,10 @@
             -webkit-backdrop-filter: blur(8px);
             color: #374151 !important;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-            width: 38px !important;
-            height: 38px !important;
-            line-height: 38px !important;
-            font-size: 18px !important;
+            width: 32px !important;
+            height: 32px !important;
+            line-height: 32px !important;
+            font-size: 15px !important;
             font-weight: 500 !important;
             transition: all 0.2s ease !important;
             display: flex !important;
@@ -1284,20 +1298,18 @@
 
         /* Collapsed State */
         .user-sidebar.collapsed {
-            width: 70px;
+            width: 56px;
         }
 
         .user-sidebar .sidebar-header {
             display: flex;
             align-items: center;
-            padding: 20px 15px;
-            /* 15px padding + 40px avatar = 55px. Avatar centers nicely in 70px */
+            padding: 12px 10px;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            min-height: 80px;
+            min-height: 56px;
             box-sizing: border-box;
             cursor: pointer;
             white-space: nowrap;
-            /* Prevent wrapping during transition */
         }
 
         .user-sidebar .sidebar-header:hover {
@@ -1307,7 +1319,7 @@
         .user-sidebar .user-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             transition: gap 0.3s ease;
         }
 
@@ -1319,32 +1331,26 @@
             box-sizing: border-box;
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
             flex-shrink: 0;
-            border: 2px solid var(--primary);
-            padding: 2px;
-            background: white;
             transition: transform 0.2s;
         }
 
         .user-sidebar .user-avatar:hover {
             transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(0, 114, 255, 0.3);
         }
 
         .user-sidebar .user-details {
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            max-width: 200px;
+            max-width: 180px;
             opacity: 1;
             visibility: visible;
             transition: max-width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
         }
 
         .user-sidebar .user-name {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 700;
             color: #1a1a1a;
             white-space: nowrap;
@@ -1352,9 +1358,9 @@
         }
 
         .user-sidebar .user-role {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
-            margin-top: 2px;
+            margin-top: 1px;
             white-space: nowrap;
         }
 
@@ -1368,7 +1374,7 @@
 
         .user-sidebar .sidebar-menu {
             list-style: none;
-            padding: 15px 0;
+            padding: 10px 0;
             margin: 0;
             flex: 1;
             overflow-y: auto;
@@ -1395,20 +1401,19 @@
         }
 
         .user-sidebar .sidebar-menu li {
-            margin-bottom: 5px;
-            padding: 0 15px;
-            /* Match header left padding */
+            margin-bottom: 4px;
+            padding: 0 10px;
         }
 
         .user-sidebar .menu-item {
             display: flex;
             align-items: center;
-            padding: 12px 0;
+            padding: 8px 0;
             color: #4b5563;
             text-decoration: none;
             transition: background 0.2s, color 0.2s;
             white-space: nowrap;
-            border-radius: 8px;
+            border-radius: 6px;
             position: relative;
             width: 100%;
         }
@@ -1422,18 +1427,17 @@
         .user-sidebar .menu-item.active::before {
             content: '';
             position: absolute;
-            left: -15px;
+            left: -10px;
             top: 50%;
             transform: translateY(-50%);
-            height: 20px;
-            width: 4px;
+            height: 16px;
+            width: 3px;
             background: var(--primary);
-            border-radius: 0 4px 4px 0;
+            border-radius: 0 3px 3px 0;
         }
 
         .user-sidebar .menu-icon {
-            width: 40px;
-            /* Match avatar width */
+            width: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1441,16 +1445,15 @@
         }
 
         .user-sidebar .menu-icon .material-symbols-rounded {
-            font-size: 22px;
+            font-size: 19px;
         }
 
         .user-sidebar .menu-text {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-left: 12px;
-            /* Match gap of header */
+            margin-left: 8px;
             overflow: hidden;
-            max-width: 200px;
+            max-width: 180px;
             opacity: 1;
             visibility: visible;
             transition: max-width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, margin 0.3s ease;
@@ -1467,15 +1470,14 @@
         /* Tooltip for collapsed state */
         .user-sidebar .menu-item .tooltip {
             position: absolute;
-            left: 55px;
-            /* Offset nicely from the icon */
+            left: 48px;
             top: 50%;
             transform: translateY(-50%);
             background: #1f2937;
             color: #fff;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
@@ -1497,8 +1499,7 @@
 
         .user-sidebar.collapsed .menu-item:hover .tooltip {
             opacity: 1;
-            left: 55px;
-            /* Nice slight slide effect */
+            left: 48px;
         }
 
         /* Edge Toggle Button (Seamless Tab) */
@@ -1507,29 +1508,21 @@
             top: 50%;
             transform: translateY(-50%);
             left: 260px;
-            /* default expanded width */
             margin-left: -1px;
-            /* overlap the sidebar border */
-            width: 16px;
-            /* Flatter width */
-            height: 52px;
-            /* Adjusted height */
+            width: 14px;
+            height: 44px;
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
             border-left: none;
-            /* seamlessly merge with sidebar */
-            border-radius: 0 8px 8px 0;
-            /* flat left, less rounded right */
+            border-radius: 0 6px 6px 0;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 2001;
-            /* Above the sidebar */
             box-shadow: 3px 0 10px rgba(0, 0, 0, 0.05);
-            /* Softer shadow */
             transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.2s, color 0.2s, width 0.2s;
             pointer-events: auto;
             color: #666;
@@ -1542,7 +1535,7 @@
         }
 
         body.sidebar-collapsed .sidebar-edge-toggle {
-            left: 70px;
+            left: 56px;
         }
 
         .sidebar-edge-toggle .icon-arrow {
@@ -1580,7 +1573,7 @@
             <div class="sidebar-header">
                 @auth
                 <a href="{{ route('client.profile') }}" class="user-info" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px; width: 100%;">
-                    <img src="{{ Auth::user()->avatar_url ? (str_starts_with(Auth::user()->avatar_url, 'http') ? Auth::user()->avatar_url : (str_starts_with(ltrim(Auth::user()->avatar_url, '/'), 'storage') ? asset(Auth::user()->avatar_url) : asset('storage/' . Auth::user()->avatar_url))) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->display_name ?? Auth::user()->username).'&background=0072FF&color=fff' }}" alt="User Avatar" class="user-avatar">
+                    <x-user-avatar :user="Auth::user()" size="40" class="user-avatar" />
                     <div class="user-details">
                         <span class="user-name">{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
                         <span class="user-role">{{ Auth::user()->role === 'admin' ? 'Quản trị viên' : (Auth::user()->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên') }}</span>
@@ -1602,6 +1595,13 @@
             </div>
             <ul class="sidebar-menu">
                 @auth
+                <li>
+                    <a href="{{ route('client.missions') }}" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-rounded" style="color: #f59e0b;">emoji_events</span></span>
+                        <span class="menu-text" style="font-weight: 600;">Nhiệm vụ & Đổi quà</span>
+                        <span class="tooltip">Nhiệm vụ & Đổi quà</span>
+                    </a>
+                </li>
                 <li>
                     <a href="{{ route('client.profile') }}#tab-favorites" class="menu-item">
                         <span class="menu-icon"><span class="material-symbols-rounded">favorite</span></span>
@@ -1772,85 +1772,230 @@
             </div>
         @endif
 
-        <!-- Bảng Nhiệm Vụ Tích Điểm - Tách biệt hoàn toàn -->
+        <!-- Bảng Nhiệm Vụ Tích Điểm - Compact cream theme -->
         <div class="mission-widget-wrapper" id="mission-widget-wrapper">
-            <!-- Header có nút thu gọn/mở rộng -->
-            <div class="mission-header" id="mission-widget-header">
-                <span class="fw-bold text-dark" style="font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 4px; color: #1f2937;">
-                    <span class="material-symbols-rounded text-warning" style="font-size: 16px; vertical-align: middle;">emoji_events</span> NHIỆM VỤ TÍCH ĐIỂM
+            <!-- Header với Nút Thu Gọn -->
+            <div class="mission-header" id="mission-widget-header" title="Nhấn để thu gọn/mở rộng">
+                <span style="font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 4px; color: #1e1b4b;">
+                    Tiến độ nhiệm vụ
                 </span>
-                <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 4px;">
                     @auth
-                        <span class="badge bg-warning bg-opacity-10 text-warning" style="font-size: 0.65rem; background-color: rgba(245, 158, 11, 0.1); color: #d97706; padding: 2px 6px; border-radius: 4px; font-weight: 600;" id="widgetPoints">{{ Auth::user()->points }} điểm</span>
+                        <span style="font-size: 0.68rem; font-weight: 700; color: #d97706; white-space: nowrap;" id="widgetPoints">{{ Auth::user()->points }} xu</span>
                     @endauth
-                    <span class="material-symbols-rounded text-muted" id="mission-toggle-arrow" style="font-size: 16px; transition: transform 0.3s;">expand_less</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="mission-toggle-arrow" style="transition: transform 0.3s;">
+                        <polyline points="18 15 12 9 6 15"/>
+                    </svg>
                 </div>
             </div>
 
             <!-- List nhiệm vụ -->
-            <div class="mission-list-container" style="background: #ffffff; padding: 12px; border-top: 1px solid #f3f4f6; transition: max-height 0.3s ease;">
+            <div class="mission-list-container" style="background: transparent; transition: max-height 0.3s ease;">
                 @auth
-                    <div class="d-flex flex-column gap-2" style="max-height: 220px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 8px;">
-                        <!-- Nhiệm vụ 1: Điểm danh -->
-                        <div class="widget-mission-item" style="font-size: 0.72rem; padding: 6px 8px; border: 1px solid #f3f4f6; border-radius: 6px; background-color: #f9fafb; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                            <div style="display: flex; flex-direction: column; text-align: left;">
-                                <span class="fw-semibold text-dark" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                    <span class="material-symbols-rounded text-success" style="font-size: 15px; vertical-align: middle;">today</span> Điểm danh hằng ngày
-                                </span>
-                                <span class="text-muted" style="font-size: 0.65rem; color: #6b7280;">+10 điểm / ngày</span>
-                            </div>
-                            @if(Auth::user()->last_daily_bonus_at && \Carbon\Carbon::parse(Auth::user()->last_daily_bonus_at)->isToday())
-                                <button class="btn btn-xs btn-success border-0 px-2 py-0.5 rounded-pill fw-semibold" style="font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; background-color: #10b981; color: white;" disabled>Đã nhận</button>
+                    <!-- Horizontal Milestone Progress Tracker -->
+                    @php
+                        $userPts = Auth::user()->points ?? 0;
+                        $fillPercent = min(100, max(0, ($userPts / 100) * 100));
+                    @endphp
+                    <div style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 8px 2px; margin-bottom: 6px;">
+                        <!-- Line BG & Fill -->
+                        <div style="position: absolute; top: 48%; left: 22px; right: 18px; height: 3px; background: #e2e8f0; border-radius: 4px; transform: translateY(-50%); z-index: 1;">
+                            <div style="height: 100%; background: linear-gradient(90deg, #7c3aed, #9333ea); border-radius: 4px; width: {{ $fillPercent }}%; transition: width 0.4s ease;"></div>
+                        </div>
+
+                        <!-- 3D Gold Star Coin Badge -->
+                        <svg width="26" height="26" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="z-index: 2; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.35));">
+                            <circle cx="20" cy="20" r="18" fill="url(#coinGrad)"/>
+                            <circle cx="20" cy="20" r="14.5" stroke="#FDE047" stroke-width="1.8" fill="none"/>
+                            <path d="M20 9.5L22.9 15.8L29.7 16.7L24.8 21.4L26 28.1L20 24.8L14 28.1L15.2 21.4L10.3 16.7L17.1 15.8L20 9.5Z" fill="#FFFBEB"/>
+                            <defs>
+                                <radialGradient id="coinGrad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(14 12) scale(24)">
+                                    <stop stop-color="#FEF08A"/>
+                                    <stop offset="0.55" stop-color="#F59E0B"/>
+                                    <stop offset="1" stop-color="#B45309"/>
+                                </radialGradient>
+                            </defs>
+                        </svg>
+
+                        <!-- Node 1: 25 -->
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                            @if($userPts >= 25)
+                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
+                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                             @else
-                                <button type="button" id="widgetClaimDailyBtn" class="btn btn-xs btn-primary border-0 px-2 py-0.5 rounded-pill fw-semibold" style="font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; background-color: var(--primary); color: white;">Nhận</button>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#DDD6FE"/>
+                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#C4B5FD"/>
+                                    <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
+                                </svg>
                             @endif
+                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">25</div>
                         </div>
 
-                        <!-- Nhiệm vụ 2: Trực tuyến -->
-                        <div class="widget-mission-item" style="font-size: 0.72rem; padding: 6px 8px; border: 1px solid #f3f4f6; border-radius: 6px; background-color: #f9fafb; display: flex; flex-direction: column; text-align: left; gap: 4px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                                <span class="fw-semibold text-dark" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                    <span class="material-symbols-rounded text-primary" style="font-size: 15px; vertical-align: middle;">schedule</span> Trực tuyến tích lũy
-                                </span>
-                                @php
-                                    $sessionPoints = \App\Models\PointTransaction::where('user_id', Auth::id())
-                                        ->where('action', 'active_session')
-                                        ->whereDate('created_at', \Carbon\Carbon::today())
-                                        ->sum('amount');
-                                @endphp
-                                <span class="text-primary fw-bold" id="widgetSessionText" style="font-size: 0.68rem; font-weight: 700;">{{ $sessionPoints }}/60 phút</span>
-                            </div>
-                            <div class="progress" style="height: 4px; margin-bottom: 2px; background-color: #e5e7eb; border-radius: 4px; overflow: hidden; width: 100%;">
-                                <div id="widgetSessionBar" class="progress-bar bg-primary" role="progressbar" style="width: {{ min(100, ($sessionPoints / 60) * 100) }}%; background-color: var(--primary); height: 100%;" aria-valuenow="{{ $sessionPoints }}" aria-valuemin="0" aria-valuemax="60"></div>
-                            </div>
+                        <!-- Node 2: 50 -->
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                            @if($userPts >= 50)
+                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
+                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            @else
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#C4B5FD"/>
+                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#DDD6FE"/>
+                                    <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
+                                    <path d="M12 6C12 6 9.5 3 7.5 3C5.5 3 5 4.5 6 6C7 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
+                                    <path d="M12 6C12 6 14.5 3 16.5 3C18.5 3 19 4.5 18 6C17 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
+                                </svg>
+                            @endif
+                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">50</div>
                         </div>
 
-                        <!-- Nhiệm vụ 3: Bình luận -->
-                        <div class="widget-mission-item" style="font-size: 0.72rem; padding: 6px 8px; border: 1px solid #f3f4f6; border-radius: 6px; background-color: #f9fafb; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                            <div style="display: flex; flex-direction: column; text-align: left;">
-                                <span class="fw-semibold text-dark" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                    <span class="material-symbols-rounded text-info" style="font-size: 15px; vertical-align: middle;">chat</span> Đóng góp ý kiến
-                                </span>
-                                <span class="text-muted" style="font-size: 0.65rem; color: #6b7280;">+5 điểm / bình luận</span>
-                            </div>
-                            <a href="#" class="btn btn-xs btn-outline-primary px-2 py-0.5 rounded-pill fw-semibold" onclick="alert('Nhấn vào một địa điểm bất kỳ trên bản đồ rồi viết bình luận để tích lũy điểm!'); return false;" style="font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(0, 114, 255, 0.3); color: var(--primary); text-decoration: none;">Làm</a>
+                        <!-- Node 3: 75 -->
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                            @if($userPts >= 75)
+                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
+                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            @else
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#C4B5FD"/>
+                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#DDD6FE"/>
+                                    <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
+                                    <path d="M12 6C12 6 9.5 3 7.5 3C5.5 3 5 4.5 6 6C7 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
+                                    <path d="M12 6C12 6 14.5 3 16.5 3C18.5 3 19 4.5 18 6C17 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
+                                </svg>
+                            @endif
+                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">75</div>
                         </div>
 
-                        <!-- Nhiệm vụ 4: Yêu thích -->
-                        <div class="widget-mission-item" style="font-size: 0.72rem; padding: 6px 8px; border: 1px solid #f3f4f6; border-radius: 6px; background-color: #f9fafb; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                            <div style="display: flex; flex-direction: column; text-align: left;">
-                                <span class="fw-semibold text-dark" style="font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                    <span class="material-symbols-rounded text-danger" style="font-size: 15px; vertical-align: middle;">favorite</span> Yêu thích địa điểm
-                                </span>
-                                <span class="text-muted" style="font-size: 0.65rem; color: #6b7280;">+2 điểm / lượt lưu</span>
-                            </div>
-                            <a href="#" class="btn btn-xs btn-outline-primary px-2 py-0.5 rounded-pill fw-semibold" onclick="alert('Nhấn vào địa điểm bất kỳ trên bản đồ rồi lưu Yêu thích để tích lũy điểm!'); return false;" style="font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(0, 114, 255, 0.3); color: var(--primary); text-decoration: none;">Làm</a>
+                        <!-- Node 4: 100 Red Gift Box -->
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                            <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.35));">
+                                <rect x="4" y="13" width="24" height="15" rx="3" fill="#DC2626"/>
+                                <rect x="2" y="8" width="28" height="5" rx="2" fill="#EF4444"/>
+                                <rect x="13.5" y="8" width="5" height="20" fill="#F59E0B"/>
+                                <path d="M16 8C16 8 11.5 3 8.5 3C5.5 3 5 5.5 7 7.5C9 9.5 16 8 16 8Z" fill="#F59E0B"/>
+                                <path d="M16 8C16 8 20.5 3 23.5 3C26.5 3 27 5.5 25 7.5C23 9.5 16 8 16 8Z" fill="#F59E0B"/>
+                            </svg>
+                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">100</div>
                         </div>
                     </div>
+
+                    <!-- Sub Cards Container -->
+                    <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 6px;">
+                        <!-- Group Card (Row 1 + Row 2) -->
+                        <div style="background: #ffffff; border-radius: 10px; border: 1px solid #f1f5f9; box-shadow: 0 1px 4px rgba(0,0,0,0.02); overflow: hidden;">
+                            <!-- Row 1: Điểm danh -->
+                            @php
+                                $hasCheckinToday = Auth::user()->last_daily_bonus_at && \Carbon\Carbon::parse(Auth::user()->last_daily_bonus_at)->isToday();
+                            @endphp
+                            <div style="padding: 7px 9px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #f1f5f9;">
+                                <div style="display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                        <path d="M9 14l2 2 4-4"/>
+                                    </svg>
+                                    <span style="font-weight: 700; color: #1e1b4b; font-size: 0.66rem; line-height: 1.25;">Điểm danh</span>
+                                </div>
+                                <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; flex-shrink: 0;">
+                                    <span style="font-weight: 700; color: #d97706; font-size: 0.62rem; white-space: nowrap;">+10 xu</span>
+                                    @if($hasCheckinToday)
+                                        <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0;">
+                                            <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
+                                            <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    @else
+                                        <button type="button" id="widgetClaimDailyBtn" style="font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border: 1.5px solid #8b5cf6; color: #7c3aed; background: transparent; border-radius: 999px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Nhận</button>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Khám phá 3 địa điểm -->
+                            @php
+                                $exploredCount = 0;
+                                if (Auth::check()) {
+                                    $exploredCount = \App\Models\PointTransaction::where('user_id', Auth::id())
+                                        ->whereIn('action', ['explore_poi', 'explore_location', 'view_poi'])
+                                        ->whereDate('created_at', \Carbon\Carbon::today())
+                                        ->count();
+                                        
+                                    $userExploreMission = \App\Models\UserMission::where('user_id', Auth::id())
+                                        ->whereHas('mission', function($q) {
+                                            $q->where('action_key', 'explore_locations')->orWhere('action_key', 'explore_poi');
+                                        })->first();
+                                        
+                                    if ($userExploreMission) {
+                                        $exploredCount = max($exploredCount, $userExploreMission->current_count);
+                                    }
+                                }
+                            @endphp
+                            <div style="padding: 7px 9px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                                    </svg>
+                                    <div style="display: flex; flex-direction: column; width: 100%; min-width: 0;">
+                                        <span style="font-weight: 700; color: #1e1b4b; font-size: 0.66rem; line-height: 1.25;">Khám phá</span>
+                                        <div style="height: 3.5px; background: #e2e8f0; border-radius: 4px; overflow: hidden; width: 100%; margin-top: 2px;">
+                                            <div id="widgetExploreBar" style="width: {{ min(100, (min(3, $exploredCount) / 3) * 100) }}%; background: #7c3aed; height: 100%; border-radius: 4px; transition: width 0.3s ease;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; gap: 1px;">
+                                    <span style="font-weight: 700; color: #d97706; font-size: 0.62rem; white-space: nowrap;">+20 xu</span>
+                                    <div style="font-weight: 700; color: #64748b; font-size: 0.58rem; display: flex; align-items: center; gap: 2px; white-space: nowrap;">
+                                        <span>{{ min(3, $exploredCount) }}/3 địa điểm</span>
+                                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="9 18 15 12 9 6"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Đổi quà ngay -->
+                        <div style="background: #ffffff; border-radius: 10px; border: 1px solid #f1f5f9; box-shadow: 0 1px 4px rgba(0,0,0,0.02); padding: 7px 9px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                                    <rect x="3" y="8" width="18" height="12" rx="2"/>
+                                    <path d="M12 8v12"/>
+                                    <path d="M7.5 8a2.5 2.5 0 0 1 0-5C9.7 3 12 8 12 8s2.3-5 4.5-5a2.5 2.5 0 0 1 0 5"/>
+                                </svg>
+                                <span style="font-weight: 700; color: #1e1b4b; font-size: 0.66rem; line-height: 1.25;">Đổi quà ngay</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; flex-shrink: 0;">
+                                <span style="font-weight: 700; color: #d97706; font-size: 0.6rem; white-space: nowrap;">Hot</span>
+                                <a href="{{ route('client.missions') }}" style="font-size: 0.58rem; font-weight: 700; padding: 1.5px 7px; border: 1.5px solid #a855f7; color: #7c3aed; background: #ffffff; border-radius: 999px; cursor: pointer; white-space: nowrap; text-decoration: none;">Đổi quà</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Link -->
+                    <div style="text-align: center; margin-top: 2px;">
+                        <a href="{{ route('client.missions') }}" style="color: #7c3aed; font-weight: 700; font-size: 0.7rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                            <span>Xem tất cả nhiệm vụ</span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                                <polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </a>
+                    </div>
                 @else
-                    <div class="text-center py-2" style="text-align: center;">
-                        <p class="text-muted mb-2" style="font-size: 0.7rem; color: #6b7280; margin-bottom: 8px;">Đăng nhập để làm nhiệm vụ tích điểm!</p>
-                        <a href="{{ route('login') }}" class="btn btn-primary btn-xs px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.68rem; background-color: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; text-decoration: none; display: inline-block;">Đăng nhập</a>
+                    <div class="text-center py-2">
+                        <p class="text-muted mb-2" style="font-size: 0.72rem; color: #6b7280;">Đăng nhập để làm nhiệm vụ tích xu!</p>
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem; background-color: #7c3aed; border: none; color: white;">Đăng nhập</a>
                     </div>
                 @endauth
             </div>
@@ -2022,12 +2167,13 @@
             iconCreateFunction: function (cluster) {
                 const count = cluster.getChildCount();
                 let size = 'small';
-                if (count >= 10) size = 'medium';
-                if (count >= 30) size = 'large';
+                let dim = 34;
+                if (count >= 10) { size = 'medium'; dim = 40; }
+                if (count >= 30) { size = 'large'; dim = 46; }
                 return L.divIcon({
                     html: '<div><span>' + count + '</span></div>',
                     className: 'marker-cluster marker-cluster-' + size,
-                    iconSize: L.point(40, 40)
+                    iconSize: L.point(dim, dim)
                 });
             }
         });
@@ -2127,7 +2273,7 @@
                 if (iconUrl) {
                     const iconColor = loc.category && loc.category.icon_color ? loc.category.icon_color : '#ef4444';
                     const pinHtml = '<div class="custom-map-pin">'
-                        + '<svg class="pin-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="30" height="40">'
+                        + '<svg class="pin-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="26" height="35">'
                         + '<path fill="' + iconColor + '" d="M172.3 501.7C27 291 0 269.4 0 192 0 86 86 0 192 0s192 86 192 192c0 77.4-27 99-172.3 309.7-9.5 13.8-29.9 13.8-39.5 0z"/>'
                         + '</svg>'
                         + '<img class="pin-icon-img" src="' + iconUrl + '">'
@@ -2137,9 +2283,9 @@
                     const customIcon = L.divIcon({
                         className: 'my-custom-marker',
                         html: pinHtml,
-                        iconSize: [30, 40],
-                        iconAnchor: [15, 40],
-                        popupAnchor: [0, -40]
+                        iconSize: [26, 35],
+                        iconAnchor: [13, 35],
+                        popupAnchor: [0, -35]
                     });
                     markerOptions = { icon: customIcon };
                 }
@@ -2782,11 +2928,11 @@
                         // Update points displays
                         const widgetPoints = document.getElementById("widgetPoints");
                         if (widgetPoints) {
-                            widgetPoints.textContent = data.points + " điểm";
+                            widgetPoints.textContent = data.points + " xu";
                         }
                         const headerPoints = document.getElementById("navbarUserPoints");
                         if (headerPoints) {
-                            headerPoints.textContent = data.points + " điểm";
+                            headerPoints.textContent = data.points + " xu";
                         }
                         alert(data.message);
                     } else {
@@ -2826,14 +2972,6 @@
             L.DomEvent.disableClickPropagation(missionWidget);
             L.DomEvent.disableScrollPropagation(missionWidget);
         }
-
     </script>
 </body>
-
-</html>
-});
-
-</script>
-</body>
-
 </html>

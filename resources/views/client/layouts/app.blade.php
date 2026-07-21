@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Cổng Thông Tin Du Lịch Hà Nam')</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Avatar Frames CSS -->
+    <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
+    @stack('styles')
     <style>
         :root {
             --primary: #0066ff;
@@ -19,7 +24,7 @@
             --text-muted: #64748b;
         }
         body { 
-            font-family: 'Outfit', sans-serif; 
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
             background-color: var(--bg-body); 
             color: var(--text-dark); 
             -webkit-font-smoothing: antialiased;
@@ -139,12 +144,13 @@
                     @auth
                         <li class="nav-item dropdown ms-lg-3">
                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: var(--primary); background: rgba(0, 102, 255, 0.08);">
-                                <img src="{{ Auth::user()->avatar_url ? (str_starts_with(Auth::user()->avatar_url, 'http') ? Auth::user()->avatar_url : asset('storage/' . Auth::user()->avatar_url)) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->display_name ?? Auth::user()->username).'&background=0072FF&color=fff' }}" alt="User Avatar" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+                                <x-user-avatar :user="Auth::user()" size="26" />
                                 <span>{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="navbarUserDropdown">
-                                <li><span class="dropdown-item-text py-2 fw-bold text-muted small"><i class="fa-solid fa-coins me-2 text-warning"></i><span id="navbarUserPoints">{{ Auth::user()->points }} điểm</span></span></li>
+                                <li><span class="dropdown-item-text py-2 fw-bold text-muted small"><i class="fa-solid fa-coins me-2 text-warning"></i><span id="navbarUserPoints">{{ Auth::user()->points }} xu</span></span></li>
                                 <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.missions') }}"><i class="fa-solid fa-bullseye me-2 text-warning"></i>Nhiệm vụ & Đổi thưởng</a></li>
                                 <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.profile') }}"><i class="fa-solid fa-user me-2 text-primary"></i>Trang cá nhân</a></li>
                                 <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.favorites.index') }}"><i class="fa-solid fa-heart me-2 text-danger"></i>Địa điểm yêu thích</a></li>
                                 <li><hr class="dropdown-divider"></li>
@@ -184,6 +190,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 
     @auth
     <script>

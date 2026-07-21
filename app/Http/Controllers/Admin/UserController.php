@@ -55,7 +55,7 @@ class UserController extends Controller
         
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar_url = '/storage/' . $path;
+            $user->avatar_url = 'avatars/' . basename($path);
         }
 
         $user->save();
@@ -109,7 +109,7 @@ class UserController extends Controller
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar_url = '/storage/' . $path;
+            $user->avatar_url = 'avatars/' . basename($path);
         }
 
         $user->save();

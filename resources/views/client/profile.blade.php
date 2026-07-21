@@ -8,8 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- FontAwesome & Avatar Frames CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
     
     <style>
         :root {
@@ -1045,11 +1046,12 @@
     <!-- Sidebar Navigation -->
     <div class="dashboard-sidebar">
         <div class="sidebar-user-section">
-            <div class="avatar-container" id="sidebarAvatarContainer" title="Nhấp để thay ảnh đại diện">
-                <img src="{{ $user->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->display_name ?? $user->username).'&background=0072FF&color=fff' }}" 
+            <div class="avatar-container {{ $user->equippedFrame ? 'avatar-frame-wrapper ' . $user->equippedFrame->css_style : '' }}" id="sidebarAvatarContainer" title="Nhấp để thay ảnh hoặc đổi khung avatar">
+                <img src="{{ $user->avatar_formatted_url }}" 
                      alt="Avatar" 
                      class="user-avatar-img"
-                     id="profileAvatarPreview">
+                     id="profileAvatarPreview"
+                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';">
                 <div class="avatar-upload-overlay">
                     Thay ảnh
                 </div>
@@ -1634,28 +1636,140 @@
     </div>
 </div>
 
-<!-- Avatar View & Edit Modal -->
+<!-- Avatar View, Edit & Frame Collection Modal -->
 <div class="modal fade" id="avatarViewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
-        <div class="modal-content rounded-3">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-center w-100">Ảnh đại diện</h5>
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 560px;">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <div class="modal-header border-bottom px-4 py-3 bg-light d-flex align-items-center justify-content-between">
+                <ul class="nav nav-pills custom-modal-tabs gap-2 mb-0" id="avatarModalTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold px-3 py-1.5 rounded-pill" id="tab-avatar-photo" data-bs-toggle="pill" data-bs-target="#pane-avatar-photo" type="button" role="tab">
+                            <i class="fa-solid fa-camera me-1.5"></i> Ảnh đại diện
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold px-3 py-1.5 rounded-pill" id="tab-avatar-frames" data-bs-toggle="pill" data-bs-target="#pane-avatar-frames" type="button" role="tab">
+                            <i class="fa-solid fa-crown me-1.5 text-warning"></i> Khung avatar
+                        </button>
+                    </li>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center py-4">
-                <div class="mb-4 d-flex justify-content-center">
-                    <img src="{{ $user->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->display_name ?? $user->username).'&background=0072FF&color=fff' }}" 
-                         alt="Avatar" 
-                         id="avatarModalLargePreview" 
-                         style="width: 340px; height: 340px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-color);">
+
+            <div class="modal-body p-4">
+                <div class="tab-content" id="avatarModalTabContent">
+                    <!-- TAB 1: PHOTO -->
+                    <div class="tab-pane fade show active text-center" id="pane-avatar-photo" role="tabpanel">
+                        <div class="mb-4 d-flex justify-content-center position-relative">
+                            <div class="avatar-frame-wrapper {{ $user->equippedFrame ? $user->equippedFrame->css_style : '' }}" style="width: 220px; height: 220px;">
+                                <img src="{{ $user->avatar_formatted_url }}" 
+                                     alt="Avatar" 
+                                     id="avatarModalLargePreview" 
+                                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';"
+                                     style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-primary fw-semibold px-4 py-2 rounded-3" id="avatarModalChangeBtn">
+                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> Thay ảnh mới
+                            </button>
+                            <button type="button" class="btn btn-light fw-semibold px-4 py-2 rounded-3 border" data-bs-dismiss="modal">
+                                Đóng
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: FRAMES -->
+                    <div class="tab-pane fade" id="pane-avatar-frames" role="tabpanel">
+                        <div class="text-center mb-3">
+                            <h6 class="fw-bold mb-0">Bộ sưu tập Khung Avatar</h6>
+                        </div>
+
+                        <div class="row g-3 style-scroll" style="max-height: 380px; overflow-y: auto; padding-right: 4px;">
+                            @foreach($allFrames as $frame)
+                                @php
+                                    $isUnlocked = in_array($frame->id, $unlockedFrameIds);
+                                    $isEquipped = ($user->equipped_frame_id == $frame->id);
+                                    
+                                    if ($frame->type === 'rank' || $frame->required_points > 0) {
+                                        $conditionText = "Tích lũy đạt " . number_format($frame->required_points) . " xu để tự động mở khóa khung này.";
+                                    } else {
+                                        $conditionText = "Hoàn thành các nhiệm vụ thành tựu hoặc đạt chuỗi điểm danh 7 ngày để mở khóa.";
+                                    }
+                                @endphp
+                                <div class="col-6 col-sm-4">
+                                    <div class="p-3 border rounded-3 text-center h-100 d-flex flex-column justify-content-between bg-white position-relative {{ $isEquipped ? 'border-primary shadow-sm' : '' }}">
+                                        @if($isEquipped)
+                                            <span class="position-absolute top-0 start-50 translate-middle badge bg-primary px-2 py-1 rounded-pill" style="font-size: 0.65rem;">
+                                                <i class="fa-solid fa-check me-1"></i> Đang đeo
+                                            </span>
+                                        @endif
+
+                                        <div>
+                                            <div class="avatar-frame-wrapper {{ $frame->css_style }} mx-auto my-2" style="width: 68px; height: 68px;">
+                                                <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                            </div>
+                                            <h6 class="fw-bold text-dark mb-2 text-truncate" style="font-size: 0.88rem;" title="{{ $frame->name }}">{{ $frame->name }}</h6>
+                                        </div>
+
+                                        <div>
+                                            @if($isEquipped)
+                                                <button type="button" class="btn btn-secondary btn-sm w-100 fw-semibold rounded-pill btn-unequip-frame" style="font-size: 0.75rem;">
+                                                    <i class="fa-solid fa-xmark me-1"></i> Tháo khung
+                                                </button>
+                                            @elseif($isUnlocked)
+                                                <button type="button" class="btn btn-primary btn-sm w-100 fw-semibold rounded-pill btn-equip-frame" data-id="{{ $frame->id }}" style="font-size: 0.75rem;">
+                                                    <i class="fa-solid fa-shirt me-1"></i> Trang bị
+                                                </button>
+                                            @else
+                                                <button type="button" 
+                                                        class="btn btn-light text-muted btn-sm w-100 fw-semibold rounded-pill border btn-lock-info" 
+                                                        data-name="{{ $frame->name }}"
+                                                        data-desc="{{ $frame->description }}"
+                                                        data-style="{{ $frame->css_style }}"
+                                                        data-condition="{{ $conditionText }}"
+                                                        style="font-size: 0.73rem;">
+                                                    <i class="fa-solid fa-lock text-warning me-1"></i> Chưa mở khóa
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
-                <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-primary btn-sm rounded-2 py-2" id="avatarModalChangeBtn">
-                        Thay ảnh mới
-                    </button>
-                    <button type="button" class="btn btn-light btn-sm rounded-2 py-2" data-bs-dismiss="modal">
-                        Đóng
-                    </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Frame Lock Condition Custom Modal -->
+<div class="modal fade" id="frameConditionModal" tabindex="-1" aria-hidden="true" style="z-index: 1060; backdrop-filter: blur(6px); background: rgba(0, 0, 0, 0.45);">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 350px;">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden text-center p-2">
+            <div class="modal-body p-3">
+                <div class="position-relative d-inline-block mx-auto mb-2">
+                    <div id="modalLockFrameWrapper" class="avatar-frame-wrapper" style="width: 76px; height: 76px;">
+                        <img src="{{ $user->avatar_formatted_url }}" 
+                             id="modalLockAvatarPreview"
+                             onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';"
+                             style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                    </div>
+                    <span class="position-absolute bottom-0 end-0 bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 24px; height: 24px; font-size: 11px; border: 2px solid white;">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
                 </div>
+
+                <h6 class="fw-bold text-dark mb-2" id="modalLockFrameName" style="font-size: 0.95rem;">Tên Khung</h6>
+
+                <div class="p-3 bg-light rounded-3 border text-center mb-3" style="background-color: #f8fafc !important;">
+                    <div class="text-secondary small fw-medium" id="modalLockConditionText" style="line-height: 1.5; font-size: 0.82rem;">Tải điều kiện...</div>
+                </div>
+
+                <button type="button" class="btn btn-primary fw-bold w-100 rounded-pill py-2" data-bs-dismiss="modal" style="font-size: 0.85rem;">
+                    Đã hiểu
+                </button>
             </div>
         </div>
     </div>
@@ -1804,6 +1918,79 @@
                 });
             });
         }
+
+        // --- Avatar Frames Equip / Unequip / Lock Info Handlers ---
+        document.querySelectorAll('.btn-equip-frame').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const frameId = this.dataset.id;
+                fetch("{{ route('client.avatar_frames.equip') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ frame_id: frameId })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, true);
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        showToast(data.message, false);
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('.btn-unequip-frame').forEach(btn => {
+            btn.addEventListener('click', function() {
+                fetch("{{ route('client.avatar_frames.equip') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ frame_id: null })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, true);
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        showToast(data.message, false);
+                    }
+                });
+            });
+        });
+
+        const frameConditionModalEl = document.getElementById('frameConditionModal');
+        const frameConditionModal = frameConditionModalEl ? new bootstrap.Modal(frameConditionModalEl) : null;
+        const modalLockFrameName = document.getElementById('modalLockFrameName');
+        const modalLockFrameDesc = document.getElementById('modalLockFrameDesc');
+        const modalLockConditionText = document.getElementById('modalLockConditionText');
+        const modalLockFrameWrapper = document.getElementById('modalLockFrameWrapper');
+
+        document.querySelectorAll('.btn-lock-info').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const name = this.dataset.name;
+                const desc = this.dataset.desc;
+                const condition = this.dataset.condition;
+                const style = this.dataset.style;
+
+                if (modalLockFrameName) modalLockFrameName.innerText = name;
+                if (modalLockFrameDesc) modalLockFrameDesc.innerText = desc || 'Khung Avatar độc quyền';
+                if (modalLockConditionText) modalLockConditionText.innerText = condition;
+                if (modalLockFrameWrapper) {
+                    modalLockFrameWrapper.className = `avatar-frame-wrapper ${style || ''}`;
+                }
+
+                if (frameConditionModal) {
+                    frameConditionModal.show();
+                }
+            });
+        });
 
         // --- Sidebar Display Name Inline Edit ---
         const displayNameText = document.getElementById('sidebarDisplayNameText');

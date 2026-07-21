@@ -18,11 +18,13 @@ class InteractionController extends Controller
 
         if ($favorite) {
             $favorite->delete();
+            $countToday = $user->favoriteLocations()->whereDate('created_at', \Carbon\Carbon::today())->count();
+            \App\Services\MissionService::trackProgress($user, 'favorite_location', $countToday, true);
             return response()->json(['status' => 'removed', 'message' => 'Đã xóa khỏi danh sách yêu thích.']);
         } else {
             $user->favoriteLocations()->create(['location_id' => $location->id]);
-            // Award points for adding a favorite
-            PointService::awardPoints($user, 2, 'favorite', 'Yêu thích địa điểm ' . $location->name);
+            $countToday = $user->favoriteLocations()->whereDate('created_at', \Carbon\Carbon::today())->count();
+            \App\Services\MissionService::trackProgress($user, 'favorite_location', $countToday, true);
             return response()->json(['status' => 'added', 'message' => 'Đã thêm vào danh sách yêu thích.']);
         }
     }
@@ -43,8 +45,9 @@ class InteractionController extends Controller
 
         // Award points for comment
         PointService::awardPoints(Auth::user(), 5, 'comment', 'Bình luận địa điểm ' . $location->name);
+        \App\Services\MissionService::trackProgress(Auth::user(), 'write_comment', 1);
 
-        $comment->load('user');
+        $comment->load('user.equippedFrame');
 
         return response()->json([
             'success' => true,
@@ -56,7 +59,8 @@ class InteractionController extends Controller
                 'created_at' => $comment->created_at->diffForHumans(),
                 'user' => [
                     'display_name' => $comment->user->display_name ?? $comment->user->username,
-                    'avatar_url' => $comment->user->avatar_url ? (str_starts_with($comment->user->avatar_url, 'http') ? $comment->user->avatar_url : asset('storage/' . $comment->user->avatar_url)) : 'https://ui-avatars.com/api/?name=' . urlencode($comment->user->display_name ?? $comment->user->username) . '&background=0072FF&color=fff',
+                    'avatar_url' => $comment->user->avatar_formatted_url,
+                    'frame_css' => $comment->user->equippedFrame->css_style ?? '',
                 ]
             ]
         ]);

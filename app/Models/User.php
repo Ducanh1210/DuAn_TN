@@ -28,6 +28,9 @@ class User extends Authenticatable
         'provider',
         'provider_id',
         'points',
+        'equipped_frame_id',
+        'streak_count',
+        'last_streak_at',
         'last_daily_bonus_at',
     ];
 
@@ -54,8 +57,58 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_daily_bonus_at' => 'datetime',
-        // 'password_hash' => 'hashed', // Disable default hashing casting since we use custom MD5
+        'last_streak_at' => 'date',
     ];
+
+    /**
+     * Get properly formatted avatar URL.
+     */
+    public function getAvatarFormattedUrlAttribute()
+    {
+        $name = $this->display_name ?? $this->username ?? 'User';
+        $fallback = 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=0072FF&color=fff';
+
+        if (empty($this->avatar_url)) {
+            return $fallback;
+        }
+
+        if (str_starts_with($this->avatar_url, 'http://') || str_starts_with($this->avatar_url, 'https://')) {
+            return $this->avatar_url;
+        }
+
+        $cleanPath = ltrim($this->avatar_url, '/');
+        if (str_starts_with($cleanPath, 'storage/')) {
+            return asset($cleanPath);
+        }
+
+        return asset('storage/' . $cleanPath);
+    }
+
+    /**
+     * Get the equipped avatar frame.
+     */
+    public function equippedFrame()
+    {
+        return $this->belongsTo(AvatarFrame::class, 'equipped_frame_id');
+    }
+
+    /**
+     * Get all unlocked avatar frames for the user.
+     */
+    public function avatarFrames()
+    {
+        return $this->belongsToMany(AvatarFrame::class, 'user_avatar_frames')
+                    ->withPivot('is_equipped', 'unlocked_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get user mission progress.
+     */
+    public function userMissions()
+    {
+        return $this->hasMany(UserMission::class);
+    }
 
     /**
      * Get the point transactions for the user.

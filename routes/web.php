@@ -121,6 +121,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/comments/{comment}', [\App\Http\Controllers\Client\ProfileController::class, 'destroyComment'])->name('client.profile.comments.destroy');
     Route::post('/profile/heartbeat', [\App\Http\Controllers\Client\ProfileController::class, 'heartbeat'])->name('client.profile.heartbeat');
     Route::post('/profile/claim-daily', [\App\Http\Controllers\Client\ProfileController::class, 'claimDaily'])->name('client.profile.claim_daily');
+    
+    // Missions & Avatar Frame Routes
+    Route::get('/missions', [\App\Http\Controllers\Client\ProfileController::class, 'missions'])->name('client.missions');
+    Route::post('/missions/claim/{mission}', [\App\Http\Controllers\Client\ProfileController::class, 'claimMissionReward'])->name('client.missions.claim');
+    Route::post('/missions/claim-milestone', [\App\Http\Controllers\Client\ProfileController::class, 'claimMilestone100'])->name('client.missions.claim_milestone');
+    Route::post('/avatar-frames/equip', [\App\Http\Controllers\Client\ProfileController::class, 'equipAvatarFrame'])->name('client.avatar_frames.equip');
+    Route::post('/avatar-frames/buy/{frame}', [\App\Http\Controllers\Client\ProfileController::class, 'buyAvatarFrame'])->name('client.avatar_frames.buy');
 });
 
 // Admin Protected Routes

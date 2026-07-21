@@ -18,7 +18,7 @@
                         <th>Tên hiển thị</th>
                         <th>Username</th>
                         <th>Email</th>
-                        <th>Điểm</th>
+                        <th>Xu</th>
                         <th>Vai trò</th>
                         <th>Trạng thái</th>
                         <th width="150">Hành động</th>
@@ -29,13 +29,7 @@
                         <tr>
                             <td>{{ $user->id }}</td>
                             <td>
-                                @if($user->avatar_url)
-                                    <img src="{{ str_starts_with($user->avatar_url, 'http') ? $user->avatar_url : asset('storage/' . $user->avatar_url) }}" alt="Avatar" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
-                                @else
-                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                        {{ strtoupper(substr($user->display_name ?? $user->username, 0, 1)) }}
-                                    </div>
-                                @endif
+                                <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';" alt="Avatar" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
                             </td>
                             <td><strong>{{ $user->display_name }}</strong></td>
                             <td>{{ $user->username }}</td>
