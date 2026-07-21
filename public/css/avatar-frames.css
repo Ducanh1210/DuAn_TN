@@ -1,0 +1,84 @@
+.avatar-frame-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 3px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.avatar-frame-wrapper:not([class*="frame-style-"]) {
+    border: 2px solid #e2e8f0;
+}
+
+.avatar-frame-wrapper img {
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 1. Bronze Rank Frame */
+.frame-style-bronze {
+    background: linear-gradient(135deg, #cd7f32, #f4a460, #8b4513);
+    box-shadow: 0 0 10px rgba(205, 127, 50, 0.4);
+}
+
+/* 2. Silver Rank Frame */
+.frame-style-silver {
+    background: linear-gradient(135deg, #e0e0e0, #ffffff, #9e9e9e, #ffffff);
+    background-size: 200% 200%;
+    animation: shimmerGlow 3s infinite linear;
+    box-shadow: 0 0 12px rgba(224, 224, 224, 0.6);
+}
+
+/* 3. Gold Rank Frame */
+.frame-style-gold {
+    background: linear-gradient(135deg, #ffd700, #fff8dc, #b8860b, #ffd700);
+    background-size: 200% 200%;
+    animation: shimmerGlow 2.5s infinite linear;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.7);
+}
+
+/* 4. Diamond Rank Frame */
+.frame-style-diamond {
+    background: linear-gradient(135deg, #00f2fe, #4facfe, #00c6ff, #00f2fe);
+    background-size: 200% 200%;
+    animation: shimmerGlow 2s infinite linear;
+    box-shadow: 0 0 18px rgba(0, 242, 254, 0.85);
+}
+
+/* 5. Fire Neon Shop Frame */
+.frame-style-fire-neon {
+    background: linear-gradient(135deg, #ff0844, #ffb199, #ff4e50, #f9d423);
+    background-size: 300% 300%;
+    animation: fireFlame 2s ease infinite;
+    box-shadow: 0 0 16px rgba(255, 78, 80, 0.8);
+}
+
+/* 6. Dragon Gold Shop Frame */
+.frame-style-dragon-gold {
+    background: linear-gradient(135deg, #ffe000, #799f0c, #acb6e5, #ffe000);
+    background-size: 200% 200%;
+    animation: shimmerGlow 3s infinite ease-in-out;
+    box-shadow: 0 0 18px rgba(255, 224, 0, 0.75);
+}
+
+/* 7. Review Master Achievement Frame */
+.frame-style-review-master {
+    background: linear-gradient(135deg, #11998e, #38ef7d, #00b4db);
+    box-shadow: 0 0 14px rgba(56, 239, 125, 0.75);
+}
+
+@keyframes shimmerGlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes fireFlame {
+    0% { background-position: 0% 50%; box-shadow: 0 0 12px rgba(255, 8, 68, 0.7); }
+    50% { background-position: 100% 50%; box-shadow: 0 0 20px rgba(249, 212, 35, 0.9); }
+    100% { background-position: 0% 50%; box-shadow: 0 0 12px rgba(255, 8, 68, 0.7); }
+}

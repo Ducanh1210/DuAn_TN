@@ -102,7 +102,7 @@
                 <!-- Mission Board -->
                 <div class="mt-5 mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-primary border-2">
-                        <h5 class="fw-bold mb-0 text-uppercase" style="color: var(--primary);"><i class="fa-solid fa-trophy text-warning me-2"></i>Nhiệm vụ tích điểm</h5>
+                        <h5 class="fw-bold mb-0 text-uppercase" style="color: var(--primary);"><i class="fa-solid fa-trophy text-warning me-2"></i>Nhiệm vụ tích xu</h5>
                     </div>
                     
                     <div class="card border-0 shadow-sm rounded-3" style="background: linear-gradient(145deg, #ffffff, #f8fafc); border: 1px solid rgba(0, 102, 255, 0.08) !important;">
@@ -113,8 +113,8 @@
                                         <i class="fa-solid fa-coins fs-5"></i>
                                     </div>
                                     <div>
-                                        <div class="small text-muted fw-semibold" style="font-size: 0.75rem;">Số điểm hiện tại</div>
-                                        <div class="fw-bold text-dark fs-6" id="sidebarMissionPoints">{{ Auth::user()->points }} điểm</div>
+                                        <div class="small text-muted fw-semibold" style="font-size: 0.75rem;">Số xu hiện tại</div>
+                                        <div class="fw-bold text-dark fs-6" id="sidebarMissionPoints">{{ Auth::user()->points }} xu</div>
                                     </div>
                                 </div>
 
@@ -123,10 +123,10 @@
                                     <div class="mission-item p-2 rounded-3 bg-white border border-light shadow-2xs">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <span class="fw-bold small text-dark" style="font-size: 0.8rem;"><i class="fa-solid fa-calendar-check text-success me-1"></i> Điểm danh hằng ngày</span>
-                                            <span class="badge bg-success bg-opacity-10 text-success" style="font-size: 0.7rem;">+10 điểm</span>
+                                            <span class="badge bg-success bg-opacity-10 text-success" style="font-size: 0.7rem;">+10 xu</span>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="text-muted" style="font-size: 0.72rem;">Nhận điểm mỗi ngày</span>
+                                            <span class="text-muted" style="font-size: 0.72rem;">Nhận xu mỗi ngày</span>
                                             @if(Auth::user()->last_daily_bonus_at && \Carbon\Carbon::parse(Auth::user()->last_daily_bonus_at)->isToday())
                                                 <button class="btn btn-sm btn-success border-0 px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem;" disabled><i class="fa-solid fa-check"></i> Đã nhận</button>
                                             @else
@@ -139,7 +139,7 @@
                                     <div class="mission-item p-2 rounded-3 bg-white border border-light shadow-2xs">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <span class="fw-bold small text-dark" style="font-size: 0.8rem;"><i class="fa-solid fa-clock text-primary me-1"></i> Trực tuyến tích lũy</span>
-                                            <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size: 0.7rem;">+1 điểm/phút</span>
+                                            <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size: 0.7rem;">+1 xu/phút</span>
                                         </div>
                                         <div class="mb-1">
                                             @php
@@ -164,11 +164,11 @@
                                     <!-- Write comments -->
                                     <div class="mission-item p-2 rounded-3 bg-white border border-light shadow-2xs">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span class="fw-bold small text-dark" style="font-size: 0.8rem;"><i class="fa-solid fa-comment text-info me-1"></i> Bình luận địa điểm</span>
-                                            <span class="badge bg-info bg-opacity-10 text-info" style="font-size: 0.7rem;">+5 điểm</span>
+                                            <span class="fw-bold small text-dark" style="font-size: 0.8rem;"><i class="fa-solid fa-comment text-info me-1"></i> Bình luận địa xu</span>
+                                            <span class="badge bg-info bg-opacity-10 text-info" style="font-size: 0.7rem;">+5 xu</span>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="text-muted" style="font-size: 0.72rem;">Viết bình luận tại bất kỳ địa điểm nào</span>
+                                            <span class="text-muted" style="font-size: 0.72rem;">Viết bình luận tại bất kỳ địa xu nào</span>
                                             <a href="{{ url('/') }}" class="btn btn-sm btn-outline-primary px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem; border-color: rgba(0, 102, 255, 0.2);">Làm nhiệm vụ</a>
                                         </div>
                                     </div>
@@ -176,11 +176,11 @@
                                     <!-- Favorites -->
                                     <div class="mission-item p-2 rounded-3 bg-white border border-light shadow-2xs">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span class="fw-bold small text-dark" style="font-size: 0.8rem;"><i class="fa-solid fa-heart text-danger me-1"></i> Yêu thích địa điểm</span>
-                                            <span class="badge bg-danger bg-opacity-10 text-danger" style="font-size: 0.7rem;">+2 điểm</span>
+                                            <span class="fw-bold small text-dark" style="font-size: 0.8rem;"><i class="fa-solid fa-heart text-danger me-1"></i> Yêu thích địa xu</span>
+                                            <span class="badge bg-danger bg-opacity-10 text-danger" style="font-size: 0.7rem;">+2 xu</span>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="text-muted" style="font-size: 0.72rem;">Lưu địa điểm yêu thích trên bản đồ</span>
+                                            <span class="text-muted" style="font-size: 0.72rem;">Lưu địa xu yêu thích trên bản đồ</span>
                                             <a href="{{ url('/') }}" class="btn btn-sm btn-outline-primary px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem; border-color: rgba(0, 102, 255, 0.2);">Làm nhiệm vụ</a>
                                         </div>
                                     </div>
@@ -191,7 +191,7 @@
                                         <i class="fa-solid fa-lock text-muted fs-4"></i>
                                     </div>
                                     <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Đăng nhập để nhận nhiệm vụ</h6>
-                                    <p class="text-muted mb-3" style="font-size: 0.75rem;">Tham gia làm nhiệm vụ tích điểm đổi quà hấp dẫn và nhiều đặc quyền khác!</p>
+                                    <p class="text-muted mb-3" style="font-size: 0.75rem;">Tham gia làm nhiệm vụ tích xu đổi quà hấp dẫn và nhiều đặc quyền khác!</p>
                                     <a href="{{ route('login') }}" class="btn btn-primary btn-sm px-4 py-2 rounded-pill fw-semibold" style="font-size: 0.75rem;">Đăng nhập ngay</a>
                                 </div>
                             @endauth
@@ -260,11 +260,11 @@
                         // Update points displays
                         const headerPoints = document.getElementById("navbarUserPoints");
                         if (headerPoints) {
-                            headerPoints.textContent = data.points + " điểm";
+                            headerPoints.textContent = data.points + " xu";
                         }
                         const sidebarPoints = document.getElementById("sidebarMissionPoints");
                         if (sidebarPoints) {
-                            sidebarPoints.textContent = data.points + " điểm";
+                            sidebarPoints.textContent = data.points + " xu";
                         }
                         
                         alert(data.message);

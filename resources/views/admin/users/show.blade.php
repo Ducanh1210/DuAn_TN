@@ -11,13 +11,7 @@
     <div class="col-md-4">
         <div class="card shadow mb-4">
             <div class="card-body text-center">
-                @if($user->avatar_url)
-                    <img src="{{ str_starts_with($user->avatar_url, 'http') ? $user->avatar_url : asset($user->avatar_url) }}" alt="Avatar" class="img-thumbnail rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                @else
-                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px; font-size: 64px;">
-                        {{ strtoupper(substr($user->display_name ?? $user->username, 0, 1)) }}
-                    </div>
-                @endif
+                <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';" alt="Avatar" class="img-thumbnail rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                 <h4 class="font-weight-bold">{{ $user->display_name }}</h4>
                 <p class="text-muted">{{ '@' . $user->username }}</p>
                 

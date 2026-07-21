@@ -13,6 +13,11 @@ use App\Models\Comment;
 use App\Models\Location;
 use App\Models\Category;
 use App\Models\BusinessProfile;
+use App\Models\Mission;
+use App\Models\UserMission;
+use App\Models\AvatarFrame;
+use App\Models\UserAvatarFrame;
+use App\Services\MissionService;
 use Illuminate\Support\Str;
 
 
@@ -54,7 +59,13 @@ class ProfileController extends Controller
         $categories = Category::where('status', 'active')->get();
         $businessProfile = BusinessProfile::where('user_id', $user->id)->with('category')->first();
 
-        return view('client.profile', compact('user', 'favorites', 'comments', 'categories', 'businessProfile'));
+        // Load Avatar Frames
+        $allFrames = AvatarFrame::where('status', 'active')->orderBy('required_points', 'asc')->get();
+        $unlockedFrameIds = UserAvatarFrame::where('user_id', $user->id)
+            ->pluck('avatar_frame_id')
+            ->toArray();
+
+        return view('client.profile', compact('user', 'favorites', 'comments', 'categories', 'businessProfile', 'allFrames', 'unlockedFrameIds'));
     }
 
     /**
@@ -172,7 +183,7 @@ class ProfileController extends Controller
             }
 
             // Update database avatar_url to path accessible via storage route
-            $avatarUrl = '/storage/avatars/' . $filename;
+            $avatarUrl = 'avatars/' . $filename;
             $user->update([
                 'avatar_url' => $avatarUrl,
             ]);
@@ -180,7 +191,7 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Tải ảnh đại diện lên thành công!',
-                'avatar_url' => $avatarUrl,
+                'avatar_url' => $user->avatar_formatted_url,
             ]);
         }
 
@@ -543,36 +554,159 @@ class ProfileController extends Controller
             return response()->json([
                 'success' => true,
                 'points' => $user->points,
-                'message' => 'Cộng +1 điểm hoạt động.'
+                'message' => 'Cộng +1 xu hoạt động.'
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Đã đạt giới hạn điểm hoạt động hôm nay.'
+            'message' => 'Đã đạt giới hạn xu hoạt động hôm nay.'
         ]);
     }
 
     /**
-     * Claim daily login bonus points.
+     * Claim daily login bonus points with streak bonus.
      */
     public function claimDaily(Request $request)
     {
         $user = Auth::user();
-        $awarded = \App\Services\PointService::checkDailyLoginBonus($user);
+        $result = MissionService::processDailyCheckin($user);
 
-        if ($awarded) {
+        if ($result['success']) {
             return response()->json([
                 'success' => true,
-                'points' => $user->points,
-                'message' => 'Chúc mừng! Bạn đã nhận được +10 điểm cho hoạt động điểm danh hằng ngày!'
+                'points' => $result['points'],
+                'streak' => $result['streak'],
+                'message' => $result['message']
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Hôm nay bạn đã nhận điểm danh rồi.'
+            'message' => $result['message']
         ], 400);
+    }
+
+    /**
+     * Display the Quests & Avatar Frame Reward Center.
+     */
+    public function missions()
+    {
+        $user = Auth::user();
+
+        // Track daily login
+        MissionService::trackProgress($user, 'daily_login', 1);
+
+        // Fetch active missions
+        $allMissions = Mission::where('status', 'active')->with('rewardFrame')->get();
+
+        // Fetch user progress
+        $userMissions = UserMission::where('user_id', $user->id)
+            ->get()
+            ->keyBy('mission_id');
+
+        $dailyMissions = $allMissions->where('type', 'daily');
+        $weeklyMissions = $allMissions->where('type', 'weekly');
+        $achievementMissions = $allMissions->where('type', 'achievement');
+
+        // Fetch Avatar Frames
+        $allFrames = AvatarFrame::where('status', 'active')->orderBy('required_points', 'asc')->get();
+        $unlockedFrameIds = UserAvatarFrame::where('user_id', $user->id)
+            ->pluck('avatar_frame_id')
+            ->toArray();
+
+        // Fetch Leaderboard (Top 5 Users)
+        $leaderboard = User::orderBy('points', 'desc')->take(5)->get();
+
+        return view('client.missions.index', compact(
+            'user',
+            'dailyMissions',
+            'weeklyMissions',
+            'achievementMissions',
+            'userMissions',
+            'allFrames',
+            'unlockedFrameIds',
+            'leaderboard'
+        ));
+    }
+
+    /**
+     * Claim reward for a completed mission.
+     */
+    public function claimMissionReward(Request $request, int $missionId)
+    {
+        $user = Auth::user();
+        $result = MissionService::claimReward($user, $missionId);
+
+        if ($result['success']) {
+            return response()->json($result);
+        }
+
+        return response()->json($result, 400);
+    }
+
+    /**
+     * Claim daily 100-point milestone gift box reward.
+     */
+    public function claimMilestone100(Request $request)
+    {
+        $user = Auth::user();
+        $today = \Carbon\Carbon::today();
+
+        $todayPointsEarned = \App\Models\PointTransaction::where('user_id', $user->id)
+            ->where('amount', '>', 0)
+            ->whereDate('created_at', $today)
+            ->sum('amount');
+
+        if ($todayPointsEarned < 100) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn cần tích lũy ít nhất 100 xu trong ngày để mở Hộp Quà Mốc này.'
+            ], 400);
+        }
+
+        $alreadyClaimed = \App\Models\PointTransaction::where('user_id', $user->id)
+            ->where('action', 'daily_milestone_100')
+            ->whereDate('created_at', $today)
+            ->exists();
+
+        if ($alreadyClaimed) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn đã nhận phần thưởng mốc 100 xu ngày hôm nay rồi!'
+            ], 400);
+        }
+
+        \App\Services\PointService::awardPoints($user, 50, 'daily_milestone_100', 'Thưởng mốc tích lũy 100 xu trong ngày');
+
+        return response()->json([
+            'success' => true,
+            'message' => '🎉 Chúc mừng! Bạn nhận thêm +50 xu thưởng từ Hộp Quà Mốc 100 Điểm!',
+            'points' => $user->fresh()->points
+        ]);
+    }
+
+    /**
+     * Equip or unequip an avatar frame.
+     */
+    public function equipAvatarFrame(Request $request)
+    {
+        $user = Auth::user();
+        $frameId = $request->input('frame_id');
+        $result = MissionService::equipFrame($user, $frameId ? (int)$frameId : null);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Buy an avatar frame with earned points.
+     */
+    public function buyAvatarFrame(Request $request, int $frameId)
+    {
+        $user = Auth::user();
+        $result = MissionService::purchaseFrame($user, $frameId);
+
+        return response()->json($result);
     }
 }
 

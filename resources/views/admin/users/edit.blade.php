@@ -103,14 +103,7 @@
                             Ảnh đại diện
                         </div>
                         <div class="card-body text-center">
-                            @if($user->avatar_url)
-                                <img id="avatarPreview" src="{{ str_starts_with($user->avatar_url, 'http') ? $user->avatar_url : asset($user->avatar_url) }}" alt="Preview" class="img-thumbnail rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                            @else
-                                <img id="avatarPreview" src="#" alt="Preview" class="img-thumbnail rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; display: none;">
-                                <div id="avatarPlaceholder" class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
-                                    <span class="fs-1">{{ strtoupper(substr($user->display_name ?? $user->username, 0, 1)) }}</span>
-                                </div>
-                            @endif
+                            <img id="avatarPreview" src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';" alt="Preview" class="img-thumbnail rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                             
                             <input type="file" class="form-control @error('avatar') is-invalid @enderror" id="avatar" name="avatar" accept="image/*" onchange="previewImage(this)">
                             @error('avatar')
