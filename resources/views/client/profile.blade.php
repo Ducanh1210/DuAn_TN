@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cài Đặt Tài Khoản - Hà Nam POI</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome & Avatar Frames CSS -->
@@ -24,9 +26,11 @@
         }
 
         body { 
-            font-family: 'Outfit', sans-serif; 
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
             background-color: var(--bg-body); 
             color: var(--text-main); 
+            font-size: 0.925rem;
+            line-height: 1.55;
             margin: 0;
             padding: 0;
             height: 100vh;
@@ -34,6 +38,13 @@
             display: flex;
             flex-direction: column;
         }
+
+        h1, .h1 { font-size: 1.4rem !important; }
+        h2, .h2 { font-size: 1.2rem !important; }
+        h3, .h3 { font-size: 1.05rem !important; }
+        h4, .h4 { font-size: 0.95rem !important; }
+        h5, .h5 { font-size: 0.9rem !important; }
+        h6, .h6 { font-size: 0.85rem !important; }
 
         /* Top Header Navigation */
         .top-navbar {
@@ -225,20 +236,20 @@
             flex: 1;
             height: 100%;
             overflow-y: auto;
-            padding: 40px;
+            padding: 24px;
         }
         .content-panel {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 32px;
+            padding: 24px;
             max-width: 960px;
             margin: 0 auto;
         }
         .section-title {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             color: var(--text-main);
         }
         
@@ -1046,12 +1057,15 @@
     <!-- Sidebar Navigation -->
     <div class="dashboard-sidebar">
         <div class="sidebar-user-section">
-            <div class="avatar-container {{ $user->equippedFrame ? 'avatar-frame-wrapper ' . $user->equippedFrame->css_style : '' }}" id="sidebarAvatarContainer" title="Nhấp để thay ảnh hoặc đổi khung avatar">
+            <div class="avatar-container {{ $user->equippedFrame ? ($user->equippedFrame->image_url ? 'avatar-frame-wrapper has-png-frame' : 'avatar-frame-wrapper ' . $user->equippedFrame->css_style) : '' }}" id="sidebarAvatarContainer" title="Nhấp để thay ảnh hoặc đổi khung avatar">
                 <img src="{{ $user->avatar_formatted_url }}" 
                      alt="Avatar" 
                      class="user-avatar-img"
                      id="profileAvatarPreview"
                      onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';">
+                @if($user->equippedFrame && $user->equippedFrame->image_url)
+                    <img src="{{ asset($user->equippedFrame->image_url) }}" class="avatar-frame-png-overlay">
+                @endif
                 <div class="avatar-upload-overlay">
                     Thay ảnh
                 </div>
@@ -1661,12 +1675,15 @@
                     <!-- TAB 1: PHOTO -->
                     <div class="tab-pane fade show active text-center" id="pane-avatar-photo" role="tabpanel">
                         <div class="mb-4 d-flex justify-content-center position-relative">
-                            <div class="avatar-frame-wrapper {{ $user->equippedFrame ? $user->equippedFrame->css_style : '' }}" style="width: 220px; height: 220px;">
+                            <div class="avatar-frame-wrapper {{ $user->equippedFrame ? ($user->equippedFrame->image_url ? 'has-png-frame' : $user->equippedFrame->css_style) : '' }}" style="width: 220px; height: 220px;">
                                 <img src="{{ $user->avatar_formatted_url }}" 
                                      alt="Avatar" 
                                      id="avatarModalLargePreview" 
                                      onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';"
                                      style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                @if($user->equippedFrame && $user->equippedFrame->image_url)
+                                    <img src="{{ asset($user->equippedFrame->image_url) }}" class="avatar-frame-png-overlay">
+                                @endif
                             </div>
                         </div>
                         <div class="d-flex justify-content-center gap-2">
@@ -1706,8 +1723,11 @@
                                         @endif
 
                                         <div>
-                                            <div class="avatar-frame-wrapper {{ $frame->css_style }} mx-auto my-2" style="width: 68px; height: 68px;">
+                                            <div class="avatar-frame-wrapper {{ $frame->image_url ? 'has-png-frame' : $frame->css_style }} mx-auto my-2" style="width: 68px; height: 68px;">
                                                 <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                                @if($frame->image_url)
+                                                    <img src="{{ asset($frame->image_url) }}" class="avatar-frame-png-overlay">
+                                                @endif
                                             </div>
                                             <h6 class="fw-bold text-dark mb-2 text-truncate" style="font-size: 0.88rem;" title="{{ $frame->name }}">{{ $frame->name }}</h6>
                                         </div>
@@ -1727,6 +1747,7 @@
                                                         data-name="{{ $frame->name }}"
                                                         data-desc="{{ $frame->description }}"
                                                         data-style="{{ $frame->css_style }}"
+                                                        data-image="{{ $frame->image_url ? asset($frame->image_url) : '' }}"
                                                         data-condition="{{ $conditionText }}"
                                                         style="font-size: 0.73rem;">
                                                     <i class="fa-solid fa-lock text-warning me-1"></i> Chưa mở khóa
@@ -1978,12 +1999,24 @@
                 const desc = this.dataset.desc;
                 const condition = this.dataset.condition;
                 const style = this.dataset.style;
+                const image = this.dataset.image;
 
                 if (modalLockFrameName) modalLockFrameName.innerText = name;
                 if (modalLockFrameDesc) modalLockFrameDesc.innerText = desc || 'Khung Avatar độc quyền';
                 if (modalLockConditionText) modalLockConditionText.innerText = condition;
                 if (modalLockFrameWrapper) {
-                    modalLockFrameWrapper.className = `avatar-frame-wrapper ${style || ''}`;
+                    let existingPng = modalLockFrameWrapper.querySelector('.avatar-frame-png-overlay');
+                    if (existingPng) existingPng.remove();
+
+                    if (image) {
+                        modalLockFrameWrapper.className = `avatar-frame-wrapper has-png-frame`;
+                        const imgEl = document.createElement('img');
+                        imgEl.src = image;
+                        imgEl.className = 'avatar-frame-png-overlay';
+                        modalLockFrameWrapper.appendChild(imgEl);
+                    } else {
+                        modalLockFrameWrapper.className = `avatar-frame-wrapper ${style || ''}`;
+                    }
                 }
 
                 if (frameConditionModal) {

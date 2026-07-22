@@ -651,38 +651,71 @@ class ProfileController extends Controller
     public function claimMilestone100(Request $request)
     {
         $user = Auth::user();
-        $today = \Carbon\Carbon::today();
 
-        $todayPointsEarned = \App\Models\PointTransaction::where('user_id', $user->id)
+        // 1. Exclude milestone rewards from earned points progress
+        $totalPointsEarned = \App\Models\PointTransaction::where('user_id', $user->id)
             ->where('amount', '>', 0)
-            ->whereDate('created_at', $today)
+            ->where('action', 'not like', 'daily_milestone_%')
             ->sum('amount');
 
-        if ($todayPointsEarned < 100) {
+        $claimedMilestones = \App\Models\PointTransaction::where('user_id', $user->id)
+            ->where('action', 'like', 'daily_milestone_%')
+            ->pluck('action')
+            ->toArray();
+
+        $allowedMilestones = [100, 200, 500];
+        $reqMilestone = (int)$request->input('milestone', 100);
+
+        if (!in_array($reqMilestone, $allowedMilestones)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Bạn cần tích lũy ít nhất 100 xu trong ngày để mở Hộp Quà Mốc này.'
+                'message' => 'Mốc phần thưởng không hợp lệ!'
             ], 400);
         }
 
-        $alreadyClaimed = \App\Models\PointTransaction::where('user_id', $user->id)
-            ->where('action', 'daily_milestone_100')
-            ->whereDate('created_at', $today)
-            ->exists();
-
-        if ($alreadyClaimed) {
+        if ($totalPointsEarned < $reqMilestone) {
             return response()->json([
                 'success' => false,
-                'message' => 'Bạn đã nhận phần thưởng mốc 100 xu ngày hôm nay rồi!'
+                'message' => 'Bạn cần tích lũy ít nhất ' . $reqMilestone . ' xu để mở Hộp Quà Mốc này.'
             ], 400);
         }
 
-        \App\Services\PointService::awardPoints($user, 50, 'daily_milestone_100', 'Thưởng mốc tích lũy 100 xu trong ngày');
+        $actionKey = 'daily_milestone_' . $reqMilestone;
+        if (in_array($actionKey, $claimedMilestones)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn đã nhận phần thưởng mốc ' . $reqMilestone . ' xu rồi!'
+            ], 400);
+        }
+
+        // Rewards map (Focus on avatar frames with small coin bonus)
+        $rewardsMap = [
+            100 => ['coins' => 10, 'frame_id' => 1],
+            200 => ['coins' => 20, 'frame_id' => 2],
+            500 => ['coins' => 30, 'frame_id' => 4],
+        ];
+
+        $rewardCoins = $rewardsMap[$reqMilestone]['coins'];
+        $frameId = $rewardsMap[$reqMilestone]['frame_id'];
+
+        \App\Services\PointService::awardPoints($user, $rewardCoins, $actionKey, 'Thưởng mốc tích lũy ' . $reqMilestone . ' xu');
+
+        $frame = \App\Models\AvatarFrame::find($frameId);
+        if ($frame) {
+            \App\Services\MissionService::unlockFrame($user, $frame->id);
+        }
 
         return response()->json([
             'success' => true,
-            'message' => '🎉 Chúc mừng! Bạn nhận thêm +50 xu thưởng từ Hộp Quà Mốc 100 Điểm!',
-            'points' => $user->fresh()->points
+            'message' => 'Bạn nhận thêm +' . $rewardCoins . ' xu thưởng từ Hộp Quà Mốc ' . $reqMilestone . ' Xu!',
+            'coins' => $rewardCoins,
+            'points' => $user->fresh()->points,
+            'frame' => $frame ? [
+                'id' => $frame->id,
+                'name' => $frame->name,
+                'image_url' => asset($frame->image_url),
+                'css_style' => $frame->css_style
+            ] : null
         ]);
     }
 

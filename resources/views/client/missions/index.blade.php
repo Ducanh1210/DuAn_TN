@@ -8,13 +8,184 @@
     :root {
         --q-bg: #f8fafc;
         --q-card-bg: #ffffff;
-        --q-primary: #6366f1;
-        --q-primary-hover: #4f46e5;
-        --q-primary-light: #eeeffe;
+        --q-primary: #0284c7;
+        --q-primary-hover: #0369a1;
+        --q-primary-light: #e0f2fe;
         --q-accent-orange: #f59e0b;
         --q-text-main: #0f172a;
         --q-text-sub: #64748b;
         --q-border: #e2e8f0;
+    }
+
+    /* Reward Item Cards Modal */
+    .reward-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .reward-modal-dialog {
+        position: relative;
+        width: 90%;
+        max-width: 400px;
+    }
+
+    .reward-modal-card {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+        border: 1px solid #e2e8f0;
+        padding: 24px;
+        text-align: center;
+    }
+
+    .reward-modal-header-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 20px;
+    }
+
+    .reward-cards-container {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .reward-item-card {
+        position: relative;
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 14px;
+        width: 130px;
+        height: 130px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease;
+    }
+
+    .reward-card-checkbox {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: #6366f1;
+        z-index: 2;
+        margin: 0;
+    }
+
+    .reward-item-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .reward-card-preview {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .reward-avatar-preview-box {
+        position: relative;
+        width: 64px;
+        height: 64px;
+    }
+
+    .reward-avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .reward-frame-overlay-img {
+        position: absolute;
+        top: -24%;
+        left: -24%;
+        width: 148%;
+        height: 148%;
+        pointer-events: none;
+        object-fit: contain;
+    }
+
+    .coin-card-icon-box {
+        width: 58px;
+        height: 58px;
+        background: #fef9c3;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), 0 4px 10px rgba(234, 179, 8, 0.2);
+    }
+
+    .reward-card-label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #334155;
+        text-align: center;
+        white-space: nowrap;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .reward-modal-actions-row {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .btn-reward-equip {
+        flex: 1;
+        background: #6366f1;
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.9rem;
+        padding: 11px 20px;
+        border-radius: 14px;
+        border: none;
+        transition: all 0.2s;
+    }
+
+    .btn-reward-equip:hover {
+        background: #4f46e5;
+    }
+
+    .btn-reward-close {
+        flex: 1;
+        background: #f1f5f9;
+        color: #475569 !important;
+        font-weight: 700;
+        font-size: 0.9rem;
+        padding: 11px 20px;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+
+    .btn-reward-close:hover {
+        background: #e2e8f0;
+        color: #0f172a !important;
     }
 
     /* Hide global app header and footer */
@@ -45,32 +216,32 @@
     .reward-brand {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 11px;
         text-decoration: none;
     }
 
     .reward-brand-icon {
+        font-size: 1.8rem;
+        color: #0284c7;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 32px;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6, #f59e0b);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        box-shadow: none;
     }
 
     .reward-brand-text {
-        font-size: 1.15rem;
+        font-size: 1.02rem;
         font-weight: 800;
         color: #0f172a;
-        line-height: 1.1;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        transition: color 0.2s ease;
     }
 
     .reward-brand-sub {
         font-size: 0.72rem;
         color: #64748b;
         font-weight: 500;
+        line-height: 1.2;
     }
 
     .reward-top-menu {
@@ -96,25 +267,26 @@
     }
 
     .reward-top-menu .nav-link:hover {
-        color: #6366f1 !important;
+        color: #0284c7 !important;
     }
 
     .reward-top-menu .nav-link.active {
-        color: #6366f1 !important;
+        color: #0284c7 !important;
         font-weight: 700 !important;
-        border-bottom: 3px solid #6366f1 !important;
+        border-bottom: 3px solid #0284c7 !important;
     }
 
     .user-point-capsule {
-        background: #fffbe6;
-        border: 1px solid #fde68a;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: none;
         padding: 5px 14px;
-        border-radius: 20px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         gap: 6px;
         font-weight: 700;
-        color: #d97706;
+        color: #0f172a;
         font-size: 0.85rem;
     }
 
@@ -156,6 +328,7 @@
         color: #475569 !important;
         background: transparent !important;
         border: none !important;
+        border-left: 4px solid transparent !important;
         text-align: left;
         transition: all 0.2s ease;
         margin-bottom: 4px;
@@ -164,26 +337,29 @@
     }
 
     .reward-cat-btn:hover {
-        background: #eeeffe !important;
-        color: #6366f1 !important;
+        background: #f1f5f9 !important;
+        color: #0284c7 !important;
     }
 
     .reward-cat-btn.active {
-        background: #6366f1 !important;
-        color: #ffffff !important;
+        background: #e0f2fe !important;
+        color: #0284c7 !important;
         font-weight: 700 !important;
-        box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3) !important;
+        border-left: 4px solid #0284c7 !important;
+        box-shadow: none !important;
+        border-top-left-radius: 3px !important;
+        border-bottom-left-radius: 3px !important;
     }
 
     .reward-cat-btn.active i,
     .reward-cat-btn.active span {
-        color: #ffffff !important;
+        color: #0284c7 !important;
     }
 
     /* Hero Banner (Shop Tab) */
     .reward-hero-compact {
-        background: linear-gradient(135deg, #f5f3ff 0%, #eeeffe 50%, #e0e7ff 100%);
-        border: 1px solid #c7d2fe;
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+        border: 1px solid #7dd3fc;
         border-radius: 18px;
         padding: 22px 28px;
         position: relative;
@@ -206,19 +382,19 @@
     }
 
     .btn-hero-compact {
-        background: #6366f1;
+        background: linear-gradient(135deg, #06b6d4, #0284c7);
         color: #ffffff;
         font-weight: 700;
         font-size: 0.84rem;
         padding: 8px 22px;
         border-radius: 20px;
         border: none;
-        box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 3px 10px rgba(2, 132, 199, 0.3);
         transition: all 0.2s ease;
     }
 
     .btn-hero-compact:hover {
-        background: #4f46e5;
+        background: #0369a1;
         color: #ffffff;
     }
 
@@ -242,14 +418,14 @@
         width: 34px;
         height: 34px;
         border-radius: 50%;
-        background: #eeeffe;
-        color: #6366f1;
+        background: #e0f2fe;
+        color: #0284c7;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 0.95rem;
         flex-shrink: 0;
-        border: 1px solid #c7d2fe;
+        border: 1px solid #bae6fd;
     }
 
     .assurance-title-compact {
@@ -318,7 +494,7 @@
     }
 
     .btn-action-compact {
-        background: #6366f1;
+        background: linear-gradient(135deg, #06b6d4, #0284c7);
         color: #ffffff;
         font-weight: 700;
         font-size: 0.8rem;
@@ -327,17 +503,37 @@
         border: none;
         width: 100%;
         transition: all 0.2s;
-        box-shadow: 0 3px 8px rgba(99, 102, 241, 0.25);
+        box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
     }
 
     .btn-action-compact:hover {
-        background: #4f46e5;
+        background: #0369a1;
         color: #ffffff;
     }
 
+    .btn-indigo {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .btn-indigo:hover {
+        background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%) !important;
+        box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35) !important;
+        color: #ffffff !important;
+    }
+
+    .text-indigo {
+        color: #0284c7 !important;
+    }
+
     .btn-outline-compact {
-        border: 1px solid #6366f1;
-        color: #6366f1;
+        border: 1px solid #0284c7;
+        color: #0284c7;
         background: #ffffff;
         font-weight: 700;
         font-size: 0.8rem;
@@ -348,7 +544,7 @@
     }
 
     .btn-outline-compact:hover {
-        background: #6366f1;
+        background: #0284c7;
         color: #ffffff;
     }
 
@@ -362,90 +558,114 @@
     }
 
     .quest-filter-pill {
-        border-radius: 20px;
-        padding: 6px 16px;
-        font-size: 0.82rem;
+        border-radius: 8px;
+        padding: 5px 14px;
+        font-size: 0.8rem;
         font-weight: 600;
         color: #64748b;
-        background: #f1f5f9;
-        border: none;
+        background: transparent;
+        border: 1px solid #e2e8f0;
         transition: all 0.2s ease;
         cursor: pointer;
     }
 
     .quest-filter-pill.active {
-        background: #6366f1;
+        background: #0284c7;
         color: #ffffff;
         font-weight: 700;
-        box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
+        border-color: #0284c7;
+        box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);
     }
 
     .quest-item-card {
+        position: relative;
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 14px 18px;
-        margin-bottom: 12px;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
         transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
 
+    .quest-item-card:hover {
+        border-color: #bae6fd;
+        box-shadow: 0 3px 12px rgba(2, 132, 199, 0.05);
+    }
+
     .quest-icon-box {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.15rem;
+        font-size: 0.92rem;
         flex-shrink: 0;
+        transition: all 0.2s ease;
     }
 
-    .bg-icon-purple { background: #eeeffe; color: #6366f1; }
-    .bg-icon-green { background: #dcfce7; color: #10b981; }
-    .bg-icon-blue { background: #e0f2fe; color: #0284c7; }
-    .bg-icon-orange { background: #ffedd5; color: #f97316; }
+    .bg-icon-purple { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+    .bg-icon-green { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .bg-icon-blue { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+    .bg-icon-orange { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
 
     .quest-reward-tag {
-        font-size: 0.82rem;
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        font-size: 0.76rem;
         font-weight: 700;
         color: #d97706;
-        display: flex;
-        align-items: center;
-        gap: 4px;
     }
 
     .btn-quest-action {
-        background: #eeeffe;
-        color: #6366f1;
+        background: #ffffff;
+        color: #0284c7;
         font-weight: 700;
-        font-size: 0.82rem;
-        border-radius: 10px;
-        padding: 7px 18px;
-        border: none;
+        font-size: 0.78rem;
+        border-radius: 8px;
+        padding: 5px 14px;
+        border: 1px solid #0284c7;
         transition: all 0.2s ease;
     }
 
     .btn-quest-action:hover {
-        background: #6366f1;
+        background: #0284c7;
         color: #ffffff;
     }
 
     .btn-quest-claim {
-        background: #6366f1;
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.78rem;
+        border-radius: 8px;
+        padding: 6px 16px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-quest-action:hover {
+        background: #0284c7;
+        color: #ffffff;
+    }
+
+    .btn-quest-claim {
+        background: linear-gradient(135deg, #06b6d4, #0284c7);
         color: #ffffff;
         font-weight: 700;
         font-size: 0.82rem;
         border-radius: 10px;
         padding: 7px 18px;
         border: none;
-        box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 3px 10px rgba(2, 132, 199, 0.3);
     }
 
     .btn-quest-claim:hover {
-        background: #4f46e5;
+        background: #0369a1;
         color: #ffffff;
     }
 
@@ -476,10 +696,19 @@
     }
 
     .streak-day-box.current {
-        background: #fffbe6;
-        border-color: #fde68a;
-        color: #d97706;
-        box-shadow: 0 0 0 2px #f59e0b;
+        border: 2px solid #16a34a !important;
+        box-shadow: none !important;
+    }
+
+    .streak-day-box.special-day {
+        background: #f0f9ff !important;
+        border: 1.5px solid #0284c7 !important;
+        color: #0284c7 !important;
+    }
+
+    .streak-day-box.special-day .special-day-title {
+        color: #0284c7 !important;
+        font-weight: 800 !important;
     }
 
     /* Muted disabled check-in button */
@@ -498,13 +727,13 @@
         width: 64px;
         height: 64px;
         border-radius: 50%;
-        border: 4px solid #6366f1;
+        border: 4px solid #0284c7;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1rem;
         font-weight: 800;
-        color: #6366f1;
+        color: #0284c7;
         flex-shrink: 0;
     }
 
@@ -518,7 +747,7 @@
     }
 
     .leaderboard-row.highlight {
-        background: #eeeffe;
+        background: #e0f2fe;
         font-weight: 700;
     }
 
@@ -540,8 +769,8 @@
     .rank-other { background: #e2e8f0; color: #64748b; }
 
     .promo-banner-card {
-        background: linear-gradient(135deg, #fce7f3, #fae8ff);
-        border: 1px solid #f5d0fe;
+        background: linear-gradient(135deg, #e0f2fe, #ccfbf1);
+        border: 1px solid #bae6fd;
         border-radius: 16px;
         padding: 16px;
     }
@@ -579,7 +808,7 @@
 
     .quest-milestone-line-fill {
         height: 100%;
-        background: linear-gradient(90deg, #7c3aed, #9333ea);
+        background: linear-gradient(90deg, #06b6d4, #0284c7);
         border-radius: 4px;
         transition: width 0.4s ease;
     }
@@ -587,16 +816,16 @@
     .quest-coin-badge {
         width: 44px;
         height: 44px;
-        background: linear-gradient(135deg, #fef08a, #f59e0b, #d97706);
+        background: #f59e0b;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #ffffff;
         font-size: 22px;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        box-shadow: none;
         z-index: 2;
-        border: 2px solid #ffffff;
+        border: 2.5px solid #ffffff;
     }
 
     .milestone-node {
@@ -650,6 +879,62 @@
         white-space: nowrap;
     }
 
+    .milestone-node {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .milestone-node .milestone-tooltip {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%) translateY(4px);
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.2), 0 3px 8px rgba(0, 0, 0, 0.06);
+        border-radius: 10px;
+        padding: 4px;
+        white-space: nowrap;
+        text-align: center;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tooltip-mini-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2px;
+        box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+
+    .milestone-node .milestone-tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 6px 6px 0 6px;
+        border-style: solid;
+        border-color: #ffffff transparent transparent transparent;
+    }
+
+    .milestone-node:hover .milestone-tooltip,
+    .milestone-node.active .milestone-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
     .quest-sub-item-card {
         background: #ffffff;
         border-radius: 16px;
@@ -664,13 +949,13 @@
     }
 
     .quest-sub-item-card:hover {
-        box-shadow: 0 4px 14px rgba(124, 58, 237, 0.08);
-        border-color: #ddd6fe;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+        border-color: #bfdbfe;
     }
 
     .btn-outline-purple {
-        border: 1.5px solid #8b5cf6;
-        color: #7c3aed;
+        border: 1.5px solid #3b82f6;
+        color: #2563eb;
         background: transparent;
         border-radius: 20px;
         padding: 4px 16px;
@@ -680,7 +965,7 @@
     }
 
     .btn-outline-purple:hover {
-        background: #7c3aed;
+        background: #2563eb;
         color: #ffffff;
     }
 </style>
@@ -691,12 +976,10 @@
 <div class="reward-top-bar-full">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
         <a href="{{ url('/') }}" class="reward-brand" title="Quay về trang chủ Bản đồ">
-            <div class="reward-brand-icon">
-                <i class="fa-solid fa-gift"></i>
-            </div>
+            <i class="fa-solid fa-gift reward-brand-icon"></i>
             <div>
-                <div class="reward-brand-text">ĐỔI THƯỞNG</div>
-                <div class="reward-brand-sub">Nhận quà cực dễ</div>
+                <div class="reward-brand-text" id="headerBrandText">Nhiệm Vụ & Tích Xu</div>
+                <div class="reward-brand-sub" id="headerBrandSub">Hoàn thành nhiệm vụ nhận xu hàng ngày</div>
             </div>
         </a>
 
@@ -706,13 +989,13 @@
                 <a class="nav-link" href="{{ url('/') }}">Trang chủ</a>
             </li>
             <li class="nav-item">
-                <button class="nav-link active" id="nav-shop-tab" data-bs-toggle="pill" data-bs-target="#shop-pane" type="button" role="tab" onclick="switchNavTab('shop-pane')">
-                    Đổi thưởng
+                <button class="nav-link active" id="nav-quests-tab" data-bs-toggle="pill" data-bs-target="#quests-pane" type="button" role="tab" onclick="switchNavTab('quests-pane')">
+                    Nhiệm vụ
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="nav-quests-tab" data-bs-toggle="pill" data-bs-target="#quests-pane" type="button" role="tab" onclick="switchNavTab('quests-pane')">
-                    Nhiệm vụ
+                <button class="nav-link" id="nav-shop-tab" data-bs-toggle="pill" data-bs-target="#shop-pane" type="button" role="tab" onclick="switchNavTab('shop-pane')">
+                    Đổi thưởng
                 </button>
             </li>
             <li class="nav-item">
@@ -734,9 +1017,7 @@
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">3</span>
             </div>
 
-            <div class="avatar-frame-wrapper {{ $user->equippedFrame ? $user->equippedFrame->css_style : '' }}" style="width: 34px; height: 34px;">
-                <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=6366f1&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-            </div>
+            <x-user-avatar :user="$user" size="34" />
         </div>
     </div>
 </div>
@@ -746,7 +1027,7 @@
     <div class="tab-content" id="mainTabContent">
         
         <!-- TAB 1: ĐỔI THƯỞNG (SHOP PANE - MATCHED INDIGO COLOR SCHEME) -->
-        <div class="tab-pane fade show active" id="shop-pane" role="tabpanel">
+        <div class="tab-pane fade" id="shop-pane" role="tabpanel">
             <div class="row g-3">
                 <!-- LEFT COLUMN: Danh Mục Phần Thưởng Sidebar -->
                 <div class="col-lg-3 col-xl-2">
@@ -777,7 +1058,7 @@
                         <div class="fs-4 text-warning mb-1"><i class="fa-solid fa-gift"></i></div>
                         <h6 class="fw-bold text-dark mb-1" style="font-size: 0.82rem;">Giới thiệu bạn bè</h6>
                         <p class="text-muted mb-2" style="font-size: 0.72rem;">Nhận ngay <strong>2.000 xu</strong> cho mỗi lượt mời!</p>
-                        <button class="btn btn-indigo btn-sm w-100 fw-bold rounded-pill text-white shadow-sm" onclick="navigator.clipboard.writeText(window.location.origin); alert('Đã sao chép liên kết!');" style="background: #6366f1; font-size: 0.75rem; padding: 4px 10px;">
+                        <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="navigator.clipboard.writeText(window.location.origin); alert('Đã sao chép liên kết!');" style="font-size: 0.78rem; padding: 7px 10px;">
                             Giới thiệu ngay
                         </button>
                     </div>
@@ -794,7 +1075,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <button id="btnDailyCheckinShop" class="btn btn-hero-compact" @if($user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday()) disabled @endif>
                                         @if($user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday())
-                                            Đã xu danh hôm nay
+                                            Đã điểm danh hôm nay
                                         @else
                                             Đổi quà ngay (+10 xu)
                                         @endif
@@ -806,9 +1087,7 @@
                             </div>
                             <div class="col-lg-4 text-center text-lg-end">
                                 <div class="p-2 bg-white bg-opacity-80 rounded-3 d-inline-block border border-indigo border-opacity-25 shadow-sm text-center">
-                                    <div class="avatar-frame-wrapper {{ $user->equippedFrame ? $user->equippedFrame->css_style : '' }} mx-auto mb-1" style="width: 60px; height: 60px;">
-                                        <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=6366f1&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-                                    </div>
+                                    <x-user-avatar :user="$user" size="60" class="mx-auto mb-1" />
                                     <div class="fw-bold text-dark" style="font-size: 0.78rem;">{{ $user->display_name ?? $user->username }}</div>
                                     <div class="text-muted" style="font-size: 0.7rem;">
                                         {{ $user->equippedFrame ? $user->equippedFrame->name : 'Khung mặc định' }}
@@ -967,7 +1246,7 @@
         </div>
 
         <!-- TAB 2: NHIỆM VỤ (QUESTS PANE - REFERENCED QUEST LAYOUT) -->
-        <div class="tab-pane fade" id="quests-pane" role="tabpanel">
+        <div class="tab-pane fade show active" id="quests-pane" role="tabpanel">
             <div class="row g-3">
                 <!-- LEFT COLUMN: Menu Sidebar -->
                 <div class="col-lg-3 col-xl-2">
@@ -994,7 +1273,7 @@
                         <div class="fs-4 text-warning mb-1"><i class="fa-solid fa-gift"></i></div>
                         <h6 class="fw-bold text-dark mb-1" style="font-size: 0.82rem;">Mời bạn bè</h6>
                         <p class="text-muted mb-2" style="font-size: 0.72rem;">Nhận ngay <strong>2.000 xu</strong> cho mỗi lượt mời!</p>
-                        <button class="btn btn-indigo btn-sm w-100 fw-bold rounded-pill text-white shadow-sm" onclick="navigator.clipboard.writeText(window.location.origin); alert('Đã sao chép liên kết mời!');" style="background: #6366f1; font-size: 0.75rem; padding: 4px 10px;">
+                        <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="navigator.clipboard.writeText(window.location.origin); alert('Đã sao chép liên kết mời!');" style="font-size: 0.78rem; padding: 7px 10px;">
                             Mời ngay
                         </button>
                     </div>
@@ -1003,22 +1282,51 @@
                 <!-- CENTER COLUMN: Quest List -->
                 <div class="col-lg-5 col-xl-6">
                     @php
-                        $todayPointsEarned = \App\Models\PointTransaction::where('user_id', Auth::id())
+                        $totalPointsEarned = \App\Models\PointTransaction::where('user_id', Auth::id())
                             ->where('amount', '>', 0)
-                            ->whereDate('created_at', \Carbon\Carbon::today())
+                            ->where('action', 'not like', 'daily_milestone_%')
                             ->sum('amount');
-                        $milestonePercent = min(100, max(0, $todayPointsEarned));
+
+                        $claimedMilestones = \App\Models\PointTransaction::where('user_id', Auth::id())
+                            ->where('action', 'like', 'daily_milestone_%')
+                            ->pluck('action')
+                            ->toArray();
+
+                        // Progress percentage for 3 nodes (100, 200, 500)
+                        if ($totalPointsEarned <= 100) {
+                            $milestonePercent = ($totalPointsEarned / 100) * 33.33;
+                        } elseif ($totalPointsEarned <= 200) {
+                            $milestonePercent = 33.33 + (($totalPointsEarned - 100) / 100) * 33.33;
+                        } else {
+                            $milestonePercent = 66.66 + (min(300, $totalPointsEarned - 200) / 300) * 33.34;
+                        }
+                        $milestonePercent = min(100, max(0, round($milestonePercent)));
+
+                        $claimed100 = in_array('daily_milestone_100', $claimedMilestones);
+                        $claimed200 = in_array('daily_milestone_200', $claimedMilestones);
+                        $claimed500 = in_array('daily_milestone_500', $claimedMilestones);
+                        $allClaimed = $claimed100 && $claimed200 && $claimed500;
+
+                        $frame100 = \App\Models\AvatarFrame::find(1);
+                        $frame200 = \App\Models\AvatarFrame::find(2);
+                        $frame500 = \App\Models\AvatarFrame::find(4);
                     @endphp
 
-                    <!-- TIẾN ĐỘ NHIỆM VỤ Widget (Cream Theme) -->
+                    <!-- TIẾN ĐỘ NHIỆM VỤ Widget (3 Mốc 100, 200, 500 Xu) -->
                     <div class="quest-progress-card-cream">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <h6 class="fw-extrabold text-dark mb-0" style="font-size: 0.88rem;">
-                                <i class="fa-solid fa-trophy text-warning me-1.5"></i> Tiến độ tích xu hôm nay: <span class="text-indigo fw-black">{{ $todayPointsEarned }}/100 xu</span>
+                                <i class="fa-solid fa-trophy text-warning me-1.5"></i> Tiến độ tích xu: <span class="text-indigo fw-black">{{ number_format($totalPointsEarned) }} xu</span>
                             </h6>
-                            <span class="badge bg-warning-subtle text-warning fw-bold px-2.5 py-1 rounded-pill" style="font-size: 0.7rem;">
-                                <i class="fa-solid fa-bolt me-1"></i> Mốc 100 xu nhận Hộp Quà
-                            </span>
+                            @if($allClaimed)
+                                <span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1 rounded-pill" style="font-size: 0.7rem;">
+                                    <i class="fa-solid fa-circle-check me-1"></i> Đã hoàn thành tất cả mốc!
+                                </span>
+                            @else
+                                <span class="badge bg-warning-subtle text-warning fw-bold px-2.5 py-1 rounded-pill" style="font-size: 0.7rem;">
+                                    <i class="fa-solid fa-bolt me-1"></i> Mốc 100 - 200 - 500 Xu
+                                </span>
+                            @endif
                         </div>
 
                         <div class="quest-milestone-track-wrapper">
@@ -1027,68 +1335,102 @@
                             </div>
 
                             <!-- Start Coin -->
-                            <div class="quest-coin-badge" title="Tích xu hôm nay">
+                            <div class="quest-coin-badge" title="Tích lũy xu từ nhiệm vụ">
                                 <i class="fa-solid fa-star"></i>
                             </div>
 
-                            <!-- Node 25 -->
+                            <!-- Mốc 1: 100 Xu -->
                             <div class="milestone-node">
-                                <div class="node-icon-circle {{ $todayPointsEarned >= 25 ? 'bg-indigo text-white' : 'bg-secondary bg-opacity-25 text-muted' }}">
-                                    @if($todayPointsEarned >= 25)
-                                        <i class="fa-solid fa-check"></i>
-                                    @else
-                                        <span style="font-size: 0.65rem;">25</span>
-                                    @endif
+                                <div class="milestone-tooltip">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <div class="tooltip-mini-card">
+                                            <i class="fa-solid fa-coins text-warning mb-0.5" style="font-size: 0.82rem;"></i>
+                                            <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">+10 xu</div>
+                                        </div>
+                                        @if($frame100)
+                                            <div class="tooltip-mini-card">
+                                                <img src="{{ asset($frame100->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame100->name }}">
+                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 38px;">{{ $frame100->name }}</div>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-                                <div class="node-bottom-val {{ $todayPointsEarned >= 25 ? 'text-indigo' : 'text-muted' }}">25</div>
-                            </div>
-
-                            <!-- Node 50 -->
-                            <div class="milestone-node">
-                                <div class="node-icon-circle {{ $todayPointsEarned >= 50 ? 'bg-indigo text-white' : 'bg-secondary bg-opacity-25 text-muted' }}">
-                                    @if($todayPointsEarned >= 50)
-                                        <i class="fa-solid fa-check"></i>
-                                    @else
-                                        <span style="font-size: 0.65rem;">50</span>
-                                    @endif
-                                </div>
-                                <div class="node-bottom-val {{ $todayPointsEarned >= 50 ? 'text-indigo' : 'text-muted' }}">50</div>
-                            </div>
-
-                            <!-- Node 75 -->
-                            <div class="milestone-node">
-                                <div class="node-icon-circle {{ $todayPointsEarned >= 75 ? 'bg-indigo text-white' : 'bg-secondary bg-opacity-25 text-muted' }}">
-                                    @if($todayPointsEarned >= 75)
-                                        <i class="fa-solid fa-check"></i>
-                                    @else
-                                        <span style="font-size: 0.65rem;">75</span>
-                                    @endif
-                                </div>
-                                <div class="node-bottom-val {{ $todayPointsEarned >= 75 ? 'text-indigo' : 'text-muted' }}">75</div>
-                            </div>
-
-                            <!-- Node 100 (Gift Box) -->
-                            <div class="milestone-node">
-                                @php
-                                    $hasClaimed100Gift = \App\Models\PointTransaction::where('user_id', Auth::id())
-                                        ->where('action', 'daily_milestone_100')
-                                        ->whereDate('created_at', \Carbon\Carbon::today())
-                                        ->exists();
-                                @endphp
-                                @if($hasClaimed100Gift)
+                                @if($claimed100)
                                     <div class="node-icon-circle bg-success text-white" title="Đã nhận quà mốc 100 xu">
                                         <i class="fa-solid fa-check"></i>
                                     </div>
-                                @elseif($todayPointsEarned >= 100)
-                                    <button type="button" id="btnClaimMilestone100" class="btn p-0 border-0 bg-transparent node-icon-gift-big text-danger" title="Nhấn để nhận Hộp Quà Mốc 100 Xu!" style="cursor: pointer; animation: pulse 1.2s infinite;">
+                                @elseif($totalPointsEarned >= 100)
+                                    <button type="button" class="btn p-0 border-0 bg-transparent node-icon-gift-big text-danger btn-claim-milestone-box" data-milestone="100" title="Nhấn để nhận Hộp Quà Mốc 100 Xu!" style="cursor: pointer; animation: pulse 1.2s infinite;">
                                         <i class="fa-solid fa-gift"></i>
                                     </button>
                                 @else
-                                    <div class="node-icon-gift-big opacity-50" title="Đạt 100 xu để mở quà!">
+                                    <div class="node-icon-circle bg-secondary bg-opacity-25 text-muted" title="Cần 100 xu để mở">
+                                        <span style="font-size: 0.65rem;">100</span>
+                                    </div>
+                                @endif
+                                <div class="node-bottom-val {{ $totalPointsEarned >= 100 ? 'text-indigo fw-extrabold' : 'text-muted' }}">100</div>
+                            </div>
+                            <div class="milestone-node">
+                                <div class="milestone-tooltip">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <div class="tooltip-mini-card">
+                                            <i class="fa-solid fa-coins text-warning mb-0.5" style="font-size: 0.82rem;"></i>
+                                            <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">+20 xu</div>
+                                        </div>
+                                        @if($frame200)
+                                            <div class="tooltip-mini-card">
+                                                <img src="{{ asset($frame200->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame200->name }}">
+                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 38px;">{{ $frame200->name }}</div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                @if($claimed200)
+                                    <div class="node-icon-circle bg-success text-white" title="Đã nhận quà mốc 200 xu">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                @elseif($totalPointsEarned >= 200)
+                                    <button type="button" class="btn p-0 border-0 bg-transparent node-icon-gift-big text-danger btn-claim-milestone-box" data-milestone="200" title="Nhấn để nhận Hộp Quà Mốc 200 Xu!" style="cursor: pointer; animation: pulse 1.2s infinite;">
+                                        <i class="fa-solid fa-gift"></i>
+                                    </button>
+                                @else
+                                    <div class="node-icon-circle bg-secondary bg-opacity-25 text-muted" title="Cần 200 xu để mở">
+                                        <span style="font-size: 0.65rem;">200</span>
+                                    </div>
+                                @endif
+                                <div class="node-bottom-val {{ $totalPointsEarned >= 200 ? 'text-indigo fw-extrabold' : 'text-muted' }}">200</div>
+                            </div>
+
+                            <!-- Mốc 3: 500 Xu (Mốc Lớn Tối Đa) -->
+                            <div class="milestone-node">
+                                <div class="milestone-tooltip">
+                                    <div class="d-flex align-items-center gap-1">
+                                        <div class="tooltip-mini-card">
+                                            <i class="fa-solid fa-coins text-warning mb-0.5" style="font-size: 0.82rem;"></i>
+                                            <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">+30 xu</div>
+                                        </div>
+                                        @if($frame500)
+                                            <div class="tooltip-mini-card">
+                                                <img src="{{ asset($frame500->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame500->name }}">
+                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 38px;">{{ $frame500->name }}</div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                @if($claimed500)
+                                    <div class="node-icon-circle bg-success text-white" title="Đã nhận quà mốc 500 xu">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                @elseif($totalPointsEarned >= 500)
+                                    <button type="button" class="btn p-0 border-0 bg-transparent node-icon-gift-big text-danger btn-claim-milestone-box" data-milestone="500" title="Nhấn để nhận Hộp Quà Mốc 500 Xu Tối Đa!" style="cursor: pointer; animation: pulse 1.2s infinite;">
+                                        <i class="fa-solid fa-gift"></i>
+                                    </button>
+                                @else
+                                    <div class="node-icon-gift-big opacity-50" title="Đạt 500 xu để mở quà lớn!">
                                         <i class="fa-solid fa-gift text-danger"></i>
                                     </div>
                                 @endif
-                                <div class="node-bottom-val {{ $todayPointsEarned >= 100 ? 'text-danger fw-extrabold' : 'text-muted' }}">100</div>
+                                <div class="node-bottom-val {{ $totalPointsEarned >= 500 ? 'text-danger fw-extrabold' : 'text-muted' }}">500</div>
                             </div>
                         </div>
                     </div>
@@ -1144,12 +1486,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="text-end">
-                                        <div class="quest-reward-tag mb-2">
-                                            <i class="fa-solid fa-coins text-warning"></i> +{{ $mission->reward_points }} xu
-                                        </div>
+                                    <div class="quest-reward-tag">
+                                        +{{ $mission->reward_points }} xu
+                                    </div>
+                                    <div class="text-end pt-3">
                                         @if($isClaimed)
-                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 10px; padding: 6px 14px;">Đã nhận</button>
+                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Đã nhận</button>
                                         @elseif($isCompleted)
                                             <button class="btn-quest-claim btn-claim-mission" data-id="{{ $mission->id }}">Nhận thưởng</button>
                                         @else
@@ -1182,12 +1524,12 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="text-end">
-                                        <div class="quest-reward-tag mb-2">
-                                            <i class="fa-solid fa-coins text-warning"></i> +{{ $mission->reward_points }} xu
-                                        </div>
+                                    <div class="quest-reward-tag">
+                                        +{{ $mission->reward_points }} xu
+                                    </div>
+                                    <div class="text-end pt-3">
                                         @if($isClaimed)
-                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 10px; padding: 6px 14px;">Đã nhận</button>
+                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Đã nhận</button>
                                         @elseif($isCompleted)
                                             <button class="btn-quest-claim btn-claim-mission" data-id="{{ $mission->id }}">Nhận thưởng</button>
                                         @else
@@ -1214,6 +1556,9 @@
                                 $hasClaimedToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
                                 $rawStreak = (int)($user->streak_count ?? 0);
                                 $effectiveStreak = $hasClaimedToday ? max(1, $rawStreak) : $rawStreak;
+                                $day7Frame = \App\Models\AvatarFrame::where('code', 'frame-streak')->first()
+                                    ?? \App\Models\AvatarFrame::where('name', 'like', '%Duy Trì%')->first()
+                                    ?? \App\Models\AvatarFrame::first();
                             @endphp
                             @for($day = 1; $day <= 7; $day++)
                                 @php
@@ -1222,20 +1567,24 @@
                                     $isCurrent = (!$hasClaimedToday && $day == ($effectiveStreak + 1));
                                     $isFrameDay = ($day == 7);
                                 @endphp
-                                <div class="streak-day-box {{ $isDone ? 'completed' : ($isCurrent ? 'current' : '') }} {{ $isFrameDay && !$isDone && !$isCurrent ? 'border-warning bg-warning-subtle' : '' }}">
+                                <div class="streak-day-box {{ $isDone ? 'completed' : ($isCurrent ? 'current' : '') }} {{ $isFrameDay && !$isDone && !$isCurrent ? 'special-day' : '' }}">
                                     <div style="font-size: 0.64rem; font-weight: 600;">Ngày {{ $day }}</div>
-                                    <div class="my-1">
+                                    <div class="my-1 d-flex align-items-center justify-content-center" style="height: 28px;">
                                         @if($isDone)
                                             <i class="fa-solid fa-check fs-6 text-success fw-bold"></i>
                                         @elseif($isFrameDay)
-                                            <i class="fa-solid fa-id-badge fs-6 text-warning" title="Phần thưởng Khung Avatar!"></i>
+                                            @if($day7Frame && $day7Frame->image_url)
+                                                <img src="{{ asset($day7Frame->image_url) }}" alt="{{ $day7Frame->name }}" style="width: 28px; height: 28px; object-fit: contain;" title="Phần thưởng: Khung {{ $day7Frame->name }}">
+                                            @else
+                                                <i class="fa-solid fa-crown fs-6 text-warning" title="Phần thưởng Khung Avatar!"></i>
+                                            @endif
                                         @else
                                             <i class="fa-solid fa-gift fs-6 text-warning"></i>
                                         @endif
                                     </div>
                                     <div class="fw-bold text-truncate" style="font-size: 0.65rem;">
                                         @if($isFrameDay)
-                                            <span class="{{ $isDone ? 'text-muted' : 'text-warning fw-extrabold' }}">Khung</span>
+                                            <span class="{{ $isDone ? 'text-muted' : 'special-day-title' }}">{{ $day7Frame->name ?? 'Khung' }}</span>
                                         @else
                                             +{{ $day * 10 }}
                                         @endif
@@ -1244,9 +1593,9 @@
                             @endfor
                         </div>
 
-                        <button id="btnDailyCheckinSide" class="btn btn-indigo w-100 fw-bold rounded-pill text-white shadow-sm" style="background: #6366f1; padding: 8px; font-size: 0.84rem;" @if($user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday()) disabled @endif>
+                        <button id="btnDailyCheckinSide" class="btn btn-indigo w-100 fw-bold" style="padding: 9px; font-size: 0.84rem;" @if($user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday()) disabled @endif>
                             @if($user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday())
-                                Đã xu danh hôm nay
+                                Đã điểm danh hôm nay
                             @else
                                 Điểm danh ngay
                             @endif
@@ -1267,7 +1616,7 @@
                                 <div class="fw-bold text-dark" style="font-size: 0.82rem;">Hoàn thành 5 nhiệm vụ</div>
                                 <div class="text-muted mb-1.5" style="font-size: 0.74rem;">Nhận thưởng <strong class="text-warning">100 xu</strong></div>
                                 <div class="progress rounded-pill" style="height: 5px; width: 130px; background: #e2e8f0;">
-                                    <div class="progress-bar" style="width: 40%; background: #6366f1;"></div>
+                                    <div class="progress-bar" style="width: 40%; background: #0284c7;"></div>
                                 </div>
                             </div>
                         </div>
@@ -1288,9 +1637,7 @@
                                         <div class="rank-badge {{ $rank == 1 ? 'rank-1' : ($rank == 2 ? 'rank-2' : ($rank == 3 ? 'rank-3' : 'rank-other')) }}">
                                             {{ $rank }}
                                         </div>
-                                        <div class="avatar-frame-wrapper {{ $topUser->equippedFrame ? $topUser->equippedFrame->css_style : '' }}" style="width: 26px; height: 26px;">
-                                            <img src="{{ $topUser->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($topUser->display_name ?? $topUser->username) }}&background=6366f1&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-                                        </div>
+                                        <x-user-avatar :user="$topUser" size="26" />
                                         <span class="text-dark small text-truncate" style="max-width: 110px;">{{ $topUser->display_name ?? $topUser->username }}</span>
                                     </div>
                                     <div class="fw-bold text-indigo" style="color: #6366f1; font-size: 0.8rem;">
@@ -1350,8 +1697,11 @@
                                 @php $isEquipped = ($user->equipped_frame_id == $frame->id); @endphp
                                 <div class="col-6 col-md-4 col-lg-3">
                                     <div class="p-3 border rounded-3 text-center bg-white">
-                                        <div class="avatar-frame-wrapper {{ $frame->css_style }} mx-auto mb-2" style="width: 56px; height: 56px;">
+                                        <div class="avatar-frame-wrapper {{ $frame->image_url ? 'has-png-frame' : $frame->css_style }} mx-auto mb-2" style="width: 56px; height: 56px;">
                                             <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=6366f1&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                            @if($frame->image_url)
+                                                <img src="{{ asset($frame->image_url) }}" class="avatar-frame-png-overlay">
+                                            @endif
                                         </div>
                                         <h6 class="fw-bold text-dark text-truncate mb-1" style="font-size: 0.86rem;">{{ $frame->name }}</h6>
                                         <div class="text-muted text-truncate small mb-2" style="font-size: 0.75rem;">{{ $frame->description }}</div>
@@ -1374,6 +1724,44 @@
             </div>
         </div>
 
+<!-- Custom Reward Item Cards Modal -->
+<div id="rewardCustomModal" class="reward-modal-backdrop d-none">
+    <div class="reward-modal-dialog">
+        <div class="reward-modal-card">
+            <h5 class="reward-modal-header-title" id="rewardModalTitle">Phần thưởng đạt được</h5>
+
+            <!-- Reward Item Cards Grid -->
+            <div class="reward-cards-container" id="rewardCardsContainer">
+                
+                <!-- Card 1: Avatar Frame Card -->
+                <div class="reward-item-card d-none" id="cardAvatarFrame">
+                    <input type="checkbox" class="reward-card-checkbox" id="chkEquipFrame" checked title="Tích chọn để trang bị khung này">
+                    <div class="reward-card-preview">
+                        <div class="reward-avatar-preview-box">
+                            <img src="{{ $user->avatar_formatted_url }}" class="reward-avatar-img">
+                            <img src="" id="rewardFrameOverlay" class="reward-frame-overlay-img">
+                        </div>
+                    </div>
+                    <div class="reward-card-label" id="rewardFrameName">Khung Avatar</div>
+                </div>
+
+                <!-- Card 2: Coins Reward Card -->
+                <div class="reward-item-card" id="cardCoinsReward">
+                    <div class="reward-card-preview">
+                        <div class="coin-card-icon-box">
+                            <i class="fa-solid fa-coins text-warning"></i>
+                        </div>
+                    </div>
+                    <div class="reward-card-label text-warning fw-extrabold fs-6" id="rewardCoinsVal">+100 Xu</div>
+                </div>
+
+            </div>
+
+            <div class="reward-modal-actions-row">
+                <button type="button" class="btn btn-reward-equip d-none" id="rewardModalBtnEquip" onclick="equipRewardFrame()">Trang bị</button>
+                <button type="button" class="btn btn-reward-close" id="rewardModalBtnClose" onclick="closeRewardModal()">Đóng</button>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
@@ -1477,28 +1865,142 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Claim 100 Milestone Gift Box
-    const btnMilestone100 = document.getElementById('btnClaimMilestone100');
-    if (btnMilestone100) {
-        btnMilestone100.addEventListener('click', function() {
+    let currentUnlockedFrameId = null;
+
+    window.showRewardModal = function(options) {
+        const modalEl = document.getElementById('rewardCustomModal');
+        const titleEl = document.getElementById('rewardModalTitle');
+        const cardAvatarFrame = document.getElementById('cardAvatarFrame');
+        const frameOverlay = document.getElementById('rewardFrameOverlay');
+        const frameNameEl = document.getElementById('rewardFrameName');
+        const cardCoinsReward = document.getElementById('cardCoinsReward');
+        const coinsValEl = document.getElementById('rewardCoinsVal');
+        const btnEquip = document.getElementById('rewardModalBtnEquip');
+
+        if (!modalEl) {
+            alert(options.message || options.title);
+            return;
+        }
+
+        titleEl.textContent = options.title || (options.isError ? 'Thông báo' : 'Phần thưởng đạt được');
+
+        currentUnlockedFrameId = null;
+
+        const chkEquipFrame = document.getElementById('chkEquipFrame');
+        if (chkEquipFrame) chkEquipFrame.checked = true;
+
+        // Frame Card
+        if (options.frame && options.frame.image_url) {
+            currentUnlockedFrameId = options.frame.id;
+            frameOverlay.src = options.frame.image_url;
+            if (frameNameEl) frameNameEl.textContent = options.frame.name || 'Khung Avatar';
+            if (cardAvatarFrame) cardAvatarFrame.classList.remove('d-none');
+            if (btnEquip) {
+                btnEquip.classList.remove('d-none');
+                btnEquip.textContent = 'Trang bị';
+            }
+        } else {
+            if (cardAvatarFrame) cardAvatarFrame.classList.add('d-none');
+            if (btnEquip) btnEquip.classList.add('d-none');
+        }
+
+        // Coins Card
+        let coinsAmount = options.coins || null;
+        if (!coinsAmount && options.message) {
+            const match = options.message.match(/\+(\d+)\s*xu/i);
+            if (match) coinsAmount = match[1];
+        }
+
+        if (coinsAmount && cardCoinsReward) {
+            if (coinsValEl) coinsValEl.textContent = '+' + coinsAmount + ' Xu';
+            cardCoinsReward.classList.remove('d-none');
+        } else if (cardCoinsReward) {
+            cardCoinsReward.classList.add('d-none');
+        }
+
+        modalEl.classList.remove('d-none');
+    };
+
+    window.equipRewardFrame = function() {
+        if (!currentUnlockedFrameId) {
+            closeRewardModal();
+            return;
+        }
+
+        const frameIdToEquip = currentUnlockedFrameId;
+        fetch("{{ route('client.avatar_frames.equip') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken
+            },
+            body: JSON.stringify({ frame_id: frameIdToEquip })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeRewardModal();
+        });
+    };
+
+    window.closeRewardModal = function() {
+        const modalEl = document.getElementById('rewardCustomModal');
+        if (modalEl) modalEl.classList.add('d-none');
+        location.reload();
+    };
+
+    const chkEquipFrameEl = document.getElementById('chkEquipFrame');
+    if (chkEquipFrameEl) {
+        chkEquipFrameEl.addEventListener('change', function() {
+            const btnEquip = document.getElementById('rewardModalBtnEquip');
+            if (btnEquip) {
+                if (this.checked) {
+                    btnEquip.classList.remove('d-none');
+                } else {
+                    btnEquip.classList.add('d-none');
+                }
+            }
+        });
+    }
+
+    // Claim Milestone Gift Box (100, 200, 500)
+    document.querySelectorAll('.btn-claim-milestone-box').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const milestoneVal = this.getAttribute('data-milestone');
             fetch("{{ route('client.missions.claim_milestone') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": csrfToken
-                }
+                },
+                body: JSON.stringify({ milestone: milestoneVal })
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
+                showRewardModal({
+                    title: data.success ? 'Nhận phần thưởng mốc' : 'Thông báo',
+                    message: data.message,
+                    coins: data.coins || null,
+                    isError: !data.success,
+                    frame: data.frame || null
+                });
             });
         });
-    }
+    });
+
+    // Toggle milestone tooltip popovers on click / touch
+    document.querySelectorAll('.milestone-node').forEach(node => {
+        node.addEventListener('click', function(e) {
+            if (e.target.closest('.btn-claim-milestone-box')) return;
+            e.stopPropagation();
+            const isActive = this.classList.contains('active');
+            document.querySelectorAll('.milestone-node').forEach(n => n.classList.remove('active'));
+            if (!isActive) this.classList.add('active');
+        });
+    });
+
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.milestone-node').forEach(n => n.classList.remove('active'));
+    });
 
     // Daily checkin handler
     const handleDailyCheckin = function() {
@@ -1511,13 +2013,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                alert(data.message);
-                updatePointsUI(data.points, data.streak);
-                location.reload();
-            } else {
-                alert(data.message);
-            }
+            showRewardModal({
+                title: data.success ? 'Điểm danh thành công' : 'Thông báo',
+                message: data.message,
+                isError: !data.success,
+                frame: data.frame || null
+            });
         });
     };
 
@@ -1541,12 +2042,15 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
+                showRewardModal({
+                    title: data.success ? '🏆 HOÀN THÀNH NHIỆM VỤ!' : 'THÔNG BÁO',
+                    message: data.message,
+                    isError: !data.success,
+                    icon: 'fa-solid fa-trophy',
+                    onConfirm: function() {
+                        if (data.success) location.reload();
+                    }
+                });
             });
         });
     });
@@ -1565,12 +2069,15 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
+                showRewardModal({
+                    title: data.success ? '✨ TRANG BỊ KHUNG THÀNH CÔNG!' : 'THÔNG BÁO',
+                    message: data.message,
+                    isError: !data.success,
+                    icon: 'fa-solid fa-circle-user',
+                    onConfirm: function() {
+                        if (data.success) location.reload();
+                    }
+                });
             });
         });
     });
@@ -1589,12 +2096,15 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
+                showRewardModal({
+                    title: data.success ? ' THÁO KHUNG THÀNH CÔNG!' : 'THÔNG BÁO',
+                    message: data.message,
+                    isError: !data.success,
+                    icon: 'fa-solid fa-circle-minus',
+                    onConfirm: function() {
+                        if (data.success) location.reload();
+                    }
+                });
             });
         });
     }
@@ -1615,15 +2125,89 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
+                showRewardModal({
+                    title: data.success ? '🎉 ĐỔI KHUNG THÀNH CÔNG!' : 'THÔNG BÁO',
+                    message: data.message,
+                    isError: !data.success,
+                    icon: 'fa-solid fa-store',
+                    onConfirm: function() {
+                        if (data.success) location.reload();
+                    }
+                });
             });
         });
     });
+
+    // Restore active tab from hash or localStorage
+    let activeTab = 'quests-pane';
+    if (window.location.hash) {
+        const hash = window.location.hash.replace('#', '');
+        if (['quests-pane', 'shop-pane', 'inventory-pane'].includes(hash)) {
+            activeTab = hash;
+        }
+    } else if (localStorage.getItem('active_mission_tab')) {
+        const saved = localStorage.getItem('active_mission_tab');
+        if (['quests-pane', 'shop-pane', 'inventory-pane'].includes(saved)) {
+            activeTab = saved;
+        }
+    }
+
+    if (activeTab) {
+        window.switchNavTab(activeTab);
+    }
 });
+
+// Global tab switch function
+window.switchNavTab = function(paneId) {
+    if (!paneId) return;
+    paneId = paneId.replace('#', '');
+    localStorage.setItem('active_mission_tab', paneId);
+    if (history.replaceState) {
+        history.replaceState(null, null, '#' + paneId);
+    }
+
+    // Dynamically update Brand Header Title & Subtitle
+    const brandMap = {
+        'quests-pane': {
+            title: 'Nhiệm Vụ & Tích Xu',
+            sub: 'Hoàn thành nhiệm vụ nhận xu hàng ngày'
+        },
+        'shop-pane': {
+            title: 'Cửa Hàng Đổi Thưởng',
+            sub: 'Dùng xu đổi quà & khung avatar độc quyền'
+        },
+        'inventory-pane': {
+            title: 'Tủ Khung Cá Nhân',
+            sub: 'Bộ sưu tập khung & vật phẩm đã sở hữu'
+        }
+    };
+
+    if (brandMap[paneId]) {
+        const textEl = document.getElementById('headerBrandText');
+        const subEl = document.getElementById('headerBrandSub');
+
+        if (textEl) textEl.textContent = brandMap[paneId].title;
+        if (subEl) subEl.textContent = brandMap[paneId].sub;
+    }
+
+    const tabBtn = document.querySelector(`[data-bs-target="#${paneId}"]`);
+    if (tabBtn) {
+        document.querySelectorAll('#rewardTopNav .nav-link').forEach(btn => btn.classList.remove('active'));
+        tabBtn.classList.add('active');
+
+        if (window.bootstrap && bootstrap.Tab) {
+            const bsTab = bootstrap.Tab.getOrCreateInstance(tabBtn);
+            bsTab.show();
+        } else {
+            document.querySelectorAll('#mainTabContent > .tab-pane').forEach(pane => {
+                if (pane.id === paneId) {
+                    pane.classList.add('show', 'active');
+                } else {
+                    pane.classList.remove('show', 'active');
+                }
+            });
+        }
+    }
+};
 </script>
 @endpush

@@ -3,7 +3,7 @@
 @section('title', $event->title)
 
 @section('content')
-<div class="container py-5">
+<div class="container py-3 py-md-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('/') }}">Trang chủ</a></li>
@@ -14,39 +14,39 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm mb-4">
-                <span class="badge bg-danger mb-3 px-3 py-2 fs-6"><i class="fa-solid fa-fire me-1"></i> Sự kiện</span>
+            <div class="bg-white p-3 p-md-4 rounded-3 shadow-sm mb-4">
+                <span class="badge bg-danger mb-3 px-2 py-1"><i class="fa-solid fa-fire me-1"></i> Sự kiện</span>
                 
-                <h1 class="fw-bold mb-4 text-danger">{{ $event->title }}</h1>
+                <h1 class="fw-bold mb-3 text-danger">{{ $event->title }}</h1>
                 
-                <div class="text-muted small mb-4">
+                <div class="text-muted small mb-3">
                     <i class="fa-regular fa-calendar me-1"></i> Xuất bản: {{ $event->published_at ? $event->published_at->format('d/m/Y H:i') : $event->created_at->format('d/m/Y H:i') }}
                     <span class="mx-2">|</span>
                     <i class="fa-solid fa-eye me-1"></i> {{ number_format($event->view_count) }} lượt xem
                 </div>
                 
                 @if($event->featured_image)
-                    <img src="{{ str_starts_with($event->featured_image, 'http') ? $event->featured_image : asset('storage/' . ltrim($event->featured_image, '/')) }}" class="img-fluid rounded-3 mb-4 w-100" alt="{{ $event->title }}" style="max-height: 500px; object-fit: cover;">
+                    <img src="{{ str_starts_with($event->featured_image, 'http') ? $event->featured_image : asset('storage/' . ltrim($event->featured_image, '/')) }}" class="img-fluid rounded-3 mb-4 w-100" alt="{{ $event->title }}" style="max-height: 400px; object-fit: cover;">
                 @endif
 
                 @if($event->summary)
-                    <div class="alert alert-light border shadow-sm mb-4" style="font-size: 1.1rem; font-style: italic;">
+                    <div class="alert alert-light border shadow-sm mb-3" style="font-size: 0.95rem; font-style: italic;">
                         {{ $event->summary }}
                     </div>
                 @endif
 
                 @if($event->content)
-                    <h4 class="fw-bold mb-3 border-start border-4 border-danger ps-3">Thông tin chi tiết</h4>
-                    <div class="content-body mb-4" style="line-height: 1.8; font-size: 16px;">
+                    <h5 class="fw-bold mb-3 border-start border-4 border-danger ps-3">Thông tin chi tiết</h5>
+                    <div class="content-body mb-3" style="line-height: 1.6; font-size: 0.9rem;">
                         {!! $event->content !!}
                     </div>
                 @endif
             </div>
         </div>
         
-        <div class="col-lg-4 mt-5 mt-lg-0">
-            <div class="bg-white p-4 rounded-4 shadow-sm position-sticky" style="top: 100px;">
-                <h4 class="fw-bold mb-4 border-bottom pb-2">Sự kiện khác</h4>
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="bg-white p-3 rounded-3 shadow-sm position-sticky" style="top: 90px;">
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Sự kiện khác</h5>
                 <div class="d-flex flex-column gap-3">
                     @forelse($relatedEvents as $item)
                         <a href="{{ route('client.events.show', $item->slug) }}" class="text-decoration-none">

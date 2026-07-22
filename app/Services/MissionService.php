@@ -151,7 +151,7 @@ class MissionService
         $yesterday = Carbon::yesterday();
 
         if ($user->last_daily_bonus_at && Carbon::parse($user->last_daily_bonus_at)->isToday()) {
-            return ['success' => false, 'message' => 'Bạn đã xu danh hôm nay rồi!'];
+            return ['success' => false, 'message' => 'Bạn đã điểm danh hôm nay rồi!'];
         }
 
         return DB::transaction(function () use ($user, $today, $yesterday) {
@@ -166,9 +166,9 @@ class MissionService
             $user->last_daily_bonus_at = Carbon::now();
             $user->save();
 
-            // Calculate points: base 10 + streak bonus (up to 30)
-            $streakBonus = min(20, ($user->streak_count - 1) * 5);
-            $totalPoints = 10 + $streakBonus;
+            // Calculate points matching UI: Day 1=10, Day 2=20, Day 3=30, Day 4=40, Day 5=50, Day 6=60, Day 7=70
+            $dayCycle = (($user->streak_count - 1) % 7) + 1;
+            $totalPoints = $dayCycle * 10;
 
             PointService::awardPoints($user, $totalPoints, 'daily_login', 'Điểm danh hàng ngày (Chuỗi ' . $user->streak_count . ' ngày)');
 
@@ -181,13 +181,14 @@ class MissionService
             if ($user->streak_count >= 7) {
                 $streakFrame = AvatarFrame::where('status', 'active')
                     ->where(function($q) {
-                        $q->where('css_style', 'frame-gold-phoenix')
+                        $q->where('code', 'frame-streak')
+                          ->orWhere('name', 'like', '%Duy Trì%')
                           ->orWhere('name', 'like', '%Chăm Chỉ%')
                           ->orWhere('name', 'like', '%Chuỗi%');
                     })->first();
 
                 if (!$streakFrame) {
-                    $streakFrame = AvatarFrame::where('status', 'active')->first();
+                    $streakFrame = AvatarFrame::where('code', 'frame-streak')->first();
                 }
 
                 if ($streakFrame && self::unlockFrame($user, $streakFrame->id)) {
@@ -200,9 +201,16 @@ class MissionService
 
             return [
                 'success' => true,
-                'message' => "Điểm danh thành công! Bạn nhận +" . $totalPoints . " xu (Chuỗi " . $user->streak_count . " ngày 🔥)" . $streakFrameMsg,
+                'message' => "Điểm danh thành công!",
+                'coins' => $totalPoints,
                 'streak' => $user->streak_count,
-                'points' => $user->points
+                'points' => $user->points,
+                'frame' => (isset($streakFrame) && $streakFrame) ? [
+                    'id' => $streakFrame->id,
+                    'name' => $streakFrame->name,
+                    'image_url' => asset($streakFrame->image_url),
+                    'css_style' => $streakFrame->css_style
+                ] : null
             ];
         });
     }
