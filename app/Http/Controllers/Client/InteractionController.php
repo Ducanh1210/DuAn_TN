@@ -122,4 +122,77 @@ class InteractionController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Cảm ơn bạn đã báo cáo. Chúng tôi sẽ xem xét sớm nhất có thể.']);
     }
+
+    public function myContributions()
+    {
+        $user = Auth::user();
+        $suggestions = \App\Models\LocationSuggestion::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
+        $feedbacks = \App\Models\FeedbackReport::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
+        $categories = \App\Models\Category::all();
+
+        return view('client.profile.contributions', compact('suggestions', 'feedbacks', 'user', 'categories'));
+    }
+
+    public function suggestLocation(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:200',
+            'address' => 'nullable|string|max:500',
+            'description' => 'nullable|string',
+            'category_suggest' => 'nullable|string|max:80',
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120' // 5MB max
+        ]);
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('location_suggestions', 'public');
+                $imagePaths[] = 'storage/' . $path;
+            }
+        }
+
+        $suggestion = \App\Models\LocationSuggestion::create([
+            'user_id' => Auth::id(),
+            'name' => $request->name,
+            'address' => $request->address,
+            'description' => $request->description,
+            'category_suggest' => $request->category_suggest,
+            'lat' => $request->lat,
+            'lng' => $request->lng,
+            'images' => $imagePaths,
+            'status' => 'pending'
+        ]);
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Cảm ơn bạn đã đóng góp! Đề xuất của bạn đã được ghi nhận và đang chờ duyệt.',
+            'data' => $suggestion
+        ]);
+    }
+
+    public function submitFeedback(Request $request)
+    {
+        $request->validate([
+            'report_type' => 'required|in:wrong_info,duplicate_location,image_error,wrong_position,location_closed,system_suggestion,other',
+            'target_type' => 'nullable|in:location,news,event,comment,system',
+            'target_id' => 'nullable|integer',
+            'content' => 'required|string|max:1000',
+        ]);
+
+        $feedback = \App\Models\FeedbackReport::create([
+            'user_id' => Auth::check() ? Auth::id() : null,
+            'report_type' => $request->report_type,
+            'target_type' => $request->target_type,
+            'target_id' => $request->target_id,
+            'content' => $request->content,
+            'status' => 'pending'
+        ]);
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Cảm ơn bạn! Đóng góp/báo cáo của bạn đã được gửi cho Ban quản trị.'
+        ]);
+    }
 }
