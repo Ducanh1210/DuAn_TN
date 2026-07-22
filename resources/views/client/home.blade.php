@@ -1610,6 +1610,13 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('client.contributions.index') }}" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-rounded" style="color: #10b981;">volunteer_activism</span></span>
+                        <span class="menu-text">Quản lý Đóng góp</span>
+                        <span class="tooltip">Quản lý Đóng góp</span>
+                    </a>
+                </li>
+                <li>
                     <a href="#" class="menu-item">
                         <span class="menu-icon"><span class="material-symbols-rounded">history</span></span>
                         <span class="menu-text">Lịch sử xem</span>
@@ -2969,5 +2976,7 @@
             L.DomEvent.disableScrollPropagation(missionWidget);
         }
     </script>
+    
+    @include('client.components.contribution-modals')
 </body>
 </html>
