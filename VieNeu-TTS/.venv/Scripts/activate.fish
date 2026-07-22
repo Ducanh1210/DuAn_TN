@@ -79,10 +79,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV 'D:\laragon\www\datnv2\DuAn_TN\VieNeu-TTS\.venv'
-if string match -qr 'CYGWIN|MSYS|MINGW' (uname); and command -s cygpath >/dev/null
-    set -gx VIRTUAL_ENV (cygpath -u "$VIRTUAL_ENV")
-end
+set -gx VIRTUAL_ENV 'D:\laragon\www\Du_An_TN\VieNeu-TTS\.venv'
 
 # https://github.com/fish-shell/fish-shell/issues/436 altered PATH handling
 if test (string sub -s 1 -l 1 $FISH_VERSION) -lt 3
