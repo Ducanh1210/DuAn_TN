@@ -27,8 +27,25 @@
             font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
             background-color: var(--bg-body); 
             color: var(--text-dark); 
+            font-size: 0.925rem;
+            line-height: 1.55;
             -webkit-font-smoothing: antialiased;
         }
+
+        /* Proportional, compact typography matching homepage scale */
+        h1, .h1 { font-size: 1.4rem !important; line-height: 1.3; }
+        h2, .h2 { font-size: 1.2rem !important; line-height: 1.35; }
+        h3, .h3 { font-size: 1.05rem !important; line-height: 1.4; }
+        h4, .h4 { font-size: 0.95rem !important; line-height: 1.4; }
+        h5, .h5 { font-size: 0.9rem !important; line-height: 1.4; }
+        h6, .h6 { font-size: 0.85rem !important; line-height: 1.4; }
+
+        .breadcrumb { font-size: 0.825rem; }
+        .badge { font-size: 0.75rem; font-weight: 600; }
+        .form-control, .form-select { font-size: 0.875rem; }
+        .btn { font-size: 0.875rem; }
+        .btn-sm { font-size: 0.775rem; }
+
         /* Navbar */
         .navbar { 
             background: rgba(255, 255, 255, 0.85); 
@@ -36,12 +53,12 @@
             -webkit-backdrop-filter: blur(16px);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); 
             border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 15px 0;
+            padding: 10px 0 !important;
             transition: all 0.3s ease;
         }
         .navbar-brand { 
             font-weight: 800; 
-            font-size: 1.5rem;
+            font-size: 1.25rem !important;
             background: linear-gradient(135deg, #0066ff, #00c6ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -49,9 +66,10 @@
         }
         .nav-link { 
             font-weight: 600; 
+            font-size: 0.875rem !important;
             color: var(--text-muted); 
-            padding: 8px 16px !important;
-            margin: 0 4px;
+            padding: 6px 14px !important;
+            margin: 0 2px;
             border-radius: 8px;
             transition: all 0.3s ease;
         }
@@ -63,9 +81,9 @@
         /* Modern Card */
         .card-modern { 
             border: none; 
-            border-radius: 20px; 
+            border-radius: 16px; 
             background: #fff;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.04); 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.04); 
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
             overflow: hidden; 
             display: flex;
@@ -73,8 +91,8 @@
             height: 100%;
         }
         .card-modern:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
+            transform: translateY(-4px); 
+            box-shadow: 0 14px 30px rgba(0,0,0,0.07); 
         }
         .card-modern .img-wrapper {
             position: relative;
@@ -89,19 +107,19 @@
             transition: transform 0.6s ease;
         }
         .card-modern:hover .img-wrapper img {
-            transform: scale(1.05);
+            transform: scale(1.04);
         }
         
         /* Badges */
         .badge-glass { 
             position: absolute; 
-            top: 16px; 
-            left: 16px; 
+            top: 12px; 
+            left: 12px; 
             background: rgba(255,255,255,0.85); 
             color: var(--text-dark); 
-            padding: 6px 14px; 
-            border-radius: 30px; 
-            font-size: 0.75rem; 
+            padding: 4px 10px; 
+            border-radius: 20px; 
+            font-size: 0.725rem; 
             font-weight: 700; 
             backdrop-filter: blur(8px); 
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -113,9 +131,9 @@
         footer { 
             background: #0f172a; 
             color: #94a3b8; 
-            padding: 60px 0 30px; 
-            margin-top: 80px; 
-            font-size: 0.95rem;
+            padding: 40px 0 20px; 
+            margin-top: 50px; 
+            font-size: 0.85rem;
         }
         
         /* Utilities */

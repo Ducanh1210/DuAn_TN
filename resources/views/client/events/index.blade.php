@@ -30,7 +30,7 @@
                                         {{ $event->title }}
                                     </h4>
                                     <p class="small fw-semibold text-danger mb-2"><i class="fa-regular fa-calendar me-1"></i> {{ $event->published_at ? $event->published_at->format('d/m/Y H:i') : $event->created_at->format('d/m/Y H:i') }}</p>
-                                    <p class="news-excerpt text-muted mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.95rem; line-height: 1.5;">
+                                    <p class="news-excerpt text-muted mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.875rem; line-height: 1.5;">
                                         {{ strip_tags($event->summary) }}
                                     </p>
                                 </div>

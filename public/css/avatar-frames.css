@@ -9,11 +9,31 @@
     transition: all 0.3s ease;
 }
 
-.avatar-frame-wrapper:not([class*="frame-style-"]) {
+.avatar-frame-wrapper:not([class*="frame-style-"]):not(.has-png-frame) {
     border: 2px solid #e2e8f0;
 }
 
-.avatar-frame-wrapper img {
+.avatar-frame-wrapper.has-png-frame {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.avatar-frame-png-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 124%;
+    height: 124%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    max-width: none !important;
+    max-height: none !important;
+    z-index: 2;
+}
+
+.avatar-frame-wrapper img:not(.avatar-frame-png-overlay) {
     border-radius: 50%;
     object-fit: cover;
     display: block;
@@ -69,6 +89,14 @@
 .frame-style-review-master {
     background: linear-gradient(135deg, #11998e, #38ef7d, #00b4db);
     box-shadow: 0 0 14px rgba(56, 239, 125, 0.75);
+}
+
+/* 8. 7-Day Streak Duy Tri Frame */
+.frame-style-streak {
+    background: linear-gradient(135deg, #ff4e50, #f9d423, #ff0844, #ffb199);
+    background-size: 200% 200%;
+    animation: fireFlame 2.5s ease infinite;
+    box-shadow: 0 0 16px rgba(255, 78, 80, 0.85);
 }
 
 @keyframes shimmerGlow {

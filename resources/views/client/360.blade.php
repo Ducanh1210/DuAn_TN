@@ -302,7 +302,7 @@
         <div class="comments-list" id="commentsList">
             @forelse($location->comments as $comment)
                 <div class="comment-item" id="comment-{{ $comment->id }}">
-                    <img src="{{ $comment->user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($comment->user->display_name ?? $comment->user->username) }}&background=0072FF&color=fff';" alt="{{ $comment->user->display_name ?? $comment->user->username }}" class="comment-avatar">
+                    <x-user-avatar :user="$comment->user" size="38" />
                     <div class="comment-body">
                         <div class="comment-author">
                             <span>{{ $comment->user->display_name ?? $comment->user->username }}</span>

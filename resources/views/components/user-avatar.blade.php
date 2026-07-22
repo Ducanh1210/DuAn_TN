@@ -7,11 +7,16 @@
     $avatarUrl = $user ? $user->avatar_formatted_url : $fallbackUrl;
     
     $frameClass = '';
+    $frameImageUrl = null;
     if ($user && $user->equippedFrame) {
         $frameClass = $user->equippedFrame->css_style;
+        $frameImageUrl = $user->equippedFrame->image_url;
     }
 @endphp
 
-<div class="avatar-frame-wrapper {{ $frameClass }} {{ $class }}" style="width: {{ $sizePx }}; height: {{ $sizePx }}; flex-shrink: 0;" title="{{ $displayName }}">
+<div class="avatar-frame-wrapper {{ $frameImageUrl ? 'has-png-frame' : $frameClass }} {{ $class }}" style="width: {{ $sizePx }}; height: {{ $sizePx }}; flex-shrink: 0;" title="{{ $displayName }}">
     <img src="{{ $avatarUrl }}" alt="{{ $displayName }}" onerror="this.onerror=null; this.src='{{ $fallbackUrl }}';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+    @if($frameImageUrl)
+        <img src="{{ asset($frameImageUrl) }}" alt="Frame" class="avatar-frame-png-overlay">
+    @endif
 </div>

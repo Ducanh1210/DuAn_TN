@@ -23,3 +23,10 @@ yarn-error.log
 /VieNeu-TTS/apps/__pycache__
 /VieNeu-TTS/src/__pycache__
 /VieNeu-TTS/models
+
+# Logs
+/storage/logs/*
+!/storage/logs/.gitignore
+/storage/*.log
+*.log
+

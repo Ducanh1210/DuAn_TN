@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Ký Tài Khoản Doanh Nghiệp - Hà Nam POI</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Leaflet CSS -->
@@ -25,17 +27,26 @@
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-body);
             color: var(--text-main);
+            font-size: 0.925rem;
+            line-height: 1.55;
             min-height: 100vh;
         }
+
+        h1, .h1 { font-size: 1.4rem !important; }
+        h2, .h2 { font-size: 1.2rem !important; }
+        h3, .h3 { font-size: 1.05rem !important; }
+        h4, .h4 { font-size: 0.95rem !important; }
+        h5, .h5 { font-size: 0.9rem !important; }
+        h6, .h6 { font-size: 0.85rem !important; }
 
         /* Top Navigation Bar */
         .top-navbar {
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
-            padding: 15px 30px;
+            padding: 12px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -50,6 +61,7 @@
             align-items: center;
             gap: 6px;
             font-weight: 500;
+            font-size: 0.875rem;
             transition: color 0.15s ease;
         }
         .btn-back:hover {
@@ -60,18 +72,18 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 30px;
+            padding: 24px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
         
         .section-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             color: var(--text-main);
             border-bottom: 2px solid var(--primary);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
             display: inline-block;
         }
 

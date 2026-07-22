@@ -1801,8 +1801,17 @@
                 @auth
                     <!-- Horizontal Milestone Progress Tracker -->
                     @php
-                        $userPts = Auth::user()->points ?? 0;
-                        $fillPercent = min(100, max(0, ($userPts / 100) * 100));
+                        $userPts = Auth::check() ? \App\Models\PointTransaction::where('user_id', Auth::id())
+                            ->where('amount', '>', 0)
+                            ->where('action', 'not like', 'daily_milestone_%')
+                            ->sum('amount') : 0;
+                        if ($userPts <= 100) {
+                            $fillPercent = ($userPts / 100) * 33.33;
+                        } elseif ($userPts <= 200) {
+                            $fillPercent = 33.33 + (($userPts - 100) / 100) * 33.33;
+                        } else {
+                            $fillPercent = 66.66 + (min(300, $userPts - 200) / 300) * 33.34;
+                        }
                     @endphp
                     <div style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 8px 2px; margin-bottom: 6px;">
                         <!-- Line BG & Fill -->
@@ -1824,10 +1833,10 @@
                             </defs>
                         </svg>
 
-                        <!-- Node 1: 25 -->
+                        <!-- Node 1: 100 -->
                         <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
                             <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
-                            @if($userPts >= 25)
+                            @if($userPts >= 100)
                                 <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
                                     <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1839,60 +1848,47 @@
                                     <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
                                 </svg>
                             @endif
-                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">25</div>
-                        </div>
-
-                        <!-- Node 2: 50 -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
-                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
-                            @if($userPts >= 50)
-                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
-                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            @else
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#C4B5FD"/>
-                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#DDD6FE"/>
-                                    <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
-                                    <path d="M12 6C12 6 9.5 3 7.5 3C5.5 3 5 4.5 6 6C7 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
-                                    <path d="M12 6C12 6 14.5 3 16.5 3C18.5 3 19 4.5 18 6C17 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
-                                </svg>
-                            @endif
-                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">50</div>
-                        </div>
-
-                        <!-- Node 3: 75 -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
-                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
-                            @if($userPts >= 75)
-                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
-                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            @else
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#C4B5FD"/>
-                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#DDD6FE"/>
-                                    <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
-                                    <path d="M12 6C12 6 9.5 3 7.5 3C5.5 3 5 4.5 6 6C7 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
-                                    <path d="M12 6C12 6 14.5 3 16.5 3C18.5 3 19 4.5 18 6C17 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
-                                </svg>
-                            @endif
-                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">75</div>
-                        </div>
-
-                        <!-- Node 4: 100 Red Gift Box -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
-                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
-                            <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.35));">
-                                <rect x="4" y="13" width="24" height="15" rx="3" fill="#DC2626"/>
-                                <rect x="2" y="8" width="28" height="5" rx="2" fill="#EF4444"/>
-                                <rect x="13.5" y="8" width="5" height="20" fill="#F59E0B"/>
-                                <path d="M16 8C16 8 11.5 3 8.5 3C5.5 3 5 5.5 7 7.5C9 9.5 16 8 16 8Z" fill="#F59E0B"/>
-                                <path d="M16 8C16 8 20.5 3 23.5 3C26.5 3 27 5.5 25 7.5C23 9.5 16 8 16 8Z" fill="#F59E0B"/>
-                            </svg>
                             <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">100</div>
+                        </div>
+
+                        <!-- Node 2: 200 -->
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                            @if($userPts >= 200)
+                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
+                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            @else
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#C4B5FD"/>
+                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#DDD6FE"/>
+                                    <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
+                                    <path d="M12 6C12 6 9.5 3 7.5 3C5.5 3 5 4.5 6 6C7 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
+                                    <path d="M12 6C12 6 14.5 3 16.5 3C18.5 3 19 4.5 18 6C17 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
+                                </svg>
+                            @endif
+                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">200</div>
+                        </div>
+
+                        <!-- Node 3: 500 Red Gift Box -->
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                            @if($userPts >= 500)
+                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="11" cy="11" r="11" fill="#DC2626"/>
+                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            @else
+                                <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.35));">
+                                    <rect x="4" y="13" width="24" height="15" rx="3" fill="#DC2626"/>
+                                    <rect x="2" y="8" width="28" height="5" rx="2" fill="#EF4444"/>
+                                    <rect x="13.5" y="8" width="5" height="20" fill="#F59E0B"/>
+                                    <path d="M16 8C16 8 11.5 3 8.5 3C5.5 3 5 5.5 7 7.5C9 9.5 16 8 16 8Z" fill="#F59E0B"/>
+                                    <path d="M16 8C16 8 20.5 3 23.5 3C26.5 3 27 5.5 25 7.5C23 9.5 16 8 16 8Z" fill="#F59E0B"/>
+                                </svg>
+                            @endif
+                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">500</div>
                         </div>
                     </div>
 

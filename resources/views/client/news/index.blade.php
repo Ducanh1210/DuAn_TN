@@ -28,7 +28,7 @@
                                     <h4 class="news-title fw-bold mb-2" style="color: #1a1a1a; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; transition: color 0.2s;">
                                         {{ $item->title }}
                                     </h4>
-                                    <p class="news-excerpt text-muted mb-0" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.95rem; line-height: 1.5;">
+                                    <p class="news-excerpt text-muted mb-0" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.875rem; line-height: 1.5;">
                                         {{ strip_tags($item->summary ?? $item->content) }}
                                     </p>
                                 </div>
@@ -62,7 +62,7 @@
                                     <img src="{{ $item->featured_image ? (str_starts_with($item->featured_image, 'http') ? $item->featured_image : asset('storage/' . ltrim($item->featured_image, '/'))) : 'https://via.placeholder.com/300x200?text=No+Image' }}" alt="{{ $item->title }}" class="img-fluid w-100 h-100" style="object-fit: cover;">
                                 </div>
                                 <div class="sidebar-content flex-grow-1">
-                                    <h6 class="sidebar-title fw-bold text-dark mb-0" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.95rem; line-height: 1.4; transition: color 0.2s;">
+                                    <h6 class="sidebar-title fw-bold text-dark mb-0" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.875rem; line-height: 1.4; transition: color 0.2s;">
                                         {{ $item->title }}
                                     </h6>
                                 </div>
@@ -87,7 +87,7 @@
                                     <img src="{{ $item->featured_image ? (str_starts_with($item->featured_image, 'http') ? $item->featured_image : asset('storage/' . ltrim($item->featured_image, '/'))) : 'https://via.placeholder.com/300x200?text=No+Image' }}" alt="{{ $item->title }}" class="img-fluid w-100 h-100" style="object-fit: cover;">
                                 </div>
                                 <div class="sidebar-content flex-grow-1">
-                                    <h6 class="sidebar-title fw-bold text-dark mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.95rem; line-height: 1.4; transition: color 0.2s;">
+                                    <h6 class="sidebar-title fw-bold text-dark mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.875rem; line-height: 1.4; transition: color 0.2s;">
                                         {{ $item->title }}
                                     </h6>
                                     <small class="text-success fw-semibold"><i class="fa-regular fa-calendar me-1"></i> {{ $item->published_at ? $item->published_at->format('d/m/Y') : '' }}</small>

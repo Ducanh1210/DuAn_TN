@@ -42,20 +42,11 @@ class PointService
      */
     public static function checkDailyLoginBonus(User $user)
     {
-        $today = Carbon::today();
-        
-        // If they already got it today, skip
         if ($user->last_daily_bonus_at && Carbon::parse($user->last_daily_bonus_at)->isToday()) {
             return false;
         }
 
-        DB::transaction(function () use ($user) {
-            $user->last_daily_bonus_at = Carbon::now();
-            $user->save();
-
-            self::awardPoints($user, 10, 'daily_login', 'Điểm danh hằng ngày');
-        });
-
-        return true;
+        $result = MissionService::processDailyCheckin($user);
+        return $result['success'] ?? false;
     }
 }

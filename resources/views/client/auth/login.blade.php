@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - Hà Nam POI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -17,13 +19,14 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             background: url('https://images.unsplash.com/photo-1596422846543-75c6fc197f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') no-repeat center center fixed;
             background-size: cover;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.9rem;
         }
 
         .auth-overlay {
@@ -41,22 +44,22 @@
             position: relative;
             z-index: 2;
             width: 100%;
-            max-width: 420px;
-            padding: 40px;
+            max-width: 400px;
+            padding: 32px 28px;
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 24px;
+            border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
 
         .auth-logo {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 800;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -66,8 +69,8 @@
 
         .auth-subtitle {
             color: var(--text-muted);
-            margin-bottom: 30px;
-            font-size: 15px;
+            margin-bottom: 24px;
+            font-size: 13.5px;
         }
 
         .form-group {

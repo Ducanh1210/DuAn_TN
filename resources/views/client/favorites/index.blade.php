@@ -3,7 +3,7 @@
 @section('title', 'Địa Điểm Yêu Thích')
 
 @section('content')
-<div class="container py-5">
+<div class="container py-3 py-md-4">
     <div class="mb-4 pb-2 border-bottom d-flex justify-content-between align-items-center">
         <h2 class="fw-bold text-uppercase mb-0" style="color: #2c3e50;">Địa Điểm Yêu Thích Của Tôi</h2>
     </div>
