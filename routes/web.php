@@ -90,6 +90,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/comments/{comment}', [\App\Http\Controllers\Client\InteractionController::class, 'deleteComment'])->name('client.comments.destroy');
     Route::get('/ca-nhan/dia-diem-yeu-thich', [\App\Http\Controllers\Client\InteractionController::class, 'myFavorites'])->name('client.favorites.index');
     Route::post('/report', [\App\Http\Controllers\Client\InteractionController::class, 'report'])->name('client.report');
+
+    // Community Contributions
+    Route::get('/ca-nhan/dong-gop', [\App\Http\Controllers\Client\InteractionController::class, 'myContributions'])->name('client.contributions.index');
+    Route::post('/locations/suggest', [\App\Http\Controllers\Client\InteractionController::class, 'suggestLocation'])->name('client.locations.suggest');
+    Route::post('/feedback', [\App\Http\Controllers\Client\InteractionController::class, 'submitFeedback'])->name('client.feedback.submit');
 });
 
 // Auth Routes
@@ -190,4 +195,11 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class)->only(['index']);
     Route::patch('reports/{report}/status', [\App\Http\Controllers\Admin\ReportController::class, 'updateStatus'])->name('reports.update_status');
     Route::delete('reports/{report}/content', [\App\Http\Controllers\Admin\ReportController::class, 'deleteReportedContent'])->name('reports.delete_content');
+
+    // Location Suggestions (Đề xuất địa điểm)
+    Route::resource('location_suggestions', \App\Http\Controllers\Admin\LocationSuggestionController::class)->only(['index', 'show', 'update']);
+    Route::post('location_suggestions/{id}/approve', [\App\Http\Controllers\Admin\LocationSuggestionController::class, 'approve'])->name('location_suggestions.approve');
+
+    // Feedback & Content Reports (Góp ý & Báo lỗi nội dung)
+    Route::resource('feedbacks', \App\Http\Controllers\Admin\FeedbackReportController::class)->only(['index', 'show', 'update']);
 });
