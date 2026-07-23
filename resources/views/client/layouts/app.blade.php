@@ -166,7 +166,7 @@
                                 <span>{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="navbarUserDropdown">
-                                <li><span class="dropdown-item-text py-2 fw-bold text-muted small"><i class="fa-solid fa-coins me-2 text-warning"></i><span id="navbarUserPoints">{{ Auth::user()->points }} xu</span></span></li>
+                                <li><span class="dropdown-item-text py-2 fw-bold text-muted small"><img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 18px; height: 18px; object-fit: contain; vertical-align: -2px;" class="me-2"><span id="navbarUserPoints">{{ Auth::user()->points }} xu</span></span></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.missions') }}"><i class="fa-solid fa-bullseye me-2 text-warning"></i>Nhiệm vụ & Đổi thưởng</a></li>
                                 <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.profile') }}"><i class="fa-solid fa-user me-2 text-primary"></i>Trang cá nhân</a></li>

@@ -15,9 +15,10 @@
     <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
     
     <style>
+    <style>
         :root {
-            --primary: #0072FF;
-            --primary-hover: #0052cc;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
             --bg-body: #f8fafc;
             --text-main: #0f172a;
             --text-sub: #64748b;
@@ -29,7 +30,7 @@
             font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
             background-color: var(--bg-body); 
             color: var(--text-main); 
-            font-size: 0.925rem;
+            font-size: 0.875rem;
             line-height: 1.55;
             margin: 0;
             padding: 0;
@@ -39,8 +40,8 @@
             flex-direction: column;
         }
 
-        h1, .h1 { font-size: 1.4rem !important; }
-        h2, .h2 { font-size: 1.2rem !important; }
+        h1, .h1 { font-size: 1.3rem !important; }
+        h2, .h2 { font-size: 1.15rem !important; }
         h3, .h3 { font-size: 1.05rem !important; }
         h4, .h4 { font-size: 0.95rem !important; }
         h5, .h5 { font-size: 0.9rem !important; }
@@ -48,13 +49,13 @@
 
         /* Top Header Navigation */
         .top-navbar {
-            height: 64px;
+            height: 54px;
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            padding: 0 20px;
             z-index: 100;
         }
         .btn-back {
@@ -65,7 +66,7 @@
             color: var(--text-sub);
             text-decoration: none;
             transition: color 0.15s ease;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
         }
@@ -73,52 +74,52 @@
             color: var(--text-main);
         }
         .back-chevron {
-            font-size: 1.6rem;
-            margin-right: 6px;
+            font-size: 1.4rem;
+            margin-right: 4px;
             line-height: 1;
             font-weight: 400;
             position: relative;
-            top: -4px;
+            top: -2px;
         }
 
         /* Main Screen Layout */
         .main-layout {
             display: flex;
             flex: 1;
-            height: calc(100vh - 64px);
+            height: calc(100vh - 54px);
             overflow: hidden;
         }
 
         /* Sidebar Dashboard Navigation */
         .dashboard-sidebar {
-            width: 280px;
+            width: 260px;
             background-color: var(--card-bg);
             border-right: 1px solid var(--border-color);
             height: 100%;
             display: flex;
             flex-direction: column;
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
         }
         .sidebar-user-section {
             text-align: center;
-            padding-bottom: 24px;
+            padding-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
         .avatar-container {
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             position: relative;
-            margin: 0 auto 16px auto;
+            margin: 0 auto 12px auto;
             cursor: pointer;
         }
         .avatar-edit-badge {
             position: absolute;
             bottom: 2px;
             right: 2px;
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             background-color: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 50%;
@@ -168,7 +169,7 @@
             color: #ffffff;
             cursor: pointer;
             transition: opacity 0.2s ease;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
         }
         .avatar-container:hover .avatar-upload-overlay {
@@ -188,9 +189,9 @@
         }
         .user-role-badge {
             display: inline-block;
-            font-size: 0.75rem;
+            font-size: 0.725rem;
             font-weight: 500;
-            padding: 2px 10px;
+            padding: 2px 8px;
             border-radius: 4px;
             background-color: #f1f5f9;
             color: var(--text-sub);
@@ -201,34 +202,35 @@
         .sidebar-menu-tabs .nav-link {
             width: 100%;
             text-align: left;
-            padding: 12px 16px;
+            padding: 9px 12px;
             color: var(--text-sub);
             font-weight: 500;
             border-radius: 8px;
             border: none;
             background: transparent;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             transition: all 0.2s ease;
-            font-size: 0.95rem;
+            font-size: 0.875rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
         .sidebar-menu-tabs .nav-link:hover {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             color: var(--text-main);
         }
         .sidebar-menu-tabs .nav-link.active {
             background-color: #f1f5f9;
-            color: var(--text-main);
-            font-weight: 700;
+            color: #0f172a;
+            font-weight: 600;
         }
         .menu-count-badge {
             background-color: #e2e8f0;
             color: var(--text-sub);
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 10px;
         }
 
         /* Content Workspace Area */
@@ -247,7 +249,7 @@
             margin: 0 auto;
         }
         .section-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             margin-bottom: 20px;
             color: var(--text-main);
@@ -287,13 +289,35 @@
             color: #ffffff;
             border: none;
             border-radius: 8px;
-            padding: 10px 24px;
-            font-weight: 600;
-            font-size: 0.9rem;
+            padding: 7px 18px;
+            font-weight: 500;
+            font-size: 0.85rem;
             transition: background-color 0.2s ease;
         }
         .btn-action:hover {
             background-color: var(--primary-hover);
+        }
+
+        /* Soft Elegant Modal Tabs */
+        .custom-modal-tabs .nav-link {
+            background-color: transparent;
+            color: var(--text-sub);
+            font-weight: 500;
+            font-size: 0.825rem;
+            padding: 5px 13px;
+            border-radius: 6px !important;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .custom-modal-tabs .nav-link:hover {
+            background-color: #f8fafc;
+            color: var(--text-main);
+        }
+        .custom-modal-tabs .nav-link.active {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+            border-color: #e2e8f0 !important;
+            font-weight: 600;
         }
 
         /* Simple Card for Favorites */
@@ -1098,8 +1122,8 @@
                 {{ $user->role === 'admin' ? 'Quản trị viên' : ($user->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên') }}
             </span>
             <div class="mt-2">
-                <span class="badge bg-primary text-white" style="font-size: 0.8rem; padding: 6px 12px; border-radius: 20px; font-weight: 600;">
-                     {{ $user->points }} điểm tích lũy
+                <span style="font-size: 0.775rem; padding: 4px 12px; border-radius: 16px; font-weight: 500; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; display: inline-flex; align-items: center;">
+                    {{ number_format($user->points) }} điểm tích lũy
                 </span>
             </div>
         </div>
@@ -1652,18 +1676,18 @@
 
 <!-- Avatar View, Edit & Frame Collection Modal -->
 <div class="modal fade" id="avatarViewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 560px;">
-        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
-            <div class="modal-header border-bottom px-4 py-3 bg-light d-flex align-items-center justify-content-between">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 540px;">
+        <div class="modal-content rounded-3 border-0 shadow-sm overflow-hidden">
+            <div class="modal-header border-bottom px-3 py-2.5 bg-white d-flex align-items-center justify-content-between">
                 <ul class="nav nav-pills custom-modal-tabs gap-2 mb-0" id="avatarModalTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active fw-bold px-3 py-1.5 rounded-pill" id="tab-avatar-photo" data-bs-toggle="pill" data-bs-target="#pane-avatar-photo" type="button" role="tab">
-                            <i class="fa-solid fa-camera me-1.5"></i> Ảnh đại diện
+                        <button class="nav-link active" id="tab-avatar-photo" data-bs-toggle="pill" data-bs-target="#pane-avatar-photo" type="button" role="tab">
+                            Ảnh đại diện
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link fw-bold px-3 py-1.5 rounded-pill" id="tab-avatar-frames" data-bs-toggle="pill" data-bs-target="#pane-avatar-frames" type="button" role="tab">
-                            <i class="fa-solid fa-crown me-1.5 text-warning"></i> Khung avatar
+                        <button class="nav-link" id="tab-avatar-frames" data-bs-toggle="pill" data-bs-target="#pane-avatar-frames" type="button" role="tab">
+                            Khung avatar
                         </button>
                     </li>
                 </ul>
@@ -1675,7 +1699,7 @@
                     <!-- TAB 1: PHOTO -->
                     <div class="tab-pane fade show active text-center" id="pane-avatar-photo" role="tabpanel">
                         <div class="mb-4 d-flex justify-content-center position-relative">
-                            <div class="avatar-frame-wrapper {{ $user->equippedFrame ? ($user->equippedFrame->image_url ? 'has-png-frame' : $user->equippedFrame->css_style) : '' }}" style="width: 220px; height: 220px;">
+                            <div class="avatar-frame-wrapper {{ $user->equippedFrame ? ($user->equippedFrame->image_url ? 'has-png-frame' : $user->equippedFrame->css_style) : '' }}" style="width: 200px; height: 200px;">
                                 <img src="{{ $user->avatar_formatted_url }}" 
                                      alt="Avatar" 
                                      id="avatarModalLargePreview" 
@@ -1687,10 +1711,10 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-center gap-2">
-                            <button type="button" class="btn btn-primary fw-semibold px-4 py-2 rounded-3" id="avatarModalChangeBtn">
-                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> Thay ảnh mới
+                            <button type="button" class="btn btn-primary btn-sm fw-medium px-3 py-1.5 rounded-2" id="avatarModalChangeBtn" style="font-size: 0.825rem;">
+                                Thay ảnh mới
                             </button>
-                            <button type="button" class="btn btn-light fw-semibold px-4 py-2 rounded-3 border" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-light btn-sm fw-medium px-3 py-1.5 rounded-2 border" data-bs-dismiss="modal" style="font-size: 0.825rem;">
                                 Đóng
                             </button>
                         </div>
@@ -1717,8 +1741,8 @@
                                 <div class="col-6 col-sm-4">
                                     <div class="p-3 border rounded-3 text-center h-100 d-flex flex-column justify-content-between bg-white position-relative {{ $isEquipped ? 'border-primary shadow-sm' : '' }}">
                                         @if($isEquipped)
-                                            <span class="position-absolute top-0 start-50 translate-middle badge bg-primary px-2 py-1 rounded-pill" style="font-size: 0.65rem;">
-                                                <i class="fa-solid fa-check me-1"></i> Đang đeo
+                                            <span class="position-absolute top-0 start-50 translate-middle badge bg-dark text-white px-2 py-1 rounded-2" style="font-size: 0.65rem; font-weight: 500;">
+                                                Đang đeo
                                             </span>
                                         @endif
 
@@ -1729,28 +1753,28 @@
                                                     <img src="{{ asset($frame->image_url) }}" class="avatar-frame-png-overlay">
                                                 @endif
                                             </div>
-                                            <h6 class="fw-bold text-dark mb-2 text-truncate" style="font-size: 0.88rem;" title="{{ $frame->name }}">{{ $frame->name }}</h6>
+                                            <h6 class="fw-bold text-dark mb-2 text-truncate" style="font-size: 0.85rem;" title="{{ $frame->name }}">{{ $frame->name }}</h6>
                                         </div>
 
                                         <div>
                                             @if($isEquipped)
-                                                <button type="button" class="btn btn-secondary btn-sm w-100 fw-semibold rounded-pill btn-unequip-frame" style="font-size: 0.75rem;">
-                                                    <i class="fa-solid fa-xmark me-1"></i> Tháo khung
+                                                <button type="button" class="btn btn-secondary btn-sm w-100 fw-medium rounded-2 btn-unequip-frame" style="font-size: 0.775rem;">
+                                                    Tháo khung
                                                 </button>
                                             @elseif($isUnlocked)
-                                                <button type="button" class="btn btn-primary btn-sm w-100 fw-semibold rounded-pill btn-equip-frame" data-id="{{ $frame->id }}" style="font-size: 0.75rem;">
-                                                    <i class="fa-solid fa-shirt me-1"></i> Trang bị
+                                                <button type="button" class="btn btn-primary btn-sm w-100 fw-medium rounded-2 btn-equip-frame" data-id="{{ $frame->id }}" style="font-size: 0.775rem;">
+                                                    Trang bị
                                                 </button>
                                             @else
                                                 <button type="button" 
-                                                        class="btn btn-light text-muted btn-sm w-100 fw-semibold rounded-pill border btn-lock-info" 
+                                                        class="btn btn-light text-muted btn-sm w-100 fw-medium rounded-2 border btn-lock-info" 
                                                         data-name="{{ $frame->name }}"
                                                         data-desc="{{ $frame->description }}"
                                                         data-style="{{ $frame->css_style }}"
                                                         data-image="{{ $frame->image_url ? asset($frame->image_url) : '' }}"
                                                         data-condition="{{ $conditionText }}"
                                                         style="font-size: 0.73rem;">
-                                                    <i class="fa-solid fa-lock text-warning me-1"></i> Chưa mở khóa
+                                                    Chưa mở khóa
                                                 </button>
                                             @endif
                                         </div>

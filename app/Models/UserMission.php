@@ -16,11 +16,13 @@ class UserMission extends Model
         'status',
         'last_reset_at',
         'claimed_at',
+        'meta',
     ];
 
     protected $casts = [
         'last_reset_at' => 'datetime',
         'claimed_at' => 'datetime',
+        'meta' => 'array',
     ];
 
     public function user()

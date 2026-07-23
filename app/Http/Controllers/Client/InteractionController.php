@@ -18,13 +18,10 @@ class InteractionController extends Controller
 
         if ($favorite) {
             $favorite->delete();
-            $countToday = $user->favoriteLocations()->whereDate('created_at', \Carbon\Carbon::today())->count();
-            \App\Services\MissionService::trackProgress($user, 'favorite_location', $countToday, true);
             return response()->json(['status' => 'removed', 'message' => 'Đã xóa khỏi danh sách yêu thích.']);
         } else {
             $user->favoriteLocations()->create(['location_id' => $location->id]);
-            $countToday = $user->favoriteLocations()->whereDate('created_at', \Carbon\Carbon::today())->count();
-            \App\Services\MissionService::trackProgress($user, 'favorite_location', $countToday, true);
+            \App\Services\MissionService::trackProgress($user, 'favorite_location', 1, false, $location->id);
             return response()->json(['status' => 'added', 'message' => 'Đã thêm vào danh sách yêu thích.']);
         }
     }
@@ -125,12 +122,7 @@ class InteractionController extends Controller
 
     public function myContributions()
     {
-        $user = Auth::user();
-        $suggestions = \App\Models\LocationSuggestion::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
-        $feedbacks = \App\Models\FeedbackReport::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
-        $categories = \App\Models\Category::all();
-
-        return view('client.profile.contributions', compact('suggestions', 'feedbacks', 'user', 'categories'));
+        return redirect()->route('home');
     }
 
     public function suggestLocation(Request $request)

@@ -74,6 +74,9 @@ Route::get('/', function () {
 
 // Client 360 Viewer
 Route::get('locations/{location:slug}/360', function (\App\Models\Location $location) {
+    if (auth()->check()) {
+        \App\Services\MissionService::trackProgress(auth()->user(), 'vr_360_view', 1, false, $location->id);
+    }
     return view('client.360', compact('location'));
 })->name('client.locations.360');
 
