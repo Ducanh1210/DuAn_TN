@@ -21,7 +21,7 @@ class MissionService
      * @param int $increment
      * @return void
      */
-    public static function trackProgress(User $user, string $actionKey, int $value = 1, bool $isAbsolute = false)
+    public static function trackProgress(User $user, string $actionKey, int $value = 1, bool $isAbsolute = false, $entityId = null)
     {
         if (!$user) return;
 
@@ -42,8 +42,11 @@ class MissionService
                     'current_count' => 0,
                     'status' => 'in_progress',
                     'last_reset_at' => Carbon::now(),
+                    'meta' => [],
                 ]
             );
+
+            $meta = $userMission->meta ?? [];
 
             // Handle periodic resets
             if ($userMission->last_reset_at) {
@@ -54,11 +57,13 @@ class MissionService
                     $userMission->status = 'in_progress';
                     $userMission->last_reset_at = Carbon::now();
                     $userMission->claimed_at = null;
+                    $meta = [];
                 } elseif ($mission->type === 'weekly' && $lastReset->lt($startOfWeek)) {
                     $userMission->current_count = 0;
                     $userMission->status = 'in_progress';
                     $userMission->last_reset_at = Carbon::now();
                     $userMission->claimed_at = null;
+                    $meta = [];
                 }
             }
 
@@ -66,6 +71,19 @@ class MissionService
             if ($userMission->status === 'claimed') {
                 continue;
             }
+
+            // If entityId is specified, check uniqueness to prevent counting duplicate locations
+            if ($entityId !== null) {
+                $visitedEntities = $meta['visited_entities'] ?? [];
+                if (in_array((string)$entityId, $visitedEntities, true)) {
+                    // Already counted this location/entity for this mission in current period
+                    continue;
+                }
+                $visitedEntities[] = (string)$entityId;
+                $meta['visited_entities'] = $visitedEntities;
+            }
+
+            $userMission->meta = $meta;
 
             // Progress assignment
             if ($isAbsolute) {
@@ -196,9 +214,6 @@ class MissionService
                 }
             }
 
-            // Auto-check rank frames
-            self::checkRankFramesUnlocked($user);
-
             return [
                 'success' => true,
                 'message' => "Điểm danh thành công!",
@@ -236,10 +251,7 @@ class MissionService
                 'unlocked_at' => Carbon::now(),
             ]);
 
-            // Auto-equip if user currently has no equipped frame
-            if (!$user->equipped_frame_id) {
-                self::equipFrame($user, $frameId);
-            }
+            // Auto-equip removed to let users manually choose to equip frames in their inventory
             return true;
         }
         return false;

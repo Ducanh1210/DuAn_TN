@@ -177,7 +177,7 @@ class ProfileController extends Controller
             $path = $avatarFile->storeAs('avatars', $filename, 'public');
 
             // Delete old local avatar file if exists
-            if ($user->avatar_url && str_contains($user->avatar_url, '/storage/avatars/')) {
+            if ($user->avatar_url && str_contains($user->avatar_url, 'avatars/') && !str_starts_with($user->avatar_url, 'http')) {
                 $oldFilename = basename($user->avatar_url);
                 Storage::disk('public')->delete('avatars/' . $oldFilename);
             }

@@ -108,6 +108,10 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('avatar')) {
+            // Delete old avatar file if exists
+            if ($user->avatar_url && str_contains($user->avatar_url, 'avatars/') && !str_starts_with($user->avatar_url, 'http')) {
+                Storage::disk('public')->delete('avatars/' . basename($user->avatar_url));
+            }
             $path = $request->file('avatar')->store('avatars', 'public');
             $user->avatar_url = 'avatars/' . basename($path);
         }

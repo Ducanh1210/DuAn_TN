@@ -433,71 +433,311 @@
             flex-shrink: 0;
         }
 
-        /* Top Floating Search Panel */
+        /* Unified Floating Command Dock */
         .top-search-panel {
             position: absolute;
-            top: 12px;
+            top: 14px;
             left: 72px;
-            right: 260px;
             z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             pointer-events: none;
         }
 
-        .search-box-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            pointer-events: auto;
-        }
-
-        .search-box {
+        .unified-command-dock {
             display: flex;
             align-items: center;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            box-shadow: var(--glass-shadow);
-            padding: 2px 4px 2px 12px;
-            height: 32px;
-            box-sizing: border-box;
-            width: 210px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+            height: 38px;
+            padding: 0 4px 0 10px;
+            gap: 8px;
+            pointer-events: auto;
+            transition: all 0.2s ease;
+        }
+
+        .unified-command-dock:focus-within,
+        .unified-command-dock:hover {
+            border-color: #475569;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
+        }
+
+        .dock-search-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 195px;
+        }
+
+        .dock-search-box .search-icon {
+            font-size: 18px;
+            color: #64748b;
             flex-shrink: 0;
-            border: 1px solid var(--glass-border);
-            transition: all 0.3s ease;
         }
 
-        .search-box:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 6px 24px 0 rgba(0, 114, 255, 0.2);
-        }
-
-        .search-input {
+        .dock-search-box .search-input {
             flex: 1;
             border: none;
             outline: none;
             font-family: inherit;
-            font-size: 13px;
-            color: #333;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e293b;
             background: transparent;
+            width: 100%;
         }
 
-        .search-input::placeholder {
-            color: #666;
+        .dock-search-box .search-input::placeholder {
+            color: #94a3b8;
         }
 
-        .search-actions {
+        .dock-divider {
+            width: 1px;
+            height: 20px;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .dock-filter-wrapper {
+            position: relative;
+        }
+
+        .dock-filter-btn {
             display: flex;
             align-items: center;
-            gap: 2px;
-        }
-
-        .icon-btn {
+            gap: 4px;
             background: transparent;
             border: none;
+            padding: 0 4px;
+            height: 30px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .dock-filter-btn:hover {
+            color: #0f172a;
+        }
+
+        .dock-filter-btn .material-symbols-rounded {
+            font-size: 16px;
+            color: #64748b;
+            transition: transform 0.2s ease;
+        }
+
+        .dock-filter-btn.active {
+            color: #0284c7;
+        }
+
+        .dock-filter-btn.active .material-symbols-rounded {
+            color: #0284c7;
+        }
+
+        .dock-filter-btn.menu-open .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .dock-random-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0 8px;
+            height: 28px;
+            font-family: inherit;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .dock-random-btn:hover {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: #0284c7;
+        }
+
+        .dock-random-btn .material-symbols-rounded {
+            font-size: 15px;
+            color: #0284c7;
+            transition: color 0.2s ease;
+        }
+
+        .dock-random-btn:hover .material-symbols-rounded {
+            color: #ffffff;
+        }
+
+        .radius-section {
+            padding: 4px 6px 8px 6px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 4px;
+        }
+
+        .radius-title {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .radius-btn-group {
+            display: flex;
+            gap: 4px;
+        }
+
+        .radius-btn {
+            flex: 1;
+            padding: 3px 0;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s ease;
+        }
+
+        .radius-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .radius-btn.active {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: #0284c7;
+        }
+
+        .dock-filter-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+            padding: 6px;
+            display: none;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 1010;
+            animation: popoverFadeIn 0.18s ease-out;
+        }
+
+        @keyframes popoverFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dock-filter-menu.show {
+            display: flex;
+        }
+
+        .filter-menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 6px 6px 6px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-reset-btn {
+            background: transparent;
+            border: none;
+            color: #0284c7;
+            font-size: 0.68rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .filter-reset-btn:hover {
+            text-decoration: underline;
+        }
+
+        .filter-menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-height: 240px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: all 0.15s ease;
+        }
+
+        .filter-item:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .filter-item.active {
+            background: #f0f9ff;
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        .filter-item.active .filter-count-badge {
+            background: #0284c7;
+            color: #ffffff;
+        }
+
+        .filter-item-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-item-left .material-symbols-rounded {
+            font-size: 16px;
+            color: #64748b;
+        }
+
+        .filter-count-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
             width: 24px;
             height: 24px;
             border-radius: 50%;
@@ -700,60 +940,217 @@
             pointer-events: auto;
         }
 
-        /* Bottom Featured Drawer (Full Width Glassmorphism Theme) */
+        /* Bottom Featured Drawer */
         .bottom-drawer-wrapper {
             position: absolute;
             bottom: 0;
-            left: 56px;
-            /* Offset for collapsed sidebar */
+            left: 66px;
             right: 0;
             z-index: 1000;
-            width: auto;
+            pointer-events: none;
+            transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1), bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
-            pointer-events: none;
-            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-items: flex-start;
         }
 
         body.sidebar-expanded .bottom-drawer-wrapper {
             left: 260px;
-            /* Offset for expanded sidebar */
         }
 
-        .drawer-toggle-btn {
+        /* Khi thu gọn (collapsed): lơ lửng cách đáy 14px, bo góc 10px hiện đại */
+        .bottom-drawer-wrapper:not(.open) {
+            bottom: 14px;
+        }
+
+        .bottom-drawer-wrapper:not(.open) .drawer-header {
+            border-radius: 7px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1), 0 1px 3px rgba(15, 23, 42, 0.05);
+            padding: 6px 14px;
+        }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: fit-content;
+            max-width: calc(100% - 24px);
+            padding: 6px 14px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-bottom: none;
+            border-radius: 7px 7px 0 0;
+            box-shadow: 0 -3px 12px rgba(15, 23, 42, 0.07);
+            cursor: pointer;
+            user-select: none;
+            box-sizing: border-box;
             pointer-events: auto;
-            align-self: flex-end;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 6px 12px;
-            border-radius: 6px 6px 0 0;
-            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+            margin-left: 12px;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .drawer-header-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .drawer-header-divider {
+            width: 1px;
+            height: 12px;
+            background: #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        /* Khi thu gọn (collapsed), ẩn bộ lọc chủ đề & vạch chia thứ hai */
+        .bottom-drawer-wrapper:not(.open) .drawer-filter-dropdown-wrapper,
+        .bottom-drawer-wrapper:not(.open) .drawer-header-divider:last-of-type {
+            display: none !important;
+        }
+
+        .drawer-filter-dropdown-wrapper {
+            position: relative;
+        }
+
+        .drawer-filter-trigger {
             display: flex;
             align-items: center;
             gap: 4px;
-            font-weight: 600;
-            font-size: 12px;
-            color: #111827;
+            background: transparent;
+            border: none;
+            padding: 1px 2px;
+            font-family: inherit;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: #475569;
             cursor: pointer;
-            margin-right: 20px;
-            transition: all 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-bottom: none;
+            transition: color 0.15s ease;
+            white-space: nowrap;
         }
 
-        .drawer-toggle-btn:hover {
+        .drawer-filter-trigger:hover {
+            color: #0284c7;
+        }
+
+        .drawer-filter-trigger .material-symbols-rounded {
+            font-size: 14px;
+            color: #64748b;
+            transition: color 0.15s ease;
+        }
+
+        .drawer-filter-trigger:hover .material-symbols-rounded {
+            color: #0284c7;
+        }
+
+        .drawer-filter-trigger .arrow-icon {
+            font-size: 14px;
+            color: #94a3b8;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .drawer-filter-trigger.menu-open .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .drawer-filter-menu {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 0;
+            width: 180px;
             background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.16), 0 -2px 6px rgba(15, 23, 42, 0.06);
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 99999;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px) scale(0.95);
+            transform-origin: bottom left;
+            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
+            pointer-events: none;
         }
 
-        .drawer-toggle-btn .material-symbols-rounded {
-            font-size: 18px !important;
-            color: var(--primary);
+        .drawer-filter-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .drawer-filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 8px;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: all 0.15s ease;
+        }
+
+        .drawer-filter-item:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .drawer-filter-item.active {
+            background: #f0f9ff;
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        .drawer-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #334155;
+            letter-spacing: -0.15px;
+        }
+
+        .drawer-count-badge {
+            font-size: 0.62rem;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 1px 6px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .drawer-close-btn {
+            background: transparent;
+            border: none;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .drawer-close-btn:hover {
+            background: #f1f5f9;
+            color: #0f172a;
         }
 
         .drawer-chevron {
-            transition: transform 0.3s;
-            color: #6b7280 !important;
+            font-size: 15px;
+            transition: transform 0.3s ease;
         }
 
         .bottom-drawer-wrapper.open .drawer-chevron {
@@ -761,104 +1158,102 @@
         }
 
         .drawer-content {
-            pointer-events: auto;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
             width: 100%;
-            height: 0;
+            max-height: 0;
             opacity: 0;
-            visibility: hidden;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            box-sizing: border-box;
-            position: relative;
-            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            background: #ffffff;
+            border-top: 1px solid #cbd5e1;
+            box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+            pointer-events: auto;
         }
 
         .bottom-drawer-wrapper.open .drawer-content {
-            height: 135px;
-            /* Chiều cao thẻ hình ảnh */
+            max-height: 145px;
             opacity: 1;
-            visibility: visible;
         }
 
         .featured-loc-scroll {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             overflow-x: auto;
-            width: 100%;
-            height: 100%;
-            align-items: center;
+            padding: 12px 16px;
             scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
-            padding: 10px 12px;
-        }
-
-        .featured-loc-scroll::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .featured-loc-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 4px;
+            scrollbar-color: #cbd5e1 transparent;
         }
 
         .featured-loc-card {
             position: relative;
-            width: 160px;
-            height: 105px;
-            border-radius: 6px;
+            width: 175px;
+            height: 110px;
+            border-radius: 8px;
             overflow: hidden;
-            display: flex;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.2s, box-shadow 0.2s;
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            border: 2px solid transparent;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
         }
 
         .featured-loc-card:hover {
             transform: translateY(-3px);
-            border-color: #ffffff;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            border-color: #334155;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
         }
 
         .featured-loc-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .featured-loc-card:hover .featured-loc-img {
+            transform: scale(1.05);
+        }
+
+        .featured-loc-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 2;
         }
 
         .featured-loc-info {
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 100%;
-            padding: 20px 8px 6px 8px;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+            right: 0;
+            padding: 24px 8px 6px 8px;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0) 100%);
             display: flex;
             align-items: center;
             gap: 4px;
-            box-sizing: border-box;
-        }
-
-        .featured-loc-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: #ffffff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            z-index: 2;
         }
 
         .featured-loc-info .material-symbols-rounded {
             font-size: 14px;
             color: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .featured-loc-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .weather-main {
@@ -942,17 +1337,17 @@
             background: #111827;
         }
 
-        /* Bảng Nhiệm Vụ Tích Điểm - Compact cream theme */
+        /* Bảng Nhiệm Vụ Tích Điểm - Crisp modern theme */
         .mission-widget-wrapper {
             position: absolute;
             top: 195px;
             right: 2px;
             width: 220px;
             z-index: 1000;
-            background: #fffcf8;
-            border-radius: 14px;
-            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
-            border: 1px solid #fef3c7;
+            background: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
             box-sizing: border-box;
             pointer-events: auto;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -961,7 +1356,7 @@
         }
 
         .mission-widget-wrapper.collapsed {
-            border-radius: 18px;
+            border-radius: 6px;
             padding-bottom: 8px;
         }
 
@@ -1187,49 +1582,66 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             padding: 0 10px;
-            height: 30px;
+            height: 32px;
             box-sizing: border-box;
-            border-radius: 20px;
+            border-radius: 6px;
             font-family: inherit;
             font-size: 12px;
-            font-weight: 500;
-            color: #374151;
+            font-weight: 600;
+            color: #475569;
             cursor: pointer;
             white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+            transition: all 0.2s ease;
         }
 
-        .category-pill:hover,
+        .category-pill:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #1e293b;
+        }
+
         .category-pill.active {
-            background: #fff;
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 114, 255, 0.12);
+            background: #334155;
+            border-color: #334155;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(51, 65, 85, 0.25);
+        }
+
+        .category-pill.active span {
+            color: #ffffff !important;
         }
 
         .category-pill span {
-            font-size: 15px;
-            color: inherit;
+            font-size: 14px;
+            color: #64748b;
+            transition: color 0.2s ease;
         }
 
         /* Custom Leaflet Zoom Controls */
         .leaflet-top.leaflet-right {
             top: auto !important;
             bottom: 65px !important;
-            right: 8px !important;
+            left: 82px !important;
+            right: auto !important;
+            transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1), bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        body.sidebar-expanded .leaflet-top.leaflet-right {
+            left: 276px !important;
+        }
+
+        body:has(.bottom-drawer-wrapper.open) .leaflet-top.leaflet-right {
+            bottom: 200px !important;
         }
 
         .leaflet-control-zoom {
             border: none !important;
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
-            border-radius: 8px !important;
+            border-radius: 7px !important;
             overflow: hidden;
             margin-bottom: 0 !important;
             margin-right: 0 !important;
@@ -1298,7 +1710,12 @@
 
         /* Collapsed State */
         .user-sidebar.collapsed {
-            width: 56px;
+            width: 66px;
+        }
+
+        .user-sidebar.collapsed .sidebar-header {
+            justify-content: center;
+            padding: 10px 0;
         }
 
         .user-sidebar .sidebar-header {
@@ -1324,7 +1741,10 @@
         }
 
         .user-sidebar.collapsed .user-info {
-            gap: 0;
+            gap: 0 !important;
+            justify-content: center !important;
+            width: 100% !important;
+            margin: 0 auto;
         }
 
         .user-sidebar .user-avatar {
@@ -1332,7 +1752,13 @@
             width: 40px;
             height: 40px;
             flex-shrink: 0;
-            transition: transform 0.2s;
+            transition: transform 0.2s, width 0.2s, height 0.2s;
+        }
+
+        .user-sidebar.collapsed .user-avatar {
+            width: 42px !important;
+            height: 42px !important;
+            margin: 0 auto !important;
         }
 
         .user-sidebar .user-avatar:hover {
@@ -1377,6 +1803,8 @@
             padding: 10px 0;
             margin: 0;
             flex: 1;
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
             overflow-x: hidden;
         }
@@ -1402,42 +1830,42 @@
 
         .user-sidebar .sidebar-menu li {
             margin-bottom: 4px;
-            padding: 0 10px;
+            padding: 0 6px;
         }
 
         .user-sidebar .menu-item {
             display: flex;
             align-items: center;
-            padding: 8px 0;
-            color: #4b5563;
+            padding: 8px 6px;
+            color: #475569;
             text-decoration: none;
             transition: background 0.2s, color 0.2s;
             white-space: nowrap;
-            border-radius: 6px;
+            border-radius: 8px;
             position: relative;
             width: 100%;
         }
 
         .user-sidebar .menu-item:hover,
         .user-sidebar .menu-item.active {
-            background: rgba(0, 114, 255, 0.08);
-            color: var(--primary);
+            background: #f1f5f9;
+            color: #0284c7;
         }
 
         .user-sidebar .menu-item.active::before {
             content: '';
             position: absolute;
-            left: -10px;
+            left: 0;
             top: 50%;
             transform: translateY(-50%);
             height: 16px;
             width: 3px;
-            background: var(--primary);
+            background: #0284c7;
             border-radius: 0 3px 3px 0;
         }
 
         .user-sidebar .menu-icon {
-            width: 34px;
+            width: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1445,12 +1873,19 @@
         }
 
         .user-sidebar .menu-icon .material-symbols-rounded {
-            font-size: 19px;
+            font-size: 20px;
+            color: #475569;
+            transition: color 0.2s ease;
+        }
+
+        .user-sidebar .menu-item:hover .menu-icon .material-symbols-rounded,
+        .user-sidebar .menu-item.active .menu-icon .material-symbols-rounded {
+            color: #0284c7;
         }
 
         .user-sidebar .menu-text {
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             margin-left: 8px;
             overflow: hidden;
             max-width: 180px;
@@ -1459,47 +1894,76 @@
             transition: max-width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, margin 0.3s ease;
         }
 
-        .user-sidebar.collapsed .menu-text {
-            max-width: 0;
+        /* Google Maps Style Collapsed Sidebar Items */
+        .user-sidebar.collapsed .sidebar-menu li {
+            padding: 0 3px;
+            margin-bottom: 12px;
+        }
+
+        .user-sidebar.collapsed .menu-item {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 2px;
+            border-radius: 8px;
+        }
+
+        .user-sidebar.collapsed .menu-icon {
+            width: auto;
             margin-left: 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: max-width 0.2s ease, opacity 0.2s ease, visibility 0.2s ease, margin 0.2s ease;
+            margin-bottom: 4px;
         }
 
-        /* Tooltip for collapsed state */
-        .user-sidebar .menu-item .tooltip {
-            position: absolute;
-            left: 48px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #1f2937;
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
+        .user-sidebar.collapsed .menu-icon .material-symbols-rounded {
+            font-size: 20px;
+        }
+
+        .user-sidebar.collapsed .menu-text {
+            max-width: 100% !important;
+            margin-left: 0 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            font-size: 0.60rem;
+            font-weight: 500;
+            color: #475569;
+            text-align: center;
+            line-height: 1.3;
+            letter-spacing: -0.15px;
             white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            z-index: 100;
+            overflow: visible;
+            width: 100%;
+            padding-bottom: 2px;
         }
 
-        .user-sidebar .menu-item .tooltip::before {
-            content: '';
-            position: absolute;
-            left: -4px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 5px 5px 5px 0;
-            border-style: solid;
-            border-color: transparent #1f2937 transparent transparent;
+        .user-sidebar.collapsed .menu-item:hover .menu-text,
+        .user-sidebar.collapsed .menu-item.active .menu-text {
+            color: #0284c7;
+            font-weight: 600;
         }
 
-        .user-sidebar.collapsed .menu-item:hover .tooltip {
-            opacity: 1;
-            left: 48px;
+        /* Logout Item in Collapsed State: Icon only, pushed to bottom */
+        .user-sidebar.collapsed .logout-item {
+            margin-top: auto !important;
+            margin-bottom: 8px !important;
+            padding-top: 12px !important;
+            padding-bottom: 0 !important;
+        }
+
+        .user-sidebar.collapsed .logout-item .menu-text {
+            display: none !important;
+        }
+
+        .user-sidebar.collapsed .logout-item .menu-item {
+            padding: 10px 0 !important;
+        }
+
+        .user-sidebar.collapsed .logout-item .menu-icon {
+            margin-bottom: 0 !important;
+        }
+
+        /* Tooltip for collapsed state (Disabled as text is already visible inside items) */
+        .user-sidebar .menu-item .tooltip {
+            display: none !important;
         }
 
         /* Edge Toggle Button (Seamless Tab) */
@@ -1535,7 +1999,7 @@
         }
 
         body.sidebar-collapsed .sidebar-edge-toggle {
-            left: 56px;
+            left: 66px;
         }
 
         .sidebar-edge-toggle .icon-arrow {
@@ -1553,9 +2017,9 @@
 
         /* Adjust top search panel when sidebar is expanded */
         .top-search-panel {
-            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            left: 94px;
-            /* default with collapsed sidebar: 70px + 24px */
+            transition: left 0.3s cubic-bezier(0.4, 0.2, 0.2, 1);
+            left: 90px;
+            /* default with collapsed sidebar: 66px + 24px */
         }
 
         body.sidebar-expanded .top-search-panel {
@@ -1597,29 +2061,29 @@
                 @auth
                 <li>
                     <a href="{{ route('client.missions') }}" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded" style="color: #f59e0b;">emoji_events</span></span>
-                        <span class="menu-text" style="font-weight: 600;">Nhiệm vụ & Đổi quà</span>
+                        <span class="menu-icon"><span class="material-symbols-rounded">emoji_events</span></span>
+                        <span class="menu-text">Nhiệm vụ</span>
                         <span class="tooltip">Nhiệm vụ & Đổi quà</span>
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('client.profile') }}#tab-favorites" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded">favorite</span></span>
-                        <span class="menu-text">Địa điểm yêu thích</span>
-                        <span class="tooltip">Địa điểm yêu thích</span>
+                        <span class="menu-icon"><span class="material-symbols-rounded">bookmark</span></span>
+                        <span class="menu-text">Đã lưu</span>
+                        <span class="tooltip">Địa điểm đã lưu</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('client.contributions.index') }}" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded" style="color: #10b981;">volunteer_activism</span></span>
-                        <span class="menu-text">Quản lý Đóng góp</span>
-                        <span class="tooltip">Quản lý Đóng góp</span>
+                    <a href="#" onclick="openModal('suggestLocationModal'); return false;" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-rounded">add_location_alt</span></span>
+                        <span class="menu-text">Đề xuất</span>
+                        <span class="tooltip">Đề xuất địa điểm</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="menu-item">
                         <span class="menu-icon"><span class="material-symbols-rounded">history</span></span>
-                        <span class="menu-text">Lịch sử xem</span>
+                        <span class="menu-text">Gần đây</span>
                         <span class="tooltip">Lịch sử xem</span>
                     </a>
                 </li>
@@ -1630,29 +2094,28 @@
                         <span class="tooltip">Cài đặt</span>
                     </a>
                 </li>
-                <li style="margin-top: auto; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 10px;">
+                <li class="logout-item" style="margin-top: auto; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 6px;">
                     <form action="{{ route('logout') }}" method="POST" style="display: none;" id="logout-form">
                         @csrf
                     </form>
                     <a href="#" class="menu-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <span class="menu-icon"><span class="material-symbols-rounded" style="color: #ef4444;">logout</span></span>
-                        <span class="menu-text" style="color: #ef4444;">Đăng xuất</span>
+                        <span class="menu-icon"><span class="material-symbols-rounded">logout</span></span>
+                        <span class="menu-text">Đăng xuất</span>
                         <span class="tooltip">Đăng xuất</span>
                     </a>
                 </li>
                 @else
                     <li>
                         <a href="{{ route('login') }}" class="menu-item">
-                            <span class="menu-icon"><span class="material-symbols-rounded"
-                                    style="color: var(--primary);">login</span></span>
-                            <span class="menu-text" style="color: var(--primary); font-weight: 700;">Đăng nhập</span>
+                            <span class="menu-icon"><span class="material-symbols-rounded">login</span></span>
+                            <span class="menu-text">Đăng nhập</span>
                             <span class="tooltip">Đăng nhập</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('register') }}" class="menu-item">
                             <span class="menu-icon"><span class="material-symbols-rounded">person_add</span></span>
-                            <span class="menu-text">Đăng ký tài khoản</span>
+                            <span class="menu-text">Đăng ký</span>
                             <span class="tooltip">Đăng ký tài khoản</span>
                         </a>
                     </li>
@@ -1668,26 +2131,62 @@
     <!-- Map Container -->
     <div id="map"></div>
 
-    <!-- Top Floating Search Panel -->
-    <div class="top-search-panel">
-        <div class="search-box-container">
-            <div class="search-box">
-                <input type="text" id="map-search-input" placeholder="Tìm kiếm địa điểm..." class="search-input"
-                    autocomplete="off">
-                <div class="search-actions">
-                    <button class="icon-btn" title="Tìm kiếm"><span
-                            class="material-symbols-rounded">search</span></button>
+    <!-- Top Floating Search & Filter Command Dock -->
+    <div class="top-search-panel" id="topSearchPanel">
+        <div class="unified-command-dock">
+            <!-- Search Box -->
+            <div class="dock-search-box">
+                <span class="material-symbols-rounded search-icon">search</span>
+                <input type="text" id="map-search-input" placeholder="Tìm kiếm địa điểm..." class="search-input" autocomplete="off">
+            </div>
+
+            <!-- Divider -->
+            <div class="dock-divider"></div>
+
+            <!-- Category Filter Dropdown -->
+            <div class="dock-filter-wrapper">
+                <button type="button" class="dock-filter-btn" id="categoryFilterBtn">
+                    <span class="material-symbols-rounded">tune</span>
+                    <span id="selectedCategoryLabel">Tất cả chủ đề</span>
+                    <span class="material-symbols-rounded arrow-icon">expand_more</span>
+                </button>
+
+                <!-- Floating Filter Menu -->
+                <div class="dock-filter-menu" id="dockFilterMenu">
+                    <!-- Radius Filter Section -->
+                    <div class="radius-section">
+                        <div class="radius-title">BÁN KÍNH GẦN BẠN</div>
+                        <div class="radius-btn-group" id="radiusBtnGroup">
+                            <button type="button" class="radius-btn active" data-radius="all">Tất cả</button>
+                            <button type="button" class="radius-btn" data-radius="5">5km</button>
+                            <button type="button" class="radius-btn" data-radius="10">10km</button>
+                            <button type="button" class="radius-btn" data-radius="20">20km</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-menu-header">
+                        <span>LỌC THEO CHỦ ĐỀ</span>
+                        <button type="button" class="filter-reset-btn" id="resetCategoryBtn" style="display: none;">Đặt lại</button>
+                    </div>
+                    <div class="filter-menu-list" id="map-categories">
+                        <!-- Content rendered by JS -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Dropdown Gợi ý tìm kiếm -->
-            <div class="search-suggestions" id="search-suggestions">
-                <!-- Nội dung được sinh ra bằng Javascript -->
-            </div>
+            <!-- Divider -->
+            <div class="dock-divider"></div>
+
+            <!-- Random Discovery Button -->
+            <button type="button" class="dock-random-btn" id="randomFlyBtn" title="Khám phá ngẫu nhiên một địa điểm">
+                <span class="material-symbols-rounded">auto_awesome</span>
+                <span>Gợi ý ngẫu nhiên</span>
+            </button>
         </div>
 
-        <div class="categories-scroll" id="map-categories">
-            <!-- Render danh mục bằng Javascript từ dữ liệu thật -->
+        <!-- Dropdown Gợi ý tìm kiếm -->
+        <div class="search-suggestions" id="search-suggestions">
+            <!-- Nội dung được sinh ra bằng Javascript -->
         </div>
     </div>
 
@@ -1783,12 +2282,15 @@
         <div class="mission-widget-wrapper" id="mission-widget-wrapper">
             <!-- Header với Nút Thu Gọn -->
             <div class="mission-header" id="mission-widget-header" title="Nhấn để thu gọn/mở rộng">
-                <span style="font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 4px; color: #1e1b4b;">
+                <span style="font-size: 0.76rem; font-weight: 700; display: flex; align-items: center; gap: 4px; color: #334155;">
                     Tiến độ nhiệm vụ
                 </span>
-                <div style="display: flex; align-items: center; gap: 4px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
                     @auth
-                        <span style="font-size: 0.68rem; font-weight: 700; color: #d97706; white-space: nowrap;" id="widgetPoints">{{ Auth::user()->points }} xu</span>
+                        <div style="display: flex; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: 700; color: #334155;">
+                            <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 14px; height: 14px; object-fit: contain;">
+                            <span id="widgetPoints">{{ number_format(Auth::user()->points) }}</span>
+                        </div>
                     @endauth
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="mission-toggle-arrow" style="transition: transform 0.3s;">
                         <polyline points="18 15 12 9 6 15"/>
@@ -1813,113 +2315,92 @@
                             $fillPercent = 66.66 + (min(300, $userPts - 200) / 300) * 33.34;
                         }
                     @endphp
-                    <div style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 8px 2px; margin-bottom: 6px;">
+                    <div style="position: relative; display: flex; align-items: flex-start; justify-content: space-between; padding: 4px 6px 8px 6px; margin-bottom: 8px;">
                         <!-- Line BG & Fill -->
-                        <div style="position: absolute; top: 48%; left: 22px; right: 18px; height: 3px; background: #e2e8f0; border-radius: 4px; transform: translateY(-50%); z-index: 1;">
-                            <div style="height: 100%; background: linear-gradient(90deg, #7c3aed, #9333ea); border-radius: 4px; width: {{ $fillPercent }}%; transition: width 0.4s ease;"></div>
+                        <div style="position: absolute; top: 13px; left: 20px; right: 20px; height: 3px; background: #e2e8f0; border-radius: 4px; transform: translateY(-50%); z-index: 1;">
+                            <div style="height: 100%; background: #475569; border-radius: 4px; width: {{ $fillPercent }}%; transition: width 0.4s ease;"></div>
                         </div>
 
-                        <!-- 3D Gold Star Coin Badge -->
-                        <svg width="26" height="26" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="z-index: 2; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.35));">
-                            <circle cx="20" cy="20" r="18" fill="url(#coinGrad)"/>
-                            <circle cx="20" cy="20" r="14.5" stroke="#FDE047" stroke-width="1.8" fill="none"/>
-                            <path d="M20 9.5L22.9 15.8L29.7 16.7L24.8 21.4L26 28.1L20 24.8L14 28.1L15.2 21.4L10.3 16.7L17.1 15.8L20 9.5Z" fill="#FFFBEB"/>
-                            <defs>
-                                <radialGradient id="coinGrad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(14 12) scale(24)">
-                                    <stop stop-color="#FEF08A"/>
-                                    <stop offset="0.55" stop-color="#F59E0B"/>
-                                    <stop offset="1" stop-color="#B45309"/>
-                                </radialGradient>
-                            </defs>
-                        </svg>
+                        <!-- Start Flag (Standalone SVG Flag) -->
+                        <div style="position: relative; z-index: 2; width: 18px; height: 18px; display: flex; align-items: flex-end; justify-content: center; transform: translateY(-1px);">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 21V3" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+                                <path d="M5 4H19L14.5 9L19 14H5" fill="#475569" stroke="#475569" stroke-width="1.2" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
 
                         <!-- Node 1: 100 -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
-                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 22px;">
                             @if($userPts >= 100)
-                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
-                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="18" height="18" rx="4" fill="#475569"/>
+                                    <path d="M5 9.2L7.8 12L13 6.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             @else
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#DDD6FE"/>
-                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#C4B5FD"/>
-                                    <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#F8FAFC" stroke="#64748b" stroke-width="1.6"/>
+                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#E2E8F0" stroke="#64748b" stroke-width="1.6"/>
+                                    <path d="M12 6V21" stroke="#64748b" stroke-width="1.6"/>
                                 </svg>
                             @endif
-                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">100</div>
+                            <div style="font-size: 0.6rem; font-weight: 700; color: #64748b; margin-top: 2px;">100</div>
                         </div>
 
                         <!-- Node 2: 200 -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
-                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 22px;">
                             @if($userPts >= 200)
-                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
-                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="18" height="18" rx="4" fill="#475569"/>
+                                    <path d="M5 9.2L7.8 12L13 6.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             @else
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#C4B5FD"/>
-                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#DDD6FE"/>
-                                    <path d="M12 6V21" stroke="#8B5CF6" stroke-width="2"/>
-                                    <path d="M12 6C12 6 9.5 3 7.5 3C5.5 3 5 4.5 6 6C7 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
-                                    <path d="M12 6C12 6 14.5 3 16.5 3C18.5 3 19 4.5 18 6C17 7.5 12 6 12 6Z" stroke="#8B5CF6" stroke-width="1.8" fill="#DDD6FE"/>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#F8FAFC" stroke="#64748b" stroke-width="1.6"/>
+                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#E2E8F0" stroke="#64748b" stroke-width="1.6"/>
+                                    <path d="M12 6V21" stroke="#64748b" stroke-width="1.6"/>
                                 </svg>
                             @endif
-                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">200</div>
+                            <div style="font-size: 0.6rem; font-weight: 700; color: #64748b; margin-top: 2px;">200</div>
                         </div>
 
-                        <!-- Node 3: 500 Red Gift Box -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center;">
-                            <div style="font-size: 0.56rem; font-weight: 700; color: #78716c; margin-bottom: 1px;">&nbsp;</div>
+                        <!-- Node 3: 500 -->
+                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 22px;">
                             @if($userPts >= 500)
-                                <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="11" cy="11" r="11" fill="#DC2626"/>
-                                    <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="18" height="18" rx="4" fill="#475569"/>
+                                    <path d="M5 9.2L7.8 12L13 6.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             @else
-                                <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.35));">
-                                    <rect x="4" y="13" width="24" height="15" rx="3" fill="#DC2626"/>
-                                    <rect x="2" y="8" width="28" height="5" rx="2" fill="#EF4444"/>
-                                    <rect x="13.5" y="8" width="5" height="20" fill="#F59E0B"/>
-                                    <path d="M16 8C16 8 11.5 3 8.5 3C5.5 3 5 5.5 7 7.5C9 9.5 16 8 16 8Z" fill="#F59E0B"/>
-                                    <path d="M16 8C16 8 20.5 3 23.5 3C26.5 3 27 5.5 25 7.5C23 9.5 16 8 16 8Z" fill="#F59E0B"/>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#F8FAFC" stroke="#64748b" stroke-width="1.6"/>
+                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#E2E8F0" stroke="#64748b" stroke-width="1.6"/>
+                                    <path d="M12 6V21" stroke="#64748b" stroke-width="1.6"/>
                                 </svg>
                             @endif
-                            <div style="font-size: 0.6rem; font-weight: 800; color: #1e1b4b; margin-top: 1px;">500</div>
+                            <div style="font-size: 0.6rem; font-weight: 700; color: #64748b; margin-top: 2px;">500</div>
                         </div>
                     </div>
 
                     <!-- Sub Cards Container -->
-                    <div style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 6px;">
+                    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
                         <!-- Group Card (Row 1 + Row 2) -->
-                        <div style="background: #ffffff; border-radius: 10px; border: 1px solid #f1f5f9; box-shadow: 0 1px 4px rgba(0,0,0,0.02); overflow: hidden;">
+                        <div style="background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; overflow: hidden;">
                             <!-- Row 1: Điểm danh -->
                             @php
                                 $hasCheckinToday = Auth::user()->last_daily_bonus_at && \Carbon\Carbon::parse(Auth::user()->last_daily_bonus_at)->isToday();
                             @endphp
-                            <div style="padding: 7px 9px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #f1f5f9;">
-                                <div style="display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                        <line x1="16" y1="2" x2="16" y2="6"/>
-                                        <line x1="8" y1="2" x2="8" y2="6"/>
-                                        <line x1="3" y1="10" x2="21" y2="10"/>
-                                        <path d="M9 14l2 2 4-4"/>
-                                    </svg>
-                                    <span style="font-weight: 700; color: #1e1b4b; font-size: 0.66rem; line-height: 1.25;">Điểm danh</span>
+                            <div style="padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #f1f5f9;">
+                                <div style="display: flex; align-items: center; min-width: 0; flex: 1;">
+                                    <span style="font-weight: 700; color: #334155; font-size: 0.68rem; line-height: 1.25;">Điểm danh</span>
                                 </div>
                                 <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; flex-shrink: 0;">
-                                    <span style="font-weight: 700; color: #d97706; font-size: 0.62rem; white-space: nowrap;">+10 xu</span>
+                                    <div style="display: flex; align-items: center; gap: 2px; font-weight: 700; color: #334155; font-size: 0.6rem;">
+                                        +10 <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;">
+                                    </div>
                                     @if($hasCheckinToday)
-                                        <svg width="15" height="15" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0;">
-                                            <circle cx="11" cy="11" r="11" fill="#7C3AED"/>
-                                            <path d="M6.5 11.5L9.5 14.5L15.5 8.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        </svg>
+                                        <span style="font-weight: 600; color: #475569; font-size: 0.56rem; white-space: nowrap;">Đã điểm danh</span>
                                     @else
-                                        <button type="button" id="widgetClaimDailyBtn" style="font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border: 1.5px solid #8b5cf6; color: #7c3aed; background: transparent; border-radius: 999px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Nhận</button>
+                                        <button type="button" id="widgetClaimDailyBtn" style="font-size: 0.56rem; font-weight: 700; padding: 2px 8px; border: 1px solid #475569; color: #ffffff; background: #475569; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Nhận</button>
                                     @endif
                                 </div>
                             </div>
@@ -1943,83 +2424,99 @@
                                     }
                                 }
                             @endphp
-                            <div style="padding: 7px 9px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                                <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
-                                    </svg>
+                            <div style="padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
                                     <div style="display: flex; flex-direction: column; width: 100%; min-width: 0;">
-                                        <span style="font-weight: 700; color: #1e1b4b; font-size: 0.66rem; line-height: 1.25;">Khám phá</span>
-                                        <div style="height: 3.5px; background: #e2e8f0; border-radius: 4px; overflow: hidden; width: 100%; margin-top: 2px;">
-                                            <div id="widgetExploreBar" style="width: {{ min(100, (min(3, $exploredCount) / 3) * 100) }}%; background: #7c3aed; height: 100%; border-radius: 4px; transition: width 0.3s ease;"></div>
+                                        <span style="font-weight: 700; color: #334155; font-size: 0.68rem; line-height: 1.25;">Khám phá</span>
+                                        <div style="height: 3px; background: #e2e8f0; border-radius: 2px; overflow: hidden; width: 100%; margin-top: 4px;">
+                                            <div id="widgetExploreBar" style="width: {{ min(100, (min(3, $exploredCount) / 3) * 100) }}%; background: #475569; height: 100%; border-radius: 2px; transition: width 0.3s ease;"></div>
                                         </div>
                                     </div>
                                 </div>
-                                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; gap: 1px;">
-                                    <span style="font-weight: 700; color: #d97706; font-size: 0.62rem; white-space: nowrap;">+20 xu</span>
-                                    <div style="font-weight: 700; color: #64748b; font-size: 0.58rem; display: flex; align-items: center; gap: 2px; white-space: nowrap;">
+                                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; flex-shrink: 0; gap: 2px;">
+                                    <div style="display: flex; align-items: center; gap: 2px; font-weight: 700; color: #334155; font-size: 0.6rem;">
+                                        +20 <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;">
+                                    </div>
+                                    <div style="font-weight: 500; color: #64748b; font-size: 0.54rem; display: flex; align-items: center; gap: 2px; white-space: nowrap;">
                                         <span>{{ min(3, $exploredCount) }}/3 địa điểm</span>
-                                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="9 18 15 12 9 6"/>
-                                        </svg>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Card 3: Đổi quà ngay -->
-                        <div style="background: #ffffff; border-radius: 10px; border: 1px solid #f1f5f9; box-shadow: 0 1px 4px rgba(0,0,0,0.02); padding: 7px 9px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                            <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
-                                    <rect x="3" y="8" width="18" height="12" rx="2"/>
-                                    <path d="M12 8v12"/>
-                                    <path d="M7.5 8a2.5 2.5 0 0 1 0-5C9.7 3 12 8 12 8s2.3-5 4.5-5a2.5 2.5 0 0 1 0 5"/>
-                                </svg>
-                                <span style="font-weight: 700; color: #1e1b4b; font-size: 0.66rem; line-height: 1.25;">Đổi quà ngay</span>
+                        <div style="background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <div style="display: flex; align-items: center; min-width: 0; flex: 1;">
+                                <span style="font-weight: 700; color: #334155; font-size: 0.68rem; line-height: 1.25;">Đổi quà ngay</span>
                             </div>
-                            <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; flex-shrink: 0;">
-                                <span style="font-weight: 700; color: #d97706; font-size: 0.6rem; white-space: nowrap;">Hot</span>
-                                <a href="{{ route('client.missions') }}" style="font-size: 0.58rem; font-weight: 700; padding: 1.5px 7px; border: 1.5px solid #a855f7; color: #7c3aed; background: #ffffff; border-radius: 999px; cursor: pointer; white-space: nowrap; text-decoration: none;">Đổi quà</a>
+                            <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+                                <a href="{{ route('client.missions') }}" style="font-size: 0.58rem; font-weight: 700; padding: 2.5px 9px; border: 1px solid #475569; color: #475569; background: #ffffff; border-radius: 4px; cursor: pointer; white-space: nowrap; text-decoration: none; transition: all 0.2s;">Đổi quà</a>
                             </div>
                         </div>
                     </div>
 
                     <!-- Footer Link -->
-                    <div style="text-align: center; margin-top: 2px;">
-                        <a href="{{ route('client.missions') }}" style="color: #7c3aed; font-weight: 700; font-size: 0.7rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                    <div style="text-align: center; margin-top: 4px; padding-top: 2px;">
+                        <a href="{{ route('client.missions') }}" style="color: #475569; font-weight: 700; font-size: 0.72rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
                             <span>Xem tất cả nhiệm vụ</span>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="5" y1="12" x2="19" y2="12"/>
                                 <polyline points="12 5 19 12 12 19"/>
                             </svg>
                         </a>
                     </div>
                 @else
-                    <div class="text-center py-2">
-                        <p class="text-muted mb-2" style="font-size: 0.72rem; color: #6b7280;">Đăng nhập để làm nhiệm vụ tích xu!</p>
-                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem; background-color: #7c3aed; border: none; color: white;">Đăng nhập</a>
+                    <div style="text-align: center; padding: 10px 4px 6px 4px;">
+                        <div style="margin-bottom: 8px; display: flex; justify-content: center;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(2, 132, 199, 0.08); display: flex; align-items: center; justify-content: center;">
+                                <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 20px; height: 20px; object-fit: contain;">
+                            </div>
+                        </div>
+                        <p style="font-size: 0.72rem; color: #64748b; margin-bottom: 10px; font-weight: 500; line-height: 1.35;">Đăng nhập để làm nhiệm vụ & nhận xu thưởng!</p>
+                        <a href="{{ route('login') }}" style="display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 6px 18px; background: #0284c7; color: #ffffff; border-radius: 8px; text-decoration: none; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25); transition: all 0.2s;">Đăng nhập ngay</a>
                     </div>
                 @endauth
             </div>
         </div>
     </div>
 
-    <!-- Bottom Featured Drawer (Full Width) -->
+    <!-- Bottom Featured Drawer (Full Width Sheet) -->
     <div class="bottom-drawer-wrapper open" id="featured-drawer">
-        <div class="drawer-toggle-btn" id="drawer-toggle-btn" title="Địa điểm nổi bật">
-            <span class="material-symbols-rounded">star</span>
-            <span class="drawer-title">Địa điểm nổi bật</span>
-            <span class="material-symbols-rounded drawer-chevron">expand_less</span>
+        <div class="drawer-header" id="drawer-toggle-btn" title="Nhấn để thu gọn/mở rộng">
+            <div class="drawer-header-left">
+                <span class="drawer-title">Khám phá</span>
+            </div>
+
+            <div class="drawer-header-divider"></div>
+
+            <!-- Single Combined Category Dropdown Filter (Seamless Style) -->
+            <div class="drawer-filter-dropdown-wrapper">
+                <button type="button" class="drawer-filter-trigger" id="drawerFilterTrigger">
+                    <span class="material-symbols-rounded">tune</span>
+                    <span id="drawerFilterLabel">Tất cả chủ đề</span>
+                </button>
+                <div class="drawer-filter-menu" id="drawerFilterMenu">
+                    <!-- Items rendered dynamically by JS -->
+                </div>
+            </div>
+
+            <div class="drawer-header-divider"></div>
+
+            <button type="button" class="drawer-close-btn" id="drawerCloseBtn">
+                <span class="material-symbols-rounded drawer-chevron">expand_less</span>
+            </button>
         </div>
         <div class="drawer-content">
-            <div class="featured-loc-scroll">
-                @foreach($locations->sortByDesc('view_count')->take(10) as $loc)
-                    <a href="#" class="featured-loc-card" onclick="flyToLocation({{ $loc->id }}); return false;">
+            <div class="featured-loc-scroll" id="featuredLocScroll">
+                @foreach($locations as $loc)
+                    <a href="#" class="featured-loc-card" data-cat="{{ $loc->category ? $loc->category->id : '' }}" onclick="flyToLocation({{ $loc->id }}); return false;">
                         <img src="{{ $loc->thumbnail_url ?: 'https://placehold.co/300x200/1e3a8a/ffffff?text=No+Image' }}"
                             alt="{{ $loc->name }}" class="featured-loc-img">
+                        <div class="featured-loc-badge">
+                            {{ $loc->category ? $loc->category->name : 'Điểm đến' }}
+                        </div>
                         <div class="featured-loc-info">
-                            <span class="material-symbols-rounded">account_balance</span>
+                            <span class="material-symbols-rounded">location_on</span>
                             <div class="featured-loc-title">{{ $loc->name }}</div>
                         </div>
                     </a>
@@ -2336,53 +2833,265 @@
         // --- Logic Tìm kiếm và Danh mục ---
         const searchInput = document.getElementById('map-search-input');
         const suggestionsBox = document.getElementById('search-suggestions');
-        const categoriesScroll = document.getElementById('map-categories');
+        const categoriesContainer = document.getElementById('map-categories');
+        const categoryFilterBtn = document.getElementById('categoryFilterBtn');
+        const dockFilterMenu = document.getElementById('dockFilterMenu');
+        const selectedCategoryLabel = document.getElementById('selectedCategoryLabel');
+        const resetCategoryBtn = document.getElementById('resetCategoryBtn');
 
-        // Lấy danh sách danh mục duy nhất từ locations
-        const uniqueCategories = [];
+        // Toggle popover menu
+        if (categoryFilterBtn && dockFilterMenu) {
+            categoryFilterBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dockFilterMenu.classList.toggle('show');
+                categoryFilterBtn.classList.toggle('menu-open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#topSearchPanel')) {
+                    dockFilterMenu.classList.remove('show');
+                    categoryFilterBtn.classList.remove('menu-open');
+                }
+            });
+        }
+
+        // Calculate location counts per category
         const catMap = {};
+        const catCounts = {};
+        const uniqueCategories = [];
         locations.forEach(loc => {
-            if (loc.category && !catMap[loc.category.id]) {
-                catMap[loc.category.id] = true;
-                uniqueCategories.push(loc.category);
+            if (loc.category) {
+                catCounts[loc.category.id] = (catCounts[loc.category.id] || 0) + 1;
+                if (!catMap[loc.category.id]) {
+                    catMap[loc.category.id] = true;
+                    uniqueCategories.push(loc.category);
+                }
             }
         });
 
-        // Render category pills
-        uniqueCategories.forEach(cat => {
-            const btn = document.createElement('button');
-            btn.className = 'category-pill';
-            // Giả lập icon từ google font, nếu có icon url thì dùng img, ở đây dùng tạm một icon chung nếu không parse được
-            const iconColor = cat.icon_color || 'var(--primary)';
-            btn.innerHTML = `<span class="material-symbols-rounded" style="color: ${iconColor};">location_on</span> ${cat.name}`;
+        let currentActiveCatId = null;
 
-            btn.addEventListener('click', () => {
-                // Nếu đang active thì bấm để bỏ lọc (hiển thị tất cả)
-                if (btn.classList.contains('active')) {
-                    btn.classList.remove('active');
-                    markers.clearLayers();
-                    locations.forEach(loc => {
-                        if (loc.marker) {
-                            markers.addLayer(loc.marker);
+        function resetCategoryFilter() {
+            currentActiveCatId = null;
+            selectedCategoryLabel.textContent = 'Tất cả chủ đề';
+            categoryFilterBtn.classList.remove('active');
+            if (resetCategoryBtn) resetCategoryBtn.style.display = 'none';
+            document.querySelectorAll('.filter-item').forEach(el => el.classList.remove('active'));
+
+            markers.clearLayers();
+            locations.forEach(loc => {
+                if (loc.marker) markers.addLayer(loc.marker);
+            });
+        }
+
+        if (resetCategoryBtn) {
+            resetCategoryBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                resetCategoryFilter();
+                dockFilterMenu.classList.remove('show');
+                categoryFilterBtn.classList.remove('menu-open');
+            });
+        }
+
+        // Render category items inside popover
+        if (categoriesContainer) {
+            categoriesContainer.innerHTML = '';
+            uniqueCategories.forEach(cat => {
+                const count = catCounts[cat.id] || 0;
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'filter-item';
+                item.innerHTML = `
+                    <div class="filter-item-left">
+                        <span class="material-symbols-rounded">location_on</span>
+                        <span>${cat.name}</span>
+                    </div>
+                    <span class="filter-count-badge">${count}</span>
+                `;
+
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (currentActiveCatId === cat.id) {
+                        resetCategoryFilter();
+                    } else {
+                        currentActiveCatId = cat.id;
+                        selectedCategoryLabel.textContent = cat.name;
+                        categoryFilterBtn.classList.add('active');
+                        resetCategoryBtn.style.display = 'inline-block';
+
+                        document.querySelectorAll('.filter-item').forEach(el => el.classList.remove('active'));
+                        item.classList.add('active');
+
+                        markers.clearLayers();
+                        locations.forEach(loc => {
+                            if (loc.category && loc.category.id === cat.id && loc.marker) {
+                                markers.addLayer(loc.marker);
+                            }
+                        });
+                    }
+                    dockFilterMenu.classList.remove('show');
+                    categoryFilterBtn.classList.remove('menu-open');
+                });
+
+                categoriesContainer.appendChild(item);
+            });
+        }
+
+        // --- Independent Category Filter for Bottom Featured Drawer Cards ONLY ---
+        const drawerFilterTrigger = document.getElementById('drawerFilterTrigger');
+        const drawerFilterMenu = document.getElementById('drawerFilterMenu');
+        const drawerFilterLabel = document.getElementById('drawerFilterLabel');
+        const featuredCards = document.querySelectorAll('#featuredLocScroll .featured-loc-card');
+        const featuredCountBadge = document.getElementById('featuredCountBadge');
+
+        if (drawerFilterTrigger && drawerFilterMenu) {
+            drawerFilterTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                drawerFilterMenu.classList.toggle('show');
+                drawerFilterTrigger.classList.toggle('menu-open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.drawer-filter-dropdown-wrapper')) {
+                    drawerFilterMenu.classList.remove('show');
+                    drawerFilterTrigger.classList.remove('menu-open');
+                }
+            });
+        }
+
+        if (drawerFilterMenu && uniqueCategories) {
+            drawerFilterMenu.innerHTML = '';
+            
+            // "Tất cả chủ đề" item
+            const allItem = document.createElement('button');
+            allItem.type = 'button';
+            allItem.className = 'drawer-filter-item active';
+            allItem.innerHTML = '<span>Tất cả chủ đề</span>';
+            allItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                drawerFilterMenu.querySelectorAll('.drawer-filter-item').forEach(i => i.classList.remove('active'));
+                allItem.classList.add('active');
+                if (drawerFilterLabel) drawerFilterLabel.textContent = 'Tất cả chủ đề';
+                if (drawerFilterTrigger) drawerFilterTrigger.classList.remove('active');
+
+                // Filter cards ONLY (Do NOT alter map markers)
+                let visibleCount = 0;
+                featuredCards.forEach(card => {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                });
+                if (featuredCountBadge) featuredCountBadge.textContent = visibleCount;
+
+                drawerFilterMenu.classList.remove('show');
+            });
+            drawerFilterMenu.appendChild(allItem);
+
+            // Category Items
+            uniqueCategories.forEach(cat => {
+                const count = catCounts[cat.id] || 0;
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'drawer-filter-item';
+                item.innerHTML = `<span>${cat.name}</span> <span class="filter-count-badge">${count}</span>`;
+
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    drawerFilterMenu.querySelectorAll('.drawer-filter-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    if (drawerFilterLabel) drawerFilterLabel.textContent = cat.name;
+                    if (drawerFilterTrigger) drawerFilterTrigger.classList.add('active');
+
+                    // Filter cards ONLY (Do NOT alter map markers)
+                    let visibleCount = 0;
+                    featuredCards.forEach(card => {
+                        const cardCatId = card.getAttribute('data-cat');
+                        if (cardCatId == cat.id) {
+                            card.style.display = 'flex';
+                            visibleCount++;
+                        } else {
+                            card.style.display = 'none';
                         }
                     });
-                    return;
-                }
+                    if (featuredCountBadge) featuredCountBadge.textContent = visibleCount;
 
-                // Remove active class from all
-                document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-                btn.classList.add('active');
+                    drawerFilterMenu.classList.remove('show');
+                });
 
-                // Filter markers
-                markers.clearLayers();
-                locations.forEach(loc => {
-                    if (loc.category && loc.category.id === cat.id && loc.marker) {
-                        markers.addLayer(loc.marker);
-                    }
+                drawerFilterMenu.appendChild(item);
+            });
+        }
+
+        // --- Nút Khám Phá Ngẫu Nhiên ---
+        const randomFlyBtn = document.getElementById('randomFlyBtn');
+        if (randomFlyBtn) {
+            randomFlyBtn.addEventListener('click', () => {
+                if (!locations || locations.length === 0) return;
+                const randomLoc = locations[Math.floor(Math.random() * locations.length)];
+                
+                showToast(`✨ Gợi ý cho bạn: <strong>${randomLoc.name}</strong>`, 'info', 3000);
+
+                stepZoomToMarker(randomLoc, () => {
+                    map.flyTo([randomLoc.lat, randomLoc.lng], 17, { duration: 1.5 });
+                    setTimeout(() => {
+                        if (randomLoc.marker) randomLoc.marker.openPopup();
+                    }, 1000);
                 });
             });
-            categoriesScroll.appendChild(btn);
-        });
+        }
+
+        // --- Lọc Bán Kính Khám Phá ---
+        const radiusBtnGroup = document.getElementById('radiusBtnGroup');
+        let currentRadiusCircle = null;
+
+        if (radiusBtnGroup) {
+            radiusBtnGroup.querySelectorAll('.radius-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    radiusBtnGroup.querySelectorAll('.radius-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const rVal = btn.getAttribute('data-radius');
+                    if (currentRadiusCircle) {
+                        map.removeLayer(currentRadiusCircle);
+                        currentRadiusCircle = null;
+                    }
+
+                    if (rVal === 'all') {
+                        markers.clearLayers();
+                        locations.forEach(loc => {
+                            if (loc.marker) markers.addLayer(loc.marker);
+                        });
+                        return;
+                    }
+
+                    const radiusKm = parseFloat(rVal);
+                    const radiusMeters = radiusKm * 1000;
+                    const centerPoint = userCoords ? L.latLng(userCoords.lat, userCoords.lng) : map.getCenter();
+
+                    currentRadiusCircle = L.circle(centerPoint, {
+                        radius: radiusMeters,
+                        color: '#0284c7',
+                        weight: 1.5,
+                        dashArray: '5,5',
+                        fillColor: '#0284c7',
+                        fillOpacity: 0.08
+                    }).addTo(map);
+
+                    markers.clearLayers();
+                    const filtered = locations.filter(loc => {
+                        const dist = centerPoint.distanceTo(L.latLng(loc.lat, loc.lng));
+                        return dist <= radiusMeters;
+                    });
+
+                    filtered.forEach(loc => {
+                        if (loc.marker) markers.addLayer(loc.marker);
+                    });
+
+                    map.fitBounds(currentRadiusCircle.getBounds(), { padding: [30, 30] });
+                    showToast(`🎯 Tìm thấy ${filtered.length} địa điểm trong bán kính ${radiusKm}km`, 'info', 3000);
+                });
+            });
+        }
 
         // Hàm loại bỏ dấu tiếng Việt
         function removeAccents(str) {
