@@ -3,18 +3,18 @@
 @section('title', 'Chỉnh sửa Địa điểm: ' . $location->name)
 
 @section('content')
-<ul class="nav nav-tabs mb-4" id="locationTabs" role="tablist">
+<ul class="nav nav-tabs mb-4 border-bottom" id="locationTabs" role="tablist" style="border-color: var(--border-light) !important;">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Thông tin cơ bản</button>
+        <button class="nav-link active fw-medium text-dark px-3 py-2" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" style="font-size: 0.85rem;">Thông tin cơ bản</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-bold text-success" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab"><i class="fas fa-images"></i> Quản lý Hình ảnh</button>
+        <button class="nav-link fw-medium text-muted px-3 py-2" id="images-tab" data-bs-toggle="tab" data-bs-target="#images" type="button" role="tab" style="font-size: 0.85rem;">Quản lý Hình ảnh</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-bold text-primary" id="pano-tab" data-bs-toggle="tab" data-bs-target="#pano" type="button" role="tab"><i class="fas fa-vr-cardboard"></i> Dữ liệu 360°</button>
+        <button class="nav-link fw-medium text-muted px-3 py-2" id="pano-tab" data-bs-toggle="tab" data-bs-target="#pano" type="button" role="tab" style="font-size: 0.85rem;">Dữ liệu 360°</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link fw-bold text-warning" id="audio-tab" data-bs-toggle="tab" data-bs-target="#audio" type="button" role="tab"><i class="fas fa-microphone"></i> Audio thuyết minh</button>
+        <button class="nav-link fw-medium text-muted px-3 py-2" id="audio-tab" data-bs-toggle="tab" data-bs-target="#audio" type="button" role="tab" style="font-size: 0.85rem;">Audio thuyết minh</button>
     </li>
 </ul>
 
@@ -22,106 +22,113 @@
 <div class="tab-content" id="locationTabsContent">
     <!-- INFO TAB -->
     <div class="tab-pane fade show active" id="info" role="tabpanel">
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body">
-                <form action="{{ route('admin.locations.update', [$location->id] + request()->query()) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="mb-3">
-                                <label for="name" class="form-label fw-bold">Tên địa điểm <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $location->name) }}" required>
-                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="short_description" class="form-label fw-bold">Mô tả ngắn</label>
-                                <textarea class="form-control" id="short_description" name="short_description" rows="2">{{ old('short_description', $location->short_description) }}</textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="address" class="form-label fw-bold">Địa chỉ</label>
-                                <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $location->address) }}">
-                            </div>
+        <div class="card-minimal p-4 mb-4">
+            <form action="{{ route('admin.locations.update', [$location->id] + request()->query()) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                
+                <div class="row g-4">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="name" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Tên địa điểm <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $location->name) }}" required style="border-color: #e2e8f0;">
+                            @error('name') <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div> @enderror
                         </div>
                         
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="category_id" class="form-label fw-bold">Danh mục <span class="text-danger">*</span></label>
-                                <select class="form-select @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required>
-                                    @foreach($categories as $cat)
-                                        <option value="{{ $cat->id }}" {{ old('category_id', $location->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('category_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
+                        <div class="mb-3">
+                            <label for="short_description" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Mô tả ngắn</label>
+                            <textarea class="form-control form-control-sm" id="short_description" name="short_description" rows="3" style="border-color: #e2e8f0;">{{ old('short_description', $location->short_description) }}</textarea>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="lat" class="form-label fw-bold">Vĩ độ (Lat) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('lat') is-invalid @enderror" id="lat" name="lat" value="{{ old('lat', $location->lat) }}" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="lng" class="form-label fw-bold">Kinh độ (Lng) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('lng') is-invalid @enderror" id="lng" name="lng" value="{{ old('lng', $location->lng) }}" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="status" class="form-label fw-bold">Trạng thái</label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="published" {{ old('status', $location->status) == 'published' ? 'selected' : '' }}>Công khai</option>
-                                    <option value="draft" {{ old('status', $location->status) == 'draft' ? 'selected' : '' }}>Bản nháp</option>
-                                    <option value="hidden" {{ old('status', $location->status) == 'hidden' ? 'selected' : '' }}>Ẩn</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="thumbnail" class="form-label fw-bold">Ảnh đại diện (Thumbnail)</label>
-                                <input type="file" class="form-control @error('thumbnail') is-invalid @enderror" id="thumbnail" name="thumbnail" accept="image/*">
-                                @error('thumbnail') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                @if($location->thumbnail_url)
-                                    <div class="mt-2">
-                                        <small class="text-muted d-block mb-1">Ảnh đại diện hiện tại:</small>
-                                        <img src="{{ asset('storage/' . $location->thumbnail_url) }}" class="img-thumbnail" style="max-height: 120px;" alt="Thumbnail">
-                                    </div>
-                                @endif
-                            </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Địa chỉ</label>
+                            <input type="text" class="form-control form-control-sm" id="address" name="address" value="{{ old('address', $location->address) }}" style="border-color: #e2e8f0;">
                         </div>
                     </div>
+                    
+                    <div class="col-md-4 border-start" style="border-color: var(--border-light) !important;">
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Danh mục <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required style="border-color: #e2e8f0;">
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->id }}" {{ old('category_id', $location->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('category_id') <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div> @enderror
+                        </div>
 
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="{{ route('admin.locations.index', request()->query()) }}" class="btn btn-secondary">Quay lại</a>
-                        <button type="submit" class="btn btn-primary">Cập nhật Thông tin</button>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="lat" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Vĩ độ (Lat) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm @error('lat') is-invalid @enderror" id="lat" name="lat" value="{{ old('lat', $location->lat) }}" required style="border-color: #e2e8f0;">
+                            </div>
+
+                            <div class="col-6">
+                                <label for="lng" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Kinh độ (Lng) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm @error('lng') is-invalid @enderror" id="lng" name="lng" value="{{ old('lng', $location->lng) }}" required style="border-color: #e2e8f0;">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Trạng thái</label>
+                            <select class="form-select form-select-sm" id="status" name="status" style="border-color: #e2e8f0;">
+                                <option value="published" {{ old('status', $location->status) == 'published' ? 'selected' : '' }}>Công khai</option>
+                                <option value="draft" {{ old('status', $location->status) == 'draft' ? 'selected' : '' }}>Bản nháp</option>
+                                <option value="hidden" {{ old('status', $location->status) == 'hidden' ? 'selected' : '' }}>Ẩn</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="thumbnail" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Ảnh đại diện (Thumbnail)</label>
+                            <input type="file" class="form-control form-control-sm @error('thumbnail') is-invalid @enderror" id="thumbnail" name="thumbnail" accept="image/*" style="border-color: #e2e8f0;">
+                            @error('thumbnail') <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div> @enderror
+                            @if($location->thumbnail_url)
+                                <div class="mt-2">
+                                    <div class="text-muted mb-1" style="font-size: 0.725rem;">Ảnh đại diện hiện tại:</div>
+                                    <img src="{{ asset('storage/' . $location->thumbnail_url) }}" class="rounded border" style="max-height: 90px; object-fit: cover;" alt="Thumbnail">
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top" style="border-color: var(--border-light) !important;">
+                    <a href="{{ route('admin.locations.index', request()->query()) }}" class="btn-minimal text-decoration-none">Quay lại</a>
+                    <button type="submit" class="btn-minimal btn-minimal-primary">Cập nhật Thông tin</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- IMAGES TAB -->
     <div class="tab-pane fade" id="images" role="tabpanel">
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold">Upload Hình ảnh mới</h5>
-                <input type="file" id="imageUploadInput" class="d-none" multiple accept="image/*">
-                <button type="button" class="btn btn-sm btn-success" onclick="document.getElementById('imageUploadInput').click()">
-                    <i class="fas fa-upload"></i> Chọn ảnh tải lên
-                </button>
+        <div class="card-minimal mb-4">
+            <div class="p-3 border-bottom" style="border-color: var(--border-light) !important;">
+                <div class="fw-medium text-dark" style="font-size: 0.85rem;">Upload Hình ảnh mới</div>
             </div>
-            <div class="card-body bg-light" id="imagesList">
-                <div class="row g-3">
-                    @foreach($images as $img)
-                    <div class="col-md-3 col-sm-4 image-card" id="img-{{ $img->id }}">
-                        <div class="card h-100 position-relative">
-                            <img src="{{ Storage::url($img->image_url) }}" class="card-img-top object-fit-cover" height="150" alt="">
-                            <div class="position-absolute top-0 end-0 p-1">
-                                <button class="btn btn-sm btn-danger btn-delete-image" data-id="{{ $img->id }}"><i class="fas fa-trash"></i></button>
+            <div class="p-3">
+                <!-- Drag & Drop Dropzone -->
+                <div id="imageDropZone" class="border rounded p-4 text-center bg-light mb-3" onclick="document.getElementById('imageUploadInput').click()" style="border-style: dashed !important; border-color: #cbd5e1 !important; transition: all 0.2s ease; cursor: pointer;">
+                    <input type="file" id="imageUploadInput" class="d-none" multiple accept="image/*">
+                    <div class="text-muted" style="font-size: 0.825rem;">
+                        <div class="fw-medium text-dark mb-1">Kéo & thả hình ảnh vào đây hoặc bấm để chọn ảnh</div>
+                        <div style="font-size: 0.725rem;">Hỗ trợ tải lên nhiều file ảnh cùng lúc (PNG, JPG, WEBP)</div>
+                    </div>
+                </div>
+
+                <div id="imagesList">
+                    <div class="row g-3">
+                        @foreach($images as $img)
+                        <div class="col-md-3 col-sm-4 image-card" id="img-{{ $img->id }}">
+                            <div class="card-minimal h-100 position-relative p-1">
+                                <img src="{{ Storage::url($img->image_url) }}" class="rounded w-100 object-fit-cover" height="130" alt="">
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <button class="btn-minimal py-1 px-2 text-danger bg-white shadow-sm border btn-delete-image" data-id="{{ $img->id }}" style="font-size: 0.75rem;">Xóa</button>
+                                </div>
                             </div>
                         </div>
+                        @endforeach
                     </div>
-                    @endforeach
                 </div>
             </div>
         </div>
@@ -129,11 +136,11 @@
 
     <!-- PANORAMA TAB -->
     <div class="tab-pane fade" id="pano" role="tabpanel">
-        <div class="card shadow-sm border-0 mb-4 text-center p-5 bg-light">
-            <h4 class="mb-3">Bạn đã kích hoạt Trình chỉnh sửa Tour 360° nâng cao</h4>
-            <p class="text-muted">Chức năng upload 360 cơ bản đã được vô hiệu hóa. Vui lòng nhấn vào nút bên dưới để mở công cụ chỉnh sửa trực quan (thêm hotspot, liên kết ảnh, v.v.).</p>
-            <a href="{{ route('admin.locations.360_editor', $location->id) }}" class="btn btn-lg btn-warning fw-bold text-dark mx-auto mt-2 shadow">
-                <i class="fas fa-vr-cardboard"></i> Mở 360 Tour Editor
+        <div class="card-minimal text-center p-5 mb-4">
+            <h5 class="mb-2 fw-medium text-dark">Trình chỉnh sửa Tour 360° nâng cao</h5>
+            <div class="text-muted mb-3 mx-auto" style="max-width: 540px; font-size: 0.825rem;">Nhấn vào nút bên dưới để mở công cụ chỉnh sửa trực quan (thêm hotspot, liên kết ảnh, v.v.).</div>
+            <a href="{{ route('admin.locations.360_editor', $location->id) }}" class="btn-minimal btn-minimal-primary mx-auto text-decoration-none px-4 py-2" style="font-size: 0.85rem;">
+                Mở 360 Tour Editor
             </a>
         </div>
     </div>
@@ -156,106 +163,97 @@
             }
             .form-range::-webkit-slider-runnable-track {
                 width: 100%;
-                height: 6px;
+                height: 5px;
                 cursor: pointer;
-                background: #cbd5e1; /* visible slate-300 track */
+                background: #e2e8f0;
                 border-radius: 3px;
                 border: none;
             }
             .form-range::-webkit-slider-thumb {
-                height: 18px;
-                width: 18px;
+                height: 16px;
+                width: 16px;
                 border-radius: 50%;
-                background: #ffc107; /* warning yellow */
+                background: #3b82f6;
                 cursor: pointer;
                 -webkit-appearance: none;
-                margin-top: -6px; /* (6px - 18px)/2 */
-                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                margin-top: -5.5px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.15);
                 transition: transform 0.1s ease, background-color 0.1s ease;
             }
             .form-range::-webkit-slider-thumb:hover {
-                transform: scale(1.15);
-                background: #e0a800; /* slightly darker yellow */
+                transform: scale(1.1);
+                background: #2563eb;
             }
-            /* Firefox styles */
             .form-range::-moz-range-track {
                 width: 100%;
-                height: 6px;
+                height: 5px;
                 cursor: pointer;
-                background: #cbd5e1;
+                background: #e2e8f0;
                 border-radius: 3px;
                 border: none;
             }
             .form-range::-moz-range-thumb {
-                height: 18px;
-                width: 18px;
+                height: 16px;
+                width: 16px;
                 border-radius: 50%;
-                background: #ffc107;
+                background: #3b82f6;
                 cursor: pointer;
                 border: none;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.15);
                 transition: transform 0.1s ease, background-color 0.1s ease;
             }
             .form-range::-moz-range-thumb:hover {
-                transform: scale(1.15);
-                background: #e0a800;
+                transform: scale(1.1);
+                background: #2563eb;
             }
         </style>
         @if($location->audio_url)
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-bold"><i class="fas fa-volume-up text-success me-2"></i>Trình phát audio thuyết minh hiện tại</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded border {{ isset($location->attributes['tts_text']) ? 'mb-3' : '' }}">
-                        <i class="fas fa-play-circle text-success fs-3"></i>
+            <div class="card-minimal p-3 mb-4">
+                <div class="fw-medium text-dark mb-3 pb-2 border-bottom" style="font-size: 0.85rem; border-color: var(--border-light) !important;">Trình phát audio thuyết minh hiện tại</div>
+                <div>
+                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded border {{ isset($location->attributes['tts_text']) ? 'mb-3' : '' }}" style="border-color: #e2e8f0 !important;">
                         <div class="flex-grow-1">
-                            <audio controls class="w-100" style="height: 40px;" id="currentAudioPlayer">
+                            <audio controls class="w-100" style="height: 38px;" id="currentAudioPlayer">
                                 <source src="{{ asset('storage/' . $location->audio_url) }}" type="audio/mpeg">
                                 Trình duyệt không hỗ trợ thẻ audio.
                             </audio>
                         </div>
-                        <button class="btn btn-outline-danger" id="btnDeleteAudio">
-                            <i class="fas fa-trash-alt me-1"></i> Xóa audio
+                        <button class="btn-minimal py-1 px-3 text-danger" id="btnDeleteAudio" style="font-size: 0.775rem;">
+                            Xóa audio
                         </button>
                     </div>
 
                     @if(isset($location->attributes['tts_text']))
-                        <div class="p-3 bg-light rounded border border-start-0 border-end-0 border-bottom-0">
-                            <h6 class="fw-bold small text-secondary mb-2"><i class="fas fa-file-alt text-primary me-2"></i>Nội dung văn bản thuyết minh AI:</h6>
-                            <div class="text-dark bg-white p-3 rounded border" style="font-size: 13px; line-height: 1.6; border-left: 4px solid #ffc107 !important; font-style: italic; white-space: pre-wrap;">"{{ $location->attributes['tts_text'] }}"</div>
+                        <div class="p-3 bg-light rounded border" style="border-color: #e2e8f0 !important;">
+                            <div class="fw-medium text-muted mb-2" style="font-size: 0.775rem;">Nội dung văn bản thuyết minh AI:</div>
+                            <div class="text-dark bg-white p-3 rounded border" style="font-size: 0.8rem; line-height: 1.6; border-left: 3px solid #cbd5e1 !important; white-space: pre-wrap;">"{{ $location->attributes['tts_text'] }}"</div>
                         </div>
                     @endif
                 </div>
             </div>
         @else
-            <div class="alert alert-info shadow-sm border-0 mb-4 py-3">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-info-circle fs-4 me-3 text-info"></i>
-                    <div>
-                        <h6 class="mb-1 fw-bold text-dark">Chưa có audio thuyết minh</h6>
-                        <p class="mb-0 text-muted small">Hãy chọn một trong hai phương thức bên dưới để thêm âm thanh thuyết minh cho địa điểm này khi xem ở chế độ 360°.</p>
-                    </div>
-                </div>
+            <div class="p-3 rounded border mb-4 text-muted" style="border-color: #e2e8f0 !important; background: #f8fafc; font-size: 0.8rem;">
+                <div class="fw-medium text-dark mb-1">Chưa có audio thuyết minh</div>
+                <div>Chọn một trong hai phương thức bên dưới để thêm âm thanh thuyết minh cho địa điểm này khi xem ở chế độ 360°.</div>
             </div>
         @endif
 
         <div class="row g-4">
             <!-- Upload thủ công -->
             <div class="col-md-5">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="mb-0 fw-bold"><i class="fas fa-upload text-primary me-2"></i>Cách 1: Upload file thủ công</h6>
-                        <small class="text-muted">Tải lên file âm thanh thuyết minh có sẵn trên thiết bị của bạn.</small>
-                    </div>
-                    <div class="card-body d-flex flex-column justify-content-center py-4">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-file-audio text-muted display-4 mb-2"></i>
-                            <p class="text-muted small">Hỗ trợ các định dạng: MP3, WAV, OGG, M4A<br>Dung lượng tối đa: 20MB</p>
+                <div class="card-minimal p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="fw-medium text-dark mb-1" style="font-size: 0.85rem;">Cách 1: Upload file thủ công</div>
+                        <div class="text-muted mb-3" style="font-size: 0.75rem;">Tải lên file âm thanh thuyết minh có sẵn trên thiết bị của bạn.</div>
+                        <div class="text-center py-4 text-muted" style="font-size: 0.75rem;">
+                            <div>Hỗ trợ các định dạng: MP3, WAV, OGG, M4A</div>
+                            <div>Dung lượng tối đa: 20MB</div>
                         </div>
+                    </div>
+                    <div>
                         <input type="file" id="audioUploadInput" class="d-none" accept="audio/*">
-                        <button type="button" class="btn btn-outline-primary fw-bold w-100 py-2" onclick="document.getElementById('audioUploadInput').click()">
-                            <i class="fas fa-cloud-upload-alt me-1"></i> {{ $location->audio_url ? 'Đổi file audio khác' : 'Chọn file từ thiết bị' }}
+                        <button type="button" class="btn-minimal btn-minimal-primary w-100 py-2 text-center" onclick="document.getElementById('audioUploadInput').click()">
+                            {{ $location->audio_url ? 'Đổi file audio khác' : 'Chọn file từ thiết bị' }}
                         </button>
                     </div>
                 </div>
@@ -263,51 +261,51 @@
 
             <!-- Tạo bằng AI -->
             <div class="col-md-7">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="card-minimal p-3 h-100">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 pb-2 border-bottom" style="border-color: var(--border-light) !important;">
                         <div>
-                            <h6 class="mb-0 fw-bold"><i class="fas fa-robot text-warning me-2"></i>Cách 2: Tạo bằng AI Text-to-Speech (VieNeu-TTS)</h6>
-                            <small class="text-muted">Chuyển đổi văn bản tiếng Việt thành giọng nói tự động sử dụng AI.</small>
+                            <div class="fw-medium text-dark" style="font-size: 0.85rem;">Cách 2: Tạo bằng AI Text-to-Speech (VieNeu-TTS)</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">Chuyển đổi văn bản tiếng Việt thành giọng nói tự động bằng AI.</div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <span id="ttsConnectionBadge" class="badge bg-secondary py-2 px-3" style="font-size: 12px; border-radius: 20px;">
-                                <i class="fas fa-circle-notch fa-spin me-1"></i> Đang kiểm tra...
+                            <span id="ttsConnectionBadge" class="badge-minimal">
+                                Đang kiểm tra...
                             </span>
-                            <button type="button" id="btnRetryTtsConnection" class="btn btn-sm btn-outline-secondary p-1 border-0" title="Kiểm tra lại kết nối" style="line-height: 1; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-sync-alt"></i>
+                            <button type="button" id="btnRetryTtsConnection" class="btn-minimal py-0 px-2" title="Kiểm tra lại kết nối" style="font-size: 0.75rem;">
+                                Tải lại
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div>
 
                         <div class="mb-3">
-                            <label for="ttsVoiceSelect" class="form-label fw-bold small">Chọn giọng đọc (AI Voice) <span class="text-danger">*</span></label>
-                            <select id="ttsVoiceSelect" class="form-select">
+                            <label for="ttsVoiceSelect" class="form-label text-dark fw-medium" style="font-size: 0.8rem;">Chọn giọng đọc (AI Voice) <span class="text-danger">*</span></label>
+                            <select id="ttsVoiceSelect" class="form-select form-select-sm" style="border-color: #e2e8f0;">
                                 <option value="">Đang tải danh sách giọng đọc...</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="ttsTextInput" class="form-label fw-bold small">Văn bản thuyết minh <span class="text-danger">*</span></label>
-                            <textarea id="ttsTextInput" class="form-control" rows="4" placeholder="Nhập đoạn thuyết minh giới thiệu về địa danh tại đây (Tối đa 5000 ký tự)...">{{ old('tts_text', $location->attributes['tts_text'] ?? $location->short_description) }}</textarea>
-                            <div class="form-text d-flex justify-content-end">
+                            <label for="ttsTextInput" class="form-label text-dark fw-medium" style="font-size: 0.8rem;">Văn bản thuyết minh <span class="text-danger">*</span></label>
+                            <textarea id="ttsTextInput" class="form-control form-control-sm" rows="4" placeholder="Nhập đoạn thuyết minh giới thiệu tại đây (Tối đa 5000 ký tự)..." style="border-color: #e2e8f0;">{{ old('tts_text', $location->attributes['tts_text'] ?? $location->short_description) }}</textarea>
+                            <div class="form-text d-flex justify-content-end text-muted" style="font-size: 0.725rem;">
                                 <span id="ttsCharCount">0/5000</span>
                             </div>
                         </div>
 
                         <!-- Cài đặt nâng cao -->
                         <div class="mb-3">
-                            <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 border-0 px-2 py-1 bg-light text-muted w-100 justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#ttsAdvancedSettings" aria-expanded="false" aria-controls="ttsAdvancedSettings" style="border-radius: 8px;">
-                                <span class="fw-bold small"><i class="fas fa-sliders-h me-1 text-warning"></i> Cài đặt nâng cao (AI Settings)</span>
-                                <i class="fas fa-chevron-down small transition-transform" id="advancedChevron"></i>
+                            <button class="btn-minimal w-100 d-flex align-items-center justify-content-between py-1 px-2" type="button" data-bs-toggle="collapse" data-bs-target="#ttsAdvancedSettings" aria-expanded="false" aria-controls="ttsAdvancedSettings" style="font-size: 0.775rem;">
+                                <span class="fw-medium text-dark">Cài đặt nâng cao (AI Settings)</span>
+                                <span id="advancedChevron" class="transition-transform">▼</span>
                             </button>
                             <div class="collapse mt-2" id="ttsAdvancedSettings">
-                                <div class="card card-body bg-light border-0 py-3 px-3 shadow-none mb-0" style="border-radius: 8px;">
+                                <div class="p-3 bg-light rounded border border-0" style="font-size: 0.75rem;">
                                     <div class="row g-3">
                                         <!-- Cảm xúc -->
                                         <div class="col-md-6">
-                                            <label for="ttsEmotionSelect" class="form-label fw-bold mb-1 text-secondary" style="font-size: 11px;">CẢM XÚC (EMOTION)</label>
-                                            <select id="ttsEmotionSelect" class="form-select form-select-sm" style="border-radius: 6px;">
+                                            <label for="ttsEmotionSelect" class="form-label fw-medium mb-1 text-muted" style="font-size: 0.725rem;">CẢM XÚC (EMOTION)</label>
+                                            <select id="ttsEmotionSelect" class="form-select form-select-sm" style="border-color: #e2e8f0;">
                                                 <option value="natural" selected>Tự nhiên (Natural)</option>
                                                 <option value="happy">Vui vẻ (Happy)</option>
                                                 <option value="sad">Buồn bã (Sad)</option>
@@ -318,49 +316,47 @@
                                         </div>
                                         <!-- Độ ngẫu nhiên -->
                                         <div class="col-md-6">
-                                            <label for="ttsTemperatureInput" class="form-label fw-bold mb-1 text-secondary" style="font-size: 11px;">ĐỘ NGẪU NHIÊN (TEMP: <span id="ttsTemperatureVal" class="text-dark">0.8</span>)</label>
+                                            <label for="ttsTemperatureInput" class="form-label fw-medium mb-1 text-muted" style="font-size: 0.725rem;">ĐỘ NGẪU NHIÊN (TEMP: <span id="ttsTemperatureVal" class="text-dark">0.8</span>)</label>
                                             <input type="range" id="ttsTemperatureInput" class="form-range" min="0.1" max="1.5" step="0.05" value="0.8">
-                                            <small class="text-muted d-block mt-1" style="font-size: 10px; line-height: 1.2;">Thấp: giọng đều, ít lỗi. Cao: truyền cảm, tự nhiên hơn.</small>
+                                            <div class="text-muted mt-1" style="font-size: 0.675rem;">Thấp: giọng đều. Cao: truyền cảm tự nhiên.</div>
                                         </div>
                                         <!-- Top-K -->
                                         <div class="col-md-4">
-                                            <label for="ttsTopKInput" class="form-label fw-bold mb-1 text-secondary" style="font-size: 11px;">GIỚI HẠN TỪ (TOP-K: <span id="ttsTopKVal" class="text-dark">25</span>)</label>
+                                            <label for="ttsTopKInput" class="form-label fw-medium mb-1 text-muted" style="font-size: 0.725rem;">GIỚI HẠN TỪ (TOP-K: <span id="ttsTopKVal" class="text-dark">25</span>)</label>
                                             <input type="range" id="ttsTopKInput" class="form-range" min="1" max="100" step="1" value="25">
-                                            <small class="text-muted d-block mt-1" style="font-size: 10px; line-height: 1.2;">Lọc số lượng từ AI được chọn. Giúp tránh phát âm từ lạ.</small>
                                         </div>
                                         <!-- Top-P -->
                                         <div class="col-md-4">
-                                            <label for="ttsTopPInput" class="form-label fw-bold mb-1 text-secondary" style="font-size: 11px;">TỶ LỆ LỌC (TOP-P: <span id="ttsTopPVal" class="text-dark">0.95</span>)</label>
+                                            <label for="ttsTopPInput" class="form-label fw-medium mb-1 text-muted" style="font-size: 0.725rem;">TỶ LỆ LỌC (TOP-P: <span id="ttsTopPVal" class="text-dark">0.95</span>)</label>
                                             <input type="range" id="ttsTopPInput" class="form-range" min="0.1" max="1.0" step="0.05" value="0.95">
-                                            <small class="text-muted d-block mt-1" style="font-size: 10px; line-height: 1.2;">Cao: đọc trôi chảy, tự nhiên. Thấp: đọc đều và khuôn mẫu.</small>
                                         </div>
                                         <!-- Phạt lặp từ -->
                                         <div class="col-md-4">
-                                            <label for="ttsPenaltyInput" class="form-label fw-bold mb-1 text-secondary" style="font-size: 11px;">PHẠT LẶP TỪ (PENALTY: <span id="ttsPenaltyVal" class="text-dark">1.2</span>)</label>
+                                            <label for="ttsPenaltyInput" class="form-label fw-medium mb-1 text-muted" style="font-size: 0.725rem;">PHẠT LẶP TỪ (PENALTY: <span id="ttsPenaltyVal" class="text-dark">1.2</span>)</label>
                                             <input type="range" id="ttsPenaltyInput" class="form-range" min="0.5" max="2.0" step="0.05" value="1.2">
-                                            <small class="text-muted d-block mt-1" style="font-size: 10px; line-height: 1.2;">Ngăn AI lặp từ hoặc phát tiếng ồn thừa. Nên giữ 1.0 - 1.2.</small>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                         </div>
 
                         <!-- Tiến trình xử lý AI (Progress Bar) -->
-                        <div id="ttsProgressContainer" class="mb-3 d-none p-3 bg-light rounded border border-warning shadow-sm animate__animated animate__fadeIn">
-                            <div class="d-flex justify-content-between mb-1 small">
-                                <span id="ttsProgressStatus" class="fw-bold text-primary"><i class="fas fa-spinner fa-spin me-1"></i>Đang kết nối tới máy chủ AI...</span>
-                                <span id="ttsProgressPercent" class="fw-bold text-muted">0%</span>
+                        <div id="ttsProgressContainer" class="mb-3 d-none p-3 bg-light rounded border border-light">
+                            <div class="d-flex justify-content-between mb-1 small" style="font-size: 0.75rem;">
+                                <span id="ttsProgressStatus" class="fw-medium text-dark">Đang kết nối tới máy chủ AI...</span>
+                                <span id="ttsProgressPercent" class="fw-medium text-muted">0%</span>
                             </div>
-                            <div class="progress" style="height: 10px; border-radius: 5px;">
-                                <div id="ttsProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress" style="height: 6px; border-radius: 3px;">
+                                <div id="ttsProgressBar" class="progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                            <div class="mt-1 text-muted" style="font-size: 11px;">
+                            <div class="mt-1 text-muted" style="font-size: 0.7rem;">
                                 <span id="ttsProgressTimer">Đã chạy: 0.0s</span>
                             </div>
                         </div>
 
-                        <button type="button" id="btnGenerateTts" class="btn btn-warning fw-bold text-dark w-100 py-2">
+                        <button type="button" id="btnGenerateTts" class="btn-minimal btn-minimal-primary w-100 py-2">
                             <span class="spinner-border spinner-border-sm me-1 d-none" role="status" id="ttsSpinner" aria-hidden="true"></span>
-                            <i class="fas fa-robot me-1" id="ttsRobotIcon"></i>
+                            <span id="ttsRobotIcon"></span>
                             Tạo âm thanh thuyết minh AI
                         </button>
                     </div>
@@ -390,11 +386,31 @@
         }
     });
 
-    // Upload Image
+    // Upload Image Drag & Drop
+    let dropZone = $('#imageDropZone');
+    dropZone.on('dragover dragenter', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.css({'border-color': '#3b82f6', 'background-color': '#eff6ff'});
+    });
+    dropZone.on('dragleave dragend drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.css({'border-color': '#cbd5e1', 'background-color': '#f8fafc'});
+    });
+    dropZone.on('drop', function(e) {
+        let files = e.originalEvent.dataTransfer.files;
+        if(files && files.length > 0) {
+            handleImageFiles(files);
+        }
+    });
+
     $('#imageUploadInput').change(function() {
-        let files = this.files;
+        handleImageFiles(this.files);
+    });
+
+    function handleImageFiles(files) {
         if(files.length === 0) return;
-        
         for(let i=0; i<files.length; i++) {
             let formData = new FormData();
             formData.append('file', files[i]);
@@ -409,10 +425,10 @@
                     if(response.success) {
                         let html = `
                             <div class="col-md-3 col-sm-4 image-card" id="img-${response.image.id}">
-                                <div class="card h-100 position-relative">
-                                    <img src="${response.url}" class="card-img-top object-fit-cover" height="150" alt="">
-                                    <div class="position-absolute top-0 end-0 p-1">
-                                        <button class="btn btn-sm btn-danger btn-delete-image" data-id="${response.image.id}"><i class="fas fa-trash"></i></button>
+                                <div class="card-minimal h-100 position-relative p-1">
+                                    <img src="${response.url}" class="rounded w-100 object-fit-cover" height="130" alt="">
+                                    <div class="position-absolute top-0 end-0 p-2">
+                                        <button class="btn-minimal py-1 px-2 text-danger bg-white shadow-sm border btn-delete-image" data-id="${response.image.id}" style="font-size: 0.75rem;">Xóa</button>
                                     </div>
                                 </div>
                             </div>
@@ -422,7 +438,7 @@
                 }
             });
         }
-    });
+    }
 
     // Delete Image
     $(document).on('click', '.btn-delete-image', function() {

@@ -1,73 +1,41 @@
 @extends('admin.layouts.app')
 @section('title', 'Quản lý Sự kiện')
 @section('actions')
-<a href="{{ route('admin.events.create') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm sự kiện</a>
+<a href="{{ route('admin.events.create') }}" class="btn-minimal btn-minimal-primary">Thêm sự kiện</a>
 @endsection
 
-@push('styles')
-<style>
-.ev-filters{background:linear-gradient(135deg,#f8f9fc,#eef1f8);border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #e2e8f0}
-.ev-card{border:none;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;transition:box-shadow .3s}
-.ev-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.1)}
-.ev-thumb{width:100px;height:70px;object-fit:cover;border-radius:8px;flex-shrink:0}
-.ev-thumb-ph{width:100px;height:70px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px;color:#94a3b8}
-.badge-st-active{background:linear-gradient(135deg,#10b981,#059669)}
-.badge-st-cancelled{background:linear-gradient(135deg,#ef4444,#dc2626)}
-.badge-st-expired{background:linear-gradient(135deg,#94a3b8,#64748b)}
-.badge-st-hidden{background:linear-gradient(135deg,#f59e0b,#d97706)}
-.stat-card{border:none;border-radius:12px;padding:16px 20px;color:#fff;position:relative;overflow:hidden}
-.stat-card::after{content:'';position:absolute;top:-15px;right:-15px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.15)}
-.stat-card .stat-number{font-size:1.6rem;font-weight:700}
-.stat-card .stat-label{font-size:.8rem;opacity:.85}
-.action-btn{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;transition:all .2s;border:1px solid transparent}
-.action-btn:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,.15)}
-.table thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0}
-.ev-name{font-weight:600;color:#1e293b;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-.ev-loc{font-size:.82rem;color:#94a3b8;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-.featured-star{color:#f59e0b;font-size:.9rem}
-</style>
-@endpush
-
 @section('content')
-{{-- Stats --}}
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="stat-card" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
-            <div class="stat-number">{{ \App\Models\Event::count() }}</div>
-            <div class="stat-label"><i class="fas fa-calendar-alt me-1"></i>Tổng sự kiện</div>
+<!-- Horizontal Metric Strip -->
+<div class="metric-strip mb-3">
+    <div class="row g-0 align-items-center">
+        <div class="col-6 col-md-3 metric-item">
+            <div class="metric-label">Tổng sự kiện</div>
+            <div class="metric-value">{{ \App\Models\Event::count() }}</div>
         </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card" style="background:linear-gradient(135deg,#10b981,#047857)">
-            <div class="stat-number">{{ \App\Models\Event::where('status','active')->count() }}</div>
-            <div class="stat-label"><i class="fas fa-check-circle me-1"></i>Đang diễn ra</div>
+        <div class="col-6 col-md-3 metric-item">
+            <div class="metric-label">Đang diễn ra</div>
+            <div class="metric-value">{{ \App\Models\Event::where('status','active')->count() }}</div>
         </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#b45309)">
-            <div class="stat-number">{{ \App\Models\Event::where('is_featured',true)->count() }}</div>
-            <div class="stat-label"><i class="fas fa-star me-1"></i>Nổi bật</div>
+        <div class="col-6 col-md-3 metric-item mt-3 mt-md-0">
+            <div class="metric-label">Nổi bật</div>
+            <div class="metric-value">{{ \App\Models\Event::where('is_featured',true)->count() }}</div>
         </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card" style="background:linear-gradient(135deg,#ef4444,#b91c1c)">
-            <div class="stat-number">{{ \App\Models\Event::where('start_time','>=',now())->count() }}</div>
-            <div class="stat-label"><i class="fas fa-clock me-1"></i>Sắp diễn ra</div>
+        <div class="col-6 col-md-3 metric-item mt-3 mt-md-0">
+            <div class="metric-label">Sắp diễn ra</div>
+            <div class="metric-value">{{ \App\Models\Event::where('start_time','>=',now())->count() }}</div>
         </div>
     </div>
 </div>
 
-{{-- Filters --}}
-<div class="ev-filters">
-    <form method="GET" action="{{ route('admin.events.index') }}" class="row g-2 align-items-end">
+<!-- Filters Minimalist -->
+<div class="card-minimal mb-3 p-3">
+    <form method="GET" action="{{ route('admin.events.index') }}" class="row g-2 align-items-center">
         <div class="col-md-5">
-            <label class="form-label fw-semibold mb-1" style="font-size:.82rem"><i class="fas fa-search me-1"></i>Tìm kiếm</label>
-            <input type="text" name="search" class="form-control" placeholder="Tên sự kiện, mô tả..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control form-control-sm" placeholder="Tên sự kiện, mô tả..." value="{{ request('search') }}" style="border-color: #e2e8f0;">
         </div>
         <div class="col-md-3">
-            <label class="form-label fw-semibold mb-1" style="font-size:.82rem">Trạng thái</label>
-            <select name="status" class="form-select">
-                <option value="">Tất cả</option>
+            <select name="status" class="form-select form-select-sm" style="border-color: #e2e8f0;">
+                <option value="">-- Tất cả trạng thái --</option>
                 <option value="active" {{ request('status')=='active'?'selected':'' }}>Đang diễn ra</option>
                 <option value="cancelled" {{ request('status')=='cancelled'?'selected':'' }}>Đã hủy</option>
                 <option value="expired" {{ request('status')=='expired'?'selected':'' }}>Đã kết thúc</option>
@@ -75,84 +43,96 @@
             </select>
         </div>
         <div class="col-md-4 d-flex gap-2">
-            <button type="submit" class="btn btn-primary flex-grow-1"><i class="fas fa-filter me-1"></i>Lọc</button>
-            <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></a>
+            <button type="submit" class="btn-minimal btn-minimal-primary flex-fill">Lọc</button>
+            <a href="{{ route('admin.events.index') }}" class="btn-minimal text-decoration-none px-3 text-center">Làm mới</a>
         </div>
     </form>
 </div>
 
-{{-- Table --}}
-<div class="ev-card card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
-                <thead>
-                    <tr>
-                        <th width="50" class="text-center ps-3">ID</th>
-                        <th width="110">Ảnh</th>
-                        <th>Tên sự kiện</th>
-                        <th width="140">Thời gian</th>
-                        <th width="100" class="text-center">Trạng thái</th>
-                        <th width="50" class="text-center">⭐</th>
-                        <th width="110">Người tạo</th>
-                        <th width="140" class="text-center pe-3">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($events as $ev)
-                    <tr>
-                        <td class="text-center ps-3 fw-semibold text-muted">{{ $ev->id }}</td>
-                        <td>
-                            @if($ev->featured_image)
-                                <img src="{{ asset('storage/' . $ev->featured_image) }}" class="ev-thumb">
-                            @else
-                                <div class="ev-thumb-ph bg-light"><i class="fas fa-calendar-day"></i></div>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="ev-name">{{ $ev->name }}</div>
-                            <div class="ev-loc"><i class="fas fa-map-pin me-1"></i>{{ $ev->location_text ?? ($ev->location->name ?? '—') }}</div>
-                        </td>
-                        <td>
-                            <div style="font-size:.82rem"><i class="fas fa-play text-success me-1"></i>{{ $ev->start_time->format('d/m/Y H:i') }}</div>
-                            <div style="font-size:.82rem"><i class="fas fa-stop text-danger me-1"></i>{{ $ev->end_time->format('d/m/Y H:i') }}</div>
-                        </td>
-                        <td class="text-center"><span class="badge badge-st-{{ $ev->status }}">{{ $ev->status_label }}</span></td>
-                        <td class="text-center">
-                            @if($ev->is_featured)<i class="fas fa-star featured-star"></i>@else<span class="text-muted">—</span>@endif
-                        </td>
-                        <td><span class="text-muted" style="font-size:.85rem">{{ $ev->creator->display_name ?? $ev->creator->username ?? '—' }}</span></td>
-                        <td class="text-center pe-3">
-                            <div class="d-flex gap-1 justify-content-center">
-                                <a href="{{ route('admin.events.edit', $ev->id) }}" class="action-btn btn btn-sm btn-outline-primary" title="Sửa"><i class="fas fa-edit" style="font-size:.8rem"></i></a>
-                                <form action="{{ route('admin.events.toggle', $ev->id) }}" method="POST" class="d-inline">@csrf @method('PATCH')
-                                    <button class="action-btn btn btn-sm {{ $ev->status==='active'?'btn-outline-warning':'btn-outline-success' }}" title="{{ $ev->status==='active'?'Ẩn':'Hiện' }}">
-                                        <i class="fas {{ $ev->status==='active'?'fa-eye-slash':'fa-eye' }}" style="font-size:.8rem"></i>
-                                    </button>
-                                </form>
-                                <form action="{{ route('admin.events.destroy', $ev->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xóa sự kiện này?')">@csrf @method('DELETE')
-                                    <button class="action-btn btn btn-sm btn-outline-danger" title="Xóa"><i class="fas fa-trash" style="font-size:.8rem"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <div class="text-muted">
-                                <i class="fas fa-calendar-times fa-3x mb-3 d-block" style="opacity:.3"></i>
-                                <p class="mb-2 fw-semibold">Chưa có sự kiện nào</p>
-                                <a href="{{ route('admin.events.create') }}" class="btn btn-sm btn-primary"><i class="fas fa-plus me-1"></i>Thêm sự kiện</a>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+<!-- Table Minimalist -->
+<div class="card-minimal">
+    <div class="table-responsive">
+        <table class="table table-minimal align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 50px;">ID</th>
+                    <th style="width: 60px;">Ảnh</th>
+                    <th>Tên sự kiện</th>
+                    <th>Thời gian</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Nổi bật</th>
+                    <th>Người tạo</th>
+                    <th class="text-end pe-4">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($events as $ev)
+                <tr>
+                    <td class="text-center text-muted" style="font-size: 0.775rem;">{{ $ev->id }}</td>
+                    <td>
+                        @if($ev->featured_image)
+                            <img src="{{ asset('storage/' . $ev->featured_image) }}" class="rounded" style="width: 48px; height: 32px; object-fit: cover;">
+                        @else
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center text-muted" style="width: 48px; height: 32px; font-size: 0.65rem;">No Img</div>
+                        @endif
+                    </td>
+                    <td>
+                        <div class="fw-medium text-dark" style="font-size: 0.825rem; max-width: 260px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ $ev->name }}</div>
+                        <div class="text-muted" style="font-size: 0.725rem; max-width: 260px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ $ev->location_text ?? ($ev->location->name ?? '—') }}</div>
+                    </td>
+                    <td>
+                        <div style="font-size: 0.75rem;" class="text-muted">{{ $ev->start_time->format('d/m/Y H:i') }}</div>
+                        <div style="font-size: 0.75rem;" class="text-muted">{{ $ev->end_time->format('d/m/Y H:i') }}</div>
+                    </td>
+                    <td class="text-center">
+                        @if($ev->status == 'active')
+                            <span class="badge-minimal badge-minimal-success">Đang diễn ra</span>
+                        @elseif($ev->status == 'expired')
+                            <span class="badge-minimal">Kết thúc</span>
+                        @elseif($ev->status == 'cancelled')
+                            <span class="badge-minimal" style="background: #fef2f2; color: #991b1b;">Đã hủy</span>
+                        @else
+                            <span class="badge-minimal">{{ $ev->status_label }}</span>
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        @if($ev->is_featured)
+                            <span class="badge-minimal" style="background: #fffbeb; color: #b45309;">Có</span>
+                        @else
+                            <span class="text-muted" style="font-size: 0.75rem;">—</span>
+                        @endif
+                    </td>
+                    <td>
+                        <span class="text-muted" style="font-size: 0.775rem;">{{ $ev->creator->display_name ?? $ev->creator->username ?? '—' }}</span>
+                    </td>
+                    <td class="text-end pe-4">
+                        <a href="{{ route('admin.events.edit', $ev->id) }}" class="btn-minimal py-1 px-2 text-decoration-none me-1" style="font-size: 0.75rem;">Sửa</a>
+                        <form action="{{ route('admin.events.toggle', $ev->id) }}" method="POST" class="d-inline me-1">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn-minimal py-1 px-2" style="font-size: 0.75rem;">
+                                {{ $ev->status === 'active' ? 'Ẩn' : 'Hiện' }}
+                            </button>
+                        </form>
+                        <form action="{{ route('admin.events.destroy', $ev->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xóa sự kiện này?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size: 0.75rem;">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">Chưa có sự kiện nào.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
     @if($events->hasPages())
-    <div class="card-footer bg-white border-top">{{ $events->links() }}</div>
+    <div class="p-3 border-top" style="border-color: var(--border-light) !important;">
+        {{ $events->links() }}
+    </div>
     @endif
 </div>
 @endsection

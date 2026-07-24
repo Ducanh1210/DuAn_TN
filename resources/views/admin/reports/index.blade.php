@@ -3,99 +3,93 @@
 @section('title', 'Quản lý Báo cáo vi phạm')
 
 @section('content')
-<div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Danh sách Báo cáo vi phạm</h6>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-light">
+<div class="card-minimal">
+    <div class="table-responsive">
+        <table class="table table-minimal align-middle">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 50px;">ID</th>
+                    <th>Người báo cáo</th>
+                    <th>Đối tượng</th>
+                    <th>Lý do</th>
+                    <th>Chi tiết</th>
+                    <th>Ngày gửi</th>
+                    <th>Trạng thái</th>
+                    <th class="text-end pe-4">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($reports as $report)
                     <tr>
-                        <th width="50">ID</th>
-                        <th>Người báo cáo</th>
-                        <th>Đối tượng bị báo cáo</th>
-                        <th>Lý do</th>
-                        <th>Chi tiết</th>
-                        <th width="120">Ngày gửi</th>
-                        <th width="150">Trạng thái</th>
-                        <th width="150">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($reports as $report)
-                        <tr>
-                            <td>{{ $report->id }}</td>
-                            <td>
-                                <strong>{{ $report->reporter->display_name ?? ($report->reporter->username ?? 'Unknown') }}</strong>
-                            </td>
-                            <td>
-                                @if($report->reportable)
-                                    @if(class_basename($report->reportable_type) === 'Comment')
-                                        <span class="badge bg-info">Bình luận</span><br>
-                                        <small>{{ Str::limit($report->reportable->content, 50) }}</small>
-                                    @elseif(class_basename($report->reportable_type) === 'Location')
-                                        <span class="badge bg-primary">Địa điểm</span><br>
-                                        <small>{{ $report->reportable->name }}</small>
-                                    @elseif(class_basename($report->reportable_type) === 'User')
-                                        <span class="badge bg-warning text-dark">Người dùng</span><br>
-                                        <small>{{ $report->reportable->display_name }}</small>
-                                    @else
-                                        <span class="badge bg-secondary">{{ class_basename($report->reportable_type) }}</span>
-                                    @endif
+                        <td class="text-center text-muted" style="font-size: 0.775rem;">{{ $report->id }}</td>
+                        <td>
+                            <div class="fw-medium text-dark" style="font-size: 0.825rem;">{{ $report->reporter->display_name ?? ($report->reporter->username ?? 'Unknown') }}</div>
+                        </td>
+                        <td>
+                            @if($report->reportable)
+                                @if(class_basename($report->reportable_type) === 'Comment')
+                                    <span class="badge-minimal me-1">Bình luận</span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">{{ Str::limit($report->reportable->content, 35) }}</span>
+                                @elseif(class_basename($report->reportable_type) === 'Location')
+                                    <span class="badge-minimal me-1" style="background: #eff6ff; color: #1d4ed8;">Địa điểm</span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">{{ $report->reportable->name }}</span>
+                                @elseif(class_basename($report->reportable_type) === 'User')
+                                    <span class="badge-minimal me-1" style="background: #fef3c7; color: #92400e;">User</span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">{{ $report->reportable->display_name }}</span>
                                 @else
-                                    <span class="text-danger">Đã bị xóa</span>
+                                    <span class="badge-minimal">{{ class_basename($report->reportable_type) }}</span>
                                 @endif
-                            </td>
-                            <td>
-                                <strong>{{ $report->reason }}</strong>
-                            </td>
-                            <td>
-                                {{ $report->description ?? 'Không có' }}
-                            </td>
-                            <td>
-                                <small>{{ $report->created_at->format('d/m/Y H:i') }}</small>
-                            </td>
-                            <td>
-                                <form action="{{ route('admin.reports.update_status', $report->id) }}" method="POST">
+                            @else
+                                <span class="text-danger" style="font-size: 0.75rem;">Đã bị xóa</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="fw-medium text-secondary" style="font-size: 0.8rem;">{{ $report->reason }}</div>
+                        </td>
+                        <td>
+                            <div class="text-muted" style="font-size: 0.75rem;">{{ $report->description ?? 'Không có' }}</div>
+                        </td>
+                        <td class="text-muted" style="font-size: 0.75rem;">
+                            {{ $report->created_at->format('d/m/Y H:i') }}
+                        </td>
+                        <td>
+                            <form action="{{ route('admin.reports.update_status', $report->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-color: #e2e8f0;">
+                                    <option value="pending" {{ $report->status === 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
+                                    <option value="resolved" {{ $report->status === 'resolved' ? 'selected' : '' }}>Đã xử lý</option>
+                                    <option value="rejected" {{ $report->status === 'rejected' ? 'selected' : '' }}>Từ chối</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td class="text-end pe-4">
+                            @if($report->reportable && $report->status === 'pending')
+                                <form action="{{ route('admin.reports.delete_content', $report->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn XÓA nội dung vi phạm này?');">
                                     @csrf
-                                    @method('PATCH')
-                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                        <option value="pending" {{ $report->status === 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
-                                        <option value="resolved" {{ $report->status === 'resolved' ? 'selected' : '' }}>Đã xử lý</option>
-                                        <option value="rejected" {{ $report->status === 'rejected' ? 'selected' : '' }}>Từ chối</option>
-                                    </select>
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size: 0.75rem;">
+                                        Xóa vi phạm
+                                    </button>
                                 </form>
-                                @if($report->handled_by)
-                                    <small class="text-muted d-block mt-1">Bởi: {{ $report->handler->display_name ?? 'Admin' }}</small>
-                                @endif
-                            </td>
-                            <td>
-                                @if($report->reportable && $report->status === 'pending')
-                                    <form action="{{ route('admin.reports.delete_content', $report->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn XÓA nội dung vi phạm này? (Sẽ đánh dấu báo cáo là Đã xử lý)');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger w-100" title="Xóa nội dung vi phạm">
-                                            <i class="fas fa-trash"></i> Xóa vi phạm
-                                        </button>
-                                    </form>
-                                @else
-                                    <button class="btn btn-sm btn-secondary w-100" disabled>Không thể xóa</button>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">Chưa có báo cáo nào.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="d-flex justify-content-center mt-3">
-            {{ $reports->links('pagination::bootstrap-5') }}
-        </div>
+                            @else
+                                <span class="text-muted" style="font-size: 0.75rem;">—</span>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">Chưa có báo cáo nào.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
+    
+    @if($reports->hasPages())
+    <div class="p-3 border-top" style="border-color: var(--border-light) !important;">
+        {{ $reports->links('pagination::bootstrap-5') }}
+    </div>
+    @endif
 </div>
 @endsection

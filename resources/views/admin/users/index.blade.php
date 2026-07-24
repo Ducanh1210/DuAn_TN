@@ -3,87 +3,95 @@
 @section('title', 'Quản lý Người dùng')
 
 @section('actions')
-    <a href="{{ route('admin.users.create') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm Người dùng</a>
+    <a href="{{ route('admin.users.create') }}" class="btn-minimal btn-minimal-primary">Thêm tài khoản</a>
 @endsection
 
 @section('content')
-<div class="card shadow mb-4">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-light">
+<div class="card-minimal">
+    <div class="table-responsive">
+        <table class="table table-minimal align-middle">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 50px;">ID</th>
+                    <th style="width: 50px;">Avatar</th>
+                    <th>Tên hiển thị</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Xu</th>
+                    <th>Vai trò</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-end pe-4">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($users as $user)
                     <tr>
-                        <th width="50">ID</th>
-                        <th width="80">Avatar</th>
-                        <th>Tên hiển thị</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Xu</th>
-                        <th>Vai trò</th>
-                        <th>Trạng thái</th>
-                        <th width="150">Hành động</th>
+                        <td class="text-center text-muted" style="font-size: 0.775rem;">{{ $user->id }}</td>
+                        <td>
+                            <x-user-avatar :user="$user" size="32" />
+                        </td>
+                        <td>
+                            <div class="fw-medium text-dark" style="font-size: 0.825rem;">{{ $user->display_name }}</div>
+                        </td>
+                        <td>
+                            <span class="text-muted" style="font-size: 0.775rem;">{{ $user->username }}</span>
+                        </td>
+                        <td>
+                            <span class="text-secondary" style="font-size: 0.775rem;">{{ $user->email }}</span>
+                        </td>
+                        <td>
+                            <span class="fw-medium text-primary" style="font-size: 0.8rem;">{{ $user->points }}</span>
+                        </td>
+                        <td>
+                            @if($user->role == 'admin')
+                                <span class="badge-minimal" style="background: #f5f3ff; color: #5b21b6; border: 1px solid #ede9fe;">Admin</span>
+                            @elseif($user->role == 'moderator')
+                                <span class="badge-minimal" style="background: #fffbeb; color: #b45309; border: 1px solid #fef3c7;">Mod</span>
+                            @else
+                                <span class="badge-minimal">User</span>
+                            @endif
+                        </td>
+                        <td class="text-center">
+                            @if($user->status == 'active')
+                                <span class="badge-minimal badge-minimal-success">Hoạt động</span>
+                            @elseif($user->status == 'inactive')
+                                <span class="badge-minimal">Chưa kích hoạt</span>
+                            @else
+                                <span class="badge-minimal" style="background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2;">Bị khóa</span>
+                            @endif
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{{ route('admin.users.show', $user->id) }}" class="btn-minimal py-1 px-2 text-decoration-none me-1" style="font-size: 0.75rem;">Xem</a>
+                            @if(auth()->id() != $user->id)
+                                @if($user->status == 'banned')
+                                    <form action="{{ route('admin.users.toggle_status', $user->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn-minimal py-1 px-2 text-success" style="font-size: 0.75rem;">Mở</button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('admin.users.toggle_status', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn khóa tài khoản này?');">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size: 0.75rem;">Khóa</button>
+                                    </form>
+                                @endif
+                            @endif
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @forelse($users as $user)
-                        <tr>
-                            <td>{{ $user->id }}</td>
-                            <td>
-                                <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';" alt="Avatar" class="img-thumbnail rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
-                            </td>
-                            <td><strong>{{ $user->display_name }}</strong></td>
-                            <td>{{ $user->username }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td><strong class="text-primary">{{ $user->points }}</strong></td>
-                            <td>
-                                @if($user->role == 'admin')
-                                    <span class="badge bg-danger">Admin</span>
-                                @elseif($user->role == 'moderator')
-                                    <span class="badge bg-warning text-dark">Moderator</span>
-                                @else
-                                    <span class="badge bg-info">User</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($user->status == 'active')
-                                    <span class="badge bg-success">Hoạt động</span>
-                                @elseif($user->status == 'inactive')
-                                    <span class="badge bg-secondary">Chưa kích hoạt</span>
-                                @else
-                                    <span class="badge bg-dark">Bị khóa</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-sm btn-info text-white" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
-                                @if(auth()->id() != $user->id)
-                                    @if($user->status == 'banned')
-                                        <form action="{{ route('admin.users.toggle_status', $user->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-success" title="Mở khóa"><i class="fas fa-unlock"></i></button>
-                                        </form>
-                                    @else
-                                        <form action="{{ route('admin.users.toggle_status', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn khóa tài khoản này?');">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="Khóa"><i class="fas fa-lock"></i></button>
-                                        </form>
-                                    @endif
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">Chưa có người dùng nào.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="d-flex justify-content-center mt-3">
-            {{ $users->links('pagination::bootstrap-5') }}
-        </div>
+                @empty
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">Chưa có người dùng nào.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
+    
+    @if($users->hasPages())
+    <div class="p-3 border-top" style="border-color: var(--border-light) !important;">
+        {{ $users->links('pagination::bootstrap-5') }}
+    </div>
+    @endif
 </div>
 @endsection

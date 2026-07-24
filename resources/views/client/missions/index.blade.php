@@ -1,6 +1,6 @@
 @extends('client.layouts.app')
 
-@section('title', 'Trung Tâm Nhiệm Vụ & Đổi Thưởng - Hà Nam POI')
+@section('title', 'Trung Tâm Nhiệm Vụ & Đổi Thưởng - Ninh Bình POI')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
@@ -8,11 +8,11 @@
     :root {
         --q-bg: #f8fafc;
         --q-card-bg: #ffffff;
-        --q-primary: #0284c7;
-        --q-primary-hover: #0369a1;
-        --q-primary-light: #e0f2fe;
+        --q-primary: #1e3a5f;
+        --q-primary-hover: #2b4c7e;
+        --q-primary-light: #f1f5f9;
         --q-accent-orange: #f59e0b;
-        --q-text-main: #0f172a;
+        --q-text-main: #0f2442;
         --q-text-sub: #64748b;
         --q-border: #e2e8f0;
     footer {
@@ -233,7 +233,7 @@
 
     .reward-brand-icon {
         font-size: 1.8rem;
-        color: #0284c7;
+        color: #1e3a5f;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -278,13 +278,13 @@
     }
 
     .reward-top-menu .nav-link:hover {
-        color: #0284c7 !important;
+        color: #1e3a5f !important;
     }
 
     .reward-top-menu .nav-link.active {
-        color: #0284c7 !important;
+        color: #1e3a5f !important;
         font-weight: 700 !important;
-        border-bottom: 3px solid #0284c7 !important;
+        border-bottom: 3px solid #1e3a5f !important;
     }
 
     .user-point-capsule {
@@ -347,20 +347,20 @@
     }
 
     .reward-cat-btn:hover {
-        background: #f8fafc !important;
-        color: #0284c7 !important;
+        background: #f1f5f9 !important;
+        color: #1e3a5f !important;
     }
 
     .reward-cat-btn.active {
-        background: #f0f9ff !important;
-        color: #0284c7 !important;
+        background: #f1f5f9 !important;
+        color: #1e3a5f !important;
         font-weight: 700 !important;
         box-shadow: none !important;
     }
 
     .reward-cat-btn.active i,
     .reward-cat-btn.active span {
-        color: #0284c7 !important;
+        color: #1e3a5f !important;
     }
 
     /* Hero Banner (Shop Tab) */
@@ -501,7 +501,7 @@
     }
 
     .btn-action-compact {
-        background: #0284c7;
+        background: #1e3a5f;
         color: #ffffff;
         font-weight: 700;
         font-size: 0.78rem;
@@ -514,12 +514,12 @@
     }
 
     .btn-action-compact:hover {
-        background: #0369a1;
+        background: #2b4c7e;
         color: #ffffff;
     }
 
     .btn-indigo {
-        background: #0284c7 !important;
+        background: #1e3a5f !important;
         border: none !important;
         color: #ffffff !important;
         font-weight: 700 !important;
@@ -529,18 +529,18 @@
     }
 
     .btn-indigo:hover {
-        background: #0369a1 !important;
+        background: #2b4c7e !important;
         box-shadow: none !important;
         color: #ffffff !important;
     }
 
     .text-indigo {
-        color: #0284c7 !important;
+        color: #1e3a5f !important;
     }
 
     .btn-outline-compact {
-        border: 1px solid #0284c7;
-        color: #0284c7;
+        border: 1px solid #1e3a5f;
+        color: #1e3a5f;
         background: #ffffff;
         font-weight: 700;
         font-size: 0.8rem;
@@ -551,7 +551,7 @@
     }
 
     .btn-outline-compact:hover {
-        background: #0284c7;
+        background: #1e3a5f;
         color: #ffffff;
     }
 
@@ -577,10 +577,10 @@
     }
 
     .quest-filter-pill.active {
-        background: #0f172a;
+        background: #1e3a5f;
         color: #ffffff;
         font-weight: 700;
-        border-color: #0f172a;
+        border-color: #1e3a5f;
         box-shadow: none;
     }
 
@@ -619,7 +619,7 @@
     .bg-icon-blue,
     .bg-icon-orange {
         background: #f8fafc;
-        color: #0284c7;
+        color: #1e3a5f;
         border: 1px solid #e2e8f0;
     }
 
@@ -629,7 +629,7 @@
         right: 14px;
         font-size: 0.78rem;
         font-weight: 700;
-        color: #0284c7;
+        color: #1e3a5f;
         background: transparent;
         border: none;
         padding: 0;
@@ -637,22 +637,22 @@
 
     .btn-quest-action {
         background: #ffffff;
-        color: #0284c7;
+        color: #1e3a5f;
         font-weight: 700;
         font-size: 0.78rem;
         border-radius: 8px;
         padding: 5px 14px;
-        border: 1px solid #0284c7;
+        border: 1px solid #1e3a5f;
         transition: all 0.2s ease;
     }
 
     .btn-quest-action:hover {
-        background: #0284c7;
+        background: #1e3a5f;
         color: #ffffff;
     }
 
     .btn-quest-claim {
-        background: #0284c7;
+        background: #1e3a5f;
         color: #ffffff;
         font-weight: 700;
         font-size: 0.8rem;
@@ -663,7 +663,7 @@
     }
 
     .btn-quest-claim:hover {
-        background: #0369a1;
+        background: #2b4c7e;
         color: #ffffff;
     }
 
@@ -694,19 +694,19 @@
     }
 
     .streak-day-box.current {
-        border: 1.5px solid #0284c7 !important;
+        border: 1.5px solid #1e3a5f !important;
         background: #ffffff !important;
         box-shadow: none !important;
     }
 
     .streak-day-box.special-day {
-        background: #f0f9ff !important;
-        border: 1px solid #bae6fd !important;
-        color: #0284c7 !important;
+        background: #f1f5f9 !important;
+        border: 1px solid #cbdbe8 !important;
+        color: #1e3a5f !important;
     }
 
     .streak-day-box.special-day .special-day-title {
-        color: #0284c7 !important;
+        color: #1e3a5f !important;
         font-weight: 700 !important;
     }
 

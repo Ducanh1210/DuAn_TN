@@ -30,10 +30,10 @@
 
     <style>
         :root {
-            --primary: #0072FF;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --primary: #1e3a5f;
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 4px 20px 0 rgba(15, 23, 42, 0.08);
             --region-line: #7ba7d4;
             --region-dim: #94a3b8;
         }
@@ -1197,9 +1197,9 @@
         }
 
         .featured-loc-card:hover {
-            transform: translateY(-3px);
-            border-color: #334155;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
+            transform: translateY(-1px);
+            border-color: rgba(30, 58, 95, 0.4);
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
         }
 
         .featured-loc-img {
@@ -1210,7 +1210,7 @@
         }
 
         .featured-loc-card:hover .featured-loc-img {
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
         .featured-loc-badge {
@@ -1248,12 +1248,41 @@
         }
 
         .featured-loc-title {
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        /* Home Page White-Space & Sizing Enhancements */
+        .featured-loc-card {
+            width: 205px !important;
+            height: 115px !important;
+            border-radius: 4px !important;
+        }
+        .featured-loc-badge {
+            white-space: nowrap !important;
+            background: rgba(15, 36, 66, 0.8) !important;
+            border-radius: 3px !important;
+        }
+        .news-dropdown-banner .banner-title {
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            font-weight: 600 !important;
+            font-size: 0.775rem !important;
+            color: #ffffff !important;
+        }
+        .news-dropdown-banner .banner-meta {
+            white-space: nowrap !important;
+        }
+        .msb-news-text {
+            max-width: 140px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }
 
         .weather-main {
@@ -1695,15 +1724,13 @@
             position: relative;
             width: 260px;
             height: 100%;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35), rgba(241, 245, 249, 0.42)), url('{{ asset('images/nen03.png') }}') no-repeat center center / cover;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
             display: flex;
             flex-direction: column;
-            /* overflow: hidden removed to allow tooltips to show */
-            border-right: none;
-            /* Removed to seamlessly merge with toggle tab */
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
             transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             pointer-events: auto;
         }
@@ -1830,26 +1857,30 @@
 
         .user-sidebar .sidebar-menu li {
             margin-bottom: 4px;
-            padding: 0 6px;
+            padding: 0;
         }
 
         .user-sidebar .menu-item {
             display: flex;
             align-items: center;
-            padding: 8px 6px;
+            padding: 8px 12px;
             color: #475569;
             text-decoration: none;
             transition: background 0.2s, color 0.2s;
             white-space: nowrap;
-            border-radius: 8px;
+            border-radius: 0;
             position: relative;
             width: 100%;
+            box-sizing: border-box;
         }
 
         .user-sidebar .menu-item:hover,
         .user-sidebar .menu-item.active {
-            background: #f1f5f9;
-            color: #0284c7;
+            background: rgba(255, 255, 255, 0.45);
+            color: #1e3a5f;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: none;
         }
 
         .user-sidebar .menu-item.active::before {
@@ -1860,7 +1891,7 @@
             transform: translateY(-50%);
             height: 16px;
             width: 3px;
-            background: #0284c7;
+            background: #1e3a5f;
             border-radius: 0 3px 3px 0;
         }
 
@@ -1880,7 +1911,7 @@
 
         .user-sidebar .menu-item:hover .menu-icon .material-symbols-rounded,
         .user-sidebar .menu-item.active .menu-icon .material-symbols-rounded {
-            color: #0284c7;
+            color: #1e3a5f;
         }
 
         .user-sidebar .menu-text {
@@ -1896,16 +1927,17 @@
 
         /* Google Maps Style Collapsed Sidebar Items */
         .user-sidebar.collapsed .sidebar-menu li {
-            padding: 0 3px;
-            margin-bottom: 12px;
+            padding: 0;
+            margin-bottom: 8px;
         }
 
         .user-sidebar.collapsed .menu-item {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 7px 2px;
-            border-radius: 8px;
+            padding: 8px 0;
+            border-radius: 0;
+            width: 100%;
         }
 
         .user-sidebar.collapsed .menu-icon {
@@ -1937,7 +1969,7 @@
 
         .user-sidebar.collapsed .menu-item:hover .menu-text,
         .user-sidebar.collapsed .menu-item.active .menu-text {
-            color: #0284c7;
+            color: #1e3a5f;
             font-weight: 600;
         }
 
@@ -3173,6 +3205,7 @@
             }
         });
 
+
         let loadingToast = null;
 
         // Toast Notification System with GSAP
@@ -3342,7 +3375,7 @@
 
                 // Check if user is inside Ha Nam province
                 if (haNamGeo && !isInsideHaNam(userCoords.lat, userCoords.lng)) {
-                    showToast('Bạn đang ở ngoài khu vực Hà Nam.', 'warning');
+                    showToast('Bạn đang ở ngoài khu vực Ninh Bình.', 'warning');
                 } else {
                     showToast('Đã định vị thành công vị trí của bạn.', 'success');
                 }

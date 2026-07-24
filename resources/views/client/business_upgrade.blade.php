@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký Tài Khoản Doanh Nghiệp - Hà Nam POI</title>
+    <title>Đăng Ký Tài Khoản Doanh Nghiệp - Ninh Bình POI</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +17,8 @@
     
     <style>
         :root {
-            --primary: #0072FF;
-            --primary-hover: #0052cc;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
             --bg-body: #f8fafc;
             --text-main: #0f172a;
             --text-sub: #64748b;
@@ -27,20 +27,23 @@
         }
 
         body {
-            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-body);
             color: var(--text-main);
-            font-size: 0.925rem;
-            line-height: 1.55;
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 1.5;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        h1, .h1 { font-size: 1.4rem !important; }
-        h2, .h2 { font-size: 1.2rem !important; }
-        h3, .h3 { font-size: 1.05rem !important; }
-        h4, .h4 { font-size: 0.95rem !important; }
-        h5, .h5 { font-size: 0.9rem !important; }
-        h6, .h6 { font-size: 0.85rem !important; }
+        h1, .h1 { font-size: 1.3rem !important; font-weight: 600 !important; }
+        h2, .h2 { font-size: 1.15rem !important; font-weight: 600 !important; }
+        h3, .h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
+        h4, .h4 { font-size: 0.95rem !important; font-weight: 600 !important; }
+        h5, .h5 { font-size: 0.9rem !important; font-weight: 600 !important; }
+        h6, .h6 { font-size: 0.85rem !important; font-weight: 600 !important; }
 
         /* Top Navigation Bar */
         .top-navbar {
@@ -61,7 +64,7 @@
             align-items: center;
             gap: 6px;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             transition: color 0.15s ease;
         }
         .btn-back:hover {
@@ -71,15 +74,14 @@
         .content-panel {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             margin-bottom: 24px;
         }
         
         .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1.05rem;
+            font-weight: 600;
             margin-bottom: 16px;
             color: var(--text-main);
             border-bottom: 2px solid var(--primary);
@@ -88,27 +90,28 @@
         }
 
         .form-label-clean {
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 8px;
-            font-size: 0.9rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+            font-size: 0.875rem;
             display: block;
         }
         
         .form-control-clean {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+            padding: 9px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
             background-color: var(--card-bg);
             color: var(--text-main);
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 400;
+            transition: all 0.15s ease;
         }
         .form-control-clean:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 112, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         /* Business Account upgrade styles */
@@ -427,62 +430,60 @@
             width: 0%;
         }
         .step-progress-node {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 500;
             z-index: 3;
-            color: var(--text-sub);
-            transition: all 0.3s ease;
+            color: #64748b;
+            transition: all 0.2s ease;
         }
         .step-progress-node.active {
             border-color: var(--primary);
             background-color: var(--primary);
             color: white;
+            font-weight: 600;
         }
         .step-progress-node.completed {
             border-color: var(--primary);
-            background-color: var(--card-bg);
+            background-color: #ffffff;
             color: var(--primary);
+            font-weight: 600;
         }
 
-        /* Premium Custom Select Styles */
-        /* Ultra Premium Custom Select Styles */
+        /* Clean Custom Select Styles */
         .custom-select-trigger {
             display: flex;
             align-items: center;
             justify-content: space-between;
             background-color: #ffffff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 14px 18px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #1e293b;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 9px 14px;
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: #0f172a;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s ease;
             user-select: none;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         .custom-select-trigger:hover {
             border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
-            background-color: #fcfdfe;
         }
         .custom-select-trigger.active {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 4px 12px rgba(37, 99, 235, 0.08);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
             background-color: #ffffff;
         }
         .custom-select-trigger .trigger-arrow {
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 0.9rem;
+            transition: transform 0.2s ease;
+            font-size: 0.8rem;
             color: #64748b;
         }
         .custom-select-trigger.active .trigger-arrow {
@@ -594,12 +595,13 @@
         }
 
         #businessMap {
-            height: 250px;
+            height: 380px;
             width: 100%;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
             margin-bottom: 15px;
             z-index: 1;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .wizard-row {
@@ -622,30 +624,32 @@
             }
         }
         
-        /* Toast notification styling */
+        /* Toast notification styling - Soft & Minimalist */
         .toast-container-custom {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 24px;
+            right: 24px;
             z-index: 9999;
         }
         .toast-custom {
             background: #ffffff;
-            border-left: 4px solid var(--primary);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 0.9rem;
+            border: 1px solid #e2e8f0;
+            border-left: 3px solid #3b82f6;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+            padding: 9px 15px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #475569;
+            font-weight: 400;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
+            line-height: 1.4;
+            animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from { transform: translateY(8px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
@@ -657,7 +661,7 @@
         <i class="bi bi-chevron-left"></i> Quay lại trang cá nhân
     </a>
     <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-        Hà Nam POI Doanh Nghiệp
+        Ninh Bình POI Doanh Nghiệp
     </div>
     <div></div>
 </div>
@@ -691,7 +695,7 @@
                         @csrf
                         <!-- Step 1: Business Name -->
                         <div class="biz-step-pane" data-step="1">
-                            <h4 class="fw-bold mb-2">Giúp khách hàng tìm thấy doanh nghiệp của bạn trên Tìm kiếm, Maps, v.v.</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Giúp khách hàng tìm thấy doanh nghiệp của bạn trên Tìm kiếm, Maps, v.v.</h4>
                             <p class="text-secondary small mb-4">Nhập một vài thông tin doanh nghiệp để bắt đầu.</p>
                             <div class="mb-4">
                                 <label class="form-label-clean">Tên doanh nghiệp *</label>
@@ -701,12 +705,11 @@
 
                         <!-- Step 2: Business Type -->
                         <div class="biz-step-pane d-none" data-step="2">
-                            <h4 class="fw-bold mb-2">Chọn loại hình doanh nghiệp của bạn</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Chọn loại hình doanh nghiệp của bạn</h4>
                             <p class="text-secondary small mb-4">Chọn tất cả các phương thức áp dụng cho doanh nghiệp.</p>
                             
                             <!-- Custom selectable cards -->
                             <div class="biz-type-card" data-val="online_retail">
-                                <div class="biz-type-icon">🛒</div>
                                 <div class="biz-type-info">
                                     <div class="biz-type-name">Bán lẻ trực tuyến</div>
                                     <div class="biz-type-desc">Khách hàng có thể mua sản phẩm thông qua trang web của bạn</div>
@@ -715,7 +718,6 @@
                             </div>
 
                             <div class="biz-type-card" data-val="local_store">
-                                <div class="biz-type-icon">🏪</div>
                                 <div class="biz-type-info">
                                     <div class="biz-type-name">Cửa hàng tại địa phương</div>
                                     <div class="biz-type-desc">Khách hàng có thể trực tiếp ghé thăm doanh nghiệp của bạn</div>
@@ -724,7 +726,6 @@
                             </div>
 
                             <div class="biz-type-card" data-val="service_business">
-                                <div class="biz-type-icon">🚚</div>
                                 <div class="biz-type-info">
                                     <div class="biz-type-name">Doanh nghiệp dịch vụ</div>
                                     <div class="biz-type-desc">Doanh nghiệp của bạn cung cấp dịch vụ giao hàng tận nơi</div>
@@ -738,7 +739,7 @@
 
                         <!-- Step 3: Business Category -->
                         <div class="biz-step-pane d-none" data-step="3">
-                            <h4 class="fw-bold mb-2">Chọn danh mục kinh doanh</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Chọn danh mục kinh doanh</h4>
                             <p class="text-secondary small mb-4">Chọn loại hình danh mục kinh doanh phù hợp nhất với doanh nghiệp của bạn.</p>
                             
                             <div class="mb-4 position-relative">
@@ -747,7 +748,6 @@
                                 <!-- Custom Select Box -->
                                 <div class="custom-select-trigger" id="custom_category_select">
                                     <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-grid text-primary" style="font-size: 1.1rem;"></i>
                                         <span class="selected-value">-- Chọn danh mục kinh doanh --</span>
                                     </div>
                                     <i class="bi bi-chevron-down trigger-arrow"></i>
@@ -758,7 +758,6 @@
                                     <!-- Group 1 -->
                                     <div class="dropdown-group-header" data-target="group_food_drink">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span style="font-size: 1.2rem;">🍔</span>
                                             <span>Thực phẩm & Đồ uống</span>
                                         </div>
                                         <i class="bi bi-chevron-right arrow-icon"></i>
@@ -775,7 +774,6 @@
                                     <!-- Group 2 -->
                                     <div class="dropdown-group-header" data-target="group_lodging">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span style="font-size: 1.2rem;">🏨</span>
                                             <span>Khách sạn & Nơi lưu trú</span>
                                         </div>
                                         <i class="bi bi-chevron-right arrow-icon"></i>
@@ -802,43 +800,50 @@
 
                         <!-- Step 4: Business Address -->
                         <div class="biz-step-pane d-none" data-step="4">
-                            <h4 class="fw-bold mb-2">Nhập địa chỉ doanh nghiệp của bạn</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Nhập địa chỉ doanh nghiệp của bạn</h4>
                             <p class="text-secondary small mb-4">Thêm một vị trí khách hàng có thể thực tế ghé thăm doanh nghiệp của bạn.</p>
                             
-                            <div class="mb-3">
-                                <label class="form-label-clean">Quốc gia/Vùng</label>
-                                <input type="text" class="form-control-clean" name="address_country" value="Việt Nam" readonly>
+                            <!-- Row 1: 2 Fixed Defaults -->
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label class="form-label-clean">Quốc gia / Vùng</label>
+                                    <input type="text" class="form-control-clean" name="address_country" value="Việt Nam" readonly style="background-color: #f8fafc; color: #64748b;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-clean">Tỉnh / Thành phố</label>
+                                    <input type="text" class="form-control-clean" id="input_address_province" name="address_province" value="Ninh Bình" readonly style="background-color: #f8fafc; color: #64748b;" required>
+                                </div>
                             </div>
+
+                            <!-- Row 2: Fillable City/District & Postal Code -->
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label class="form-label-clean">Thành phố / Thị xã / Huyện *</label>
+                                    <input type="text" class="form-control-clean" id="input_address_city" name="address_city" required placeholder="Ví dụ: TP. Ninh Bình, Hoa Lư...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-clean">Mã bưu chính *</label>
+                                    <input type="text" class="form-control-clean" id="input_address_postal_code" name="address_postal_code" required value="430000" placeholder="Ví dụ: 430000">
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Street Address -->
                             <div class="mb-3">
                                 <label class="form-label-clean">Đường phố / Số nhà *</label>
                                 <input type="text" class="form-control-clean" id="input_address_street" name="address_street" required placeholder="Ví dụ: 123 Nguyễn Huệ">
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label-clean">Thành phố *</label>
-                                    <input type="text" class="form-control-clean" id="input_address_city" name="address_city" required placeholder="Ví dụ: Phủ Lý">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label-clean">Tỉnh *</label>
-                                    <input type="text" class="form-control-clean" id="input_address_province" name="address_province" required placeholder="Ví dụ: Hà Nam">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label-clean">Mã bưu chính *</label>
-                                <input type="text" class="form-control-clean" id="input_address_postal_code" name="address_postal_code" required value="100000" placeholder="Ví dụ: 100000">
                             </div>
                         </div>
 
                         <!-- Step 5: Contact Details -->
                         <div class="biz-step-pane d-none" data-step="5">
-                            <h4 class="fw-bold mb-2">Bạn muốn hiển thị thông tin chi tiết liên hệ nào cho khách hàng?</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Bạn muốn hiển thị thông tin chi tiết liên hệ nào cho khách hàng?</h4>
                             <p class="text-secondary small mb-4">Thêm thông tin này vào danh mục hiển thị để giúp khách hàng dễ dàng liên hệ với doanh nghiệp của bạn.</p>
                             
                             <div class="mb-4">
                                 <label class="form-label-clean">Số điện thoại liên hệ *</label>
                                 <div class="d-flex gap-2">
-                                    <div class="d-flex align-items-center px-3 border rounded-3 bg-light" style="font-size: 0.95rem; border-color: var(--border-color) !important;">
-                                        <span class="me-2">🇻🇳</span> +84
+                                    <div class="d-flex align-items-center px-3 border rounded-2 bg-light text-secondary" style="font-size: 0.875rem; border-color: var(--border-color) !important;">
+                                        +84
                                     </div>
                                     <input type="tel" class="form-control-clean flex-grow-1" id="input_phone" name="phone" required placeholder="Ví dụ: 0912345678" style="margin-bottom: 0;">
                                 </div>
@@ -852,29 +857,22 @@
 
                         <!-- Step 6: Map Coordinates -->
                         <div class="biz-step-pane d-none" data-step="6">
-                            <h4 class="fw-bold mb-2">Doanh nghiệp của bạn ở đâu?</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Doanh nghiệp của bạn ở đâu?</h4>
                             <p class="text-secondary small mb-3">Kéo và di chuyển điểm đánh dấu (marker) đến vị trí chính xác của doanh nghiệp.</p>
                             
                             <div id="businessMap"></div>
                             
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-label-clean">Vĩ độ (Latitude)</label>
-                                    <input type="text" class="form-control-clean" id="input_lat" name="lat" readonly required>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label-clean">Kinh độ (Longitude)</label>
-                                    <input type="text" class="form-control-clean" id="input_lng" name="lng" readonly required>
-                                </div>
-                            </div>
+                            <!-- Hidden inputs for Lat / Lng -->
+                            <input type="hidden" id="input_lat" name="lat" required>
+                            <input type="hidden" id="input_lng" name="lng" required>
                         </div>
 
                         <!-- Step 7: PUT BIZ ON MAP settings -->
                         <div class="biz-step-pane d-none" data-step="7">
-                            <h4 class="fw-bold mb-2">Đưa doanh nghiệp của bạn lên bản đồ</h4>
-                            <p class="text-secondary small mb-4">Bắt đầu kết nối với khách hàng trên Hà Nam POI - tất cả ở cùng một nơi.</p>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Đưa doanh nghiệp của bạn lên bản đồ</h4>
+                            <p class="text-secondary small mb-4">Bắt đầu kết nối với khách hàng trên Ninh Bình POI - tất cả ở cùng một nơi.</p>
                             
-                            <div class="p-3 border rounded-3 bg-light mb-4">
+                            <div class="p-3 border rounded-2 bg-light mb-4">
                                 <ul class="mb-0 ps-3 small text-secondary">
                                     <li class="mb-2">Giúp mọi người trong khu vực tìm thấy doanh nghiệp của bạn nhanh chóng.</li>
                                     <li class="mb-2">Trả lời các bài đánh giá về doanh nghiệp của bạn từ khách hàng địa phương.</li>
@@ -899,28 +897,24 @@
 
                         <!-- Step 8: Description -->
                         <div class="biz-step-pane d-none" data-step="8">
-                            <h4 class="fw-bold mb-2">Thêm mô tả doanh nghiệp</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Thêm mô tả doanh nghiệp *</h4>
                             <p class="text-secondary small mb-4">Cho phép khách hàng tìm hiểu thêm về doanh nghiệp của bạn bằng cách thêm mô tả ngắn gọn.</p>
                             <div class="mb-3">
-                                <label class="form-label-clean">Giới thiệu về doanh nghiệp</label>
-                                <textarea class="form-control-clean" id="input_description" name="description" rows="5" maxlength="750" placeholder="Ví dụ: Quán nhậu bình dân phục vụ các món ăn đặc sản Hà Nam..."></textarea>
+                                <label class="form-label-clean">Giới thiệu về doanh nghiệp *</label>
+                                <textarea class="form-control-clean" id="input_description" name="description" rows="5" maxlength="750" required placeholder="Ví dụ: Quán nhậu bình dân phục vụ các món ăn đặc sản Ninh Bình..."></textarea>
                                 <div class="text-end text-secondary small mt-1" id="descCharCount">0 / 750</div>
                             </div>
                         </div>
 
                         <!-- Step 9: Menu Photos -->
                         <div class="biz-step-pane d-none" data-step="9">
-                            <h4 class="fw-bold mb-2" id="step8Title">Thêm ảnh chụp thực đơn của bạn</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;" id="step8Title">Thêm ảnh chụp thực đơn của bạn *</h4>
                             <p class="text-secondary small mb-4" id="step8Desc">Khách hàng chủ yếu dựa vào ảnh thực đơn khi quyết định ăn hoặc ghé thăm ở đâu.</p>
                             
                             <div class="dropzone-area" id="menuDropzone">
-                                <div class="dropzone-icon" id="step8Icon">📋</div>
                                 <div class="fw-semibold small" id="step8Text">Kéo các hình ảnh thực đơn vào đây</div>
                                 <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính</div>
                                 <input type="file" id="menuFilesInput" class="d-none" multiple accept="image/*">
-                            </div>
-                            <div class="text-muted text-center mt-3 small">
-                                <i class="bi bi-info-circle me-1"></i>Bạn có thể click <strong>Bỏ qua</strong> ở góc phải bên dưới nếu không có thực đơn/dịch vụ.
                             </div>
 
                             <div class="upload-previews" id="menuPreviews"></div>
@@ -928,17 +922,13 @@
 
                         <!-- Step 10: Storefront Photos -->
                         <div class="biz-step-pane d-none" data-step="10">
-                            <h4 class="fw-bold mb-2">Thêm ảnh mặt tiền cửa hàng</h4>
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Thêm ảnh mặt tiền cửa hàng *</h4>
                             <p class="text-secondary small mb-4">Việc chia sẻ ảnh mặt tiền của doanh nghiệp sẽ giúp khách hàng nhận ra vị trí của bạn ngay khi ghé qua.</p>
                             
                             <div class="dropzone-area" id="storefrontDropzone">
-                                <div class="dropzone-icon">🏢</div>
                                 <div class="fw-semibold small">Kéo các hình ảnh mặt tiền vào đây</div>
                                 <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính</div>
                                 <input type="file" id="storefrontFilesInput" class="d-none" multiple accept="image/*">
-                            </div>
-                            <div class="text-muted text-center mt-3 small">
-                                <i class="bi bi-info-circle me-1"></i>Bạn có thể click <strong>Bỏ qua</strong> ở góc phải bên dưới nếu không có ảnh mặt tiền.
                             </div>
 
                             <div class="upload-previews" id="storefrontPreviews"></div>
@@ -947,10 +937,7 @@
                         <!-- Actions Row -->
                         <div class="d-flex justify-content-between mt-4">
                             <button type="button" class="btn btn-light rounded-2 btn-sm px-4" id="bizPrevBtn" disabled>Quay lại</button>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-outline-secondary rounded-2 btn-sm px-4 d-none" id="bizSkipBtn">Bỏ qua</button>
-                                <button type="button" class="btn btn-primary rounded-2 btn-sm px-4" id="bizNextBtn">Tiếp tục</button>
-                            </div>
+                            <button type="button" class="btn btn-primary rounded-2 btn-sm px-4" id="bizNextBtn">Tiếp tục</button>
                         </div>
                     </form>
                 </div>
@@ -979,34 +966,34 @@
                                     
                                     <div class="mock-action-buttons">
                                         <div class="mock-action-btn">
-                                            <div class="mock-action-icon">📞</div>
+                                            <div class="mock-action-icon"><i class="bi bi-telephone-fill" style="font-size: 0.65rem;"></i></div>
                                             <span>Gọi điện</span>
                                         </div>
                                         <div class="mock-action-btn">
-                                            <div class="mock-action-icon">📍</div>
+                                            <div class="mock-action-icon"><i class="bi bi-geo-alt-fill" style="font-size: 0.65rem;"></i></div>
                                             <span>Chỉ đường</span>
                                         </div>
                                         <div class="mock-action-btn">
-                                            <div class="mock-action-icon">🌐</div>
+                                            <div class="mock-action-icon"><i class="bi bi-globe" style="font-size: 0.65rem;"></i></div>
                                             <span>Trang web</span>
                                         </div>
                                     </div>
 
                                     <div class="mock-info-rows">
                                         <div class="mock-info-row">
-                                            <span class="mock-info-icon">📍</span>
+                                            <span class="mock-info-icon"><i class="bi bi-geo-alt"></i></span>
                                             <span id="mockBizAddress">Địa chỉ đường phố, thành phố</span>
                                         </div>
                                         <div class="mock-info-row">
-                                            <span class="mock-info-icon">🕒</span>
+                                            <span class="mock-info-icon"><i class="bi bi-clock"></i></span>
                                             <span>Đang mở cửa • Cả ngày</span>
                                         </div>
                                         <div class="mock-info-row">
-                                            <span class="mock-info-icon">📞</span>
+                                            <span class="mock-info-icon"><i class="bi bi-telephone"></i></span>
                                             <span id="mockBizPhone">{{ Auth::user()->phone ?? 'Chưa cập nhật SĐT' }}</span>
                                         </div>
                                         <div class="mock-info-row d-none" id="mockBizWebsiteRow">
-                                            <span class="mock-info-icon">🌐</span>
+                                            <span class="mock-info-icon"><i class="bi bi-globe"></i></span>
                                             <span id="mockBizWebsite"></span>
                                         </div>
                                     </div>
@@ -1014,11 +1001,11 @@
 
                                 <!-- Photos Grid preview -->
                                 <div class="mock-business-card" style="flex:1;">
-                                    <div class="fw-bold mb-2">Hình ảnh</div>
+                                    <div class="fw-semibold mb-2">Hình ảnh</div>
                                     <div class="mock-photos-grid" id="mockPhotosGrid">
-                                        <div class="mock-photo-item">📷</div>
-                                        <div class="mock-photo-item">📷</div>
-                                        <div class="mock-photo-item">📷</div>
+                                        <div class="mock-photo-item"><i class="bi bi-image" style="font-size: 0.75rem; color: #cbd5e1;"></i></div>
+                                        <div class="mock-photo-item"><i class="bi bi-image" style="font-size: 0.75rem; color: #cbd5e1;"></i></div>
+                                        <div class="mock-photo-item"><i class="bi bi-image" style="font-size: 0.75rem; color: #cbd5e1;"></i></div>
                                     </div>
                                     <div class="mt-3 text-secondary" style="font-size:0.65rem; line-height:1.3;" id="mockBizDesc">
                                         Chưa có mô tả nào được thêm...
@@ -1039,25 +1026,29 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    // Custom non-blocking toast notifications
+    // Custom non-blocking toast notifications (Minimalist without icons)
     function showToast(message, isSuccess = true) {
         const container = document.getElementById('toastContainer');
         if (!container) return;
 
+        // Remove any leading emoji icons
+        const cleanMessage = (message || '').replace(/^[⚠️❌✅\s]+/, '');
+
         const toast = document.createElement('div');
         toast.className = 'toast-custom';
         if (!isSuccess) {
-            toast.style.borderLeftColor = '#ef4444';
+            toast.style.borderLeftColor = '#f87171';
+        } else {
+            toast.style.borderLeftColor = '#3b82f6';
         }
         
-        const icon = isSuccess ? '✅' : '❌';
-        toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+        toast.innerHTML = `<span>${cleanMessage}</span>`;
         container.appendChild(toast);
 
         setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
+            toast.style.transition = 'opacity 0.25s ease';
+            setTimeout(() => toast.remove(), 250);
         }, 3000);
     }
 
@@ -1304,10 +1295,6 @@
                 }
             }
 
-            // Leaflet Map vars
-            let bizMap = null;
-            let bizMarker = null;
-
             // Update step UI
             function updateBizStepUI() {
                 if (bizStep === 9) {
@@ -1364,41 +1351,130 @@
                 saveWizardState();
             }
 
-            // Map initialization
+            // Leaflet Map vars & GeoJSON boundary
+            let bizMap = null;
+            let bizMarker = null;
+            let bizHaNamBoundaryGeoJSON = null;
+
+            function isPointInHaNamGeoJSON(lat, lng, geojson) {
+                if (!geojson) return true;
+                function pointInRing(pLng, pLat, ring) {
+                    let inside = false;
+                    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+                        const xi = ring[i][0], yi = ring[i][1];
+                        const xj = ring[j][0], yj = ring[j][1];
+                        const intersect = ((yi > pLat) !== (yj > pLat)) &&
+                            (pLng < (xj - xi) * (pLat - yi) / (yj - yi) + xi);
+                        if (intersect) inside = !inside;
+                    }
+                    return inside;
+                }
+
+                function pointInPolygon(pLng, pLat, polygon) {
+                    if (!polygon || polygon.length === 0) return false;
+                    if (!pointInRing(pLng, pLat, polygon[0])) return false;
+                    for (let i = 1; i < polygon.length; i++) {
+                        if (pointInRing(pLng, pLat, polygon[i])) return false;
+                    }
+                    return true;
+                }
+
+                const geom = geojson.geometry || geojson;
+                if (geom.type === 'Polygon') {
+                    return pointInPolygon(lng, lat, geom.coordinates);
+                }
+                if (geom.type === 'MultiPolygon') {
+                    return geom.coordinates.some(polyCoords => pointInPolygon(lng, lat, polyCoords));
+                }
+                if (geojson.type === 'FeatureCollection') {
+                    return geojson.features.some(f => isPointInHaNamGeoJSON(lat, lng, f));
+                }
+                return true;
+            }
+
+            // Map initialization matching Contribution Modal style
             function initBizMap() {
                 setTimeout(() => {
+                    const mapContainer = document.getElementById('businessMap');
+                    if (!mapContainer) return;
+
                     if (!bizMap) {
                         let savedLat = parseFloat(document.getElementById('input_lat').value);
                         let savedLng = parseFloat(document.getElementById('input_lng').value);
 
-                        const defaultLat = !isNaN(savedLat) ? savedLat : 20.5333;
-                        const defaultLng = !isNaN(savedLng) ? savedLng : 105.9167; // Phủ Lý, Hà Nam
+                        const defaultLat = !isNaN(savedLat) ? savedLat : 20.545;
+                        const defaultLng = !isNaN(savedLng) ? savedLng : 105.912; // Phủ Lý, Hà Nam
 
-                        document.getElementById('input_lat').value = defaultLat;
-                        document.getElementById('input_lng').value = defaultLng;
+                        document.getElementById('input_lat').value = defaultLat.toFixed(6);
+                        document.getElementById('input_lng').value = defaultLng.toFixed(6);
 
-                        bizMap = L.map('businessMap').setView([defaultLat, defaultLng], 13);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '&copy; OpenStreetMap contributors'
+                        bizMap = L.map('businessMap', {
+                            maxBoundsViscosity: 0.8,
+                            zoomControl: true,
+                            attributionControl: false,
+                            minZoom: 10
+                        }).setView([defaultLat, defaultLng], 12);
+
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                            subdomains: 'abcd',
+                            maxZoom: 19
                         }).addTo(bizMap);
+
+                        fetch('{{ asset('geo/ha-nam-old.geojson') }}')
+                            .then(res => res.json())
+                            .then(data => {
+                                bizHaNamBoundaryGeoJSON = data;
+                                const border = L.geoJSON(data, {
+                                    style: {
+                                        color: '#7ba7d4',
+                                        weight: 2,
+                                        opacity: 0.55,
+                                        fillColor: '#f8fafc',
+                                        fillOpacity: 0.04
+                                    }
+                                }).addTo(bizMap);
+
+                                const bounds = border.getBounds();
+                                bizMap.setMaxBounds(bounds.pad(0.2));
+                            })
+                            .catch(err => console.error('Lỗi tải ranh giới Hà Nam:', err));
 
                         bizMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(bizMap);
 
-                        // Update inputs on drag end
-                        bizMarker.on('dragend', function(e) {
-                            const position = bizMarker.getLatLng();
-                            document.getElementById('input_lat').value = position.lat.toFixed(7);
-                            document.getElementById('input_lng').value = position.lng.toFixed(7);
+                        function updateMarkerLocation(latlng) {
+                            const isInside = isPointInHaNamGeoJSON(latlng.lat, latlng.lng, bizHaNamBoundaryGeoJSON);
+
+                            if (!isInside) {
+                                mapContainer.style.borderColor = '#ef4444';
+                                mapContainer.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.18)';
+                                if (typeof showToastCustom === 'function') {
+                                    showToastCustom('⚠️ Vị trí ngoài tỉnh Ninh Bình! Vui lòng nhấp chọn lại.');
+                                }
+                                return false;
+                            }
+
+                            mapContainer.style.borderColor = '#10b981';
+                            mapContainer.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
+                            document.getElementById('input_lat').value = latlng.lat.toFixed(6);
+                            document.getElementById('input_lng').value = latlng.lng.toFixed(6);
                             saveWizardState();
+                            return true;
+                        }
+
+                        // Drag end event
+                        bizMarker.on('dragend', function(e) {
+                            const pos = bizMarker.getLatLng();
+                            updateMarkerLocation(pos);
                         });
 
-                        // Map click to place marker
+                        // Map click event
                         bizMap.on('click', function(e) {
-                            bizMarker.setLatLng(e.latlng);
-                            document.getElementById('input_lat').value = e.latlng.lat.toFixed(7);
-                            document.getElementById('input_lng').value = e.latlng.lng.toFixed(7);
-                            saveWizardState();
+                            if (updateMarkerLocation(e.latlng)) {
+                                bizMarker.setLatLng(e.latlng);
+                            }
                         });
+
+                        updateMarkerLocation({ lat: defaultLat, lng: defaultLng });
                     } else {
                         bizMap.invalidateSize();
                     }
@@ -1753,6 +1829,21 @@
                         showToast('Vui lòng kéo ghim trên bản đồ để chọn tọa độ.', false);
                         return false;
                     }
+                } else if (bizStep === 8) {
+                    if (!inputDesc.value.trim()) {
+                        showToast('Vui lòng nhập mô tả giới thiệu về doanh nghiệp của bạn.', false);
+                        return false;
+                    }
+                } else if (bizStep === 9) {
+                    if (!menuPhotos || menuPhotos.length === 0) {
+                        showToast('Vui lòng tải lên ít nhất 1 hình ảnh thực đơn/bảng giá/dịch vụ.', false);
+                        return false;
+                    }
+                } else if (bizStep === 10) {
+                    if (!storefrontPhotos || storefrontPhotos.length === 0) {
+                        showToast('Vui lòng tải lên ít nhất 1 hình ảnh mặt tiền cửa hàng.', false);
+                        return false;
+                    }
                 }
                 return true;
             }
@@ -1768,18 +1859,6 @@
                     submitBizRegistrationForm();
                 }
             });
-
-            // Skip button clicked
-            if (bizSkipBtn) {
-                bizSkipBtn.addEventListener('click', function() {
-                    if (bizStep === 9) {
-                        bizStep++;
-                        updateBizStepUI();
-                    } else if (bizStep === 10) {
-                        submitBizRegistrationForm();
-                    }
-                });
-            }
 
             // Prev button clicked
             bizPrevBtn.addEventListener('click', function() {

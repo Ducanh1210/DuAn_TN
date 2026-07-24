@@ -3,7 +3,7 @@
 @php
     $sizePx = is_numeric($size) ? $size . 'px' : $size;
     $displayName = $user ? ($user->display_name ?? $user->username) : 'Guest';
-    $fallbackUrl = 'https://ui-avatars.com/api/?name=' . urlencode($displayName) . '&background=0072FF&color=fff';
+    $fallbackUrl = 'https://ui-avatars.com/api/?name=' . urlencode($displayName) . '&background=1e3a5f&color=fff';
     $avatarUrl = $user ? $user->avatar_formatted_url : $fallbackUrl;
     
     $frameClass = '';
