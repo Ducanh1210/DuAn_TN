@@ -594,16 +594,25 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Track daily login
-        MissionService::trackProgress($user, 'daily_login', 1);
+        if ($user) {
+            // Track daily login
+            MissionService::trackProgress($user, 'daily_login', 1);
+
+            // Fetch user progress
+            $userMissions = UserMission::where('user_id', $user->id)
+                ->get()
+                ->keyBy('mission_id');
+
+            $unlockedFrameIds = UserAvatarFrame::where('user_id', $user->id)
+                ->pluck('avatar_frame_id')
+                ->toArray();
+        } else {
+            $userMissions = collect();
+            $unlockedFrameIds = [];
+        }
 
         // Fetch active missions
         $allMissions = Mission::where('status', 'active')->with('rewardFrame')->get();
-
-        // Fetch user progress
-        $userMissions = UserMission::where('user_id', $user->id)
-            ->get()
-            ->keyBy('mission_id');
 
         $dailyMissions = $allMissions->where('type', 'daily');
         $weeklyMissions = $allMissions->where('type', 'weekly');
@@ -611,9 +620,6 @@ class ProfileController extends Controller
 
         // Fetch Avatar Frames
         $allFrames = AvatarFrame::where('status', 'active')->orderBy('required_points', 'asc')->get();
-        $unlockedFrameIds = UserAvatarFrame::where('user_id', $user->id)
-            ->pluck('avatar_frame_id')
-            ->toArray();
 
         // Fetch Leaderboard (Top 5 Users)
         $leaderboard = User::orderBy('points', 'desc')->take(5)->get();

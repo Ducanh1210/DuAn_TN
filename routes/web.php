@@ -134,12 +134,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/claim-daily', [\App\Http\Controllers\Client\ProfileController::class, 'claimDaily'])->name('client.profile.claim_daily');
     
     // Missions & Avatar Frame Routes
-    Route::get('/missions', [\App\Http\Controllers\Client\ProfileController::class, 'missions'])->name('client.missions');
     Route::post('/missions/claim/{mission}', [\App\Http\Controllers\Client\ProfileController::class, 'claimMissionReward'])->name('client.missions.claim');
     Route::post('/missions/claim-milestone', [\App\Http\Controllers\Client\ProfileController::class, 'claimMilestone100'])->name('client.missions.claim_milestone');
     Route::post('/avatar-frames/equip', [\App\Http\Controllers\Client\ProfileController::class, 'equipAvatarFrame'])->name('client.avatar_frames.equip');
     Route::post('/avatar-frames/buy/{frame}', [\App\Http\Controllers\Client\ProfileController::class, 'buyAvatarFrame'])->name('client.avatar_frames.buy');
 });
+
+// Public Missions Route
+Route::get('/missions', [\App\Http\Controllers\Client\ProfileController::class, 'missions'])->name('client.missions');
 
 // Admin Protected Routes
 Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->group(function () {
