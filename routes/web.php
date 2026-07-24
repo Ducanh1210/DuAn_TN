@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\NewsController as ClientNewsController;
 use App\Http\Controllers\Client\EventController as ClientEventController;
+use App\Http\Controllers\Client\ChatbotController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +88,8 @@ Route::get('/su-kien', [ClientEventController::class, 'index'])->name('client.ev
 Route::get('/su-kien/{slug}', [ClientEventController::class, 'show'])->name('client.events.show');
 
 // Client Interactions
+Route::post('/chat/message', [ChatbotController::class, 'sendMessage'])->name('client.chat.message');
+
 Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/favorite', [\App\Http\Controllers\Client\InteractionController::class, 'toggleFavorite'])->name('client.locations.favorite');
     Route::post('/locations/{location}/comment', [\App\Http\Controllers\Client\InteractionController::class, 'storeComment'])->name('client.locations.comment');

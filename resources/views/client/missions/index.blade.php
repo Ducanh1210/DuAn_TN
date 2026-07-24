@@ -1485,16 +1485,27 @@
                         <div class="d-flex align-items-center gap-1 mb-3">
                             @php
                                 $hasClaimedToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
-                                $rawStreak = (int)($user->streak_count ?? 0);
-                                $effectiveStreak = $hasClaimedToday ? max(1, $rawStreak) : $rawStreak;
+                                $lastStreakAt = $user->last_streak_at ? \Carbon\Carbon::parse($user->last_streak_at) : null;
+                                
+                                if ($hasClaimedToday) {
+                                    $rawStreak = (int)($user->streak_count ?? 1);
+                                    $effectiveStreak = (($rawStreak - 1) % 7) + 1;
+                                } else {
+                                    if ($lastStreakAt && $lastStreakAt->isYesterday()) {
+                                        $prevStreak = (int)($user->streak_count ?? 0);
+                                        $effectiveStreak = (($prevStreak - 1) % 7) + 1;
+                                    } else {
+                                        $effectiveStreak = 0;
+                                    }
+                                }
+                                
                                 $day7Frame = \App\Models\AvatarFrame::where('code', 'frame-streak')->first()
                                     ?? \App\Models\AvatarFrame::where('name', 'like', '%Duy Trì%')->first()
                                     ?? \App\Models\AvatarFrame::first();
                             @endphp
                             @for($day = 1; $day <= 7; $day++)
                                 @php
-                                    $isDone = ($day <= $effectiveStreak);
-                                    // Current active day only highlights if NOT claimed today yet
+                                    $isDone = ($hasClaimedToday && $day <= $effectiveStreak) || (!$hasClaimedToday && $day <= $effectiveStreak);
                                     $isCurrent = (!$hasClaimedToday && $day == ($effectiveStreak + 1));
                                     $isFrameDay = ($day == 7);
                                 @endphp
