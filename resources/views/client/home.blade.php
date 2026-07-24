@@ -2419,7 +2419,19 @@
                         <div style="background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; overflow: hidden;">
                             <!-- Row 1: Điểm danh -->
                             @php
-                                $hasCheckinToday = Auth::user()->last_daily_bonus_at && \Carbon\Carbon::parse(Auth::user()->last_daily_bonus_at)->isToday();
+                                $user = Auth::user();
+                                $hasCheckinToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
+                                if ($hasCheckinToday) {
+                                    $todayBonus = ((($user->streak_count - 1) % 7) + 1) * 10;
+                                } else {
+                                    $lastStreakAt = $user->last_streak_at ? \Carbon\Carbon::parse($user->last_streak_at) : null;
+                                    if ($lastStreakAt && $lastStreakAt->isYesterday()) {
+                                        $nextStreak = $user->streak_count + 1;
+                                    } else {
+                                        $nextStreak = 1;
+                                    }
+                                    $todayBonus = ((($nextStreak - 1) % 7) + 1) * 10;
+                                }
                             @endphp
                             <div style="padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #f1f5f9;">
                                 <div style="display: flex; align-items: center; min-width: 0; flex: 1;">
@@ -2427,12 +2439,12 @@
                                 </div>
                                 <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; flex-shrink: 0;">
                                     <div style="display: flex; align-items: center; gap: 2px; font-weight: 700; color: #334155; font-size: 0.6rem;">
-                                        +10 <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;">
+                                        +<span id="widgetDailyBonusVal">{{ $todayBonus }}</span> <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;">
                                     </div>
                                     @if($hasCheckinToday)
                                         <span style="font-weight: 600; color: #475569; font-size: 0.56rem; white-space: nowrap;">Đã điểm danh</span>
                                     @else
-                                        <button type="button" id="widgetClaimDailyBtn" style="font-size: 0.56rem; font-weight: 700; padding: 2px 8px; border: 1px solid #475569; color: #ffffff; background: #475569; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Nhận</button>
+                                        <button type="button" id="widgetClaimDailyBtn" style="font-size: 0.56rem; font-weight: 700; padding: 2px 8px; border: 1px solid #1e3a5f; color: #ffffff; background: #1e3a5f; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Nhận</button>
                                     @endif
                                 </div>
                             </div>
@@ -3664,16 +3676,15 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        widgetClaimDailyBtn.className = "btn btn-xs btn-success border-0 px-2 py-0.5 rounded-pill fw-semibold";
-                        widgetClaimDailyBtn.style.backgroundColor = "#10b981";
-                        widgetClaimDailyBtn.style.color = "white";
-                        widgetClaimDailyBtn.innerHTML = "Đã nhận";
-                        widgetClaimDailyBtn.disabled = true;
+                        const parentContainer = widgetClaimDailyBtn.parentElement;
+                        if (parentContainer) {
+                            parentContainer.innerHTML = '<div style="display: flex; align-items: center; gap: 2px; font-weight: 700; color: #334155; font-size: 0.6rem;">+' + (data.coins || 10) + ' <img src="{{ asset("images/xu.png") }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;"></div><span style="font-weight: 600; color: #475569; font-size: 0.56rem; white-space: nowrap;">Đã điểm danh</span>';
+                        }
                         
                         // Update points displays
                         const widgetPoints = document.getElementById("widgetPoints");
                         if (widgetPoints) {
-                            widgetPoints.textContent = data.points + " xu";
+                            widgetPoints.textContent = data.points;
                         }
                         const headerPoints = document.getElementById("navbarUserPoints");
                         if (headerPoints) {
