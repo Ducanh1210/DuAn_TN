@@ -575,7 +575,7 @@ function initModalPickerMap() {
             mapContainer.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.18)';
             
             if (typeof showToast === 'function') {
-                showToast('⚠️ Vị trí ngoài tỉnh Hà Nam! Vui lòng nhấp chọn lại.', 'warning', 3000);
+                showToast('⚠️ Vị trí ngoài tỉnh Ninh Bình! Vui lòng nhấp chọn lại.', 'warning', 3000);
             }
             
             document.getElementById('suggestLat').value = '';
@@ -642,9 +642,9 @@ function submitLocationSuggestion(e) {
 
     if (!formData.get('lat') || !formData.get('lng')) {
         if (typeof showToast === 'function') {
-            showToast('⚠️ Vui lòng nhấp chọn vị trí hợp lệ trong địa phận tỉnh Hà Nam!', 'warning', 3500);
+            showToast('⚠️ Vui lòng nhấp chọn vị trí hợp lệ trong địa phận tỉnh Ninh Bình!', 'warning', 3500);
         } else {
-            alert('⚠️ Vui lòng nhấp chọn vị trí hợp lệ trong địa phận tỉnh Hà Nam!');
+            alert('⚠️ Vui lòng nhấp chọn vị trí hợp lệ trong địa phận tỉnh Ninh Bình!');
         }
         return;
     }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cài Đặt Tài Khoản - Hà Nam POI</title>
+    <title>Cài Đặt Tài Khoản - Ninh Bình POI</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,31 +13,32 @@
     <!-- FontAwesome & Avatar Frames CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
-    
-    <style>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --primary: #1e3a5f;
+            --primary-hover: #2b4c7e;
             --bg-body: #f8fafc;
-            --text-main: #0f172a;
+            --text-main: #0f2442;
             --text-sub: #64748b;
             --border-color: #e2e8f0;
             --card-bg: #ffffff;
         }
 
         body { 
-            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
+            font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background-color: var(--bg-body); 
             color: var(--text-main); 
             font-size: 0.875rem;
-            line-height: 1.55;
+            font-weight: 400;
+            line-height: 1.5;
             margin: 0;
             padding: 0;
             height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         h1, .h1 { font-size: 1.3rem !important; }
@@ -202,33 +203,33 @@
         .sidebar-menu-tabs .nav-link {
             width: 100%;
             text-align: left;
-            padding: 9px 12px;
-            color: var(--text-sub);
-            font-weight: 500;
-            border-radius: 8px;
+            padding: 8px 12px;
+            color: #475569;
+            font-weight: 400;
+            border-radius: 6px;
             border: none;
             background: transparent;
-            margin-bottom: 4px;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
+            margin-bottom: 3px;
+            transition: all 0.15s ease;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
         .sidebar-menu-tabs .nav-link:hover {
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
             color: var(--text-main);
         }
         .sidebar-menu-tabs .nav-link.active {
             background-color: #f1f5f9;
-            color: #0f172a;
+            color: var(--primary);
             font-weight: 600;
         }
         .menu-count-badge {
             background-color: #e2e8f0;
             color: var(--text-sub);
             font-size: 0.7rem;
-            font-weight: 600;
+            font-weight: 500;
             padding: 2px 7px;
             border-radius: 10px;
         }
@@ -250,7 +251,7 @@
         }
         .section-title {
             font-size: 1.05rem;
-            font-weight: 700;
+            font-weight: 600;
             margin-bottom: 20px;
             color: var(--text-main);
         }
@@ -563,14 +564,14 @@
         }
         .info-label {
             width: 220px;
-            font-weight: 600;
-            color: var(--text-sub);
-            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            font-size: 0.875rem;
         }
         .info-value {
-            font-weight: 500;
+            font-weight: 400;
             color: var(--text-main);
-            font-size: 0.95rem;
+            font-size: 0.875rem;
             flex: 1;
         }
         .info-input-wrapper {
@@ -614,8 +615,8 @@
         }
         .sidebar-display-name {
             cursor: pointer;
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 600;
+            font-size: 0.95rem;
             transition: all 0.15s ease;
         }
         .sidebar-display-name:hover {
@@ -1072,7 +1073,7 @@
         <span class="back-chevron">&lsaquo;</span> Quay lại
     </a>
     <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-        Hà Nam POI
+        Ninh Bình POI
     </div>
 </div>
 
@@ -1086,7 +1087,7 @@
                      alt="Avatar" 
                      class="user-avatar-img"
                      id="profileAvatarPreview"
-                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=0072FF&color=fff';">
+                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=1e3a5f&color=fff';">
                 @if($user->equippedFrame && $user->equippedFrame->image_url)
                     <img src="{{ asset($user->equippedFrame->image_url) }}" class="avatar-frame-png-overlay">
                 @endif
@@ -1219,7 +1220,7 @@
 
                         <div class="info-item">
                             <div class="info-label">Điểm tích lũy</div>
-                            <div class="info-value text-primary fw-semibold">{{ $user->points }} điểm</div>
+                            <div class="info-value fw-semibold" style="color: #1e3a5f;">{{ $user->points }} điểm</div>
                         </div>
 
                         <div class="info-item">
@@ -1473,7 +1474,7 @@
                                     <div class="p-3 border rounded-3 text-center mb-3">
                                         <div class="fw-bold text-primary mb-1" style="font-size:1.5rem;">●</div>
                                         <div class="fw-semibold small mb-1">Xem trang địa điểm</div>
-                                        <p class="text-secondary small mb-2">Xem hiển thị thực tế trên bản đồ Hà Nam POI</p>
+                                        <p class="text-secondary small mb-2">Xem hiển thị thực tế trên bản đồ Ninh Bình POI</p>
                                         @php
                                             $loc = \App\Models\Location::where('created_by', $user->id)->first();
                                         @endphp
@@ -1509,9 +1510,9 @@
                         <div class="section-title">Nâng cấp tài khoản doanh nghiệp</div>
                         <div class="text-center py-4">
 
-                            <h5 class="fw-bold mb-3">Đưa địa điểm kinh doanh của bạn lên bản đồ Hà Nam POI</h5>
+                            <h5 class="fw-bold mb-3">Đưa địa điểm kinh doanh của bạn lên bản đồ Ninh Bình POI</h5>
                             <p class="text-secondary mx-auto mb-4" style="max-width: 600px;">
-                                Quảng bá nhà hàng, khách sạn, cửa hàng hoặc dịch vụ của bạn hoàn toàn miễn phí. Tiếp cận hàng ngàn người dùng tìm kiếm địa điểm du lịch, ăn uống, và dịch vụ tại Hà Nam mỗi ngày.
+                                Quảng bá nhà hàng, khách sạn, cửa hàng hoặc dịch vụ của bạn hoàn toàn miễn phí. Tiếp cận hàng ngàn người dùng tìm kiếm địa điểm du lịch, ăn uống, và dịch vụ tại Ninh Bình mỗi ngày.
                             </p>
                             
                             <div class="row g-3 mx-auto text-start mb-4" style="max-width: 600px;">
@@ -1520,7 +1521,7 @@
                                         <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
                                         <div>
                                             <div class="fw-semibold small">Xuất hiện trên Bản đồ</div>
-                                            <p class="text-secondary small mb-0">Hiển thị vị trí chính xác trên bản đồ vệ tinh Hà Nam POI.</p>
+                                            <p class="text-secondary small mb-0">Hiển thị vị trí chính xác trên bản đồ vệ tinh Ninh Bình POI.</p>
                                         </div>
                                     </div>
                                 </div>

@@ -1,6 +1,6 @@
 @extends('client.layouts.app')
 
-@section('title', 'Sự Kiện Lễ Hội Tại Hà Nam')
+@section('title', 'Sự Kiện Lễ Hội Tại Ninh Bình')
 
 @section('content')
 <div class="container py-4">

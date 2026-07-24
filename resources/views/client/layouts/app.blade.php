@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Cổng Thông Tin Du Lịch Hà Nam')</title>
+    <title>@yield('title', 'Cổng Thông Tin Du Lịch Ninh Bình')</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,10 +17,10 @@
     @stack('styles')
     <style>
         :root {
-            --primary: #0066ff;
-            --primary-hover: #0052cc;
-            --bg-body: #f4f7fb;
-            --text-dark: #1e293b;
+            --primary: #1e3a5f;
+            --primary-hover: #2b4c7e;
+            --bg-body: #f8fafc;
+            --text-dark: #0f2442;
             --text-muted: #64748b;
         }
         body { 
@@ -30,6 +30,17 @@
             font-size: 0.925rem;
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
+        }
+        .text-primary {
+            color: #1e3a5f !important;
+        }
+        .btn-primary {
+            background-color: #1e3a5f !important;
+            border-color: #1e3a5f !important;
+        }
+        .btn-primary:hover {
+            background-color: #2b4c7e !important;
+            border-color: #2b4c7e !important;
         }
 
         /* Proportional, compact typography matching homepage scale */
@@ -46,36 +57,52 @@
         .btn { font-size: 0.875rem; }
         .btn-sm { font-size: 0.775rem; }
 
-        /* Navbar */
+        /* Minimal Navbar */
         .navbar { 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 10px 0 !important;
-            transition: all 0.3s ease;
+            background: #ffffff; 
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            padding: 8px 0 !important;
+            transition: all 0.2s ease;
         }
         .navbar-brand { 
-            font-weight: 800; 
-            font-size: 1.25rem !important;
-            background: linear-gradient(135deg, #0066ff, #00c6ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
+            font-weight: 700; 
+            font-size: 1.15rem !important;
+            color: #0f172a !important;
+            letter-spacing: -0.02em;
+            background: none;
+            -webkit-text-fill-color: initial;
         }
         .nav-link { 
-            font-weight: 600; 
-            font-size: 0.875rem !important;
-            color: var(--text-muted); 
-            padding: 6px 14px !important;
+            font-weight: 500; 
+            font-size: 0.85rem !important;
+            color: #64748b; 
+            padding: 6px 12px !important;
             margin: 0 2px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: 6px;
+            transition: all 0.15s ease;
         }
-        .nav-link:hover, .nav-link.active { 
-            color: var(--primary); 
-            background: rgba(0, 102, 255, 0.08);
+        .nav-link:hover { 
+            color: #0f172a; 
+            background: #f8fafc;
+        }
+        .nav-link.active { 
+            color: #0f172a; 
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+        .user-nav-dropdown {
+            color: #0f172a !important;
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            font-weight: 500 !important;
+            padding: 4px 10px !important;
+            border-radius: 6px !important;
+            transition: all 0.15s ease;
+        }
+        .user-nav-dropdown:hover {
+            background: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
         }
 
         /* Modern Card */
@@ -149,7 +176,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
         <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}"><i class="fa-solid fa-map-location-dot"></i> Hà Nam POI</a>
+            <a class="navbar-brand" href="{{ url('/') }}">Ninh Bình POI</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -161,8 +188,8 @@
                     
                     @auth
                         <li class="nav-item dropdown ms-lg-3">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: var(--primary); background: rgba(0, 102, 255, 0.08);">
-                                <x-user-avatar :user="Auth::user()" size="26" />
+                            <a class="nav-link dropdown-toggle user-nav-dropdown d-flex align-items-center gap-2" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <x-user-avatar :user="Auth::user()" size="22" />
                                 <span>{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="navbarUserDropdown">
@@ -202,7 +229,7 @@
 
     <footer>
         <div class="container text-center">
-            <p>&copy; {{ date('Y') }} Cổng Thông Tin Du Lịch Hà Nam. Thiết kế bằng <i class="fa-solid fa-heart text-danger"></i></p>
+            <p>&copy; {{ date('Y') }} Cổng Thông Tin Du Lịch Ninh Bình. Thiết kế bằng <i class="fa-solid fa-heart text-danger"></i></p>
         </div>
     </footer>
 
