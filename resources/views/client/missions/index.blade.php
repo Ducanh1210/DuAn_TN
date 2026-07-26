@@ -1,6 +1,6 @@
 @extends('client.layouts.app')
 
-@section('title', 'Trung Tâm Nhiệm Vụ & Đổi Thưởng - Ninh Bình POI')
+@section('title', 'Trung Tâm Nhiệm Vụ & Đổi Thưởng - Ninh Bình Travel Hub')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
@@ -1057,7 +1057,7 @@
                     <div class="reward-sidebar-compact mt-2 text-center" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px 10px;">
                         <h6 class="fw-bold text-dark mb-1" style="font-size: 0.82rem;">Giới thiệu bạn bè</h6>
                         <p class="text-muted mb-2" style="font-size: 0.72rem;">Nhận ngay <strong>2.000 xu</strong> cho mỗi lượt mời!</p>
-                        <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="navigator.clipboard.writeText(window.location.origin); alert('Đã sao chép liên kết!');" style="font-size: 0.78rem; padding: 7px 10px;">
+                        <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="copyReferralLink()" style="font-size: 0.78rem; padding: 7px 10px;">
                             Giới thiệu ngay
                         </button>
                     </div>
@@ -1100,7 +1100,7 @@
                                         <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain; vertical-align: -2px;" class="me-0.5">
                                         <span>5.000 xu</span>
                                     </div>
-                                    <button class="btn btn-action-compact" onclick="alert('Tính năng đổi voucher sẽ ra mắt trong phiên bản sắp tới!');">
+                                    <button class="btn btn-action-compact" onclick="showShopNotice('Tính năng sắp ra mắt', 'Tính năng đổi voucher sẽ ra mắt trong phiên bản sắp tới!', 'voucher')">
                                         Đổi ngay
                                     </button>
                                 </div>
@@ -1122,7 +1122,7 @@
                                         <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain; vertical-align: -2px;" class="me-0.5">
                                         <span>3.000 xu</span>
                                     </div>
-                                    <button class="btn btn-action-compact" onclick="alert('Huy hiệu sẽ được tự động mở khóa khi đạt mốc thành tựu!');">
+                                    <button class="btn btn-action-compact" onclick="showShopNotice('Thông tin huy hiệu', 'Huy hiệu sẽ được tự động mở khóa khi đạt mốc thành tựu!', 'badge')">
                                         Nhận huy hiệu
                                     </button>
                                 </div>
@@ -1159,7 +1159,7 @@
                     <div class="reward-sidebar-compact mt-2 text-center" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px 10px;">
                         <h6 class="fw-bold text-dark mb-1" style="font-size: 0.82rem;">Mời bạn bè</h6>
                         <p class="text-muted mb-2" style="font-size: 0.72rem;">Nhận ngay <strong>2.000 xu</strong> cho mỗi lượt mời!</p>
-                        <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="navigator.clipboard.writeText(window.location.origin); alert('Đã sao chép liên kết mời!');" style="font-size: 0.78rem; padding: 7px 10px;">
+                        <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="copyReferralLink()" style="font-size: 0.78rem; padding: 7px 10px;">
                             Mời ngay
                         </button>
                     </div>
@@ -2160,5 +2160,90 @@ window.switchNavTab = function(paneId) {
         tabBtn.classList.add('active');
     }
 };
+
+window.showShopNotice = function(title, message, iconType = 'info') {
+    const modalEl = document.getElementById('shopNoticeModal');
+    const titleEl = document.getElementById('shopNoticeTitle');
+    const messageEl = document.getElementById('shopNoticeMessage');
+    const iconEl = document.getElementById('shopNoticeIcon');
+
+    if (!modalEl) return;
+
+    if (titleEl) titleEl.innerText = title;
+    if (messageEl) messageEl.innerText = message;
+
+    if (iconEl) {
+        if (iconType === 'voucher') {
+            iconEl.style.backgroundColor = '#fef9c3';
+            iconEl.style.borderColor = '#fef08a';
+            iconEl.style.color = '#d97706';
+            iconEl.innerHTML = '<i class="fa-solid fa-ticket"></i>';
+        } else if (iconType === 'badge') {
+            iconEl.style.backgroundColor = '#fee2e2';
+            iconEl.style.borderColor = '#fecdd3';
+            iconEl.style.color = '#dc2626';
+            iconEl.innerHTML = '<i class="fa-solid fa-medal"></i>';
+        } else {
+            iconEl.style.backgroundColor = '#eff6ff';
+            iconEl.style.borderColor = '#dbeafe';
+            iconEl.style.color = '#3b82f6';
+            iconEl.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+        }
+    }
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+};
+
+window.showShopToast = function(message) {
+    const toast = document.getElementById('shopToastNotification');
+    const toastText = document.getElementById('shopToastText');
+    if (!toast) return;
+
+    if (toastText) toastText.innerText = message;
+
+    toast.style.opacity = '1';
+    toast.style.pointerEvents = 'auto';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.pointerEvents = 'none';
+        toast.style.transform = 'translateX(-50%) translateY(-30px)';
+    }, 2500);
+};
+
+window.copyReferralLink = function() {
+    navigator.clipboard.writeText(window.location.origin);
+    showShopToast('Đã sao chép liên kết mời thành công!');
+};
 </script>
+
+<!-- Custom Shop Notice Modal -->
+<div class="modal fade modal-confirm-backdrop" id="shopNoticeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
+            <div class="modal-body text-center p-4">
+                <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" id="shopNoticeIcon" style="width: 60px; height: 60px; background-color: #eff6ff; color: #3b82f6; border-radius: 50%; font-size: 1.5rem; border: 1px solid #dbeafe;">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <h5 class="fw-bold mb-2" id="shopNoticeTitle" style="color: #1e3a5f; font-size: 1.1rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    Thông báo
+                </h5>
+                <p class="text-secondary small mb-4" id="shopNoticeMessage" style="color: #64748b; line-height: 1.5; font-size: 0.875rem;">
+                    Nội dung thông báo...
+                </p>
+                <button type="button" class="btn px-4 py-2 w-100" data-bs-dismiss="modal" style="background: #1e3a5f; border-color: #1e3a5f; color: white; font-weight: 600; border-radius: 12px; font-size: 0.85rem;">
+                    Đã hiểu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shop Toast Container -->
+<div id="shopToastNotification" style="position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-30px); background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(16px); color: #ffffff; padding: 12px 24px; border-radius: 50px; font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3); opacity: 0; pointer-events: none; transition: all 0.35s ease; z-index: 10000; font-family: 'Be Vietnam Pro', sans-serif;">
+    <i class="fa-solid fa-circle-check text-success fs-5"></i>
+    <span id="shopToastText">Nội dung thông báo</span>
+</div>
 @endpush

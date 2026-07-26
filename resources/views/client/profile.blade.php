@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cài Đặt Tài Khoản - Ninh Bình POI</title>
+    <title>Cài Đặt Tài Khoản - Ninh Bình Travel Hub</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,8 @@
     <!-- FontAwesome & Avatar Frames CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --primary: #1e3a5f;
@@ -1063,6 +1065,168 @@
                 width: 100%;
             }
         }
+
+        /* Custom Delete Confirmation Modal Premium Styling */
+        .modal-confirm-backdrop {
+            backdrop-filter: blur(12px) saturate(180%);
+            background-color: rgba(15, 23, 42, 0.65) !important;
+        }
+
+        #deleteReviewModal .modal-dialog {
+            max-width: 440px !important;
+        }
+
+        #deleteReviewModal .modal-content {
+            border-radius: 24px !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.05) !important;
+            overflow: hidden !important;
+            background: #ffffff !important;
+            position: relative;
+        }
+
+        /* Top Red Accent Bar */
+        .confirm-modal-top-bar {
+            height: 5px;
+            width: 100%;
+            background: linear-gradient(90deg, #f43f5e 0%, #e11d48 50%, #be123c 100%);
+        }
+
+        .confirm-icon-badge {
+            width: 64px;
+            height: 64px;
+            background: #ffe4e6 !important;
+            color: #e11d48 !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 1.6rem !important;
+            margin: 0 auto 16px auto !important;
+            border: 1px solid #fecdd3 !important;
+            box-shadow: 0 8px 16px -4px rgba(225, 29, 72, 0.15) !important;
+        }
+
+        .confirm-title-text {
+            color: #0f172a !important;
+            font-size: 1.2rem !important;
+            font-weight: 700 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            letter-spacing: -0.01em;
+        }
+
+        .confirm-desc-text {
+            color: #64748b !important;
+            font-size: 0.875rem !important;
+            line-height: 1.55 !important;
+        }
+
+        /* Preview Card Container */
+        .confirm-preview-card {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 16px !important;
+            padding: 14px 16px !important;
+            text-align: left !important;
+            margin-bottom: 24px !important;
+        }
+
+        .confirm-preview-tag {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            background: #e0f2fe !important;
+            color: #0369a1 !important;
+            font-weight: 600 !important;
+            font-size: 0.775rem !important;
+            padding: 4px 10px !important;
+            border-radius: 20px !important;
+            margin-bottom: 6px !important;
+        }
+
+        .confirm-preview-quote {
+            color: #334155 !important;
+            font-size: 0.85rem !important;
+            font-style: italic !important;
+            font-weight: 500 !important;
+            line-height: 1.4 !important;
+            word-break: break-word;
+        }
+
+        /* Buttons */
+        .btn-confirm-cancel-styled {
+            background-color: #f1f5f9 !important;
+            color: #334155 !important;
+            font-weight: 600 !important;
+            border-radius: 14px !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 12px 18px !important;
+            font-size: 0.875rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-confirm-cancel-styled:hover {
+            background-color: #e2e8f0 !important;
+            color: #0f172a !important;
+            border-color: #94a3b8 !important;
+        }
+
+        .btn-confirm-delete-styled {
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            border-radius: 14px !important;
+            border: none !important;
+            padding: 12px 18px !important;
+            font-size: 0.875rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35) !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-confirm-delete-styled:hover {
+            background: linear-gradient(135deg, #be123c 0%, #9f1239 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 8px 22px rgba(225, 29, 72, 0.45) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Dark Mode Support */
+        .dark-mode-active #deleteReviewModal .modal-content {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        .dark-mode-active #deleteReviewModal .confirm-title-text {
+            color: #f8fafc !important;
+        }
+        .dark-mode-active #deleteReviewModal .confirm-desc-text {
+            color: #94a3b8 !important;
+        }
+        .dark-mode-active #deleteReviewModal .confirm-preview-card {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        .dark-mode-active #deleteReviewModal .confirm-preview-tag {
+            background: rgba(3, 105, 161, 0.25) !important;
+            color: #38bdf8 !important;
+        }
+        .dark-mode-active #deleteReviewModal .confirm-preview-quote {
+            color: #cbd5e1 !important;
+        }
+        .dark-mode-active #deleteReviewModal .btn-confirm-cancel-styled {
+            background-color: #334155 !important;
+            color: #cbd5e1 !important;
+            border-color: #475569 !important;
+        }
+        .dark-mode-active #deleteReviewModal .btn-confirm-cancel-styled:hover {
+            background-color: #475569 !important;
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <body>
@@ -1073,7 +1237,7 @@
         <span class="back-chevron">&lsaquo;</span> Quay lại
     </a>
     <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-        Ninh Bình POI
+        Ninh Bình Travel Hub
     </div>
 </div>
 
@@ -1442,8 +1606,9 @@
                                     <div class="fw-semibold text-secondary small">Địa chỉ</div>
                                     <div class="mt-1">{{ $businessProfile->address_street }}, {{ $businessProfile->address_city }}, {{ $businessProfile->address_province }}</div>
                                 </div>
-                                <div class="col-12">
-                                    <div class="fw-semibold text-secondary small font-monospace">Tọa độ: [{{ $businessProfile->lat }}, {{ $businessProfile->lng }}]</div>
+                                <div class="col-12 mb-3">
+                                    <div class="fw-semibold text-secondary small mb-2"><i class="fa-solid fa-map-location-dot text-primary me-1"></i>Vị trí doanh nghiệp trên bản đồ</div>
+                                    <div id="pendingBusinessMap" style="height: 260px; width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; z-index: 1;"></div>
                                 </div>
                                 <div class="col-12 mt-4 text-center">
                                     <button type="button" class="btn btn-outline-danger btn-sm px-4 rounded-3" id="cancelBusinessRequestBtn">
@@ -1474,12 +1639,12 @@
                                     <div class="p-3 border rounded-3 text-center mb-3">
                                         <div class="fw-bold text-primary mb-1" style="font-size:1.5rem;">●</div>
                                         <div class="fw-semibold small mb-1">Xem trang địa điểm</div>
-                                        <p class="text-secondary small mb-2">Xem hiển thị thực tế trên bản đồ Ninh Bình POI</p>
+                                        <p class="text-secondary small mb-2">Xem hiển thị thực tế trên bản đồ Ninh Bình Travel Hub</p>
                                         @php
                                             $loc = \App\Models\Location::where('created_by', $user->id)->first();
                                         @endphp
                                         @if($loc)
-                                            <a href="{{ route('location.detail', $loc->slug ?? $loc->id) }}" target="_blank" class="btn btn-outline-primary btn-sm px-3 rounded-2">Xem chi tiết</a>
+                                            <a href="{{ route('client.locations.360', $loc->slug) }}" target="_blank" class="btn btn-outline-primary btn-sm px-3 rounded-2">Xem chi tiết</a>
                                         @else
                                             <span class="text-muted small">Đang đồng bộ dữ liệu địa điểm...</span>
                                         @endif
@@ -1490,7 +1655,7 @@
                                         <div class="fw-bold text-primary mb-1" style="font-size:1.5rem;">●</div>
                                         <div class="fw-semibold small mb-1">Trang quản trị</div>
                                         <p class="text-secondary small mb-2">Truy cập Dashboard dành cho chủ doanh nghiệp</p>
-                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-sm px-3 rounded-2">Vào trang quản trị</a>
+                                        <a href="{{ route('business.dashboard') }}" class="btn btn-primary btn-sm px-3 rounded-2">Vào trang quản trị</a>
                                     </div>
                                 </div>
                             </div>
@@ -1510,7 +1675,7 @@
                         <div class="section-title">Nâng cấp tài khoản doanh nghiệp</div>
                         <div class="text-center py-4">
 
-                            <h5 class="fw-bold mb-3">Đưa địa điểm kinh doanh của bạn lên bản đồ Ninh Bình POI</h5>
+                            <h5 class="fw-bold mb-3">Đưa địa điểm kinh doanh của bạn lên bản đồ Ninh Bình Travel Hub</h5>
                             <p class="text-secondary mx-auto mb-4" style="max-width: 600px;">
                                 Quảng bá nhà hàng, khách sạn, cửa hàng hoặc dịch vụ của bạn hoàn toàn miễn phí. Tiếp cận hàng ngàn người dùng tìm kiếm địa điểm du lịch, ăn uống, và dịch vụ tại Ninh Bình mỗi ngày.
                             </p>
@@ -1521,7 +1686,7 @@
                                         <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
                                         <div>
                                             <div class="fw-semibold small">Xuất hiện trên Bản đồ</div>
-                                            <p class="text-secondary small mb-0">Hiển thị vị trí chính xác trên bản đồ vệ tinh Ninh Bình POI.</p>
+                                            <p class="text-secondary small mb-0">Hiển thị vị trí chính xác trên bản đồ vệ tinh Ninh Bình Travel Hub.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1816,6 +1981,50 @@
                 <button type="button" class="btn btn-primary fw-bold w-100 rounded-pill py-2" data-bs-dismiss="modal" style="font-size: 0.85rem;">
                     Đã hiểu
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Confirm Delete Review Modal -->
+<div class="modal fade modal-confirm-backdrop" id="deleteReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Top Red Accent Bar -->
+            <div class="confirm-modal-top-bar"></div>
+
+            <div class="modal-body text-center p-4">
+                <!-- Icon Badge -->
+                <div class="confirm-icon-badge">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+
+                <h5 class="confirm-title-text mb-1">
+                    Xác nhận xóa nhận xét
+                </h5>
+                <p class="confirm-desc-text mb-4">
+                    Bạn có chắc chắn muốn xóa nhận xét này không?<br>Thao tác này không thể hoàn tác.
+                </p>
+
+                <!-- Contextual Preview Card -->
+                <div class="confirm-preview-card" id="deleteReviewPreviewBox" style="display: none;">
+                    <div class="confirm-preview-tag" id="deleteReviewLocationName">
+                        <i class="fa-solid fa-location-dot"></i> <span>--</span>
+                    </div>
+                    <div class="confirm-preview-quote" id="deleteReviewSnippetText">
+                        "--"
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 justify-content-center">
+                    <button type="button" class="btn btn-confirm-cancel-styled flex-fill" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark me-1"></i> Hủy
+                    </button>
+                    <button type="button" class="btn btn-confirm-delete-styled flex-fill" id="confirmDeleteReviewBtn">
+                        <i class="fa-solid fa-trash-can me-1"></i> Xóa nhận xét
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2205,63 +2414,111 @@
             });
         }
 
-        // --- Delete Comment via AJAX ---
+        // --- Delete Comment via AJAX with Custom Animated Modal ---
         const commentsTable = document.getElementById('commentsTable');
         const commentsCountBadge = document.getElementById('commentsCountBadge');
+        const deleteReviewModalEl = document.getElementById('deleteReviewModal');
+        const deleteReviewModal = deleteReviewModalEl ? new bootstrap.Modal(deleteReviewModalEl) : null;
+        const confirmDeleteReviewBtn = document.getElementById('confirmDeleteReviewBtn');
+
+        const previewBox = document.getElementById('deleteReviewPreviewBox');
+        const locNameEl = document.getElementById('deleteReviewLocationName');
+        const snippetEl = document.getElementById('deleteReviewSnippetText');
+
+        let pendingDeleteCommentId = null;
+        let pendingDeleteRow = null;
 
         if (commentsTable) {
             commentsTable.addEventListener('click', function(e) {
                 const deleteBtn = e.target.closest('.delete-comment-btn');
                 if (!deleteBtn) return;
 
-                const commentId = deleteBtn.getAttribute('data-comment-id');
-                const row = document.getElementById(`comment-row-${commentId}`);
+                pendingDeleteCommentId = deleteBtn.getAttribute('data-comment-id');
+                pendingDeleteRow = document.getElementById(`comment-row-${pendingDeleteCommentId}`);
 
-                if (!confirm('Bạn có chắc chắn muốn xóa nhận xét này không?')) return;
+                // Populate preview snippet if row exists
+                if (pendingDeleteRow) {
+                    const locName = pendingDeleteRow.children[0]?.innerText?.trim() || '';
+                    const snippet = pendingDeleteRow.children[1]?.innerText?.trim() || '';
 
-                fetch(`/profile/comments/${commentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(res => {
-                    if (res.status === 419) {
-                        showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
-                        setTimeout(() => window.location.reload(), 2000);
-                        throw new Error('CSRF token mismatch (419)');
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message, true);
-                        if (row) {
-                            row.remove();
-                            let currentCount = parseInt(commentsCountBadge.innerText) || 0;
-                            currentCount = Math.max(0, currentCount - 1);
-                            commentsCountBadge.innerText = currentCount;
-
-                            const tbody = commentsTable.querySelector('tbody');
-                            if (currentCount === 0 && tbody && tbody.children.length === 0) {
-                                tbody.innerHTML = `
-                                    <tr id="noCommentsRow">
-                                        <td colspan="4" class="text-center py-4 text-secondary small">
-                                            Bạn chưa viết nhận xét nào.
-                                        </td>
-                                    </tr>
-                                `;
-                            }
+                    if (previewBox && locName) {
+                        if (locNameEl) {
+                            const spanEl = locNameEl.querySelector('span');
+                            if (spanEl) spanEl.innerText = locName;
                         }
-                    } else {
-                        showToast(data.message || 'Xóa thất bại.', false);
+                        if (snippetEl) snippetEl.innerText = `"${snippet}"`;
+                        previewBox.style.display = 'block';
                     }
-                })
-                .catch(err => {
-                    showToast('Có lỗi xảy ra.', false);
-                    console.error(err);
-                });
+                } else if (previewBox) {
+                    previewBox.style.display = 'none';
+                }
+
+                if (deleteReviewModal) {
+                    deleteReviewModal.show();
+                } else {
+                    executeDeleteComment(pendingDeleteCommentId, pendingDeleteRow);
+                }
+            });
+        }
+
+        if (confirmDeleteReviewBtn) {
+            confirmDeleteReviewBtn.addEventListener('click', function() {
+                if (!pendingDeleteCommentId) return;
+
+                const commentId = pendingDeleteCommentId;
+                const row = pendingDeleteRow;
+
+                if (deleteReviewModal) {
+                    deleteReviewModal.hide();
+                }
+
+                executeDeleteComment(commentId, row);
+            });
+        }
+
+        function executeDeleteComment(commentId, row) {
+            fetch(`/profile/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(res => {
+                if (res.status === 419) {
+                    showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
+                    setTimeout(() => window.location.reload(), 2000);
+                    throw new Error('CSRF token mismatch (419)');
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, true);
+                    if (row) {
+                        row.remove();
+                        let currentCount = parseInt(commentsCountBadge.innerText) || 0;
+                        currentCount = Math.max(0, currentCount - 1);
+                        commentsCountBadge.innerText = currentCount;
+
+                        const tbody = commentsTable.querySelector('tbody');
+                        if (currentCount === 0 && tbody && tbody.children.length === 0) {
+                            tbody.innerHTML = `
+                                <tr id="noCommentsRow">
+                                    <td colspan="4" class="text-center py-4 text-secondary small">
+                                        Bạn chưa viết nhận xét nào.
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                    }
+                } else {
+                    showToast(data.message || 'Xóa thất bại.', false);
+                }
+            })
+            .catch(err => {
+                showToast('Có lỗi xảy ra.', false);
+                console.error(err);
             });
         }
 
@@ -2417,6 +2674,81 @@
                 });
             }
         }
+    });
+</script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(isset($businessProfile) && $businessProfile->lat && $businessProfile->lng)
+            let pendingBizMap = null;
+
+            function initPendingBizMap() {
+                const mapEl = document.getElementById('pendingBusinessMap');
+                if (!mapEl) return;
+
+                const lat = parseFloat("{{ $businessProfile->lat }}");
+                const lng = parseFloat("{{ $businessProfile->lng }}");
+
+                if (isNaN(lat) || isNaN(lng)) return;
+
+                if (!pendingBizMap) {
+                    pendingBizMap = L.map('pendingBusinessMap', {
+                        zoomControl: true,
+                        attributionControl: false
+                    }).setView([lat, lng], 15);
+
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        subdomains: 'abcd',
+                        maxZoom: 19
+                    }).addTo(pendingBizMap);
+
+                    // Add GeoJSON boundary if available
+                    fetch('{{ asset('geo/ha-nam-old.geojson') }}')
+                        .then(res => res.json())
+                        .then(data => {
+                            L.geoJSON(data, {
+                                style: {
+                                    color: '#7ba7d4',
+                                    weight: 2,
+                                    opacity: 0.55,
+                                    fillColor: '#f8fafc',
+                                    fillOpacity: 0.04
+                                }
+                            }).addTo(pendingBizMap);
+                        })
+                        .catch(err => console.error(err));
+
+                    // Add marker with custom popup
+                    const marker = L.marker([lat, lng]).addTo(pendingBizMap);
+                    marker.bindPopup(`
+                        <div style="font-family: 'Be Vietnam Pro', sans-serif; font-size: 0.85rem; padding: 2px;">
+                            <strong style="color: #1e3a5f;">{{ $businessProfile->business_name }}</strong><br>
+                            <span style="color: #64748b; font-size: 0.775rem;">{{ $businessProfile->address_street }}, {{ $businessProfile->address_city }}</span>
+                        </div>
+                    `).openPopup();
+                }
+
+                setTimeout(() => {
+                    if (pendingBizMap) pendingBizMap.invalidateSize();
+                }, 200);
+            }
+
+            // Handle tab switching
+            const bizTabBtn = document.getElementById('tab-business-btn');
+            if (bizTabBtn) {
+                bizTabBtn.addEventListener('shown.bs.tab', function () {
+                    initPendingBizMap();
+                });
+            }
+
+            // If business tab is active on load
+            const bizTabPane = document.getElementById('tab-business');
+            if (bizTabPane && (bizTabPane.classList.contains('active') || bizTabPane.classList.contains('show') || window.location.hash === '#business')) {
+                setTimeout(initPendingBizMap, 300);
+            }
+        @endif
     });
 </script>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - Ninh Bình POI</title>
+    <title>Đăng nhập - Ninh Bình Travel Hub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -288,6 +288,20 @@
             padding-left: 16px;
         }
 
+        .field-error-msg {
+            display: block;
+            color: #dc2626;
+            font-size: 0.725rem;
+            font-weight: 500;
+            margin-top: 4px;
+            text-align: left;
+            transition: all 0.15s ease;
+        }
+
+        .form-control.is-invalid {
+            border-bottom: 2px solid #ef4444 !important;
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 991.98px) {
             .split-container {
@@ -332,23 +346,25 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}">
+                <form method="POST" action="{{ route('login') }}" id="loginForm" novalidate>
                     @csrf
                     <div class="form-group">
                         <label for="username" class="form-label">Tên đăng nhập</label>
                         <div class="input-wrapper">
-                            <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tên đăng nhập" value="{{ old('username') }}" required autofocus>
+                            <input type="text" id="username" name="username" class="form-control @error('username') is-invalid @enderror" placeholder="Nhập tên đăng nhập" value="{{ old('username') }}" autofocus>
                         </div>
+                        <span class="field-error-msg" id="usernameError">@error('username'){{ $message }}@enderror</span>
                     </div>
                     
                     <div class="form-group">
                         <label for="password" class="form-label">Mật khẩu</label>
                         <div class="input-wrapper">
-                            <input type="password" id="password" name="password" class="form-control has-right-icon" placeholder="Nhập mật khẩu" required>
+                            <input type="password" id="password" name="password" class="form-control has-right-icon @error('password') is-invalid @enderror" placeholder="Nhập mật khẩu">
                             <button type="button" class="toggle-password" onclick="togglePassword('password', 'passwordToggleIcon')">
                                 <i class="fa-regular fa-eye" id="passwordToggleIcon"></i>
                             </button>
                         </div>
+                        <span class="field-error-msg" id="passwordError">@error('password'){{ $message }}@enderror</span>
                     </div>
 
                     <button type="submit" class="btn-submit">Đăng nhập</button>
@@ -392,6 +408,58 @@
                 icon.classList.add('fa-eye');
             }
         }
+
+        // Inline Validation on Submit
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            if (!form) return;
+
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                const username = document.getElementById('username');
+                const usernameErr = document.getElementById('usernameError');
+                if (!username.value.trim()) {
+                    showError(username, usernameErr, 'Vui lòng nhập tên đăng nhập.');
+                    isValid = false;
+                }
+
+                const password = document.getElementById('password');
+                const passwordErr = document.getElementById('passwordError');
+                if (!password.value) {
+                    showError(password, passwordErr, 'Vui lòng nhập mật khẩu.');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+
+            function showError(input, errorEl, message) {
+                input.classList.add('is-invalid');
+                if (errorEl) {
+                    errorEl.textContent = message;
+                }
+            }
+
+            function clearError(input, errorEl) {
+                input.classList.remove('is-invalid');
+                if (errorEl) {
+                    errorEl.textContent = '';
+                }
+            }
+
+            ['username', 'password'].forEach(id => {
+                const input = document.getElementById(id);
+                const errorEl = document.getElementById(id + 'Error');
+                if (input) {
+                    input.addEventListener('input', function() {
+                        clearError(this, errorEl);
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>

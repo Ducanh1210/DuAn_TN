@@ -4,12 +4,12 @@
 
 @section('content')
 <div class="card-minimal mx-auto p-4" style="max-width: 720px;">
-    <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data" novalidate>
         @csrf
         
         <div class="mb-3">
             <label for="name" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Tên danh mục <span class="text-danger">*</span></label>
-            <input type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required style="border-color: #e2e8f0;">
+            <input type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" style="border-color: #e2e8f0;">
             @error('name') <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div> @enderror
         </div>
 
@@ -35,8 +35,9 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="display_order" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Thứ tự hiển thị</label>
-                <input type="number" class="form-control form-control-sm" id="display_order" name="display_order" value="{{ old('display_order') }}" style="border-color: #e2e8f0;">
-                <div class="text-muted mt-1" style="font-size: 0.725rem;">Để trống để tự động xếp cuối</div>
+                <input type="number" min="0" class="form-control form-control-sm @error('display_order') is-invalid @enderror" id="display_order" name="display_order" value="{{ old('display_order') }}" style="border-color: #e2e8f0;">
+                <div class="text-muted mt-1" style="font-size: 0.725rem;">Để trống để tự động xếp cuối (không nhập số âm)</div>
+                @error('display_order') <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div> @enderror
             </div>
             <div class="col-md-6">
                 <label for="status" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Trạng thái</label>
