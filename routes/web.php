@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\NewsController as ClientNewsController;
 use App\Http\Controllers\Client\EventController as ClientEventController;
+use App\Http\Controllers\Client\ChatbotController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,6 +88,8 @@ Route::get('/su-kien', [ClientEventController::class, 'index'])->name('client.ev
 Route::get('/su-kien/{slug}', [ClientEventController::class, 'show'])->name('client.events.show');
 
 // Client Interactions
+Route::post('/chat/message', [ChatbotController::class, 'sendMessage'])->name('client.chat.message');
+
 Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/favorite', [\App\Http\Controllers\Client\InteractionController::class, 'toggleFavorite'])->name('client.locations.favorite');
     Route::post('/locations/{location}/comment', [\App\Http\Controllers\Client\InteractionController::class, 'storeComment'])->name('client.locations.comment');
@@ -131,12 +134,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/claim-daily', [\App\Http\Controllers\Client\ProfileController::class, 'claimDaily'])->name('client.profile.claim_daily');
     
     // Missions & Avatar Frame Routes
-    Route::get('/missions', [\App\Http\Controllers\Client\ProfileController::class, 'missions'])->name('client.missions');
     Route::post('/missions/claim/{mission}', [\App\Http\Controllers\Client\ProfileController::class, 'claimMissionReward'])->name('client.missions.claim');
     Route::post('/missions/claim-milestone', [\App\Http\Controllers\Client\ProfileController::class, 'claimMilestone100'])->name('client.missions.claim_milestone');
     Route::post('/avatar-frames/equip', [\App\Http\Controllers\Client\ProfileController::class, 'equipAvatarFrame'])->name('client.avatar_frames.equip');
     Route::post('/avatar-frames/buy/{frame}', [\App\Http\Controllers\Client\ProfileController::class, 'buyAvatarFrame'])->name('client.avatar_frames.buy');
 });
+
+// Public Missions Route
+Route::get('/missions', [\App\Http\Controllers\Client\ProfileController::class, 'missions'])->name('client.missions');
 
 // Admin Protected Routes
 Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->group(function () {

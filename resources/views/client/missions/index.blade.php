@@ -15,6 +15,8 @@
         --q-text-main: #0f2442;
         --q-text-sub: #64748b;
         --q-border: #e2e8f0;
+    }
+
     footer {
         display: none !important;
     }
@@ -1003,17 +1005,23 @@
 
         <!-- Points Capsule & Avatar -->
         <div class="d-flex align-items-center gap-3">
-            <div class="user-point-capsule">
-                <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 20px; height: 20px; object-fit: contain; vertical-align: -3px;" class="me-1">
-                <span id="headerUserPoints">{{ number_format($user->points) }}</span>
-            </div>
+            @if($user)
+                <div class="user-point-capsule">
+                    <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 20px; height: 20px; object-fit: contain; vertical-align: -3px;" class="me-1">
+                    <span id="headerUserPoints">{{ number_format($user->points) }}</span>
+                </div>
 
-            <div class="position-relative">
-                <i class="fa-solid fa-bell text-muted fs-5 cursor-pointer"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary" style="font-size: 0.6rem;">3</span>
-            </div>
+                <div class="position-relative">
+                    <i class="fa-solid fa-bell text-muted fs-5 cursor-pointer"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary" style="font-size: 0.6rem;">3</span>
+                </div>
 
-            <x-user-avatar :user="$user" size="34" />
+                <x-user-avatar :user="$user" size="34" />
+            @else
+                <a href="{{ route('login') }}" class="btn btn-primary btn-sm fw-bold px-3" style="border-radius: 8px;">
+                    <i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
+                </a>
+            @endif
         </div>
     </div>
 </div>
@@ -1484,17 +1492,32 @@
 
                         <div class="d-flex align-items-center gap-1 mb-3">
                             @php
-                                $hasClaimedToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
-                                $rawStreak = (int)($user->streak_count ?? 0);
-                                $effectiveStreak = $hasClaimedToday ? max(1, $rawStreak) : $rawStreak;
+                                $hasClaimedToday = false;
+                                $effectiveStreak = 0;
+                                if ($user) {
+                                    $hasClaimedToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
+                                    $lastStreakAt = $user->last_streak_at ? \Carbon\Carbon::parse($user->last_streak_at) : null;
+                                    
+                                    if ($hasClaimedToday) {
+                                        $rawStreak = (int)($user->streak_count ?? 1);
+                                        $effectiveStreak = (($rawStreak - 1) % 7) + 1;
+                                    } else {
+                                        if ($lastStreakAt && $lastStreakAt->isYesterday()) {
+                                            $prevStreak = (int)($user->streak_count ?? 0);
+                                            $effectiveStreak = (($prevStreak - 1) % 7) + 1;
+                                        } else {
+                                            $effectiveStreak = 0;
+                                        }
+                                    }
+                                }
+                                
                                 $day7Frame = \App\Models\AvatarFrame::where('code', 'frame-streak')->first()
                                     ?? \App\Models\AvatarFrame::where('name', 'like', '%Duy Trì%')->first()
                                     ?? \App\Models\AvatarFrame::first();
                             @endphp
                             @for($day = 1; $day <= 7; $day++)
                                 @php
-                                    $isDone = ($day <= $effectiveStreak);
-                                    // Current active day only highlights if NOT claimed today yet
+                                    $isDone = ($hasClaimedToday && $day <= $effectiveStreak) || (!$hasClaimedToday && $day <= $effectiveStreak);
                                     $isCurrent = (!$hasClaimedToday && $day == ($effectiveStreak + 1));
                                     $isFrameDay = ($day == 7);
                                 @endphp
@@ -1524,8 +1547,8 @@
                             @endfor
                         </div>
 
-                        <button id="btnDailyCheckinSide" class="btn btn-indigo w-100 fw-bold" style="padding: 9px; font-size: 0.84rem;" @if($user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday()) disabled @endif>
-                            @if($user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday())
+                        <button id="btnDailyCheckinSide" class="btn btn-indigo w-100 fw-bold" style="padding: 9px; font-size: 0.84rem;" @if($user && $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday()) disabled @endif>
+                            @if($user && $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday())
                                 Đã điểm danh hôm nay
                             @else
                                 Điểm danh ngay
@@ -1563,7 +1586,7 @@
                         <div class="d-flex flex-column gap-1">
                             @forelse($leaderboard as $index => $topUser)
                                 @php $rank = $index + 1; @endphp
-                                <div class="leaderboard-row {{ $topUser->id == $user->id ? 'highlight' : '' }}">
+                                <div class="leaderboard-row {{ $user && $topUser->id == $user->id ? 'highlight' : '' }}">
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="rank-badge {{ $rank == 1 ? 'rank-1' : ($rank == 2 ? 'rank-2' : ($rank == 3 ? 'rank-3' : 'rank-other')) }}">
                                             {{ $rank }}
@@ -1615,7 +1638,7 @@
                     <div class="main-section-card">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <h4 class="fw-extrabold text-dark mb-0" style="font-size: 1.2rem;">Tủ khung cá nhân</h4>
-                            @if($user->equipped_frame_id)
+                            @if($user && $user->equipped_frame_id)
                                 <button class="btn btn-outline-danger btn-sm rounded-pill fw-bold btn-unequip-frame" style="font-size: 0.75rem;">
                                     <i class="fa-solid fa-xmark me-1"></i> Tháo khung
                                 </button>
@@ -1625,11 +1648,11 @@
                         <div class="row g-3">
                             @php $myFrames = $allFrames->whereIn('id', $unlockedFrameIds); @endphp
                             @forelse($myFrames as $frame)
-                                @php $isEquipped = ($user->equipped_frame_id == $frame->id); @endphp
+                                @php $isEquipped = ($user && $user->equipped_frame_id == $frame->id); @endphp
                                 <div class="col-6 col-md-4 col-lg-3">
                                     <div class="p-3 border rounded-3 text-center bg-white">
                                         <div class="avatar-frame-wrapper {{ $frame->image_url ? 'has-png-frame' : $frame->css_style }} mx-auto mb-2" style="width: 56px; height: 56px;">
-                                            <img src="{{ $user->avatar_formatted_url }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->display_name ?? $user->username) }}&background=6366f1&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                            <img src="{{ $user ? $user->avatar_formatted_url : 'https://ui-avatars.com/api/?name=Guest&background=6366f1&color=fff' }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Guest&background=6366f1&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                                             @if($frame->image_url)
                                                 <img src="{{ asset($frame->image_url) }}" class="avatar-frame-png-overlay">
                                             @endif
@@ -1669,7 +1692,7 @@
                     <input type="checkbox" class="reward-card-checkbox" id="chkEquipFrame" checked title="Tích chọn để trang bị khung này">
                     <div class="reward-card-preview">
                         <div class="reward-avatar-preview-box">
-                            <img src="{{ $user->avatar_formatted_url }}" class="reward-avatar-img">
+                            <img src="{{ $user ? $user->avatar_formatted_url : 'https://ui-avatars.com/api/?name=Guest&background=6366f1&color=fff' }}" class="reward-avatar-img">
                             <img src="" id="rewardFrameOverlay" class="reward-frame-overlay-img">
                         </div>
                     </div>

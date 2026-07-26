@@ -172,6 +172,7 @@
             -webkit-text-fill-color: transparent;
         }
     </style>
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
@@ -301,5 +302,8 @@
         })();
     </script>
     @endauth
+
+    <!-- AI Chatbot Floating Widget -->
+    <x-chatbot-widget />
 </body>
 </html>

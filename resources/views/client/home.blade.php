@@ -790,21 +790,21 @@
         /* Search Suggestions */
         .search-suggestions {
             position: absolute;
-            top: 36px;
+            top: calc(100% + 8px);
             left: 0;
-            width: 100%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 12px;
-            box-shadow: var(--glass-shadow);
-            border: 1px solid var(--glass-border);
+            width: 340px;
+            max-width: calc(100vw - 32px);
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.06);
+            border: 1px solid #cbdbe8;
             overflow: hidden;
             display: none;
             flex-direction: column;
-            max-height: 280px;
+            max-height: 240px;
             overflow-y: auto;
-            z-index: 1001;
+            z-index: 99999;
+            pointer-events: auto;
         }
 
         /* Mini Status Bar Wrapper & Dropdown Banner */
@@ -1532,13 +1532,13 @@
         }
 
         .suggestion-item {
-            padding: 12px 20px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
             cursor: pointer;
-            transition: background 0.2s;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: background 0.15s ease;
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .suggestion-item:last-child {
@@ -1546,13 +1546,13 @@
         }
 
         .suggestion-item:hover {
-            background: rgba(0, 114, 255, 0.08);
+            background: #f8fafc;
         }
 
         .suggestion-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1561,7 +1561,7 @@
         }
 
         .suggestion-icon span {
-            font-size: 18px;
+            font-size: 15px;
         }
 
         .suggestion-info {
@@ -1571,23 +1571,24 @@
         }
 
         .suggestion-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a1a;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #1e3a5f;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .suggestion-cat {
-            font-size: 12px;
-            color: #666;
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 1px;
         }
 
         .no-results {
-            padding: 16px 20px;
-            font-size: 14px;
-            color: #666;
+            padding: 12px 14px;
+            font-size: 0.8rem;
+            color: #64748b;
             text-align: center;
         }
 
@@ -2419,7 +2420,19 @@
                         <div style="background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; overflow: hidden;">
                             <!-- Row 1: Điểm danh -->
                             @php
-                                $hasCheckinToday = Auth::user()->last_daily_bonus_at && \Carbon\Carbon::parse(Auth::user()->last_daily_bonus_at)->isToday();
+                                $user = Auth::user();
+                                $hasCheckinToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
+                                if ($hasCheckinToday) {
+                                    $todayBonus = ((($user->streak_count - 1) % 7) + 1) * 10;
+                                } else {
+                                    $lastStreakAt = $user->last_streak_at ? \Carbon\Carbon::parse($user->last_streak_at) : null;
+                                    if ($lastStreakAt && $lastStreakAt->isYesterday()) {
+                                        $nextStreak = $user->streak_count + 1;
+                                    } else {
+                                        $nextStreak = 1;
+                                    }
+                                    $todayBonus = ((($nextStreak - 1) % 7) + 1) * 10;
+                                }
                             @endphp
                             <div style="padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #f1f5f9;">
                                 <div style="display: flex; align-items: center; min-width: 0; flex: 1;">
@@ -2427,12 +2440,12 @@
                                 </div>
                                 <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; flex-shrink: 0;">
                                     <div style="display: flex; align-items: center; gap: 2px; font-weight: 700; color: #334155; font-size: 0.6rem;">
-                                        +10 <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;">
+                                        +<span id="widgetDailyBonusVal">{{ $todayBonus }}</span> <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;">
                                     </div>
                                     @if($hasCheckinToday)
                                         <span style="font-weight: 600; color: #475569; font-size: 0.56rem; white-space: nowrap;">Đã điểm danh</span>
                                     @else
-                                        <button type="button" id="widgetClaimDailyBtn" style="font-size: 0.56rem; font-weight: 700; padding: 2px 8px; border: 1px solid #475569; color: #ffffff; background: #475569; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Nhận</button>
+                                        <button type="button" id="widgetClaimDailyBtn" style="font-size: 0.56rem; font-weight: 700; padding: 2px 8px; border: 1px solid #1e3a5f; color: #ffffff; background: #1e3a5f; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Nhận</button>
                                     @endif
                                 </div>
                             </div>
@@ -2596,6 +2609,13 @@
         }).addTo(map);
 
         L.control.zoom({ position: 'topright' }).addTo(map);
+
+        // Prevent Leaflet Map events from propagating on search panel
+        const topSearchPanelEl = document.getElementById('topSearchPanel');
+        if (topSearchPanelEl) {
+            L.DomEvent.disableClickPropagation(topSearchPanelEl);
+            L.DomEvent.disableScrollPropagation(topSearchPanelEl);
+        }
 
 
 
@@ -3162,7 +3182,11 @@
                         </div>
                     `;
 
-                    item.addEventListener('click', () => {
+                    const handleSelectLoc = (e) => {
+                        if (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
                         suggestionsBox.classList.remove('active');
                         searchInput.value = loc.name;
 
@@ -3171,23 +3195,29 @@
                             markers.addLayer(loc.marker);
                         }
 
+                        const openLocPopup = () => {
+                            setTimeout(() => {
+                                if (loc.marker) loc.marker.openPopup();
+                            }, 100);
+                        };
+
                         // Zoom từng cấp cụm một (step-by-step) thay vì nhảy vọt
                         stepZoomToMarker(loc, () => {
                             let targetZoom = Math.max(18, map.getZoom());
                             let dist = map.getCenter().distanceTo([loc.lat, loc.lng]);
 
-                            if (dist > 500) {
-                                map.flyTo([loc.lat, loc.lng], targetZoom, { duration: 1.2 });
+                            if (dist > 80) {
+                                map.once('moveend', openLocPopup);
+                                map.flyTo([loc.lat, loc.lng], targetZoom, { duration: 1.1 });
                             } else {
-                                map.setView([loc.lat, loc.lng], targetZoom, { animate: true, duration: 1.2 });
+                                map.setView([loc.lat, loc.lng], targetZoom, { animate: true });
+                                openLocPopup();
                             }
-
-                            // Đợi bay đến giữa rồi mới mở popup để tránh giật hình
-                            setTimeout(() => {
-                                loc.marker.openPopup();
-                            }, 800);
                         });
-                    });
+                    };
+
+                    item.addEventListener('click', handleSelectLoc);
+                    item.addEventListener('mousedown', handleSelectLoc);
 
                     suggestionsBox.appendChild(item);
                 });
@@ -3664,16 +3694,15 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        widgetClaimDailyBtn.className = "btn btn-xs btn-success border-0 px-2 py-0.5 rounded-pill fw-semibold";
-                        widgetClaimDailyBtn.style.backgroundColor = "#10b981";
-                        widgetClaimDailyBtn.style.color = "white";
-                        widgetClaimDailyBtn.innerHTML = "Đã nhận";
-                        widgetClaimDailyBtn.disabled = true;
+                        const parentContainer = widgetClaimDailyBtn.parentElement;
+                        if (parentContainer) {
+                            parentContainer.innerHTML = '<div style="display: flex; align-items: center; gap: 2px; font-weight: 700; color: #334155; font-size: 0.6rem;">+' + (data.coins || 10) + ' <img src="{{ asset("images/xu.png") }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;"></div><span style="font-weight: 600; color: #475569; font-size: 0.56rem; white-space: nowrap;">Đã điểm danh</span>';
+                        }
                         
                         // Update points displays
                         const widgetPoints = document.getElementById("widgetPoints");
                         if (widgetPoints) {
-                            widgetPoints.textContent = data.points + " xu";
+                            widgetPoints.textContent = data.points;
                         }
                         const headerPoints = document.getElementById("navbarUserPoints");
                         if (headerPoints) {
@@ -3720,5 +3749,8 @@
     </script>
     
     @include('client.components.contribution-modals')
+
+    <!-- AI Chatbot Floating Widget -->
+    <x-chatbot-widget />
 </body>
 </html>
