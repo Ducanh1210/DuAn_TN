@@ -251,13 +251,15 @@
   }
 
   function createLinkHotspotElement(hotspot) {
+
+    // Create wrapper element to hold icon and tooltip.
     var wrapper = document.createElement('div');
     wrapper.classList.add('hotspot');
     wrapper.classList.add('link-hotspot');
-    wrapper.classList.add('link-hotspot-tooltip');
     wrapper.setAttribute('data-id', hotspot.id);
     wrapper.style.setProperty('--base-scale', hotspot.scale || 1.0);
 
+    // Pause autorotate on hover
     wrapper.addEventListener('mouseenter', function() {
       if (typeof stopAutorotate === 'function') stopAutorotate();
     });
@@ -265,25 +267,20 @@
       if (typeof startAutorotate === 'function') startAutorotate();
     });
 
-    var targetData = findSceneDataById(hotspot.target);
-    var targetTitle = targetData ? targetData.name : 'Chưa liên kết';
+    // Create dot element.
+    var icon = document.createElement('div');
+    icon.classList.add('link-hotspot-icon');
+    icon.classList.add('pulsing-dot');
 
-    wrapper.innerHTML = `
-      <div class="hotspot-anchor-dot"></div>
-      <div class="dashed-connector-svg">
-        <svg viewBox="0 0 70 50" preserveAspectRatio="none">
-          <line class="dashed-line-path" x1="0" y1="50" x2="70" y2="0" stroke="white" stroke-width="2" stroke-dasharray="4 4" />
-        </svg>
-      </div>
-      <div class="hotspot-badge-card">
-        <div class="hotspot-badge-icon">
-          <i class="fas fa-map-marker-alt"></i>
-        </div>
-        <div class="hotspot-badge-title">${targetTitle}</div>
-      </div>
-    `;
+    // Set rotation transform.
+    var transformProperties = ['-ms-transform', '-webkit-transform', 'transform'];
+    for (var i = 0; i < transformProperties.length; i++) {
+      var property = transformProperties[i];
+      icon.style[property] = 'rotate(' + hotspot.rotation + 'rad)';
+    }
 
-    var clickHandler = function(e) {
+    // Add click event handler.
+    wrapper.addEventListener('click', function (e) {
       if (window.isEditorMode) {
         document.querySelectorAll('.hotspot').forEach(function(h) { 
             h.classList.remove('active-menu'); 
@@ -291,18 +288,45 @@
         });
         wrapper.classList.add('active-menu');
         wrapper.style.zIndex = '100000';
-        return;
+        return; // Handled by context menu buttons
       }
-      if (targetData) {
-        switchScene(findSceneById(targetData.id));
+      var targetScene = findSceneById(hotspot.target);
+      if (targetScene) {
+        if (hotspot.target_yaw !== null && hotspot.target_yaw !== undefined) {
+          switchScene(targetScene, { yaw: hotspot.target_yaw, pitch: hotspot.target_pitch });
+        } else {
+          switchScene(targetScene);
+        }
       }
-    };
+    });
 
-    wrapper.querySelector('.hotspot-anchor-dot').addEventListener('click', clickHandler);
-    wrapper.querySelector('.hotspot-badge-card').addEventListener('click', clickHandler);
-
+    // Prevent touch and scroll events from reaching the parent element.
     stopTouchAndScrollEventPropagation(wrapper);
 
+    // Create SVG Dashed Connector + Badge Card
+    var tooltip = document.createElement('div');
+    tooltip.classList.add('hotspot-tooltip');
+    tooltip.classList.add('link-hotspot-tooltip');
+
+    var targetData = findSceneDataById(hotspot.target);
+    var sceneTitle = targetData ? targetData.name : 'Chưa liên kết';
+
+    tooltip.innerHTML = `
+      <svg class="hotspot-dashed-connector" viewBox="0 0 30 30">
+        <line x1="0" y1="30" x2="30" y2="0" class="dashed-line-path"></line>
+      </svg>
+      <div class="hotspot-badge-card">
+        <div class="hotspot-badge-icon">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div class="hotspot-badge-title">${sceneTitle}</div>
+      </div>
+    `;
+
+    wrapper.appendChild(icon);
+    wrapper.appendChild(tooltip);
+
+    // In editor mode, append context menu
     if (window.isEditorMode) {
       var menu = document.createElement('div');
       menu.className = 'hotspot-context-menu';
@@ -319,13 +343,15 @@
   }
 
   function createInfoHotspotElement(hotspot) {
+
+    // Create wrapper element to hold icon and tooltip.
     var wrapper = document.createElement('div');
     wrapper.classList.add('hotspot');
     wrapper.classList.add('info-hotspot');
-    wrapper.classList.add('info-hotspot-tooltip');
     wrapper.setAttribute('data-id', hotspot.id);
     wrapper.style.setProperty('--base-scale', hotspot.scale || 1.0);
 
+    // Pause autorotate on hover
     wrapper.addEventListener('mouseenter', function() {
       if (typeof stopAutorotate === 'function') stopAutorotate();
     });
@@ -333,24 +359,32 @@
       if (typeof startAutorotate === 'function') startAutorotate();
     });
 
-    var infoTitle = hotspot.title || 'Thông tin';
+    // Create micro anchor dot
+    var anchor = document.createElement('div');
+    anchor.classList.add('info-hotspot-anchor');
 
-    wrapper.innerHTML = `
-      <div class="info-hotspot-anchor"></div>
-      <div class="dashed-connector-svg">
-        <svg viewBox="0 0 70 50" preserveAspectRatio="none">
-          <line class="dashed-line-path" x1="0" y1="50" x2="70" y2="0" stroke="white" stroke-width="2" stroke-dasharray="4 4" />
-        </svg>
-      </div>
+    // Prevent touch and scroll events
+    stopTouchAndScrollEventPropagation(wrapper);
+
+    // Create SVG Dashed Connector + Badge Card for Info Hotspot
+    var tooltip = document.createElement('div');
+    tooltip.classList.add('hotspot-tooltip');
+    tooltip.classList.add('info-hotspot-tooltip');
+
+    tooltip.innerHTML = `
+      <svg class="hotspot-dashed-connector" viewBox="0 0 30 30">
+        <line x1="0" y1="30" x2="30" y2="0" class="dashed-line-path"></line>
+      </svg>
       <div class="hotspot-badge-card">
         <div class="hotspot-badge-icon info-badge-icon">
-          <i class="fas fa-info-circle"></i>
+          <i class="fa-solid fa-circle-info"></i>
         </div>
-        <div class="hotspot-badge-title info-badge-title">${infoTitle}</div>
+        <div class="hotspot-badge-title info-badge-title">${hotspot.title || ''}</div>
       </div>
     `;
 
-    var clickHandler = function(e) {
+    // Click handler to open modal/editor
+    wrapper.addEventListener('click', function (e) {
       if (window.isEditorMode) {
         document.querySelectorAll('.hotspot').forEach(function(h) { 
             h.classList.remove('active-menu'); 
@@ -360,14 +394,13 @@
         wrapper.style.zIndex = '100000';
         return;
       }
-      wrapper.classList.toggle('visible');
-    };
+      showInfoModal(hotspot);
+    });
 
-    wrapper.querySelector('.info-hotspot-anchor').addEventListener('click', clickHandler);
-    wrapper.querySelector('.hotspot-badge-card').addEventListener('click', clickHandler);
+    wrapper.appendChild(anchor);
+    wrapper.appendChild(tooltip);
 
-    stopTouchAndScrollEventPropagation(wrapper);
-
+    // In editor mode, append context menu
     if (window.isEditorMode) {
       var menu = document.createElement('div');
       menu.className = 'hotspot-context-menu';

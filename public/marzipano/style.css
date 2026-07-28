@@ -422,81 +422,58 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   100% { transform: scale(calc(var(--base-scale, 1) * 2.8)); opacity: 0; border-width: 0px; }
 }
 
-/* Custom Hotspot System (Badge Card + Dashed Line) */
+/* Elevate hovered hotspot above all other elements */
+.hotspot:hover,
+.hotspot.active-menu {
+  z-index: 1000 !important;
+}
 
-.link-hotspot-tooltip, .info-hotspot-tooltip {
+/* Modern Dashed Connector & Badge Card Design */
+.hotspot-tooltip {
   position: absolute;
-  top: 50%;
   left: 50%;
-  transform: translate(0, -100%);
+  top: 50%;
   pointer-events: none;
   z-index: 10;
-}
-
-.hotspot-anchor-dot {
-  width: 14px;
-  height: 14px;
-  background-color: #ffffff;
-  border-radius: 50%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-left: -7px;
-  margin-top: -7px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 4px var(--hotspot-color, #FF512F);
-  pointer-events: auto;
-  cursor: pointer;
-  z-index: 2;
+  transform-origin: bottom left;
   transform: scale(var(--base-scale, 1));
 }
 
-.hotspot-anchor-dot::before {
-  content: '';
+/* SVG Dashed Line */
+.hotspot-dashed-connector {
   position: absolute;
-  top: -5px; left: -5px; right: -5px; bottom: -5px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  animation: anchor-pulse 2s infinite ease-out;
-}
-
-@keyframes anchor-pulse {
-  0% { transform: scale(0.6); opacity: 1; }
-  100% { transform: scale(2.2); opacity: 0; }
-}
-
-.dashed-connector-svg {
-  position: absolute;
-  bottom: 0;
   left: 0;
-  width: 70px;
-  height: 50px;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
   overflow: visible;
   pointer-events: none;
-  z-index: 1;
-  transform: scale(var(--base-scale, 1));
-  transform-origin: bottom left;
 }
 
 .dashed-line-path {
-  stroke-dasharray: 60;
-  stroke-dashoffset: 60;
+  stroke: #ffffff;
+  stroke-width: 2.2;
+  stroke-dasharray: 4, 4;
+  stroke-linecap: round;
+  stroke-dashoffset: 45;
   opacity: 0;
-  transition: stroke-dashoffset 0.4s ease-out, opacity 0.3s ease-out;
+  transition: stroke-dashoffset 0.4s ease-out, opacity 0.3s ease;
 }
 
+/* Badge Card Container (expands smoothly outwards from bottom-left corner) */
 .hotspot-badge-card {
   position: absolute;
-  bottom: 50px;
-  left: 70px;
+  left: 30px;
+  bottom: 30px;
   display: flex;
   align-items: center;
-  pointer-events: auto;
-  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
   opacity: 0;
   transform-origin: bottom left;
-  transform: scale(var(--base-scale, 1)) scaleY(0);
-  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease-out;
-  z-index: 3;
+  transform: scale(0);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
 }
 
 /* White square icon container (left side) */
@@ -508,29 +485,31 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #475569 !important; /* Neutral slate gray */
+  color: #475569 !important; /* Simple sleek gray color */
   font-size: 16px;
   z-index: 2;
   flex-shrink: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* Link Hotspot Title container (Subtly narrower vertically: 32px) */
 .hotspot-badge-title {
-  height: 36px;
+  height: 32px;
   background: linear-gradient(135deg, var(--hotspot-color, #FF512F), color-mix(in srgb, var(--hotspot-color, #FF512F) 80%, #000));
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
   padding: 0 14px 0 12px;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 7px 7px 0;
   display: flex;
   align-items: center;
   margin-left: -3px;
   z-index: 1;
   letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
-/* Hover effects for link hotspots */
+/* On hover over .link-hotspot */
 .no-touch .link-hotspot:hover .dashed-line-path,
 .link-hotspot:active .dashed-line-path,
 .link-hotspot.active-menu .dashed-line-path {
@@ -542,10 +521,25 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
 .link-hotspot:active .hotspot-badge-card,
 .link-hotspot.active-menu .hotspot-badge-card {
   opacity: 1;
-  transform: scale(var(--base-scale, 1)) scaleY(1);
+  transform: scale(1);
 }
 
-/* Info Hotspot Static Dot & Always Visible Badge */
+/* Info Hotspot Container */
+.info-hotspot {
+  width: 60px;
+  height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+  opacity: 0.95;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.no-touch .info-hotspot:hover {
+  opacity: 1;
+}
+
+/* Micro anchor dot for Info Hotspot (Static clean dot) */
 .info-hotspot-anchor {
   width: 8px;
   height: 8px;
@@ -563,6 +557,7 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   transform: scale(var(--base-scale, 1));
 }
 
+/* Info Hotspot (Simple dark glass design - ALWAYS VISIBLE) */
 .info-hotspot-tooltip .dashed-line-path {
   stroke-dashoffset: 0;
   opacity: 1;
@@ -570,11 +565,11 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
 
 .info-hotspot-tooltip .hotspot-badge-card {
   opacity: 1;
-  transform: scale(var(--base-scale, 1)) scaleY(1);
+  transform: scale(1);
 }
 
 .info-badge-icon {
-  color: #475569 !important;
+  color: #475569 !important; /* Simple sleek gray color */
 }
 
 .info-badge-title {
@@ -584,6 +579,22 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-left: none;
   font-weight: 500 !important;
+}
+
+.info-hotspot .info-hotspot-icon-wrapper {
+  width: 40px;
+  height: 40px;
+}
+
+.mobile .info-hotspot .info-hotspot-icon-wrapper {
+  width: 50px;
+  height: 50px;
+}
+
+.info-hotspot .info-hotspot-icon {
+  width: 90%;
+  height: 90%;
+  margin: 5%;
 }
 
 .info-hotspot .info-hotspot-title-wrapper {

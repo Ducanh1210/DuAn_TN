@@ -38,27 +38,27 @@
 
 @section('content')
 <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <a href="{{ route('admin.business-profiles.index') }}" class="btn btn-sm btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+    <a href="{{ route('admin.business-profiles.index') }}" class="btn-minimal text-decoration-none">
+        ← Quay lại danh sách
     </a>
 
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 align-items-center">
         @if($businessProfile->status === 'pending')
-            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
-                <i class="fas fa-times me-1"></i> Từ chối yêu cầu
+            <button type="button" class="btn-minimal text-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                Từ chối yêu cầu
             </button>
             <form action="{{ route('admin.business-profiles.approve', $businessProfile->id) }}" method="POST" class="d-inline">
                 @csrf
-                <button type="submit" class="btn btn-sm btn-success px-3" onclick="return confirm('Bạn có chắc chắn muốn phê duyệt doanh nghiệp này?')">
-                    <i class="fas fa-check me-1"></i> Phê duyệt đăng ký
+                <button type="submit" class="btn-minimal btn-minimal-primary px-3" onclick="return confirm('Bạn có chắc chắn muốn phê duyệt doanh nghiệp này?')">
+                    Phê duyệt đăng ký
                 </button>
             </form>
         @elseif($businessProfile->status === 'approved')
-            <span class="badge bg-success py-2 px-3 fs-6"><i class="fas fa-check-circle me-1"></i> Đã phê duyệt</span>
+            <span class="badge-minimal badge-minimal-success py-2 px-3" style="font-size: 0.8rem;"><i class="fas fa-check-circle me-1"></i> Đã phê duyệt</span>
         @elseif($businessProfile->status === 'rejected')
-            <span class="badge bg-danger py-2 px-3 fs-6"><i class="fas fa-times-circle me-1"></i> Đã từ chối</span>
-            <button type="button" class="btn btn-sm btn-outline-success ms-2" data-bs-toggle="modal" data-bs-target="#reApproveModal">
-                <i class="fas fa-redo me-1"></i> Phê duyệt lại
+            <span class="badge-minimal badge-minimal-danger py-2 px-3" style="font-size: 0.8rem;"><i class="fas fa-times-circle me-1"></i> Đã từ chối</span>
+            <button type="button" class="btn-minimal ms-2" data-bs-toggle="modal" data-bs-target="#reApproveModal">
+                Phê duyệt lại
             </button>
         @endif
     </div>
@@ -71,23 +71,23 @@
         <div class="card-minimal p-4 mb-4">
             <div class="d-flex justify-content-between align-items-start mb-3 border-bottom pb-3">
                 <div>
-                    <h4 class="fw-bold mb-1 text-primary">{{ $businessProfile->business_name }}</h4>
-                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 me-2">
+                    <h4 class="fw-semibold mb-1 text-dark">{{ $businessProfile->business_name }}</h4>
+                    <span class="badge-minimal me-2">
                         {{ $businessProfile->category ? $businessProfile->category->name : 'N/A' }}
                     </span>
                     @if(!empty($businessProfile->business_types))
                         @foreach((array)$businessProfile->business_types as $type)
-                            <span class="badge bg-light text-secondary border me-1">{{ $type }}</span>
+                            <span class="badge-minimal me-1">{{ $type }}</span>
                         @endforeach
                     @endif
                 </div>
                 <div>
                     @if($businessProfile->status === 'pending')
-                        <span class="badge bg-warning text-dark px-3 py-2">Chờ xét duyệt</span>
+                        <span class="badge-minimal badge-minimal-warning px-3 py-2" style="font-size: 0.8rem;">Chờ xét duyệt</span>
                     @elseif($businessProfile->status === 'approved')
-                        <span class="badge bg-success px-3 py-2">Đã kích hoạt</span>
+                        <span class="badge-minimal badge-minimal-success px-3 py-2" style="font-size: 0.8rem;">Đã kích hoạt</span>
                     @else
-                        <span class="badge bg-danger px-3 py-2">Bị từ chối</span>
+                        <span class="badge-minimal badge-minimal-danger px-3 py-2" style="font-size: 0.8rem;">Bị từ chối</span>
                     @endif
                 </div>
             </div>
