@@ -422,56 +422,81 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   100% { transform: scale(calc(var(--base-scale, 1) * 2.8)); opacity: 0; border-width: 0px; }
 }
 
-/* Modern Dashed Connector & Badge Tooltip (Image 2 style) */
+/* Custom Hotspot System (Badge Card + Dashed Line) */
 
-.link-hotspot-tooltip {
+.link-hotspot-tooltip, .info-hotspot-tooltip {
   position: absolute;
-  left: 50%;
   top: 50%;
-  width: 0;
-  height: 0;
+  left: 50%;
+  transform: translate(0, -100%);
   pointer-events: none;
-  z-index: 100;
-  transform-origin: 0 0;
+  z-index: 10;
+}
+
+.hotspot-anchor-dot {
+  width: 14px;
+  height: 14px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -7px;
+  margin-top: -7px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 4px var(--hotspot-color, #FF512F);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 2;
   transform: scale(var(--base-scale, 1));
 }
 
-/* SVG dashed line container */
-.hotspot-line-svg {
+.hotspot-anchor-dot::before {
+  content: '';
   position: absolute;
+  top: -5px; left: -5px; right: -5px; bottom: -5px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  animation: anchor-pulse 2s infinite ease-out;
+}
+
+@keyframes anchor-pulse {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.dashed-connector-svg {
+  position: absolute;
+  bottom: 0;
   left: 0;
-  top: -50px;
-  width: 50px;
+  width: 70px;
   height: 50px;
   overflow: visible;
   pointer-events: none;
+  z-index: 1;
+  transform: scale(var(--base-scale, 1));
+  transform-origin: bottom left;
 }
 
-/* Dashed line path */
 .dashed-line-path {
-  stroke-dasharray: 5 3;
+  stroke-dasharray: 60;
   stroke-dashoffset: 60;
   opacity: 0;
-  transition: stroke-dashoffset 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease;
+  transition: stroke-dashoffset 0.4s ease-out, opacity 0.3s ease-out;
 }
 
-/* Badge Card container */
 .hotspot-badge-card {
   position: absolute;
-  left: 30px;
-  top: -62px;
+  bottom: 50px;
+  left: 70px;
   display: flex;
   align-items: center;
-  gap: 0;
-  white-space: nowrap;
   pointer-events: auto;
   cursor: pointer;
-
-  /* Flat horizontal strip opening UPWARDS (from bottom left) */
   opacity: 0;
-  transform: scaleY(0) scaleX(0.3);
   transform-origin: bottom left;
-  transition: transform 0.35s cubic-bezier(0.34, 1.46, 0.64, 1), opacity 0.2s ease;
+  transform: scale(var(--base-scale, 1)) scaleY(0);
+  transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease-out;
+  z-index: 3;
 }
 
 /* White square icon container (left side) */
@@ -483,14 +508,13 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #475569 !important; /* Simple sleek gray color */
+  color: #475569 !important; /* Neutral slate gray */
   font-size: 16px;
   z-index: 2;
   flex-shrink: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Link Hotspot Title container (Keeps category/location theme color!) */
 .hotspot-badge-title {
   height: 36px;
   background: linear-gradient(135deg, var(--hotspot-color, #FF512F), color-mix(in srgb, var(--hotspot-color, #FF512F) 80%, #000));
@@ -506,7 +530,7 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   letter-spacing: 0.2px;
 }
 
-/* On hover over .link-hotspot */
+/* Hover effects for link hotspots */
 .no-touch .link-hotspot:hover .dashed-line-path,
 .link-hotspot:active .dashed-line-path,
 .link-hotspot.active-menu .dashed-line-path {
@@ -518,26 +542,10 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
 .link-hotspot:active .hotspot-badge-card,
 .link-hotspot.active-menu .hotspot-badge-card {
   opacity: 1;
-  transform: scaleX(1) scaleY(1);
+  transform: scale(var(--base-scale, 1)) scaleY(1);
 }
 
-/* Info Hotspot Container */
-
-.info-hotspot {
-  width: 60px;
-  height: 60px;
-  margin-left: -30px;
-  margin-top: -30px;
-  opacity: 0.95;
-  transition: opacity 0.2s;
-  pointer-events: none;
-}
-
-.no-touch .info-hotspot:hover {
-  opacity: 1;
-}
-
-/* Micro anchor dot for Info Hotspot (Static clean dot) */
+/* Info Hotspot Static Dot & Always Visible Badge */
 .info-hotspot-anchor {
   width: 8px;
   height: 8px;
@@ -555,9 +563,18 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   transform: scale(var(--base-scale, 1));
 }
 
-/* Info Hotspot (Simple dark glass design) */
+.info-hotspot-tooltip .dashed-line-path {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+.info-hotspot-tooltip .hotspot-badge-card {
+  opacity: 1;
+  transform: scale(var(--base-scale, 1)) scaleY(1);
+}
+
 .info-badge-icon {
-  color: #475569 !important; /* Simple sleek gray color */
+  color: #475569 !important;
 }
 
 .info-badge-title {
@@ -569,33 +586,70 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   font-weight: 500 !important;
 }
 
-/* Tooltip container for info hotspot */
-.info-hotspot-tooltip {
+.info-hotspot .info-hotspot-title-wrapper {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 40px;
+  top: 0;
   width: 0;
-  height: 0;
-  pointer-events: none;
-  z-index: 100;
-  transform-origin: 0 0;
-  transform: scale(var(--base-scale, 1));
+  height: 40px;
+  padding: 0;
+  overflow: hidden;
+  -webkit-transition: width 0s 0.4s,
+                      padding 0s 0.4s;
+  transition: width 0s 0.4s,
+              padding 0s 0.4s;
 }
 
-/* Always visible for info hotspot */
-.info-hotspot-tooltip .dashed-line-path {
-  stroke-dashoffset: 0;
-  opacity: 1;
+.desktop .info-hotspot.visible .info-hotspot-title-wrapper,
+.desktop.no-touch .info-hotspot .info-hotspot-header:hover .info-hotspot-title-wrapper {
+  width: 220px;
+  padding: 0 5px;
+  -webkit-transition: width 0s 0.4s,
+                      padding 0s 0.4s;
+  transition: width 0s 0.4s,
+              padding 0s 0.4s;
 }
 
-.info-hotspot-tooltip .hotspot-badge-card {
-  opacity: 1;
-  transform: scaleY(1) scaleX(1);
-  transition: filter 0.2s ease, transform 0.2s ease;
+.info-hotspot .info-hotspot-title-wrapper:before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
 }
 
-.no-touch .info-hotspot:hover .hotspot-badge-card {
-  filter: brightness(1.1);
+.info-hotspot .info-hotspot-title {
+  display: inline-block;
+  vertical-align: middle;
+
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+.info-hotspot .info-hotspot-close-wrapper {
+  position: absolute;
+  left: 260px;
+  top: 0;
+  height: 40px;
+  width: 40px;
+  border-top-right-radius: 5px;
+  background-color: rgb(78,88,104);
+  visibility: hidden;
+  -ms-transform: perspective(200px) rotateY(90deg);
+  -webkit-transform: perspective(200px) rotateY(90deg);
+  transform: perspective(200px) rotateY(90deg);
+  -ms-transform-origin: 0 50% 0;
+  -webkit-transform-origin: 0 50% 0;
+  transform-origin: 0 50% 0;
+  -webkit-transition: -ms-transform 0.3s 0.3s,
+                      -webkit-transform 0.3s 0.3s,
+                      transform 0.3s 0.3s,
+                      visibility 0s 0.6s;
+  transition: -ms-transform 0.3s 0.3s,
+              -webkit-transform 0.3s 0.3s,
+              transform 0.3s 0.3s,
+              visibility 0s 0.6s;
 }
 
 .desktop .info-hotspot.visible .info-hotspot-close-wrapper {
