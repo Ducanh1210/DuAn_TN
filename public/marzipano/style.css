@@ -422,227 +422,180 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   100% { transform: scale(calc(var(--base-scale, 1) * 2.8)); opacity: 0; border-width: 0px; }
 }
 
+/* Modern Dashed Connector & Badge Tooltip (Image 2 style) */
+
 .link-hotspot-tooltip {
   position: absolute;
   left: 50%;
-  top: 14px; /* ( 60 - (16 + 2*8) ) / 2 */
-
-  margin-left: 0;
-
-  font-size: 13px;
-
-
-
-  padding: 6px 14px;
-
-  border-radius: 20px;
-
-  background: linear-gradient(to right, color-mix(in srgb, var(--hotspot-color, #FF512F) 40%, black), var(--hotspot-color, #FF512F));
-
-  color: #fff;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-
-  white-space: nowrap;
-  
-  cursor: pointer;
-
-  opacity: 0;
-
-  transform-origin: left center;
-  -ms-transform: translateX(calc(var(--base-scale, 1) * 25px)) scale(var(--base-scale, 1));
-  -webkit-transform: translateX(calc(var(--base-scale, 1) * 25px)) scale(var(--base-scale, 1));
-  transform: translateX(calc(var(--base-scale, 1) * 25px)) scale(var(--base-scale, 1));
-
-  -webkit-transition: -ms-transform 0.3s,
-                      -webkit-transform 0.3s,
-                      transform 0.3s,
-                      opacity 0.3s;
-  transition: -ms-transform 0.3s,
-              -webkit-transform 0.3s,
-              transform 0.3s,
-              opacity 0.3s;
-}
-
-.link-hotspot-tooltip::after {
-  content: '';
-  position: absolute;
   top: 50%;
-  right: calc(100% - 1px); /* Overlap by 1px to prevent gaps */
-  margin-top: -6px;
-  border-width: 6px 6px 6px 0;
-  border-style: solid;
-  border-color: transparent color-mix(in srgb, var(--hotspot-color, #FF512F) 40%, black) transparent transparent;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 100;
+  transform-origin: 0 0;
+  transform: scale(var(--base-scale, 1));
 }
 
-.mobile .link-hotspot {
-  top: 19px; /* ( 70 - (16 + 2*8) ) / 2 */
-}
-
-.no-touch .link-hotspot:hover .link-hotspot-tooltip {
-  opacity: 1;
-  -ms-transform: translateX(calc(var(--base-scale, 1) * 33px)) scale(var(--base-scale, 1));
-  -webkit-transform: translateX(calc(var(--base-scale, 1) * 33px)) scale(var(--base-scale, 1));
-  transform: translateX(calc(var(--base-scale, 1) * 33px)) scale(var(--base-scale, 1));
-}
-
-/* Prevent tooltip from triggering */
-.link-hotspot-tooltip {
+/* SVG dashed line container */
+.hotspot-line-svg {
+  position: absolute;
+  left: 0;
+  top: -50px;
+  width: 50px;
+  height: 50px;
+  overflow: visible;
   pointer-events: none;
 }
-.no-touch .link-hotspot:hover .link-hotspot-tooltip {
-  pointer-events: all;
+
+/* Dashed line path */
+.dashed-line-path {
+  stroke-dasharray: 5 3;
+  stroke-dashoffset: 60;
+  opacity: 0;
+  transition: stroke-dashoffset 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease;
 }
 
-/* Fallback mode without pointer-events (IE8-10) */
-.tooltip-fallback .link-hotspot-tooltip {
-  display: none;
-}
-.no-touch .tooltip-fallback .link-hotspot:hover .link-hotspot-tooltip {
-  display: block;
+/* Badge Card container */
+.hotspot-badge-card {
+  position: absolute;
+  left: 30px;
+  top: -62px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
+
+  /* Flat horizontal strip opening UPWARDS (from bottom left) */
+  opacity: 0;
+  transform: scaleY(0) scaleX(0.3);
+  transform-origin: bottom left;
+  transition: transform 0.35s cubic-bezier(0.34, 1.46, 0.64, 1), opacity 0.2s ease;
 }
 
-/* Info hotspot */
+/* White square icon container (left side) */
+.hotspot-badge-icon {
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569 !important; /* Simple sleek gray color */
+  font-size: 16px;
+  z-index: 2;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Link Hotspot Title container (Keeps category/location theme color!) */
+.hotspot-badge-title {
+  height: 36px;
+  background: linear-gradient(135deg, var(--hotspot-color, #FF512F), color-mix(in srgb, var(--hotspot-color, #FF512F) 80%, #000));
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0 14px 0 12px;
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  align-items: center;
+  margin-left: -3px;
+  z-index: 1;
+  letter-spacing: 0.2px;
+}
+
+/* On hover over .link-hotspot */
+.no-touch .link-hotspot:hover .dashed-line-path,
+.link-hotspot:active .dashed-line-path,
+.link-hotspot.active-menu .dashed-line-path {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+.no-touch .link-hotspot:hover .hotspot-badge-card,
+.link-hotspot:active .hotspot-badge-card,
+.link-hotspot.active-menu .hotspot-badge-card {
+  opacity: 1;
+  transform: scaleX(1) scaleY(1);
+}
+
+/* Info Hotspot Container */
 
 .info-hotspot {
-  line-height: 1.2em;
-  opacity: 0.9;
-  -webkit-transition: opacity 0.2s 0.2s;
-  transition: opacity 0.2s 0.2s;
+  width: 60px;
+  height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+  opacity: 0.95;
+  transition: opacity 0.2s;
+  pointer-events: none;
 }
 
 .no-touch .info-hotspot:hover {
   opacity: 1;
-  -webkit-transition: opacity 0.2s;
-  transition: opacity 0.2s;
 }
 
-.info-hotspot.visible {
+/* Micro anchor dot for Info Hotspot (Static clean dot) */
+.info-hotspot-anchor {
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -4px;
+  margin-top: -4px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9), 0 0 3px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 2;
+  transform: scale(var(--base-scale, 1));
+}
+
+/* Info Hotspot (Simple dark glass design) */
+.info-badge-icon {
+  color: #475569 !important; /* Simple sleek gray color */
+}
+
+.info-badge-title {
+  background: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: none;
+  font-weight: 500 !important;
+}
+
+/* Tooltip container for info hotspot */
+.info-hotspot-tooltip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 100;
+  transform-origin: 0 0;
+  transform: scale(var(--base-scale, 1));
+}
+
+/* Always visible for info hotspot */
+.info-hotspot-tooltip .dashed-line-path {
+  stroke-dashoffset: 0;
   opacity: 1;
 }
 
-.info-hotspot .info-hotspot-header {
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  background-color: rgb(103,115,131);
-  cursor: pointer;
-  transform: scale(var(--base-scale, 1));
-  transform-origin: center;
-  -webkit-transition: width 0.3s ease-in-out 0.5s,
-                      border-radius 0.3s ease-in-out 0.5s;
-  transition: width 0.3s ease-in-out 0.5s,
-              border-radius 0.3s ease-in-out 0.5s;
+.info-hotspot-tooltip .hotspot-badge-card {
+  opacity: 1;
+  transform: scaleY(1) scaleX(1);
+  transition: filter 0.2s ease, transform 0.2s ease;
 }
 
-.mobile .info-hotspot .info-hotspot-header {
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
-}
-
-.desktop.no-touch .info-hotspot .info-hotspot-header:hover {
-  width: 260px;
-  border-radius: 5px;
-  -webkit-transition: width 0.3s ease-in-out,
-                      border-radius 0.3s ease-in-out;
-  transition: width 0.3s ease-in-out,
-              border-radius 0.3s ease-in-out;
-}
-
-.desktop .info-hotspot.visible .info-hotspot-header,
-.desktop.no-touch .info-hotspot.visible .info-hotspot-header:hover {
-  width: 260px;
-  border-radius: 5px;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-  -webkit-transition: width 0.3s ease-in-out,
-                      border-radius 0.3s ease-in-out;
-  transition: width 0.3s ease-in-out,
-              border-radius 0.3s ease-in-out;
-}
-
-.info-hotspot .info-hotspot-icon-wrapper {
-  width: 40px;
-  height: 40px;
-}
-
-.mobile .info-hotspot .info-hotspot-icon-wrapper {
-  width: 50px;
-  height: 50px;
-}
-
-.info-hotspot .info-hotspot-icon {
-  width: 90%;
-  height: 90%;
-  margin: 5%;
-}
-
-.info-hotspot .info-hotspot-title-wrapper {
-  position: absolute;
-  left: 40px;
-  top: 0;
-  width: 0;
-  height: 40px;
-  padding: 0;
-  overflow: hidden;
-  -webkit-transition: width 0s 0.4s,
-                      padding 0s 0.4s;
-  transition: width 0s 0.4s,
-              padding 0s 0.4s;
-}
-
-.desktop .info-hotspot.visible .info-hotspot-title-wrapper,
-.desktop.no-touch .info-hotspot .info-hotspot-header:hover .info-hotspot-title-wrapper {
-  width: 220px;
-  padding: 0 5px;
-  -webkit-transition: width 0s 0.4s,
-                      padding 0s 0.4s;
-  transition: width 0s 0.4s,
-              padding 0s 0.4s;
-}
-
-.info-hotspot .info-hotspot-title-wrapper:before {
-  content: '';
-  display: inline-block;
-  vertical-align: middle;
-  height: 100%;
-}
-
-.info-hotspot .info-hotspot-title {
-  display: inline-block;
-  vertical-align: middle;
-
-  -moz-user-select: text;
-  -webkit-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
-}
-
-.info-hotspot .info-hotspot-close-wrapper {
-  position: absolute;
-  left: 260px;
-  top: 0;
-  height: 40px;
-  width: 40px;
-  border-top-right-radius: 5px;
-  background-color: rgb(78,88,104);
-  visibility: hidden;
-  -ms-transform: perspective(200px) rotateY(90deg);
-  -webkit-transform: perspective(200px) rotateY(90deg);
-  transform: perspective(200px) rotateY(90deg);
-  -ms-transform-origin: 0 50% 0;
-  -webkit-transform-origin: 0 50% 0;
-  transform-origin: 0 50% 0;
-  -webkit-transition: -ms-transform 0.3s 0.3s,
-                      -webkit-transform 0.3s 0.3s,
-                      transform 0.3s 0.3s,
-                      visibility 0s 0.6s;
-  transition: -ms-transform 0.3s 0.3s,
-              -webkit-transform 0.3s 0.3s,
-              transform 0.3s 0.3s,
-              visibility 0s 0.6s;
+.no-touch .info-hotspot:hover .hotspot-badge-card {
+  filter: brightness(1.1);
 }
 
 .desktop .info-hotspot.visible .info-hotspot-close-wrapper {

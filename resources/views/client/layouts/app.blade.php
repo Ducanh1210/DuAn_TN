@@ -303,7 +303,8 @@
     </script>
     @endauth
 
-    <!-- AI Chatbot Floating Widget -->
+    <!-- AI Chatbot & Trip Planner Floating Widgets -->
     <x-chatbot-widget />
+    <x-trip-planner-widget />
 </body>
 </html>

@@ -18,27 +18,203 @@
         :root {
             --hotspot-color: {{ $location->category->icon_color ?? '#FF512F' }};
         }
-        /* Layout Structure */
-        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        /* Layout & Modern Admin Theme (aligned with DESIGN.md) */
+        body, html {
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
+            font-family: 'Outfit', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a; color: #f8fafc;
+        }
         #app { display: flex; height: 100vh; flex-direction: column; }
         
         /* Topbar */
-        .topbar { background-color: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; position: relative; height: 50px; }
-        
-        /* Main Layout */
-        .main-layout { display: flex; flex: 1; height: calc(100vh - 50px); position: relative; }
-        
-        /* Sidebar */
-        .sidebar { width: 300px; background-color: #34495e; color: white; display: flex; flex-direction: column; overflow-y: auto; z-index: 10; }
-        .section-header { background-color: #2c3e50; padding: 10px 15px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
-        .scene-item { padding: 10px 15px; border-bottom: 1px solid #2c3e50; display: flex; align-items: center; cursor: pointer; transition: background 0.2s; }
-        .scene-item:hover, .scene-item.active { background-color: #1abc9c; }
-        .scene-item img { width: 50px; height: 35px; object-fit: cover; margin-right: 10px; border-radius: 3px; }
-        .scene-item .name { flex: 1; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
-        .scene-item .actions { opacity: 0; transition: opacity 0.2s; }
-        .scene-item:hover .actions, .scene-item.active .actions { opacity: 1; }
-        .add-pano-btn { display: block; width: 100%; padding: 15px; background: #3498db; color: white; text-align: center; font-weight: bold; border: none; cursor: pointer; }
-        .add-pano-btn:hover { background: #2980b9; }
+        .topbar {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            position: relative;
+            height: 56px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+
+        .topbar-brand i {
+            color: #6366f1;
+            font-size: 18px;
+        }
+
+        /* Editor Buttons */
+        .editor-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .editor-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .editor-btn.btn-success {
+            background: #10b981;
+            border-color: #10b981;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        }
+        .editor-btn.btn-success:hover {
+            background: #059669;
+            border-color: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
+
+        @keyframes pulseEmerald {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .pulse-green {
+            animation: pulseEmerald 1.8s infinite;
+        }
+
+        /* Sidebar Structure */
+        .main-layout { display: flex; flex: 1; height: calc(100vh - 56px); position: relative; }
+        .sidebar {
+            width: 290px;
+            background-color: #1e293b;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 10;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .add-pano-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 14px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .add-pano-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .section-header {
+            background-color: transparent;
+            padding: 8px 16px 6px 16px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        #custom-scene-list {
+            padding: 0 10px 14px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .scene-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #94a3b8;
+        }
+
+        .scene-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+        }
+
+        .scene-item.active {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .scene-item img {
+            width: 48px;
+            height: 36px;
+            object-fit: cover;
+            margin-right: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .scene-item .name {
+            flex: 1;
+            font-size: 13.5px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .scene-item .actions {
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .scene-item:hover .actions, .scene-item.active .actions {
+            opacity: 1;
+        }
+
+        .scene-item .actions i {
+            font-size: 12.5px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .scene-item .actions i:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
 
         /* Viewer Area */
         .viewer-area { flex: 1; position: relative; background: #000; overflow: hidden; }
@@ -50,45 +226,102 @@
         #sceneList { display: none !important; }
         #sceneListToggle { display: none !important; }
 
-        /* Topbar Buttons */
-        .editor-btn {
-            background: #3498db; color: white; border: none; padding: 6px 12px;
-            border-radius: 4px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; text-decoration: none;
+        /* Target Popup Box */
+        .target-box {
+            position: absolute;
+            top: 75px; left: 15px; width: 220px;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: inherit;
+            pointer-events: auto;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 99999;
         }
-        .editor-btn:hover { background: #2980b9; color: white; }
-        .editor-btn.btn-warning { background: #e67e22; color: white; }
-        .editor-btn.btn-purple { background: #9b59b6; color: white; }
-        .editor-btn.btn-danger { background: #e74c3c; color: white; }
-        .editor-btn.btn-success { background: #2ecc71; color: white; }
-        .editor-btn.btn-secondary { background: #7f8c8d; color: white; }
+        .target-box.active { display: block; }
+
+        .target-box-header {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .target-box-header .close-btn { cursor: pointer; font-size: 18px; line-height: 1; color: #94a3b8; }
+        .target-box-header .close-btn:hover { color: #ffffff; }
+
+        .target-box-body {
+            padding: 12px 14px;
+        }
+
+        .target-box-body select,
+        .target-box-body input[type="text"],
+        .target-box-body textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 8px 10px;
+            font-size: 13px;
+            margin-bottom: 10px;
+            outline: none;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .target-box-body select:focus,
+        .target-box-body input[type="text"]:focus,
+        .target-box-body textarea:focus {
+            border-color: #38bdf8;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .target-box-footer {
+            padding: 10px 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .target-box-footer button {
+            width: 100%;
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .target-box-footer button:hover {
+            background: #0369a1;
+        }
         
-        @keyframes pulseGreen {
-            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        .scene-list-item {
+            padding: 9px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 13px;
+            color: #cbd5e1;
+            transition: all 0.15s;
         }
-        .pulse-green {
-            animation: pulseGreen 1.5s infinite;
-        }
+        .scene-list-item:hover { background: rgba(255, 255, 255, 0.08); color: #ffffff; }
+        .scene-list-item.active { background: rgba(2, 132, 199, 0.22); color: #ffffff; font-weight: 600; }
 
         /* Draggable Hotspot Icon Override */
         .info-hotspot-header { cursor: pointer; }
         .link-hotspot-icon { cursor: pointer; }
         .hotspot.editing .link-hotspot-icon, .hotspot.editing .info-hotspot-icon-wrapper {
             box-shadow: 0 0 0 4px rgba(255,255,255,0.7); border-radius: 50%;
-        }
-
-        /* Prevent native browser drag on hotspot images in editor mode */
-        body.editor-mode .hotspot img {
-            -webkit-user-drag: none;
-            user-drag: none;
-            pointer-events: none;
-        }
-        body.editor-mode .hotspot {
-            cursor: grab;
-        }
-        body.editor-mode .hotspot:active {
-            cursor: grabbing;
         }
 
         /* Permanent Context Menu (Editor Mode) */
@@ -104,63 +337,31 @@
             z-index: 9999 !important;
         }
         .context-menu-btn {
-            position: absolute; width: 30px; height: 30px;
-            background: rgba(40,40,40,0.85); color: white; border-radius: 50%;
+            position: absolute; width: 32px; height: 32px;
+            background: rgba(15, 23, 42, 0.9); color: white; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; font-size: 13px;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
-            margin-top: -15px; margin-left: -15px; /* Center relative to parent */
-            backdrop-filter: blur(4px);
+            margin-top: -16px; margin-left: -16px; /* Center relative to parent */
+            backdrop-filter: blur(8px);
             z-index: 9999 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
         .context-menu-btn:hover {
-            background: rgba(80,80,80,0.95);
+            background: rgba(30, 41, 59, 0.95);
             transform: scale(1.15);
-            box-shadow: 0 0 8px rgba(255,255,255,0.3);
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
         
         .btn-go { transform: translate(calc(-0.258 * var(--R)), calc(-0.965 * var(--R))); }
-        .btn-go:hover { transform: translate(calc(-0.258 * var(--R)), calc(-0.965 * var(--R))) scale(1.15); background: #333; }
+        .btn-go:hover { transform: translate(calc(-0.258 * var(--R)), calc(-0.965 * var(--R))) scale(1.15); background: #4f46e5; }
         .btn-rotate { transform: translate(calc(-0.906 * var(--R)), calc(-0.422 * var(--R))); }
-        .btn-rotate:hover { transform: translate(calc(-0.906 * var(--R)), calc(-0.422 * var(--R))) scale(1.15); background: #333; }
+        .btn-rotate:hover { transform: translate(calc(-0.906 * var(--R)), calc(-0.422 * var(--R))) scale(1.15); background: #0284c7; }
         .btn-delete { transform: translate(calc(-0.906 * var(--R)), calc(0.422 * var(--R))); }
-        .btn-delete:hover { transform: translate(calc(-0.906 * var(--R)), calc(0.422 * var(--R))) scale(1.15); background: rgba(200,50,50,0.9); }
+        .btn-delete:hover { transform: translate(calc(-0.906 * var(--R)), calc(0.422 * var(--R))) scale(1.15); background: #dc2626; }
         .btn-edit { transform: translate(calc(-0.258 * var(--R)), calc(0.965 * var(--R))); }
-        .btn-edit:hover { transform: translate(calc(-0.258 * var(--R)), calc(0.965 * var(--R))) scale(1.15); background: rgba(50,130,200,0.9); }
-
-        /* Target Box */
-        .target-box {
-            position: absolute; top: 75px; left: 15px; width: 200px;
-            background: rgba(45,45,45,0.95); border-radius: 3px; color: white; font-family: 'Segoe UI', sans-serif;
-            pointer-events: auto; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-        }
-        .target-box.active { display: block; }
-        .target-box-header {
-            padding: 8px 12px; font-weight: 600; font-size: 14px;
-            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444;
-        }
-        .target-box-header .close-btn { cursor: pointer; font-size: 18px; line-height: 1; }
-        .target-box-body { padding: 12px; }
-        .target-box-body select, .target-box-body input, .target-box-body textarea {
-            width: 100%; background: #222; color: white; border: 1px solid #555; padding: 6px; border-radius: 2px; font-size: 13px; outline: none; margin-bottom: 10px;
-        }
-        .target-box-footer { padding: 0 12px 12px; text-align: right; }
-        .target-box-footer button {
-            background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 2px; cursor: pointer; font-size: 13px;
-        }
-        
-        .scene-list-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #333;
-            font-size: 13px;
-            transition: background 0.1s;
-        }
-        .scene-list-item:hover { background: #444; }
-        .scene-list-item.active { background: #3498db; font-weight: bold; }
-        .target-box-footer button:hover { background: #2980b9; }
+        .btn-edit:hover { transform: translate(calc(-0.258 * var(--R)), calc(0.965 * var(--R))) scale(1.15); background: #0284c7; }
 
         /* Hide client tooltips and modals in Editor Mode */
         body.editor-mode .info-hotspot-modal { display: none !important; }
@@ -218,16 +419,16 @@
 <div id="app">
     <!-- Topbar -->
     <div class="topbar">
-        <div class="fw-bold d-flex align-items-center gap-3">
-            <span><i class="fas fa-edit text-warning"></i> Marzipano Editor</span>
+        <div class="topbar-brand">
+            <span>360 Tour Editor</span>
         </div>
-        <div class="d-flex gap-2">
-            <button class="editor-btn btn-warning" onclick="console.log('Add Info clicked'); createHotspot('info')"><i class="fas fa-info-circle"></i> Add Info</button>
-            <button class="editor-btn btn-primary" onclick="console.log('Add Link clicked'); createHotspot('link')"><i class="fas fa-link"></i> Add Link</button>
-            <button id="save-changes-btn" class="editor-btn btn-success disabled" onclick="saveAllChanges()" style="opacity: 0.5; cursor: not-allowed;"><i class="fas fa-save"></i> Lưu thay đổi</button>
-            <button class="editor-btn btn-purple" onclick="console.log('Save Default View clicked'); saveInitialView()"><i class="fas fa-eye"></i> Save Default View</button>
-            <div class="ms-3 border-start ps-3">
-                <a href="{{ route('admin.locations.edit', $location->id) }}" class="editor-btn btn-secondary" onclick="return confirmCloseEditor(event)"><i class="fas fa-times"></i> Đóng Editor</a>
+        <div class="d-flex gap-2 align-items-center">
+            <button class="editor-btn" onclick="createHotspot('info')">Add Info</button>
+            <button class="editor-btn" onclick="createHotspot('link')">Add Link</button>
+            <button id="save-changes-btn" class="editor-btn btn-success disabled" onclick="saveAllChanges()" style="opacity: 0.5; cursor: not-allowed;">Lưu thay đổi</button>
+            <button class="editor-btn" onclick="saveInitialView()">Save Default View</button>
+            <div class="ms-2 border-start ps-3 border-secondary border-opacity-25">
+                <a href="{{ route('admin.locations.edit', $location->id) }}" class="editor-btn" onclick="return confirmCloseEditor(event)">Đóng Editor</a>
             </div>
         </div>
     </div>
@@ -901,7 +1102,7 @@
         // Update DOM directly
         let dragTarget = document.querySelector(`.hotspot[data-id="${activeHotspotId}"]`);
         if (dragTarget) {
-            let titleEl = dragTarget.querySelector('.info-hotspot-title');
+            let titleEl = dragTarget.querySelector('.hotspot-badge-title') || dragTarget.querySelector('.info-hotspot-title');
             if (titleEl) titleEl.innerHTML = titleVal;
             let textEl = dragTarget.querySelector('.info-hotspot-text');
             if (textEl) textEl.innerHTML = contentVal;
@@ -911,6 +1112,19 @@
         document.querySelectorAll('.hotspot').forEach(el => el.classList.remove('editing'));
         setDirty(true);
     }
+
+    // Real-time live typing update for info title
+    $(document).ready(function() {
+        $('#infoTitle').on('input', function() {
+            let titleVal = $(this).val();
+            if (!activeHotspotId) return;
+            let dragTarget = document.querySelector(`.hotspot[data-id="${activeHotspotId}"]`);
+            if (dragTarget) {
+                let titleEl = dragTarget.querySelector('.hotspot-badge-title') || dragTarget.querySelector('.info-hotspot-title');
+                if (titleEl) titleEl.innerHTML = titleVal;
+            }
+        });
+    });
 
     window.autoSaveLinkHotspot = function(target) {
         let sceneId = getCurrentSceneId();
@@ -944,10 +1158,14 @@
         // Update DOM tooltip with target name
         let dragTarget = document.querySelector(`.hotspot[data-id="${activeHotspotId}"]`);
         if (dragTarget) {
-            let tooltipEl = dragTarget.querySelector('.hotspot-tooltip');
-            if (tooltipEl) {
-                let targetSceneData = window.APP_DATA.scenes.find(s => s.id == target);
-                tooltipEl.innerHTML = targetSceneData ? targetSceneData.name : 'Chưa liên kết';
+            let titleEl = dragTarget.querySelector('.hotspot-badge-title');
+            let targetSceneData = window.APP_DATA.scenes.find(s => s.id == target);
+            let targetName = targetSceneData ? targetSceneData.name : 'Chưa liên kết';
+            if (titleEl) {
+                titleEl.innerHTML = targetName;
+            } else {
+                let tooltipEl = dragTarget.querySelector('.hotspot-tooltip');
+                if (tooltipEl) tooltipEl.innerHTML = targetName;
             }
         }
         

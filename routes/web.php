@@ -89,6 +89,8 @@ Route::get('/su-kien/{slug}', [ClientEventController::class, 'show'])->name('cli
 
 // Client Interactions
 Route::post('/chat/message', [ChatbotController::class, 'sendMessage'])->name('client.chat.message');
+Route::post('/trip-planner/next-question', [\App\Http\Controllers\Client\TripPlannerController::class, 'nextQuestion'])->name('client.trip_planner.next_question');
+Route::post('/trip-planner/generate', [\App\Http\Controllers\Client\TripPlannerController::class, 'generate'])->name('client.trip_planner.generate');
 
 Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/favorite', [\App\Http\Controllers\Client\InteractionController::class, 'toggleFavorite'])->name('client.locations.favorite');

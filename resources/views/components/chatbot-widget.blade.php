@@ -585,6 +585,18 @@
                     <button class="chat-chip" onclick="window.sendQuickMessage('Lịch trình 1 ngày cho tôi')">Lịch trình 1 ngày</button>
                     <button class="chat-chip" onclick="window.sendQuickMessage('Khách sạn nghỉ dưỡng tốt')">Khách sạn</button>
                 </div>
+                <div style="margin-top: 8px;">
+                    <button onclick="if(window.openTripPlanner) window.openTripPlanner();"
+                        style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbdbe8;
+                        background: #f1f5f9; color: #1e3a5f;
+                        font-size: 0.73rem; font-weight: 500; cursor: pointer;
+                        display: flex; align-items: center; justify-content: center; gap: 5px;
+                        font-family: inherit; transition: all 0.15s;"
+                        onmouseover="this.style.background='#e2e8f0'"
+                        onmouseout="this.style.background='#f1f5f9'">
+                        Lên lịch trình AI
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -712,6 +724,18 @@
                             <button class="chat-chip" onclick="window.sendQuickMessage('Đặc sản ngon nên thử')">Đặc sản</button>
                             <button class="chat-chip" onclick="window.sendQuickMessage('Lịch trình 1 ngày cho tôi')">Lịch trình 1 ngày</button>
                             <button class="chat-chip" onclick="window.sendQuickMessage('Khách sạn nghỉ dưỡng tốt')">Khách sạn</button>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <button onclick="if(window.openTripPlanner) window.openTripPlanner();"
+                                style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbdbe8;
+                                background: #f1f5f9; color: #1e3a5f;
+                                font-size: 0.73rem; font-weight: 500; cursor: pointer;
+                                display: flex; align-items: center; justify-content: center; gap: 5px;
+                                font-family: inherit; transition: all 0.15s;"
+                                onmouseover="this.style.background='#e2e8f0'"
+                                onmouseout="this.style.background='#f1f5f9'">
+                                Lên lịch trình AI
+                            </button>
                         </div>
                     </div>
                 `;
