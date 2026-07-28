@@ -14,6 +14,7 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -2945,17 +2946,46 @@
             });
         }
 
+        // Helper function to render matching category icon
+        function getCategoryIconHtml(cat) {
+            if (!cat) return '<span class="material-symbols-rounded">location_on</span>';
+
+            const iconPath = cat.icon_url || (cat.icon ? (cat.icon.startsWith('http') ? cat.icon : '{{ asset("") }}' + cat.icon.replace(/^\//, '')) : null);
+
+            if (iconPath) {
+                return `<img src="${iconPath}" alt="${cat.name}" class="cat-icon-img" style="width: 20px; height: 20px; object-fit: contain; flex-shrink: 0;" onError="this.onerror=null; this.outerHTML='<span class=\\'material-symbols-rounded\\'>location_on</span>';">`;
+            }
+
+            const name = (cat.name || '').toLowerCase();
+            if (name.includes('tâm linh')) {
+                return `<i class="fa-solid fa-place-of-worship" style="color: ${cat.icon_color || '#f59e0b'}; font-size: 16px;"></i>`;
+            } else if (name.includes('văn hóa') || name.includes('lịch sử')) {
+                return `<i class="fa-solid fa-monument" style="color: ${cat.icon_color || '#8b5cf6'}; font-size: 16px;"></i>`;
+            } else if (name.includes('sinh thái')) {
+                return `<i class="fa-solid fa-tree" style="color: ${cat.icon_color || '#10b981'}; font-size: 16px;"></i>`;
+            } else if (name.includes('ẩm thực')) {
+                return `<i class="fa-solid fa-utensils" style="color: ${cat.icon_color || '#f43f5e'}; font-size: 16px;"></i>`;
+            } else if (name.includes('lưu trú')) {
+                return `<i class="fa-solid fa-hotel" style="color: ${cat.icon_color || '#3b82f6'}; font-size: 16px;"></i>`;
+            } else if (name.includes('check-in') || name.includes('check in')) {
+                return `<i class="fa-solid fa-camera-retro" style="color: ${cat.icon_color || '#ec4899'}; font-size: 16px;"></i>`;
+            }
+
+            return `<span class="material-symbols-rounded" style="color: ${cat.icon_color || 'var(--primary)'}">location_on</span>`;
+        }
+
         // Render category items inside popover
         if (categoriesContainer) {
             categoriesContainer.innerHTML = '';
             uniqueCategories.forEach(cat => {
                 const count = catCounts[cat.id] || 0;
+                const iconHtml = getCategoryIconHtml(cat);
                 const item = document.createElement('button');
                 item.type = 'button';
                 item.className = 'filter-item';
                 item.innerHTML = `
                     <div class="filter-item-left">
-                        <span class="material-symbols-rounded">location_on</span>
+                        ${iconHtml}
                         <span>${cat.name}</span>
                     </div>
                     <span class="filter-count-badge">${count}</span>
@@ -3041,10 +3071,11 @@
             // Category Items
             uniqueCategories.forEach(cat => {
                 const count = catCounts[cat.id] || 0;
+                const iconHtml = getCategoryIconHtml(cat);
                 const item = document.createElement('button');
                 item.type = 'button';
                 item.className = 'drawer-filter-item';
-                item.innerHTML = `<span>${cat.name}</span> <span class="filter-count-badge">${count}</span>`;
+                item.innerHTML = `<div class="d-flex align-items-center gap-2">${iconHtml}<span>${cat.name}</span></div> <span class="filter-count-badge">${count}</span>`;
 
                 item.addEventListener('click', (e) => {
                     e.stopPropagation();

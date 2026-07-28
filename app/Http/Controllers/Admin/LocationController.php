@@ -8,6 +8,8 @@ use App\Models\Location;
 use App\Models\LocationImage;
 use App\Models\Panorama;
 use Illuminate\Http\Request;
+use App\Http\Requests\Admin\StoreLocationRequest;
+use App\Http\Requests\Admin\UpdateLocationRequest;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -44,15 +46,9 @@ class LocationController extends Controller
         return view('admin.locations.create', compact('categories'));
     }
 
-    public function store(Request $request)
+    public function store(StoreLocationRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:200',
-            'category_id' => 'required|exists:categories,id',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:20480',
-        ]);
+        $validated = $request->validated();
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->name) . '-' . time();
@@ -77,15 +73,9 @@ class LocationController extends Controller
         return view('admin.locations.edit', compact('location', 'categories', 'images', 'panoramas'));
     }
 
-    public function update(Request $request, Location $location)
+    public function update(UpdateLocationRequest $request, Location $location)
     {
-        $request->validate([
-            'name' => 'required|string|max:200',
-            'category_id' => 'required|exists:categories,id',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:20480',
-        ]);
+        $validated = $request->validated();
 
         $data = $request->all();
         if ($request->name !== $location->name) {
@@ -104,7 +94,7 @@ class LocationController extends Controller
 
         $location->update($data);
 
-        return back()->with('success', 'Cập nhật địa điểm thành công!');
+        return redirect()->route('admin.locations.index')->with('success', 'Cập nhật địa điểm thành công!');
     }
 
     public function destroy(Location $location)

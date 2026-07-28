@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Dashboard') - Ninh Bình POI</title>
+    <title>@yield('title', 'Admin Dashboard') - Ninh Bình Travel Hub</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -313,7 +313,7 @@
         <div class="sidebar flex-shrink-0" id="sidebar">
             <div class="sidebar-brand">
                 <span class="sidebar-brand-dot"></span>
-                <span>Ninh Bình POI</span>
+                <span>Ninh Bình Travel Hub</span>
             </div>
             
             <div class="sidebar-group-title">Quản lý</div>
@@ -326,6 +326,15 @@
                 </a>
                 <a href="{{ route('admin.locations.index') }}" class="{{ request()->routeIs('admin.locations.*') ? 'active' : '' }}">
                     Địa điểm du lịch
+                </a>
+                <a href="{{ route('admin.business-profiles.index') }}" class="d-flex justify-content-between align-items-center {{ request()->routeIs('admin.business-profiles.*') ? 'active' : '' }}">
+                    <span>Duyệt doanh nghiệp</span>
+                    @php
+                        $pendingBizCount = \App\Models\BusinessProfile::where('status', 'pending')->count();
+                    @endphp
+                    @if($pendingBizCount > 0)
+                        <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.65rem;">{{ $pendingBizCount }}</span>
+                    @endif
                 </a>
             </nav>
 

@@ -23,7 +23,7 @@
     <!-- INFO TAB -->
     <div class="tab-pane fade show active" id="info" role="tabpanel">
         <div class="card-minimal p-4 mb-4">
-            <form action="{{ route('admin.locations.update', [$location->id] + request()->query()) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.locations.update', [$location->id] + request()->query()) }}" method="POST" enctype="multipart/form-data" novalidate>
                 @csrf
                 @method('PUT')
                 
@@ -31,7 +31,7 @@
                     <div class="col-md-8">
                         <div class="mb-3">
                             <label for="name" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Tên địa điểm <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $location->name) }}" required style="border-color: #e2e8f0;">
+                            <input type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $location->name) }}" style="border-color: #e2e8f0;">
                             @error('name') <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div> @enderror
                         </div>
                         
@@ -49,7 +49,7 @@
                     <div class="col-md-4 border-start" style="border-color: var(--border-light) !important;">
                         <div class="mb-3">
                             <label for="category_id" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Danh mục <span class="text-danger">*</span></label>
-                            <select class="form-select form-select-sm @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required style="border-color: #e2e8f0;">
+                            <select class="form-select form-select-sm @error('category_id') is-invalid @enderror" id="category_id" name="category_id" style="border-color: #e2e8f0;">
                                 @foreach($categories as $cat)
                                     <option value="{{ $cat->id }}" {{ old('category_id', $location->category_id) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
                                 @endforeach
@@ -60,12 +60,14 @@
                         <div class="row mb-3">
                             <div class="col-6">
                                 <label for="lat" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Vĩ độ (Lat) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm @error('lat') is-invalid @enderror" id="lat" name="lat" value="{{ old('lat', $location->lat) }}" required style="border-color: #e2e8f0;">
+                                <input type="text" class="form-control form-control-sm @error('lat') is-invalid @enderror" id="lat" name="lat" value="{{ old('lat', $location->lat) }}" style="border-color: #e2e8f0;">
+                                @error('lat') <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-6">
                                 <label for="lng" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Kinh độ (Lng) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm @error('lng') is-invalid @enderror" id="lng" name="lng" value="{{ old('lng', $location->lng) }}" required style="border-color: #e2e8f0;">
+                                <input type="text" class="form-control form-control-sm @error('lng') is-invalid @enderror" id="lng" name="lng" value="{{ old('lng', $location->lng) }}" style="border-color: #e2e8f0;">
+                                @error('lng') <div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div> @enderror
                             </div>
                         </div>
 

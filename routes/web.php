@@ -140,6 +140,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/missions/claim-milestone', [\App\Http\Controllers\Client\ProfileController::class, 'claimMilestone100'])->name('client.missions.claim_milestone');
     Route::post('/avatar-frames/equip', [\App\Http\Controllers\Client\ProfileController::class, 'equipAvatarFrame'])->name('client.avatar_frames.equip');
     Route::post('/avatar-frames/buy/{frame}', [\App\Http\Controllers\Client\ProfileController::class, 'buyAvatarFrame'])->name('client.avatar_frames.buy');
+
+    // Dedicated Business Dashboard Portal (Portal Dành Cho Chủ Doanh Nghiệp)
+    Route::get('/doanh-nghiep/dashboard', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'index'])->name('business.dashboard');
+    Route::post('/doanh-nghiep/update-info', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'updateInfo'])->name('business.update_info');
+    Route::post('/doanh-nghiep/upload-photo', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'uploadPhoto'])->name('business.upload_photo');
 });
 
 // Public Missions Route
@@ -212,4 +217,9 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
 
     // Feedback & Content Reports (Góp ý & Báo lỗi nội dung)
     Route::resource('feedbacks', \App\Http\Controllers\Admin\FeedbackReportController::class)->only(['index', 'show', 'update']);
+
+    // Business Upgrade Requests Management (Quản lý yêu cầu doanh nghiệp)
+    Route::resource('business-profiles', \App\Http\Controllers\Admin\BusinessProfileController::class)->only(['index', 'show']);
+    Route::post('business-profiles/{id}/approve', [\App\Http\Controllers\Admin\BusinessProfileController::class, 'approve'])->name('business-profiles.approve');
+    Route::post('business-profiles/{id}/reject', [\App\Http\Controllers\Admin\BusinessProfileController::class, 'reject'])->name('business-profiles.reject');
 });
