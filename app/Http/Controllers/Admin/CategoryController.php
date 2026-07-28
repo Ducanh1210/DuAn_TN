@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Requests\Admin\StoreCategoryRequest;
+use App\Http\Requests\Admin\UpdateCategoryRequest;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
@@ -20,15 +22,9 @@ class CategoryController extends Controller
         return view('admin.categories.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCategoryRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:80|unique:categories',
-            'status' => 'required|in:active,hidden',
-            'display_order' => 'nullable|integer',
-            'icon_color' => 'nullable|string|max:20',
-            'icon' => 'nullable|image|mimes:png,jpg,jpeg,svg,gif|max:2048',
-        ]);
+        $validated = $request->validated();
 
         $data = $request->except('icon');
         $data['slug'] = Str::slug($request->name);
@@ -53,15 +49,9 @@ class CategoryController extends Controller
         return view('admin.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $request->validate([
-            'name' => 'required|string|max:80|unique:categories,name,' . $category->id,
-            'status' => 'required|in:active,hidden',
-            'display_order' => 'required|integer',
-            'icon_color' => 'nullable|string|max:20',
-            'icon' => 'nullable|image|mimes:png,jpg,jpeg,svg,gif|max:2048',
-        ]);
+        $validated = $request->validated();
 
         $data = $request->except('icon');
         $data['slug'] = Str::slug($request->name);

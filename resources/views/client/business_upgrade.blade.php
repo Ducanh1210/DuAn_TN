@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký Tài Khoản Doanh Nghiệp - Ninh Bình POI</title>
+    <title>Đăng Ký Tài Khoản Doanh Nghiệp - Ninh Bình Travel Hub</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -661,7 +661,7 @@
         <i class="bi bi-chevron-left"></i> Quay lại trang cá nhân
     </a>
     <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-        Ninh Bình POI Doanh Nghiệp
+        Ninh Bình Travel Hub Doanh Nghiệp
     </div>
     <div></div>
 </div>
@@ -870,7 +870,7 @@
                         <!-- Step 7: PUT BIZ ON MAP settings -->
                         <div class="biz-step-pane d-none" data-step="7">
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Đưa doanh nghiệp của bạn lên bản đồ</h4>
-                            <p class="text-secondary small mb-4">Bắt đầu kết nối với khách hàng trên Ninh Bình POI - tất cả ở cùng một nơi.</p>
+                            <p class="text-secondary small mb-4">Bắt đầu kết nối với khách hàng trên Ninh Bình Travel Hub - tất cả ở cùng một nơi.</p>
                             
                             <div class="p-3 border rounded-2 bg-light mb-4">
                                 <ul class="mb-0 ps-3 small text-secondary">

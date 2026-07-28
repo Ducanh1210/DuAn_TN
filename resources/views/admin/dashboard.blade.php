@@ -7,7 +7,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="page-header-title">Tổng quan</h1>
-        <p class="text-muted mb-0" style="font-size: 0.8rem; font-weight: 400;">Cập nhật hệ thống thông tin địa điểm Ninh Bình POI</p>
+        <p class="text-muted mb-0" style="font-size: 0.8rem; font-weight: 400;">Cập nhật hệ thống thông tin địa điểm Ninh Bình Travel Hub</p>
     </div>
     <div class="text-muted" style="font-size: 0.775rem;">
         Hôm nay: {{ \Carbon\Carbon::now()->format('d/m/Y') }}

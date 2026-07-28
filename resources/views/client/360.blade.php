@@ -178,6 +178,15 @@
         }
         .btn-submit-comment:hover { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(var(--hotspot-color-rgb, 255,81,47), 0.4); }
         .btn-submit-comment:active { transform: translateY(0); }
+
+        .star-rating-picker {
+            display: flex; align-items: center; gap: 4px; color: #f59e0b; cursor: pointer; font-size: 1.15rem;
+        }
+        .star-rating-picker i { transition: transform 0.15s ease, color 0.15s ease; }
+        .star-rating-picker i:hover { transform: scale(1.2); }
+        .comment-stars-display {
+            color: #f59e0b; font-size: 11px; display: inline-flex; gap: 2px; vertical-align: middle;
+        }
         
         .auth-prompt { text-align: center; color: rgba(255,255,255,0.7); font-size: 14px; }
         .auth-prompt a { color: var(--hotspot-color); text-decoration: none; font-weight: 600; }
@@ -213,6 +222,54 @@
         .btn-report-submit { background: #ef4444; border: none; padding: 10px 16px; border-radius: 8px; color: white; cursor: pointer; font-weight: 600; transition: 0.2s;}
         .btn-report-submit:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);}
         .btn-report-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Floating Toast Notification 360 */
+        .toast-notification-360 {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10000;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        .toast-notification-360.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Heart Pop Animation */
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.38); }
+            100% { transform: scale(1); }
+        }
+        .heart-pop-anim {
+            animation: heartPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .interaction-btn.active {
+            background-color: rgba(255, 228, 230, 0.25) !important;
+            border-color: #fecdd3 !important;
+        }
+        .interaction-btn.active i {
+            color: #ef4444 !important;
+        }
     </style>
 </head>
 
@@ -305,7 +362,16 @@
                     <x-user-avatar :user="$comment->user" size="38" />
                     <div class="comment-body">
                         <div class="comment-author">
-                            <span>{{ $comment->user->display_name ?? $comment->user->username }}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span>{{ $comment->user->display_name ?? $comment->user->username }}</span>
+                                @if($comment->rating && $comment->rating > 0)
+                                    <span class="comment-stars-display" title="{{ $comment->rating }}/5 sao">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="{{ $i <= $comment->rating ? 'fa-solid' : 'fa-regular' }} fa-star"></i>
+                                        @endfor
+                                    </span>
+                                @endif
+                            </div>
                             <div class="d-flex align-items-center gap-2">
                                 <span class="comment-time">{{ $comment->created_at->diffForHumans() }}</span>
                                 <button class="btn btn-sm text-danger p-0 border-0 bg-transparent" title="Báo cáo bình luận" onclick="openReportModal({{ $comment->id }}, 'Comment')"><i class="fa-solid fa-flag" style="font-size: 12px;"></i></button>
@@ -322,6 +388,17 @@
         </div>
         <div class="comment-form">
             @auth
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span style="color: rgba(255,255,255,0.75); font-size: 13px; font-weight: 500;">Đánh giá của bạn:</span>
+                    <div class="star-rating-picker" id="starRatingPicker">
+                        <i class="fa-solid fa-star star-btn" data-value="1"></i>
+                        <i class="fa-solid fa-star star-btn" data-value="2"></i>
+                        <i class="fa-solid fa-star star-btn" data-value="3"></i>
+                        <i class="fa-solid fa-star star-btn" data-value="4"></i>
+                        <i class="fa-solid fa-star star-btn" data-value="5"></i>
+                    </div>
+                    <input type="hidden" id="selectedCommentRating" value="5">
+                </div>
                 <textarea id="commentContent" rows="3" placeholder="Chia sẻ cảm nhận của bạn về địa điểm này..."></textarea>
                 <button class="btn-submit-comment" id="btnSubmitComment">
                     <i class="fa-regular fa-paper-plane"></i> Gửi bình luận
@@ -511,6 +588,12 @@
     </script>
 @endif
 
+<!-- Toast Notification 360 -->
+<div id="toastNotification360" class="toast-notification-360">
+    <span id="toastIcon360"><i class="fa-solid fa-heart" style="color: #e11d48; font-size: 1.2rem;"></i></span>
+    <span id="toastText360">Nội dung thông báo</span>
+</div>
+
 <!-- Interactions Logic -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -540,14 +623,49 @@
             });
         }
 
+        // Toast Helper Function
+        let toastTimeout360 = null;
+        function showToast360(message, status = 'success') {
+            const toast = document.getElementById('toastNotification360');
+            const toastIcon = document.getElementById('toastIcon360');
+            const toastText = document.getElementById('toastText360');
+            if (!toast) return;
+
+            if (toastTimeout360) clearTimeout(toastTimeout360);
+
+            toastText.innerText = message;
+            if (status === 'added') {
+                toastIcon.innerHTML = '<i class="fa-solid fa-heart" style="color: #ef4444; font-size: 1.2rem;"></i>';
+            } else if (status === 'removed') {
+                toastIcon.innerHTML = '<i class="fa-regular fa-heart" style="color: #94a3b8; font-size: 1.2rem;"></i>';
+            } else if (status === 'comment') {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1.2rem;"></i>';
+            } else {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-info" style="color: #38bdf8; font-size: 1.2rem;"></i>';
+            }
+
+            toast.classList.add('show');
+
+            toastTimeout360 = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
         // Favorite Logic
         if (btnToggleFavorite) {
             btnToggleFavorite.addEventListener('click', function() {
                 if (!isAuth) {
-                    window.location.href = "{{ route('login') }}";
+                    showToast360('Vui lòng đăng nhập để lưu địa điểm yêu thích!', 'info');
+                    setTimeout(() => {
+                        window.location.href = "{{ route('login') }}";
+                    }, 1500);
                     return;
                 }
-                
+
+                // Heart Pop Animation
+                btnToggleFavorite.classList.add('heart-pop-anim');
+                setTimeout(() => btnToggleFavorite.classList.remove('heart-pop-anim'), 400);
+
                 fetch(`/locations/${locationId}/favorite`, {
                     method: 'POST',
                     headers: {
@@ -560,13 +678,59 @@
                 .then(data => {
                     if (data.status === 'added') {
                         btnToggleFavorite.classList.add('active');
-                        btnToggleFavorite.innerHTML = '<i class="fa-solid fa-heart"></i>';
+                        btnToggleFavorite.innerHTML = '<i class="fa-solid fa-heart" style="color: #ef4444;"></i>';
+                        showToast360(data.message || 'Đã thêm vào danh sách yêu thích (+2 điểm)', 'added');
                     } else {
                         btnToggleFavorite.classList.remove('active');
                         btnToggleFavorite.innerHTML = '<i class="fa-regular fa-heart"></i>';
+                        showToast360(data.message || 'Đã xóa khỏi danh sách yêu thích', 'removed');
                     }
                 })
-                .catch(err => console.error(err));
+                .catch(err => {
+                    console.error(err);
+                    showToast360('Có lỗi xảy ra, vui lòng thử lại sau!', 'error');
+                });
+            });
+        }
+
+        // Interactive Star Rating Picker
+        const starRatingPicker = document.getElementById('starRatingPicker');
+        const selectedCommentRating = document.getElementById('selectedCommentRating');
+
+        if (starRatingPicker && selectedCommentRating) {
+            const starBtns = starRatingPicker.querySelectorAll('.star-btn');
+
+            function setStars(val) {
+                starBtns.forEach(star => {
+                    const sVal = parseInt(star.getAttribute('data-value'));
+                    if (sVal <= val) {
+                        star.classList.remove('fa-regular');
+                        star.classList.add('fa-solid');
+                    } else {
+                        star.classList.remove('fa-solid');
+                        star.classList.add('fa-regular');
+                    }
+                });
+            }
+
+            setStars(5);
+
+            starBtns.forEach(star => {
+                star.addEventListener('click', function() {
+                    const val = parseInt(this.getAttribute('data-value'));
+                    selectedCommentRating.value = val;
+                    setStars(val);
+                });
+
+                star.addEventListener('mouseenter', function() {
+                    const val = parseInt(this.getAttribute('data-value'));
+                    setStars(val);
+                });
+            });
+
+            starRatingPicker.addEventListener('mouseleave', function() {
+                const currentVal = parseInt(selectedCommentRating.value) || 5;
+                setStars(currentVal);
             });
         }
 
@@ -575,6 +739,8 @@
             btnSubmitComment.addEventListener('click', function() {
                 const content = commentContent.value.trim();
                 if (!content) return;
+
+                const rating = selectedCommentRating ? parseInt(selectedCommentRating.value) || 5 : 5;
                 
                 btnSubmitComment.disabled = true;
                 btnSubmitComment.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi...';
@@ -586,7 +752,7 @@
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ content: content })
+                    body: JSON.stringify({ content: content, rating: rating })
                 })
                 .then(res => res.json())
                 .then(data => {
@@ -599,12 +765,25 @@
                         
                         // Add new comment to list
                         const c = data.comment;
+                        const ratingVal = c.rating || rating;
+                        let starsHtml = '';
+                        if (ratingVal > 0) {
+                            starsHtml = `<span class="comment-stars-display" title="${ratingVal}/5 sao">`;
+                            for (let i = 1; i <= 5; i++) {
+                                starsHtml += `<i class="${i <= ratingVal ? 'fa-solid' : 'fa-regular'} fa-star"></i>`;
+                            }
+                            starsHtml += `</span>`;
+                        }
+
                         const html = `
                             <div class="comment-item" id="comment-${c.id}">
                                 <img src="${c.user.avatar_url}" alt="${c.user.display_name}" class="comment-avatar">
                                 <div class="comment-body">
                                     <div class="comment-author">
-                                        <span>${c.user.display_name}</span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span>${c.user.display_name}</span>
+                                            ${starsHtml}
+                                        </div>
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="comment-time">Vừa xong</span>
                                             <button class="btn btn-sm text-danger p-0 border-0 bg-transparent" title="Báo cáo bình luận" onclick="openReportModal(${c.id}, 'Comment')"><i class="fa-solid fa-flag" style="font-size: 12px;"></i></button>
@@ -620,8 +799,10 @@
                         // Update badge count
                         let currentCount = parseInt(commentsCountBadge.innerText) || 0;
                         commentsCountBadge.innerText = currentCount + 1;
+
+                        showToast360('Đã gửi bình luận thành công! (+5 điểm)', 'comment');
                     } else {
-                        alert(data.message || 'Có lỗi xảy ra.');
+                        showToast360(data.message || 'Có lỗi xảy ra.', 'error');
                     }
                 })
                 .catch(err => {

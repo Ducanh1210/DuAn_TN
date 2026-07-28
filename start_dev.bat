@@ -11,13 +11,9 @@ taskkill /f /im python.exe 2>nul
 taskkill /f /im php.exe 2>nul
 taskkill /f /im vieneu-stream.exe 2>nul
 
-:: Khoi dong Laravel Server o cua so moi
-echo [*] Dang khoi dong Laravel Server (port 8000)...
-start "Laravel Server" cmd /k "php artisan serve"
-
-:: Di chuyen vao va khoi dong VieNeu-TTS Server o cua so moi
-echo [*] Dang khoi dong VieNeu-TTS API Server (port 8001)...
-start "VieNeu-TTS API Server" cmd /k "cd /d "%~dp0VieNeu-TTS" && uv sync && uv run vieneu-stream"
+:: Khoi dong Laravel Server va VieNeu-TTS Server trong Windows Terminal
+echo [*] Dang khoi dong cac server trong Windows Terminal...
+start wt -d "%~dp0." --title "Laravel Server" cmd /k "php artisan serve" ; new-tab -d "%~dp0VieNeu-TTS" --title "VieNeu-TTS API Server" cmd /k "uv sync && uv run vieneu-stream"
 
 echo ====================================================
 echo  Da kich hoat ca hai! Vui long kiem tra 2 cua so moi.

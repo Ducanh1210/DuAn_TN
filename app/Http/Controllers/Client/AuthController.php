@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
@@ -23,15 +25,9 @@ class AuthController extends Controller
     /**
      * Handle login logic.
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
-        ], [
-            'username.required' => 'Vui lòng nhập tên đăng nhập.',
-            'password.required' => 'Vui lòng nhập mật khẩu.',
-        ]);
+        $credentials = $request->validated();
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
@@ -67,24 +63,9 @@ class AuthController extends Controller
     /**
      * Handle register logic.
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validated = $request->validate([
-            'username' => 'required|string|min:3|max:50|unique:users',
-            'email' => 'required|string|email|max:120|unique:users',
-            'display_name' => 'nullable|string|max:120',
-            'password' => 'required|string|min:6|confirmed',
-        ], [
-            'username.required' => 'Vui lòng nhập tên đăng nhập.',
-            'username.min' => 'Tên đăng nhập phải có ít nhất 3 ký tự.',
-            'username.unique' => 'Tên đăng nhập đã tồn tại.',
-            'email.required' => 'Vui lòng nhập email.',
-            'email.email' => 'Email không hợp lệ.',
-            'email.unique' => 'Email đã được sử dụng.',
-            'password.required' => 'Vui lòng nhập mật khẩu.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
             'username' => $validated['username'],
