@@ -293,6 +293,14 @@
     });
 
 
+    // Pause autorotate when hovering over hotspot, resume when mouse leaves.
+    wrapper.addEventListener('mouseenter', function () {
+      stopAutorotate();
+    });
+    wrapper.addEventListener('mouseleave', function () {
+      startAutorotate();
+    });
+
     // Prevent touch and scroll events from reaching the parent element.
     // This prevents the view control logic from interfering with the hotspot.
     stopTouchAndScrollEventPropagation(wrapper);
@@ -303,7 +311,19 @@
     tooltip.classList.add('link-hotspot-tooltip');
 
     var targetData = findSceneDataById(hotspot.target);
-    tooltip.innerHTML = targetData ? targetData.name : 'Chưa liên kết';
+    var sceneName = targetData ? targetData.name : 'Chưa liên kết';
+
+    tooltip.innerHTML = `
+      <svg class="hotspot-line-svg" width="50" height="50" viewBox="0 0 50 50">
+        <line class="dashed-line-path" x1="0" y1="50" x2="32" y2="12" stroke="rgba(255, 255, 255, 0.95)" stroke-width="2.5" stroke-dasharray="4 3" />
+      </svg>
+      <div class="hotspot-badge-card">
+        <div class="hotspot-badge-icon">
+          <i class="fa-solid fa-location-dot"></i>
+        </div>
+        <div class="hotspot-badge-title">${sanitize(sceneName)}</div>
+      </div>
+    `;
 
     wrapper.appendChild(icon);
     wrapper.appendChild(tooltip);
@@ -333,65 +353,60 @@
     wrapper.setAttribute('data-id', hotspot.id);
     wrapper.style.setProperty('--base-scale', hotspot.scale || 1.0);
 
-    // Create hotspot/tooltip header.
-    var header = document.createElement('div');
-    header.classList.add('info-hotspot-header');
+    // Create subtle micro anchor dot element.
+    var anchor = document.createElement('div');
+    anchor.classList.add('info-hotspot-anchor');
 
-    // Create image element.
-    var iconWrapper = document.createElement('div');
-    iconWrapper.classList.add('info-hotspot-icon-wrapper');
-    var icon = document.createElement('img');
-    icon.src = '/marzipano/img/info.png';
-    icon.classList.add('info-hotspot-icon');
-    iconWrapper.appendChild(icon);
+    // Create tooltip element with dashed line and badge card.
+    var tooltip = document.createElement('div');
+    tooltip.classList.add('hotspot-tooltip');
+    tooltip.classList.add('info-hotspot-tooltip');
 
-    // Create title element.
-    var titleWrapper = document.createElement('div');
-    titleWrapper.classList.add('info-hotspot-title-wrapper');
-    var title = document.createElement('div');
-    title.classList.add('info-hotspot-title');
-    title.innerHTML = hotspot.title;
-    titleWrapper.appendChild(title);
+    var titleText = hotspot.title || 'Thông tin';
 
-    // Create close element.
-    var closeWrapper = document.createElement('div');
-    closeWrapper.classList.add('info-hotspot-close-wrapper');
-    var closeIcon = document.createElement('img');
-    closeIcon.src = '/marzipano/img/close.png';
-    closeIcon.classList.add('info-hotspot-close-icon');
-    closeWrapper.appendChild(closeIcon);
+    tooltip.innerHTML = `
+      <svg class="hotspot-line-svg" width="50" height="50" viewBox="0 0 50 50">
+        <line class="dashed-line-path" x1="0" y1="50" x2="32" y2="12" stroke="rgba(255, 255, 255, 0.95)" stroke-width="2.5" stroke-dasharray="4 3" />
+      </svg>
+      <div class="hotspot-badge-card">
+        <div class="hotspot-badge-icon info-badge-icon">
+          <i class="fa-solid fa-circle-info"></i>
+        </div>
+        <div class="hotspot-badge-title info-badge-title">${sanitize(titleText)}</div>
+      </div>
+    `;
 
-    // Construct header element.
-    header.appendChild(iconWrapper);
-    header.appendChild(titleWrapper);
-    header.appendChild(closeWrapper);
+    wrapper.appendChild(anchor);
+    wrapper.appendChild(tooltip);
 
-    // Create text element.
-    var text = document.createElement('div');
-    text.classList.add('info-hotspot-text');
-    text.innerHTML = hotspot.text;
+    // If hotspot has description text, create popup text box
+    if (hotspot.text) {
+      var textEl = document.createElement('div');
+      textEl.classList.add('info-hotspot-text');
+      textEl.innerHTML = sanitize(hotspot.text);
+      wrapper.appendChild(textEl);
+    }
 
-    // Place header and text into wrapper element.
-    wrapper.appendChild(header);
-    wrapper.appendChild(text);
-
-    // Create a modal for the hotspot content to appear on mobile mode.
+    // Modal for mobile view / detail view
     var modal = document.createElement('div');
-    modal.innerHTML = wrapper.innerHTML;
     modal.classList.add('info-hotspot-modal');
+    modal.innerHTML = `
+      <div class="info-hotspot-header">
+        <div class="info-hotspot-title">${sanitize(titleText)}</div>
+        <div class="info-hotspot-close-wrapper"><img src="/marzipano/img/close.png" class="info-hotspot-close-icon"></div>
+      </div>
+      <div class="info-hotspot-text" style="visibility:visible; position:static; transform:none;">${sanitize(hotspot.text || '')}</div>
+    `;
     document.body.appendChild(modal);
 
     var toggle = function () {
-      if (window.isEditorMode) {
-        return; // Handled by context menu buttons
-      }
+      if (window.isEditorMode) return;
       wrapper.classList.toggle('visible');
       modal.classList.toggle('visible');
     };
 
-
-    // Show content when hotspot is clicked.
-    wrapper.querySelector('.info-hotspot-header').addEventListener('click', function(e) {
+    // Show content when hotspot anchor or badge card is clicked.
+    anchor.addEventListener('click', function (e) {
       if (window.isEditorMode) {
         document.querySelectorAll('.hotspot').forEach(function(h) { 
             h.classList.remove('active-menu'); 
@@ -404,11 +419,23 @@
       toggle();
     });
 
+    tooltip.querySelector('.hotspot-badge-card').addEventListener('click', function(e) {
+      if (window.isEditorMode) return;
+      toggle();
+    });
+
     // Hide content when close icon is clicked.
     modal.querySelector('.info-hotspot-close-wrapper').addEventListener('click', toggle);
 
+    // Pause autorotate when hovering over hotspot, resume when mouse leaves.
+    wrapper.addEventListener('mouseenter', function () {
+      stopAutorotate();
+    });
+    wrapper.addEventListener('mouseleave', function () {
+      startAutorotate();
+    });
+
     // Prevent touch and scroll events from reaching the parent element.
-    // This prevents the view control logic from interfering with the hotspot.
     stopTouchAndScrollEventPropagation(wrapper);
 
     // In editor mode, append context menu LAST so it stays on top
