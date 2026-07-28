@@ -422,56 +422,58 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   100% { transform: scale(calc(var(--base-scale, 1) * 2.8)); opacity: 0; border-width: 0px; }
 }
 
-/* Modern Dashed Connector & Badge Tooltip (Image 2 style) */
+/* Elevate hovered hotspot above all other elements */
+.hotspot:hover,
+.hotspot.active-menu {
+  z-index: 1000 !important;
+}
 
-.link-hotspot-tooltip {
+/* Modern Dashed Connector & Badge Card Design */
+.hotspot-tooltip {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 0;
-  height: 0;
   pointer-events: none;
-  z-index: 100;
-  transform-origin: 0 0;
+  z-index: 10;
+  transform-origin: bottom left;
   transform: scale(var(--base-scale, 1));
 }
 
-/* SVG dashed line container */
-.hotspot-line-svg {
+/* SVG Dashed Line */
+.hotspot-dashed-connector {
   position: absolute;
   left: 0;
-  top: -50px;
-  width: 50px;
-  height: 50px;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
   overflow: visible;
   pointer-events: none;
 }
 
-/* Dashed line path */
 .dashed-line-path {
-  stroke-dasharray: 5 3;
-  stroke-dashoffset: 60;
+  stroke: #ffffff;
+  stroke-width: 2.2;
+  stroke-dasharray: 4, 4;
+  stroke-linecap: round;
+  stroke-dashoffset: 45;
   opacity: 0;
-  transition: stroke-dashoffset 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease;
+  transition: stroke-dashoffset 0.4s ease-out, opacity 0.3s ease;
 }
 
-/* Badge Card container */
+/* Badge Card Container (expands smoothly outwards from bottom-left corner) */
 .hotspot-badge-card {
   position: absolute;
   left: 30px;
-  top: -62px;
+  bottom: 30px;
   display: flex;
   align-items: center;
-  gap: 0;
-  white-space: nowrap;
-  pointer-events: auto;
-  cursor: pointer;
-
-  /* Flat horizontal strip opening UPWARDS (from bottom left) */
+  border-radius: 8px;
+  overflow: hidden;
   opacity: 0;
-  transform: scaleY(0) scaleX(0.3);
   transform-origin: bottom left;
-  transition: transform 0.35s cubic-bezier(0.34, 1.46, 0.64, 1), opacity 0.2s ease;
+  transform: scale(0);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
 }
 
 /* White square icon container (left side) */
@@ -490,20 +492,21 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Link Hotspot Title container (Keeps category/location theme color!) */
+/* Link Hotspot Title container (Subtly narrower vertically: 32px) */
 .hotspot-badge-title {
-  height: 36px;
+  height: 32px;
   background: linear-gradient(135deg, var(--hotspot-color, #FF512F), color-mix(in srgb, var(--hotspot-color, #FF512F) 80%, #000));
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
   padding: 0 14px 0 12px;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 7px 7px 0;
   display: flex;
   align-items: center;
   margin-left: -3px;
   z-index: 1;
   letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 /* On hover over .link-hotspot */
@@ -518,11 +521,10 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
 .link-hotspot:active .hotspot-badge-card,
 .link-hotspot.active-menu .hotspot-badge-card {
   opacity: 1;
-  transform: scaleX(1) scaleY(1);
+  transform: scale(1);
 }
 
 /* Info Hotspot Container */
-
 .info-hotspot {
   width: 60px;
   height: 60px;
@@ -555,7 +557,17 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   transform: scale(var(--base-scale, 1));
 }
 
-/* Info Hotspot (Simple dark glass design) */
+/* Info Hotspot (Simple dark glass design - ALWAYS VISIBLE) */
+.info-hotspot-tooltip .dashed-line-path {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+.info-hotspot-tooltip .hotspot-badge-card {
+  opacity: 1;
+  transform: scale(1);
+}
+
 .info-badge-icon {
   color: #475569 !important; /* Simple sleek gray color */
 }
@@ -569,33 +581,86 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   font-weight: 500 !important;
 }
 
-/* Tooltip container for info hotspot */
-.info-hotspot-tooltip {
+.info-hotspot .info-hotspot-icon-wrapper {
+  width: 40px;
+  height: 40px;
+}
+
+.mobile .info-hotspot .info-hotspot-icon-wrapper {
+  width: 50px;
+  height: 50px;
+}
+
+.info-hotspot .info-hotspot-icon {
+  width: 90%;
+  height: 90%;
+  margin: 5%;
+}
+
+.info-hotspot .info-hotspot-title-wrapper {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: 40px;
+  top: 0;
   width: 0;
-  height: 0;
-  pointer-events: none;
-  z-index: 100;
-  transform-origin: 0 0;
-  transform: scale(var(--base-scale, 1));
+  height: 40px;
+  padding: 0;
+  overflow: hidden;
+  -webkit-transition: width 0s 0.4s,
+                      padding 0s 0.4s;
+  transition: width 0s 0.4s,
+              padding 0s 0.4s;
 }
 
-/* Always visible for info hotspot */
-.info-hotspot-tooltip .dashed-line-path {
-  stroke-dashoffset: 0;
-  opacity: 1;
+.desktop .info-hotspot.visible .info-hotspot-title-wrapper,
+.desktop.no-touch .info-hotspot .info-hotspot-header:hover .info-hotspot-title-wrapper {
+  width: 220px;
+  padding: 0 5px;
+  -webkit-transition: width 0s 0.4s,
+                      padding 0s 0.4s;
+  transition: width 0s 0.4s,
+              padding 0s 0.4s;
 }
 
-.info-hotspot-tooltip .hotspot-badge-card {
-  opacity: 1;
-  transform: scaleY(1) scaleX(1);
-  transition: filter 0.2s ease, transform 0.2s ease;
+.info-hotspot .info-hotspot-title-wrapper:before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
 }
 
-.no-touch .info-hotspot:hover .hotspot-badge-card {
-  filter: brightness(1.1);
+.info-hotspot .info-hotspot-title {
+  display: inline-block;
+  vertical-align: middle;
+
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+.info-hotspot .info-hotspot-close-wrapper {
+  position: absolute;
+  left: 260px;
+  top: 0;
+  height: 40px;
+  width: 40px;
+  border-top-right-radius: 5px;
+  background-color: rgb(78,88,104);
+  visibility: hidden;
+  -ms-transform: perspective(200px) rotateY(90deg);
+  -webkit-transform: perspective(200px) rotateY(90deg);
+  transform: perspective(200px) rotateY(90deg);
+  -ms-transform-origin: 0 50% 0;
+  -webkit-transform-origin: 0 50% 0;
+  transform-origin: 0 50% 0;
+  -webkit-transition: -ms-transform 0.3s 0.3s,
+                      -webkit-transform 0.3s 0.3s,
+                      transform 0.3s 0.3s,
+                      visibility 0s 0.6s;
+  transition: -ms-transform 0.3s 0.3s,
+              -webkit-transform 0.3s 0.3s,
+              transform 0.3s 0.3s,
+              visibility 0s 0.6s;
 }
 
 .desktop .info-hotspot.visible .info-hotspot-close-wrapper {

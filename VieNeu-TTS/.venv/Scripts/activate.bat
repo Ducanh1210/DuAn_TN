@@ -26,7 +26,7 @@
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-@for %%i in ("D:\laragon\www\Du_An_TN\VieNeu-TTS\.venv") do @set "VIRTUAL_ENV=%%~fi"
+@for %%i in ("D:\laragon\www\datnv2\DuAn_TN\VieNeu-TTS\.venv") do @set "VIRTUAL_ENV=%%~fi"
 
 @set "VIRTUAL_ENV_PROMPT=vieneu"
 @if NOT DEFINED VIRTUAL_ENV_PROMPT (

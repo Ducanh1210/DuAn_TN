@@ -263,6 +263,21 @@
             color: #166534;
         }
 
+        .badge-minimal-warning {
+            background: #fffbeb;
+            color: #b45309;
+        }
+
+        .badge-minimal-danger {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .badge-minimal-info {
+            background: #f0f9ff;
+            color: #0369a1;
+        }
+
         /* Forms in Admin */
         .form-control, .form-select {
             font-size: 0.825rem;
