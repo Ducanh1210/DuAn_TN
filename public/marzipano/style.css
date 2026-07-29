@@ -426,10 +426,17 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   100% { transform: scale(calc(var(--base-scale, 1) * 4.5)); opacity: 0; border-width: 0px; }
 }
 
-/* Elevate hovered hotspot above all other elements */
+/* Elevate hovered hotspot above all other elements & freeze dot pulse animation on hover */
 .hotspot:hover,
 .hotspot.active-menu {
   z-index: 1000 !important;
+}
+
+.hotspot:hover .pulsing-dot,
+.hotspot:hover .pulsing-dot::before,
+.hotspot:hover .pulsing-dot::after {
+  animation: none !important;
+  opacity: 1 !important;
 }
 
 /* Modern Dashed Connector & Badge Card Design */
@@ -485,7 +492,7 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* White square icon container (left side) */
+/* White square icon container (left side) for Link Hotspots */
 .hotspot-badge-icon {
   width: 36px;
   height: 36px;
@@ -504,7 +511,7 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
-/* Link Hotspot Title container (Subtly narrower vertically: 32px) */
+/* Link Hotspot Title container */
 .hotspot-badge-title {
   height: 32px;
   background: color-mix(in srgb, var(--hotspot-color, #FF512F) 82%, transparent);
@@ -524,6 +531,18 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   letter-spacing: 0.2px;
   white-space: nowrap;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Hide white square box & icon ONLY for Info Hotspots */
+.info-hotspot .hotspot-badge-icon {
+  display: none !important;
+}
+
+.info-hotspot .hotspot-badge-title {
+  margin-left: 0 !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  padding: 0 14px !important;
 }
 
 /* On hover over .link-hotspot: Line extends fast, then card un-flattens up */
@@ -607,9 +626,9 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   background: rgba(15, 23, 42, 0.75) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: none;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   font-weight: 500 !important;
+  border-radius: 8px !important;
 }
 
 .info-hotspot .info-hotspot-icon-wrapper {

@@ -142,6 +142,18 @@
     autorotateToggleElement.classList.add('enabled');
   }
 
+  // Pause camera rotation when hovering over any hotspot
+  document.addEventListener('mouseover', function(e) {
+    if (e.target.closest('.hotspot')) {
+      viewer.stopMovement();
+    }
+  });
+  document.addEventListener('mouseout', function(e) {
+    if (e.target.closest('.hotspot') && autorotateToggleElement.classList.contains('enabled')) {
+      viewer.startMovement(autorotate);
+    }
+  });
+
   // Set handler for autorotate toggle.
   autorotateToggleElement.addEventListener('click', toggleAutorotate);
 

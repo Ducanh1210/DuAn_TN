@@ -579,6 +579,17 @@
             animation: highlightFlash 1.5s ease-out;
         }
 
+        /* Remove white square block & icon ONLY from Info Hotspot tags */
+        .info-hotspot .hotspot-badge-icon {
+            display: none !important;
+        }
+        .info-hotspot .hotspot-badge-title {
+            margin-left: 0 !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            padding: 0 14px !important;
+        }
+
         /* Floating Curved Review Bubbles (Mini Compact Arc Loop Shifted Down) */
         .floating-comment-container {
             position: fixed;
