@@ -85,17 +85,45 @@
       pinFirstLevel: true
     });
 
-    // Create link hotspots.
+    var hotspotItems = [];
+
+    // Create link hotspots (hover-only).
     sceneData.linkHotspots.forEach(function (hotspot) {
       var element = createLinkHotspotElement(hotspot);
       scene.hotspotContainer().createHotspot(element, { yaw: hotspot.yaw, pitch: hotspot.pitch });
     });
 
-    // Create info hotspots.
+    // Create info hotspots (auto-fade-in when camera faces them).
     sceneData.infoHotspots.forEach(function (hotspot) {
       var element = createInfoHotspotElement(hotspot);
       scene.hotspotContainer().createHotspot(element, { yaw: hotspot.yaw, pitch: hotspot.pitch });
+      hotspotItems.push({ element: element, yaw: hotspot.yaw, pitch: hotspot.pitch });
     });
+
+    // Automatically fade in hotspots when camera rotates to face them
+    function updateHotspotsInView() {
+      var curYaw = view.yaw();
+      var curPitch = view.pitch();
+      var fov = view.fov();
+
+      // Widen viewing angle cone to cover nearly the full screen width (~100 degrees)
+      var maxYaw = Math.max(fov * 0.65, 0.85);
+      var maxPitch = 0.75;
+
+      hotspotItems.forEach(function (item) {
+        var yawDiff = Math.abs((item.yaw - curYaw + 3 * Math.PI) % (2 * Math.PI) - Math.PI);
+        var pitchDiff = Math.abs(item.pitch - curPitch);
+
+        if (yawDiff < maxYaw && pitchDiff < maxPitch) {
+          item.element.classList.add('in-view');
+        } else {
+          item.element.classList.remove('in-view');
+        }
+      });
+    }
+
+    view.addEventListener('change', updateHotspotsInView);
+    setTimeout(updateHotspotsInView, 150);
 
     return {
       data: sceneData,
