@@ -28,13 +28,24 @@ class InteractionController extends Controller
 
     public function storeComment(Request $request, Location $location)
     {
+        $user = Auth::user();
+
+        // Check if user already commented on this location (1 review per user per location)
+        $existingComment = $location->comments()->where('user_id', $user->id)->first();
+        if ($existingComment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn đã đánh giá địa điểm này rồi! Mỗi tài khoản chỉ được gửi đánh giá 1 lần.'
+            ], 422);
+        }
+
         $request->validate([
             'content' => 'required|string|max:1000',
             'rating' => 'nullable|integer|min:1|max:5',
         ]);
 
         $comment = $location->comments()->create([
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
             'content' => $request->input('content'),
             'rating' => $request->input('rating'),
             'status' => 'visible',
@@ -54,6 +65,41 @@ class InteractionController extends Controller
                 'content' => $comment->content,
                 'rating' => $comment->rating,
                 'created_at' => $comment->created_at->diffForHumans(),
+                'user' => [
+                    'display_name' => $comment->user->display_name ?? $comment->user->username,
+                    'avatar_url' => $comment->user->avatar_formatted_url,
+                    'frame_css' => $comment->user->equippedFrame->css_style ?? '',
+                ]
+            ]
+        ]);
+    }
+
+    public function updateComment(Request $request, Comment $comment)
+    {
+        if ($comment->user_id !== Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'Không có quyền chỉnh sửa.'], 403);
+        }
+
+        $request->validate([
+            'content' => 'required|string|max:1000',
+            'rating' => 'nullable|integer|min:1|max:5',
+        ]);
+
+        $comment->update([
+            'content' => $request->input('content'),
+            'rating' => $request->input('rating', $comment->rating),
+        ]);
+
+        $comment->load('user.equippedFrame');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã cập nhật bài đánh giá thành công.',
+            'comment' => [
+                'id' => $comment->id,
+                'content' => $comment->content,
+                'rating' => $comment->rating,
+                'created_at' => $comment->updated_at->diffForHumans(),
                 'user' => [
                     'display_name' => $comment->user->display_name ?? $comment->user->username,
                     'avatar_url' => $comment->user->avatar_formatted_url,

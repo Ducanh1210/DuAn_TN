@@ -95,6 +95,7 @@ Route::post('/trip-planner/generate', [\App\Http\Controllers\Client\TripPlannerC
 Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/favorite', [\App\Http\Controllers\Client\InteractionController::class, 'toggleFavorite'])->name('client.locations.favorite');
     Route::post('/locations/{location}/comment', [\App\Http\Controllers\Client\InteractionController::class, 'storeComment'])->name('client.locations.comment');
+    Route::put('/comments/{comment}', [\App\Http\Controllers\Client\InteractionController::class, 'updateComment'])->name('client.comments.update');
     Route::delete('/comments/{comment}', [\App\Http\Controllers\Client\InteractionController::class, 'deleteComment'])->name('client.comments.destroy');
     Route::get('/ca-nhan/dia-diem-yeu-thich', [\App\Http\Controllers\Client\InteractionController::class, 'myFavorites'])->name('client.favorites.index');
     Route::post('/report', [\App\Http\Controllers\Client\InteractionController::class, 'report'])->name('client.report');
