@@ -142,6 +142,18 @@
     autorotateToggleElement.classList.add('enabled');
   }
 
+  // Pause camera rotation when hovering over any hotspot
+  document.addEventListener('mouseover', function(e) {
+    if (e.target.closest('.hotspot')) {
+      viewer.stopMovement();
+    }
+  });
+  document.addEventListener('mouseout', function(e) {
+    if (e.target.closest('.hotspot') && autorotateToggleElement.classList.contains('enabled')) {
+      viewer.startMovement(autorotate);
+    }
+  });
+
   // Set handler for autorotate toggle.
   autorotateToggleElement.addEventListener('click', toggleAutorotate);
 
@@ -287,13 +299,7 @@
     wrapper.setAttribute('data-id', hotspot.id);
     wrapper.style.setProperty('--base-scale', hotspot.scale || 1.0);
 
-    // Pause autorotate on hover
-    wrapper.addEventListener('mouseenter', function() {
-      if (typeof stopAutorotate === 'function') stopAutorotate();
-    });
-    wrapper.addEventListener('mouseleave', function() {
-      if (typeof startAutorotate === 'function') startAutorotate();
-    });
+
 
     // Create dot element.
     var icon = document.createElement('div');
@@ -379,13 +385,7 @@
     wrapper.setAttribute('data-id', hotspot.id);
     wrapper.style.setProperty('--base-scale', hotspot.scale || 1.0);
 
-    // Pause autorotate on hover
-    wrapper.addEventListener('mouseenter', function() {
-      if (typeof stopAutorotate === 'function') stopAutorotate();
-    });
-    wrapper.addEventListener('mouseleave', function() {
-      if (typeof startAutorotate === 'function') startAutorotate();
-    });
+
 
     // Create micro anchor dot
     var anchor = document.createElement('div');
