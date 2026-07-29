@@ -443,7 +443,7 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   transform: scale(var(--base-scale, 1));
 }
 
-/* SVG Dashed Line */
+/* SVG Dashed Line Container (animates clip-path to visibly lengthen line quickly from bottom-left) */
 .hotspot-dashed-connector {
   position: absolute;
   left: 0;
@@ -452,6 +452,11 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   height: 30px;
   overflow: visible;
   pointer-events: none;
+  clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
+  -webkit-clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
+  opacity: 0;
+  transition: clip-path 0.3s cubic-bezier(0.16, 1, 0.3, 1), -webkit-clip-path 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  transition-delay: 0.08s;
 }
 
 .dashed-line-path {
@@ -459,12 +464,9 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   stroke-width: 2.2;
   stroke-dasharray: 4, 4;
   stroke-linecap: round;
-  stroke-dashoffset: 45;
-  opacity: 0;
-  transition: stroke-dashoffset 0.4s ease-out, opacity 0.3s ease;
 }
 
-/* Badge Card Container (expands smoothly outwards from bottom-left corner) */
+/* Badge Card Container (Expands UPWARDS from a flat horizontal strip at bottom) */
 .hotspot-badge-card {
   position: absolute;
   left: 30px;
@@ -474,9 +476,10 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   border-radius: 8px;
   overflow: hidden;
   opacity: 0;
-  transform-origin: bottom left;
-  transform: scale(0);
-  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom center;
+  transform: scale(1, 0); /* Flat horizontal strip across bottom */
+  transition: opacity 0.25s ease, transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
+  transition-delay: 0s;
   pointer-events: none; /* Disable mouse interactions when hidden so it never triggers hover prematurely */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -523,20 +526,23 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* On hover over .link-hotspot */
-.link-hotspot:hover .dashed-line-path,
-.link-hotspot:active .dashed-line-path,
-.link-hotspot.active-menu .dashed-line-path {
-  stroke-dashoffset: 0;
+/* On hover over .link-hotspot: Line extends fast, then card un-flattens up */
+.link-hotspot:hover .hotspot-dashed-connector,
+.link-hotspot:active .hotspot-dashed-connector,
+.link-hotspot.active-menu .hotspot-dashed-connector {
+  clip-path: polygon(-20% 120%, 120% 120%, 120% -20%, -20% -20%);
+  -webkit-clip-path: polygon(-20% 120%, 120% 120%, 120% -20%, -20% -20%);
   opacity: 1;
+  transition-delay: 0s;
 }
 
 .link-hotspot:hover .hotspot-badge-card,
 .link-hotspot:active .hotspot-badge-card,
 .link-hotspot.active-menu .hotspot-badge-card {
   opacity: 0.88;
-  transform: scale(1);
-  pointer-events: auto; /* Enable mouse interaction only when badge becomes visible */
+  transform: scale(1, 1);
+  transition-delay: 0.08s; /* Seamless overlap - zero waiting gap! */
+  pointer-events: auto;
 }
 
 /* Info Hotspot Container */
@@ -572,15 +578,25 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   transform: scale(var(--base-scale, 1));
 }
 
-/* Info Hotspot (Simple dark glass design - ALWAYS VISIBLE) */
-.info-hotspot-tooltip .dashed-line-path {
-  stroke-dashoffset: 0;
+/* Info Hotspot Tooltip: Line extends fast, then card un-flattens up */
+.info-hotspot.in-view .hotspot-dashed-connector,
+.info-hotspot:hover .hotspot-dashed-connector,
+.info-hotspot:active .hotspot-dashed-connector,
+.info-hotspot.active-menu .hotspot-dashed-connector {
+  clip-path: polygon(-20% 120%, 120% 120%, 120% -20%, -20% -20%);
+  -webkit-clip-path: polygon(-20% 120%, 120% 120%, 120% -20%, -20% -20%);
   opacity: 1;
+  transition-delay: 0s;
 }
 
-.info-hotspot-tooltip .hotspot-badge-card {
-  opacity: 1;
-  transform: scale(1);
+.info-hotspot.in-view .info-hotspot-tooltip .hotspot-badge-card,
+.info-hotspot:hover .info-hotspot-tooltip .hotspot-badge-card,
+.info-hotspot:active .info-hotspot-tooltip .hotspot-badge-card,
+.info-hotspot.active-menu .info-hotspot-tooltip .hotspot-badge-card {
+  opacity: 0.88;
+  transform: scale(1, 1);
+  transition-delay: 0.08s; /* Seamless overlap - zero waiting gap! */
+  pointer-events: auto;
 }
 
 .info-badge-icon {
