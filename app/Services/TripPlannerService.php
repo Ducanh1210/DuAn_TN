@@ -118,6 +118,40 @@ class TripPlannerService
     }
 
     /**
+     * Làm sạch và giải mã chuỗi JSON từ kết quả trả về của AI
+     */
+    protected function cleanAndDecodeJson(string $rawContent): ?array
+    {
+        $clean = trim($rawContent);
+        $clean = preg_replace('/^```(?:json)?\s*/i', '', $clean);
+        $clean = preg_replace('/\s*```$/i', '', $clean);
+        $clean = trim($clean);
+
+        $decoded = json_decode($clean, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        // Bóc tách khối JSON {...} bằng Regex nếu có văn bản thừa xung quanh
+        if (preg_match('/\{[\s\S]*\}/', $clean, $matches)) {
+            $jsonCandidate = $matches[0];
+            $decoded = json_decode($jsonCandidate, true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+
+            // Loại bỏ trailing commas (dấu phẩy thừa trước ] hoặc })
+            $sanitized = preg_replace('/,\s*([\]\}])/', '$1', $jsonCandidate);
+            $decoded = json_decode($sanitized, true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * AI sinh câu hỏi tiếp theo dựa trên hồ sơ các lựa chọn trước đó
      */
     public function generateNextQuestion(array $answers, int $stepNumber): array
@@ -177,16 +211,9 @@ QUY TẮC BẮT BUỘC:
             ];
         }
 
-        $decoded = json_decode($rawResponse, true);
+        $decoded = $this->cleanAndDecodeJson($rawResponse);
         if (is_array($decoded) && (isset($decoded['question']) || isset($decoded['done']))) {
             return $decoded;
-        }
-
-        if (preg_match('/\{[\s\S]*\}/', $rawResponse, $matches)) {
-            $decoded = json_decode($matches[0], true);
-            if (is_array($decoded) && (isset($decoded['question']) || isset($decoded['done']))) {
-                return $decoded;
-            }
         }
 
         return [
@@ -253,16 +280,9 @@ QUY TẮC BẮT BUỘC:
         $rawResponse = $this->callAI($systemPrompt, $userPrompt, 1500, 0.7);
 
         if ($rawResponse) {
-            $decoded = json_decode($rawResponse, true);
-            if (is_array($decoded) && isset($decoded['days'])) {
+            $decoded = $this->cleanAndDecodeJson($rawResponse);
+            if (is_array($decoded) && (isset($decoded['days']) || isset($decoded['title']))) {
                 return ['success' => true, 'itinerary' => $decoded];
-            }
-
-            if (preg_match('/\{[\s\S]*\}/', $rawResponse, $matches)) {
-                $decoded = json_decode($matches[0], true);
-                if (is_array($decoded) && isset($decoded['days'])) {
-                    return ['success' => true, 'itinerary' => $decoded];
-                }
             }
 
             return ['success' => true, 'raw' => $rawResponse];
