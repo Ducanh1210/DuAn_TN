@@ -435,6 +435,7 @@
             });
         }
     </script>
+    <script src="{{ asset('js/form-validation.js') }}"></script>
     @stack('scripts')
 </body>
 

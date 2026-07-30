@@ -409,57 +409,8 @@
             }
         }
 
-        // Inline Validation on Submit
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginForm');
-            if (!form) return;
-
-            form.addEventListener('submit', function(e) {
-                let isValid = true;
-
-                const username = document.getElementById('username');
-                const usernameErr = document.getElementById('usernameError');
-                if (!username.value.trim()) {
-                    showError(username, usernameErr, 'Vui lòng nhập tên đăng nhập.');
-                    isValid = false;
-                }
-
-                const password = document.getElementById('password');
-                const passwordErr = document.getElementById('passwordError');
-                if (!password.value) {
-                    showError(password, passwordErr, 'Vui lòng nhập mật khẩu.');
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-
-            function showError(input, errorEl, message) {
-                input.classList.add('is-invalid');
-                if (errorEl) {
-                    errorEl.textContent = message;
-                }
-            }
-
-            function clearError(input, errorEl) {
-                input.classList.remove('is-invalid');
-                if (errorEl) {
-                    errorEl.textContent = '';
-                }
-            }
-
-            ['username', 'password'].forEach(id => {
-                const input = document.getElementById(id);
-                const errorEl = document.getElementById(id + 'Error');
-                if (input) {
-                    input.addEventListener('input', function() {
-                        clearError(this, errorEl);
-                    });
-                }
-            });
-        });
-    </script>
+        // Inline validation is handled by form-validation.js
+        </script>
+    <script src="{{ asset('js/form-validation.js') }}"></script>
 </body>
 </html>
