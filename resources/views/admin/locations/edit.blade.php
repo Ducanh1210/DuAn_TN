@@ -418,7 +418,7 @@
             formData.append('file', files[i]);
             
             $.ajax({
-                url: '{{ route('admin.locations.upload_image', $location->id) }}',
+                url: '{{ route('admin.locations.upload_image', $location->id, false) }}',
                 type: 'POST',
                 data: formData,
                 contentType: false,
@@ -464,7 +464,7 @@
         formData.append('audio', file);
 
         $.ajax({
-            url: '{{ route("admin.locations.upload_audio", $location->id) }}',
+            url: '{{ route("admin.locations.upload_audio", $location->id, false) }}',
             type: 'POST',
             data: formData,
             contentType: false,
@@ -485,7 +485,7 @@
     $(document).on('click', '#btnDeleteAudio', function() {
         if (!confirm('Xóa audio thuyết minh của địa điểm này?')) return;
         $.ajax({
-            url: '{{ route("admin.locations.delete_audio", $location->id) }}',
+            url: '{{ route("admin.locations.delete_audio", $location->id, false) }}',
             type: 'DELETE',
             success: function(res) {
                 if (res.success) {
@@ -501,76 +501,93 @@
 
     // Fetch voices list for VieNeu-TTS
     function loadTtsVoices() {
+        console.log('[TTS] loadTtsVoices() called');
         let voiceSelect = $('#ttsVoiceSelect');
         let badge = $('#ttsConnectionBadge');
+
+        console.log('[TTS] voiceSelect found:', voiceSelect.length);
+        console.log('[TTS] badge found:', badge.length);
+
+        if (voiceSelect.length === 0) {
+            console.warn('[TTS] voiceSelect not found, aborting');
+            return;
+        }
         
-        badge.removeClass('bg-success bg-danger').addClass('bg-secondary')
-             .html('<i class="fas fa-circle-notch fa-spin me-1"></i> Đang kết nối...')
+        badge.text('Đang kết nối...')
              .attr('title', 'Đang kiểm tra kết nối tới máy chủ VieNeu-TTS...');
+
+        let ajaxUrl = '/admin/locations/tts-voices';
+        console.log('[TTS] AJAX URL:', ajaxUrl);
              
         $.ajax({
-            url: '{{ route("admin.locations.tts_voices") }}',
+            url: ajaxUrl,
             type: 'GET',
+            dataType: 'json',
+            timeout: 10000,
             success: function(res) {
+                console.log('[TTS] AJAX success, response:', res);
                 voiceSelect.empty();
                 
                 // Check if connection failed or error
-                if (res.length === 0 || (res.length === 1 && res[0].id === 'error')) {
+                if (!Array.isArray(res) || res.length === 0 || (res.length === 1 && res[0].id === 'error')) {
                     voiceSelect.append('<option value="">⚠️ Không có giọng đọc (Server Offline)</option>');
                     $('#btnGenerateTts').prop('disabled', true);
                     
                     let errorMsg = 'Không thể kết nối tới máy chủ VieNeu-TTS.';
-                    if (res.length === 1 && res[0].name) {
+                    if (Array.isArray(res) && res.length === 1 && res[0].name) {
                         errorMsg = res[0].name.replace('⚠️ ', '');
                     }
                     
-                    badge.removeClass('bg-secondary bg-success').addClass('bg-danger')
-                         .html('<i class="fas fa-exclamation-circle me-1"></i> Lỗi kết nối')
-                         .attr('title', errorMsg);
+                    badge.text('Lỗi kết nối').attr('title', errorMsg);
                     return;
                 }
                 
                 $('#btnGenerateTts').prop('disabled', false);
                 
-                badge.removeClass('bg-secondary bg-danger').addClass('bg-success')
-                     .html('<i class="fas fa-check-circle me-1"></i> Kết nối tốt')
+                badge.text('Kết nối tốt')
                      .attr('title', 'Đã kết nối thành công tới máy chủ VieNeu-TTS.');
                 
                 let savedVoice = localStorage.getItem('vieneu_tts_voice');
                 res.forEach(function(voice) {
-                    let selected = '';
-                    if (savedVoice) {
-                        selected = (voice.id === savedVoice) ? 'selected' : '';
-                    } else {
-                        // Fallback default selected for ngochuyen / ngoc-huyen
-                        selected = (voice.id.toLowerCase() === 'ngochuyen' || voice.id.toLowerCase() === 'ngoc-huyen') ? 'selected' : '';
-                    }
-                    voiceSelect.append(`<option value="${voice.id}" ${selected}>${voice.name}</option>`);
+                    if (!voice || !voice.id) return;
+                    let vId = String(voice.id);
+                    let vName = voice.name || vId;
+                    let selected = (savedVoice && vId === savedVoice) ? 'selected' : '';
+                    voiceSelect.append('<option value="' + vId + '" ' + selected + '>' + vName + '</option>');
                 });
                 
                 updateTtsCharCount();
             },
-            error: function(xhr) {
+            error: function(xhr, status, error) {
+                console.error('[TTS] AJAX error:', status, error, xhr.status, xhr.responseText);
                 voiceSelect.empty().append('<option value="">⚠️ Lỗi kết nối tới máy chủ TTS</option>');
                 $('#btnGenerateTts').prop('disabled', true);
                 
-                badge.removeClass('bg-secondary bg-success').addClass('bg-danger')
-                     .html('<i class="fas fa-times-circle me-1"></i> Mất kết nối')
-                     .attr('title', 'Không thể kết nối tới máy chủ VieNeu-TTS (Cổng 8001). Vui lòng kiểm tra xem dịch vụ đã được khởi chạy chưa.');
+                badge.text('Mất kết nối')
+                     .attr('title', 'Không thể kết nối tới máy chủ VieNeu-TTS (Cổng 8001). Status: ' + xhr.status);
             }
         });
     }
 
     // Retry TTS Connection
-    $(document).on('click', '#btnRetryTtsConnection', function() {
+    $(document).on('click', '#btnRetryTtsConnection', function(e) {
+        e.preventDefault();
+        console.log('[TTS] Retry button clicked');
         let btn = $(this);
-        btn.prop('disabled', true).find('i').addClass('fa-spin');
-        
+        btn.prop('disabled', true);
         loadTtsVoices();
-        
         setTimeout(function() {
-            btn.prop('disabled', false).find('i').removeClass('fa-spin');
-        }, 1000);
+            btn.prop('disabled', false);
+        }, 1500);
+    });
+
+    // Save active tab to localStorage on tab switch & load TTS if audio tab
+    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        let tabId = $(e.target).attr('id');
+        localStorage.setItem('active_location_tab', tabId);
+        if (tabId === 'audio-tab') {
+            loadTtsVoices();
+        }
     });
 
     // Restore active tab from localStorage on load
@@ -583,20 +600,9 @@
         }
     }
 
-    // Save active tab to localStorage on tab switch
-    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-        localStorage.setItem('active_location_tab', $(e.target).attr('id'));
-    });
-
-    // Load voices on tab show
-    $('#audio-tab').on('shown.bs.tab', function () {
-        loadTtsVoices();
-    });
-
-    // Trigger loading voices immediately if audio tab is active on load
-    if ($('#audio-tab').hasClass('active')) {
-        loadTtsVoices();
-    }
+    // Always trigger loadTtsVoices on page load
+    console.log('[TTS] Page loaded, calling loadTtsVoices...');
+    loadTtsVoices();
 
     // Count chars in TTS text input
     function updateTtsCharCount() {
@@ -745,7 +751,7 @@
         }, 100);
 
         $.ajax({
-            url: '{{ route("admin.locations.generate_tts", $location->id) }}',
+            url: '{{ route("admin.locations.generate_tts", $location->id, false) }}',
             type: 'POST',
             data: {
                 text: text,
