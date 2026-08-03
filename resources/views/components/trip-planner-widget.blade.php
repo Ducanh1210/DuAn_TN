@@ -1113,6 +1113,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderRawResult(raw) {
+        if (typeof raw === 'string') {
+            try {
+                let clean = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+                let match = clean.match(/\{[\s\S]*\}/);
+                if (match) {
+                    let parsed = JSON.parse(match[0]);
+                    if (parsed && (parsed.days || parsed.title)) {
+                        renderItinerary(parsed);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not parse raw JSON on client:', e);
+            }
+        }
+
         resultPanel.classList.add('active');
         resultTitle.textContent = 'Lịch trình du lịch Ninh Bình';
         resultSummary.textContent = '';
