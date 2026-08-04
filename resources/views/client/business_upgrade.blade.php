@@ -17,39 +17,91 @@
     
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-body: #f8fafc;
-            --text-main: #0f172a;
-            --text-sub: #64748b;
-            --border-color: #e2e8f0;
+            --primary: #1e3a5f;
+            --primary-hover: #2b4c7e;
+            --bg-body: #f1f5f9;
+            --text-main: #1e3a5f;
+            --text-sub: #52525b;
+            --border-color: #cbdbe8;
             --card-bg: #ffffff;
         }
 
         body {
-            font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-body);
             color: var(--text-main);
             font-size: 0.875rem;
             font-weight: 400;
-            line-height: 1.5;
+            line-height: 1.6;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        h1, .h1 { font-size: 1.3rem !important; font-weight: 600 !important; }
-        h2, .h2 { font-size: 1.15rem !important; font-weight: 600 !important; }
-        h3, .h3 { font-size: 1.05rem !important; font-weight: 600 !important; }
-        h4, .h4 { font-size: 0.95rem !important; font-weight: 600 !important; }
-        h5, .h5 { font-size: 0.9rem !important; font-weight: 600 !important; }
-        h6, .h6 { font-size: 0.85rem !important; font-weight: 600 !important; }
+        h1, .h1 { font-size: 1.3rem !important; font-weight: 600 !important; color: #1e3a5f !important; }
+        h2, .h2 { font-size: 1.15rem !important; font-weight: 600 !important; color: #1e3a5f !important; }
+        h3, .h3 { font-size: 1.05rem !important; font-weight: 600 !important; color: #1e3a5f !important; }
+        h4, .h4 { font-size: 0.95rem !important; font-weight: 600 !important; color: #1e3a5f !important; }
+        h5, .h5 { font-size: 0.9rem !important; font-weight: 600 !important; color: #1e3a5f !important; }
+        h6, .h6 { font-size: 0.85rem !important; font-weight: 600 !important; color: #1e3a5f !important; }
+
+        /* Button design system override */
+        .btn-primary {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            padding: 8px 20px;
+        }
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: var(--primary-hover) !important;
+            border-color: var(--primary-hover) !important;
+            color: #ffffff !important;
+        }
+
+        .btn-success {
+            background-color: #2b4c7e !important;
+            border-color: #2b4c7e !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+        }
+        .btn-success:hover, .btn-success:focus {
+            background-color: #1e3a5f !important;
+            border-color: #1e3a5f !important;
+            color: #ffffff !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary) !important;
+            border-color: var(--border-color) !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+        }
+        .btn-outline-primary:hover, .btn-outline-primary:focus {
+            background-color: #f1f5f9 !important;
+            color: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
+
+        .btn-light {
+            background-color: #f1f5f9 !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-sub) !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+        }
+        .btn-light:hover {
+            background-color: #e2e8f0 !important;
+            color: var(--text-main) !important;
+        }
 
         /* Top Navigation Bar */
         .top-navbar {
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
-            padding: 12px 24px;
+            padding: 14px 28px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -75,23 +127,23 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 24px;
+            padding: 28px;
             margin-bottom: 24px;
         }
         
         .section-title {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             color: var(--text-main);
             border-bottom: 2px solid var(--primary);
-            padding-bottom: 6px;
+            padding-bottom: 8px;
             display: inline-block;
         }
 
         .form-label-clean {
             font-weight: 500;
-            color: #475569;
+            color: #3b5980;
             margin-bottom: 6px;
             font-size: 0.875rem;
             display: block;
@@ -100,7 +152,7 @@
         .form-control-clean {
             width: 100%;
             padding: 9px 14px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #cbdbe8;
             border-radius: 6px;
             background-color: var(--card-bg);
             color: var(--text-main);
@@ -111,13 +163,19 @@
         .form-control-clean:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+        }
+        
+        .is-invalid-clean {
+            border-color: #ef4444 !important;
+            box-shadow: none !important;
+            background-color: #ffffff !important;
         }
 
         /* Business Account upgrade styles */
         .biz-type-card {
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 16px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -130,11 +188,11 @@
         }
         .biz-type-card:hover {
             border-color: var(--primary);
-            background-color: rgba(0, 112, 255, 0.02);
+            background-color: #f1f5f9;
         }
         .biz-type-card.selected {
             border-color: var(--primary);
-            background-color: rgba(0, 112, 255, 0.05);
+            background-color: #f1f5f9;
             box-shadow: 0 0 0 1px var(--primary);
         }
         .biz-type-icon {
@@ -605,23 +663,11 @@
         }
 
         .wizard-row {
-            display: flex;
-            gap: 30px;
+            display: block;
+            width: 100%;
         }
         .wizard-form-col {
-            flex: 1;
-        }
-        .wizard-mockup-col {
-            width: 310px;
-            flex-shrink: 0;
-        }
-        @media (max-width: 991px) {
-            .wizard-row {
-                flex-direction: column-reverse;
-            }
-            .wizard-mockup-col {
-                width: 100%;
-            }
+            width: 100%;
         }
         
         /* Toast notification styling - Soft & Minimalist */
@@ -699,7 +745,7 @@
                             <p class="text-secondary small mb-4">Nhập một vài thông tin doanh nghiệp để bắt đầu.</p>
                             <div class="mb-4">
                                 <label class="form-label-clean">Tên doanh nghiệp *</label>
-                                <input type="text" class="form-control-clean" id="input_business_name" name="business_name" required placeholder="Ví dụ: Quán Nhậu Anh">
+                                <input type="text" class="form-control-clean" id="input_business_name" name="business_name" required placeholder="Ví dụ: Nhà Hàng Dê Nướng Cố Đô">
                             </div>
                         </div>
 
@@ -766,9 +812,12 @@
                                         <div class="dropdown-option-item" data-value="5" data-name="Nhà hàng">Nhà hàng</div>
                                         <div class="dropdown-option-item" data-value="5" data-name="Quán ăn bình dân">Quán ăn bình dân</div>
                                         <div class="dropdown-option-item" data-value="5" data-name="Quán cà phê / Trà sữa">Quán cà phê / Trà sữa</div>
-                                        <div class="dropdown-option-item" data-value="5" data-name="Quán nhậu / Bar / Pub">Quán nhậu / Bar / Pub</div>
+                                        <div class="dropdown-option-item" data-value="5" data-name="Quán nước / Giải khát">Quán nước / Giải khát</div>
                                         <div class="dropdown-option-item" data-value="5" data-name="Tiệm bánh / Tráng miệng">Tiệm bánh / Tráng miệng</div>
-                                        <div class="dropdown-option-item" data-value="5" data-name="Quán ăn vặt / Vỉa hè">Quán ăn vặt / Vỉa hè</div>
+                                        <div class="dropdown-option-item dropdown-option-other" data-value="5" data-name="Khác">Khác...</div>
+                                        <div class="other-category-input-wrapper d-none p-2 mt-1 border-top">
+                                            <input type="text" class="form-control-clean input-custom-other-category" placeholder="Nhập tên danh mục chi tiết của bạn..." style="font-size: 0.85rem; padding: 7px 12px;">
+                                        </div>
                                     </div>
                                     
                                     <!-- Group 2 -->
@@ -784,7 +833,11 @@
                                         <div class="dropdown-option-item" data-value="6" data-name="Homestay">Homestay</div>
                                         <div class="dropdown-option-item" data-value="6" data-name="Resort / Khu nghỉ dưỡng">Resort / Khu nghỉ dưỡng</div>
                                         <div class="dropdown-option-item" data-value="6" data-name="Biệt thự du lịch (Villa)">Biệt thự du lịch (Villa)</div>
-                                        <div class="dropdown-option-item" data-value="6" data-name="Nhà khách / Khác">Nhà khách / Khác</div>
+                                        <div class="dropdown-option-item" data-value="6" data-name="Nhà khách">Nhà khách</div>
+                                        <div class="dropdown-option-item dropdown-option-other" data-value="6" data-name="Khác">Khác...</div>
+                                        <div class="other-category-input-wrapper d-none p-2 mt-1 border-top">
+                                            <input type="text" class="form-control-clean input-custom-other-category" placeholder="Nhập tên danh mục chi tiết của bạn..." style="font-size: 0.85rem; padding: 7px 12px;">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -867,47 +920,19 @@
                             <input type="hidden" id="input_lng" name="lng" required>
                         </div>
 
-                        <!-- Step 7: PUT BIZ ON MAP settings -->
+                        <!-- Step 7: Description -->
                         <div class="biz-step-pane d-none" data-step="7">
-                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Đưa doanh nghiệp của bạn lên bản đồ</h4>
-                            <p class="text-secondary small mb-4">Bắt đầu kết nối với khách hàng trên Ninh Bình Travel Hub - tất cả ở cùng một nơi.</p>
-                            
-                            <div class="p-3 border rounded-2 bg-light mb-4">
-                                <ul class="mb-0 ps-3 small text-secondary">
-                                    <li class="mb-2">Giúp mọi người trong khu vực tìm thấy doanh nghiệp của bạn nhanh chóng.</li>
-                                    <li class="mb-2">Trả lời các bài đánh giá về doanh nghiệp của bạn từ khách hàng địa phương.</li>
-                                    <li>Quản lý toàn diện thông tin doanh nghiệp trên hệ thống bản đồ POI.</li>
-                                </ul>
-                            </div>
-
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" name="receive_tips" id="receive_tips" value="1" checked>
-                                <label class="form-check-label small text-secondary" for="receive_tips">
-                                    Nhận tin báo và mẹo hay về cách cải thiện Trang doanh nghiệp của bạn
-                                </label>
-                            </div>
-
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" name="receive_surveys" id="receive_surveys" value="1" checked>
-                                <label class="form-check-label small text-secondary" for="receive_surveys">
-                                    Nhận lời mời tham gia các cuộc khảo sát và chương trình thí điểm không thường xuyên
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Step 8: Description -->
-                        <div class="biz-step-pane d-none" data-step="8">
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Thêm mô tả doanh nghiệp *</h4>
                             <p class="text-secondary small mb-4">Cho phép khách hàng tìm hiểu thêm về doanh nghiệp của bạn bằng cách thêm mô tả ngắn gọn.</p>
                             <div class="mb-3">
                                 <label class="form-label-clean">Giới thiệu về doanh nghiệp *</label>
-                                <textarea class="form-control-clean" id="input_description" name="description" rows="5" maxlength="750" required placeholder="Ví dụ: Quán nhậu bình dân phục vụ các món ăn đặc sản Ninh Bình..."></textarea>
+                                <textarea class="form-control-clean" id="input_description" name="description" rows="5" maxlength="750" required placeholder="Ví dụ: Nhà hàng chuyên phục vụ các món ăn đặc sản Ninh Bình như thịt dê núi, cơm cháy và các món ăn dân dã truyền thống..."></textarea>
                                 <div class="text-end text-secondary small mt-1" id="descCharCount">0 / 750</div>
                             </div>
                         </div>
 
-                        <!-- Step 9: Menu Photos -->
-                        <div class="biz-step-pane d-none" data-step="9">
+                        <!-- Step 8: Menu Photos -->
+                        <div class="biz-step-pane d-none" data-step="8">
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;" id="step8Title">Thêm ảnh chụp thực đơn của bạn *</h4>
                             <p class="text-secondary small mb-4" id="step8Desc">Khách hàng chủ yếu dựa vào ảnh thực đơn khi quyết định ăn hoặc ghé thăm ở đâu.</p>
                             
@@ -920,8 +945,8 @@
                             <div class="upload-previews" id="menuPreviews"></div>
                         </div>
 
-                        <!-- Step 10: Storefront Photos -->
-                        <div class="biz-step-pane d-none" data-step="10">
+                        <!-- Step 9: Storefront Photos -->
+                        <div class="biz-step-pane d-none" data-step="9">
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Thêm ảnh mặt tiền cửa hàng *</h4>
                             <p class="text-secondary small mb-4">Việc chia sẻ ảnh mặt tiền của doanh nghiệp sẽ giúp khách hàng nhận ra vị trí của bạn ngay khi ghé qua.</p>
                             
@@ -934,6 +959,90 @@
                             <div class="upload-previews" id="storefrontPreviews"></div>
                         </div>
 
+                        <!-- Step 10: Camera & Location Verification -->
+                        <div class="biz-step-pane d-none" data-step="10">
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #1e3a5f;">Xác thực thực địa (Camera & Vị trí GPS) *</h4>
+                            <p class="text-secondary small mb-4">Mở camera trên thiết bị của bạn để chụp ảnh thực tế tại địa điểm kinh doanh đồng thời hệ thống sẽ tự động đối chiếu vị trí GPS trên bản đồ giúp tăng tối đa tính xác thực cho hồ sơ doanh nghiệp.</p>
+
+                            <div class="row g-4">
+                                <!-- Left Column: Camera Stream Viewport -->
+                                <div class="col-lg-6">
+                                    <div class="card border rounded-3 p-3 bg-white h-100" style="border-color: #cbdbe8 !important;">
+                                        <div class="fw-semibold text-dark small mb-3">
+                                            Camera chụp ảnh trực tiếp cửa hàng
+                                        </div>
+                                        <div class="camera-verification-box border rounded-3 p-3 text-center position-relative mb-3" style="background: #1e293b; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; flex: 1;">
+                                            <video id="cameraVideo" autoplay playsinline class="w-100 rounded-2 d-none" style="max-height: 320px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);"></video>
+                                            <canvas id="cameraCanvas" class="d-none"></canvas>
+
+                                            <div id="cameraPlaceholder" class="text-white py-4">
+                                                <p class="small text-secondary mb-3 px-3">Nhấn nút bên dưới để bật Camera chụp ảnh thực địa.</p>
+                                                <button type="button" class="btn btn-primary btn-sm px-4" id="btnStartCamera">
+                                                    Bật Camera Xác Thực
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Camera Action Controls -->
+                                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                            <button type="button" class="btn btn-success btn-sm px-3 d-none" id="btnCapturePhoto">
+                                                Chụp ảnh & Ghi nhận GPS
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary btn-sm px-3 d-none" id="btnSwitchCamera">
+                                                Đổi Camera
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column: Interactive GPS Leaflet Map & Captured Photos -->
+                                <div class="col-lg-6">
+                                    <!-- Leaflet GPS Map Card -->
+                                    <div class="card border rounded-3 p-3 bg-white mb-3" id="gpsStatusCard" style="border-color: #cbdbe8 !important;">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div>
+                                                <div class="fw-semibold text-dark small" id="gpsStatusTitle">Đang xác định GPS...</div>
+                                                <div class="text-muted small" style="font-size: 0.75rem;" id="gpsStatusDetail">Cấp quyền vị trí để định vị GPS.</div>
+                                            </div>
+                                            <button type="button" class="btn btn-outline-primary btn-sm px-3" id="btnRefreshGPS" style="font-size: 0.78rem;">
+                                                Lấy lại GPS
+                                            </button>
+                                        </div>
+
+                                        <!-- GPS Distance matching badge -->
+                                        <div id="gpsDistanceBadge" class="mb-2 d-none">
+                                            <span class="badge" id="gpsDistanceText" style="background:#f1f5f9; color:#1e3a5f; border:1px solid #cbdbe8; font-weight:500;">
+                                                Trùng khớp vị trí bản đồ
+                                            </span>
+                                        </div>
+
+                                        <!-- Leaflet Live Map Canvas Container -->
+                                        <div id="verificationMiniMap" class="rounded-3 border overflow-hidden" style="height: 190px; width: 100%; z-index: 1; background: #f8fafc; border-color: #cbdbe8 !important;"></div>
+                                    </div>
+
+                                    <!-- Latest Snapshot Watermark Card -->
+                                    <div id="capturedPreviewContainer" class="d-none w-100 position-relative mb-3 border rounded-3 overflow-hidden" style="border-color: #cbdbe8 !important;">
+                                        <img id="capturedImagePreview" src="" class="img-fluid rounded-2" style="max-height: 160px; object-fit: cover; width: 100%;">
+                                        <div class="position-absolute bottom-0 start-0 end-0 p-2 text-white text-start" style="background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); font-size: 0.75rem;">
+                                            <div class="fw-bold" id="watermarkLocation">Tọa độ GPS: --</div>
+                                            <div id="watermarkTime">Thời gian: --</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Captured Verification Photos Gallery Grid -->
+                                    <div class="card border rounded-3 p-3 bg-white" id="verificationGalleryWrapper" style="border-color: #cbdbe8 !important;">
+                                        <div class="fw-semibold small mb-2 text-dark d-flex align-items-center justify-content-between">
+                                            <span>Ảnh thực địa đã chụp (<span id="verificationCount">0</span> ảnh)</span>
+                                            <span class="text-muted small" style="font-size: 0.72rem;">Chụp các góc cửa hàng</span>
+                                        </div>
+                                        <div class="upload-previews d-flex flex-wrap gap-2" id="verificationGalleryGrid">
+                                            <div class="text-muted small py-2 w-100 text-center" id="verificationEmptyText">Chưa có ảnh nào được ghi nhận qua camera.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Actions Row -->
                         <div class="d-flex justify-content-between mt-4">
                             <button type="button" class="btn btn-light rounded-2 btn-sm px-4" id="bizPrevBtn" disabled>Quay lại</button>
@@ -941,80 +1050,7 @@
                         </div>
                     </form>
                 </div>
-
-                <!-- Right: Mobile Preview Mockup -->
-                <div class="wizard-mockup-col d-none d-lg-block">
-                    <div class="phone-mockup-wrapper">
-                        <div class="phone-mockup">
-                            <div class="phone-notch"></div>
-                            <div class="phone-screen">
-                                <!-- Google Mock Search -->
-                                <div class="mock-google-search">
-                                    <div class="mock-google-logo">
-                                        <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
-                                    </div>
-                                    <div class="mock-search-text" id="mockSearchText">Tìm kiếm...</div>
-                                </div>
-
-                                <!-- Card Business info preview -->
-                                <div class="mock-business-card">
-                                    <div class="mock-biz-name" id="mockBizName">Tên doanh nghiệp</div>
-                                    <div class="mock-biz-rating">
-                                        ★★★★★ <span style="color:#70757a; font-size:0.65rem;">(5.0)</span>
-                                    </div>
-                                    <div class="mock-biz-category" id="mockBizCategory">Danh mục</div>
-                                    
-                                    <div class="mock-action-buttons">
-                                        <div class="mock-action-btn">
-                                            <div class="mock-action-icon"><i class="bi bi-telephone-fill" style="font-size: 0.65rem;"></i></div>
-                                            <span>Gọi điện</span>
-                                        </div>
-                                        <div class="mock-action-btn">
-                                            <div class="mock-action-icon"><i class="bi bi-geo-alt-fill" style="font-size: 0.65rem;"></i></div>
-                                            <span>Chỉ đường</span>
-                                        </div>
-                                        <div class="mock-action-btn">
-                                            <div class="mock-action-icon"><i class="bi bi-globe" style="font-size: 0.65rem;"></i></div>
-                                            <span>Trang web</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="mock-info-rows">
-                                        <div class="mock-info-row">
-                                            <span class="mock-info-icon"><i class="bi bi-geo-alt"></i></span>
-                                            <span id="mockBizAddress">Địa chỉ đường phố, thành phố</span>
-                                        </div>
-                                        <div class="mock-info-row">
-                                            <span class="mock-info-icon"><i class="bi bi-clock"></i></span>
-                                            <span>Đang mở cửa • Cả ngày</span>
-                                        </div>
-                                        <div class="mock-info-row">
-                                            <span class="mock-info-icon"><i class="bi bi-telephone"></i></span>
-                                            <span id="mockBizPhone">{{ Auth::user()->phone ?? 'Chưa cập nhật SĐT' }}</span>
-                                        </div>
-                                        <div class="mock-info-row d-none" id="mockBizWebsiteRow">
-                                            <span class="mock-info-icon"><i class="bi bi-globe"></i></span>
-                                            <span id="mockBizWebsite"></span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Photos Grid preview -->
-                                <div class="mock-business-card" style="flex:1;">
-                                    <div class="fw-semibold mb-2">Hình ảnh</div>
-                                    <div class="mock-photos-grid" id="mockPhotosGrid">
-                                        <div class="mock-photo-item"><i class="bi bi-image" style="font-size: 0.75rem; color: #cbd5e1;"></i></div>
-                                        <div class="mock-photo-item"><i class="bi bi-image" style="font-size: 0.75rem; color: #cbd5e1;"></i></div>
-                                        <div class="mock-photo-item"><i class="bi bi-image" style="font-size: 0.75rem; color: #cbd5e1;"></i></div>
-                                    </div>
-                                    <div class="mt-3 text-secondary" style="font-size:0.65rem; line-height:1.3;" id="mockBizDesc">
-                                        Chưa có mô tả nào được thêm...
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
             </div>
         </div>
     </div>
@@ -1089,9 +1125,305 @@
             const mockBizDesc = document.getElementById('mockBizDesc');
             const descCharCount = document.getElementById('descCharCount');
 
-            // Image uploading states
+            // Image uploading & Verification states
             let menuPhotos = [];
             let storefrontPhotos = [];
+            let verificationPhotos = [];
+            let verificationPhotoData = null;
+            let verificationLat = null;
+            let verificationLng = null;
+            let verificationTime = null;
+            let cameraStream = null;
+            let cameraFacingMode = 'environment';
+
+            // Render Verification Photos Gallery
+            function renderVerificationGallery() {
+                const galleryGrid = document.getElementById('verificationGalleryGrid');
+                const countSpan = document.getElementById('verificationCount');
+                if (!galleryGrid) return;
+
+                if (countSpan) countSpan.innerText = verificationPhotos.length;
+
+                if (verificationPhotos.length === 0) {
+                    galleryGrid.innerHTML = '<div class="text-muted small py-2 w-100 text-center" id="verificationEmptyText">Chưa có ảnh nào được chụp/tải lên.</div>';
+                    return;
+                }
+
+                galleryGrid.innerHTML = '';
+                verificationPhotos.forEach((src, idx) => {
+                    const item = document.createElement('div');
+                    item.className = 'preview-thumbnail position-relative';
+                    item.style.cssText = 'width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; position: relative; display: inline-block;';
+
+                    const imgSrc = (src.startsWith('data:') || src.startsWith('http') || src.startsWith('/storage')) ? src : `/storage/${src}`;
+                    item.innerHTML = `
+                        <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                        <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-1" style="font-size: 0.6rem; padding: 1px 4px;">#${idx + 1}</span>
+                    `;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'preview-remove-btn';
+                    removeBtn.innerHTML = '✕';
+                    removeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        verificationPhotos.splice(idx, 1);
+                        if (verificationPhotos.length > 0) {
+                            verificationPhotoData = verificationPhotos[0];
+                        } else {
+                            verificationPhotoData = null;
+                        }
+                        renderVerificationGallery();
+                        saveWizardState();
+                    });
+                    item.appendChild(removeBtn);
+                    galleryGrid.appendChild(item);
+                });
+            }
+
+            // Haversine distance calculator in meters
+            function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+                const R = 6371000;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return Math.round(R * c);
+            }
+
+            // Leaflet Mini Map state vars
+            let verificationMap = null;
+            let verificationDeviceMarker = null;
+            let verificationBizMarker = null;
+            let verificationPolyline = null;
+
+            function renderVerificationMiniMap(lat, lng) {
+                const mapContainer = document.getElementById('verificationMiniMap');
+                if (!mapContainer || typeof L === 'undefined') return;
+
+                const mapLat = parseFloat(document.getElementById('input_lat')?.value);
+                const mapLng = parseFloat(document.getElementById('input_lng')?.value);
+
+                setTimeout(() => {
+                    if (!verificationMap) {
+                        verificationMap = L.map('verificationMiniMap', {
+                            center: [lat, lng],
+                            zoom: 16,
+                            zoomControl: true,
+                            attributionControl: false
+                        });
+
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                            subdomains: 'abcd',
+                            maxZoom: 19
+                        }).addTo(verificationMap);
+                    } else {
+                        verificationMap.setView([lat, lng], 16);
+                        verificationMap.invalidateSize();
+                    }
+
+                    // Device GPS Marker (Blue pulsing pin)
+                    if (verificationDeviceMarker) verificationMap.removeLayer(verificationDeviceMarker);
+                    const deviceIcon = L.divIcon({
+                        className: 'custom-gps-pin',
+                        html: `<div style="background:#0070ff; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 10px rgba(0,112,255,0.7);"></div>`,
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 8]
+                    });
+                    verificationDeviceMarker = L.marker([lat, lng], { icon: deviceIcon }).addTo(verificationMap)
+                        .bindPopup(`<b>Vị trí GPS chụp ảnh</b><br>${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+
+                    // Business Pinned Location from Step 6 if exists
+                    if (mapLat && mapLng && !isNaN(mapLat) && !isNaN(mapLng)) {
+                        if (verificationBizMarker) verificationMap.removeLayer(verificationBizMarker);
+
+                        const bizIcon = L.divIcon({
+                            className: 'custom-biz-pin',
+                            html: `<div style="background:#10b981; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 10px rgba(16,185,129,0.7);"></div>`,
+                            iconSize: [16, 16],
+                            iconAnchor: [8, 8]
+                        });
+
+                        verificationBizMarker = L.marker([mapLat, mapLng], { icon: bizIcon }).addTo(verificationMap)
+                            .bindPopup(`<b>Vị trí ghim ở Bước 6</b><br>${mapLat.toFixed(6)}, ${mapLng.toFixed(6)}`);
+
+                        if (verificationPolyline) verificationMap.removeLayer(verificationPolyline);
+                        verificationPolyline = L.polyline([[lat, lng], [mapLat, mapLng]], {
+                            color: '#3b82f6',
+                            dashArray: '4, 8',
+                            weight: 2
+                        }).addTo(verificationMap);
+
+                        const bounds = L.latLngBounds([[lat, lng], [mapLat, mapLng]]);
+                        verificationMap.fitBounds(bounds, { padding: [30, 30] });
+                    }
+                    verificationMap.invalidateSize();
+                }, 150);
+            }
+
+            // Real-time GPS Location Fetcher for Verification
+            function fetchVerificationGPS() {
+                const statusTitle = document.getElementById('gpsStatusTitle');
+                const statusDetail = document.getElementById('gpsStatusDetail');
+                const distanceBadge = document.getElementById('gpsDistanceBadge');
+                const distanceText = document.getElementById('gpsDistanceText');
+
+                if (!navigator.geolocation) {
+                    if (statusTitle) statusTitle.innerText = 'Trình duyệt không hỗ trợ Geolocation';
+                    if (statusDetail) statusDetail.innerText = 'Vui lòng bật quyền vị trí trên trình duyệt.';
+                    return;
+                }
+
+                if (statusTitle) statusTitle.innerText = 'Đang định vị GPS thời gian thực...';
+                if (statusDetail) statusDetail.innerText = 'Đang kết nối vệ tinh GPS để xác định tọa độ...';
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        verificationLat = position.coords.latitude;
+                        verificationLng = position.coords.longitude;
+                        verificationTime = new Date().toISOString();
+
+                        const acc = Math.round(position.coords.accuracy || 0);
+                        if (statusTitle) statusTitle.innerText = `GPS Đã Khóa: ${verificationLat.toFixed(6)}, ${verificationLng.toFixed(6)}`;
+                        if (statusDetail) statusDetail.innerText = `Độ chính xác: ±${acc} mét (${new Date().toLocaleTimeString('vi-VN')})`;
+
+                        const mapLat = parseFloat(document.getElementById('input_lat')?.value);
+                        const mapLng = parseFloat(document.getElementById('input_lng')?.value);
+
+                        if (mapLat && mapLng && distanceBadge && distanceText) {
+                            const dist = calculateDistanceMeters(verificationLat, verificationLng, mapLat, mapLng);
+                            distanceBadge.classList.remove('d-none');
+                            if (dist <= 100) {
+                                distanceText.style.cssText = 'background:#f1f5f9; color:#1e3a5f; border:1px solid #cbdbe8; font-weight:500; padding:6px 10px;';
+                                distanceText.innerHTML = `Trùng khớp vị trí bản đồ (Lệch ${dist}m)`;
+                            } else if (dist <= 500) {
+                                distanceText.style.cssText = 'background:#fef3c7; color:#92400e; border:1px solid #fcd34d; font-weight:500; padding:6px 10px;';
+                                distanceText.innerHTML = `Cách vị trí bản đồ ${dist}m`;
+                            } else {
+                                distanceText.style.cssText = 'background:#f1f5f9; color:#52525b; border:1px solid #cbdbe8; font-weight:500; padding:6px 10px;';
+                                distanceText.innerHTML = `Cách vị trí ghim bản đồ ${(dist/1000).toFixed(1)}km`;
+                            }
+                        }
+
+                        renderVerificationMiniMap(verificationLat, verificationLng);
+                        saveWizardState();
+                    },
+                    (err) => {
+                        console.warn('Geolocation error:', err);
+                        if (statusTitle) statusTitle.innerText = 'Chưa thể lấy tọa độ GPS tự động';
+                        if (statusDetail) statusDetail.innerText = 'Vui lòng bật Vị Trí (Location) trên trình duyệt hoặc nhấn nút "Lấy lại GPS".';
+                    },
+                    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+                );
+            }
+
+            // Camera Controls & Handlers
+            const btnStartCamera = document.getElementById('btnStartCamera');
+            const btnCapturePhoto = document.getElementById('btnCapturePhoto');
+            const btnSwitchCamera = document.getElementById('btnSwitchCamera');
+            const btnRefreshGPS = document.getElementById('btnRefreshGPS');
+            const cameraVideo = document.getElementById('cameraVideo');
+            const cameraCanvas = document.getElementById('cameraCanvas');
+            const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+            const capturedPreviewContainer = document.getElementById('capturedPreviewContainer');
+            const capturedImagePreview = document.getElementById('capturedImagePreview');
+            const watermarkLocation = document.getElementById('watermarkLocation');
+            const watermarkTime = document.getElementById('watermarkTime');
+            const btnToggleFallbackUpload = document.getElementById('btnToggleFallbackUpload');
+            const fallbackUploadContainer = document.getElementById('fallbackUploadContainer');
+            const inputFallbackVerificationPhoto = document.getElementById('inputFallbackVerificationPhoto');
+
+            async function initCameraStream() {
+                try {
+                    if (cameraStream) {
+                        cameraStream.getTracks().forEach(track => track.stop());
+                    }
+                    cameraStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: cameraFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                        audio: false
+                    });
+                    if (cameraVideo) {
+                        cameraVideo.srcObject = cameraStream;
+                        cameraVideo.classList.remove('d-none');
+                    }
+                    if (cameraPlaceholder) cameraPlaceholder.classList.add('d-none');
+                    if (btnCapturePhoto) btnCapturePhoto.classList.remove('d-none');
+                    if (btnSwitchCamera) btnSwitchCamera.classList.remove('d-none');
+                    
+                    fetchVerificationGPS();
+                } catch (err) {
+                    console.error('Camera access error:', err);
+                    showToast('Không thể mở Camera. Vui lòng cấp quyền truy cập Camera trên trình duyệt thiết bị của bạn.', false);
+                }
+            }
+
+            if (btnStartCamera) {
+                btnStartCamera.addEventListener('click', initCameraStream);
+            }
+
+            if (btnSwitchCamera) {
+                btnSwitchCamera.addEventListener('click', function() {
+                    cameraFacingMode = (cameraFacingMode === 'environment') ? 'user' : 'environment';
+                    initCameraStream();
+                });
+            }
+
+            if (btnRefreshGPS) {
+                btnRefreshGPS.addEventListener('click', function() {
+                    fetchVerificationGPS();
+                    showToast('Đang cập nhật lại vị trí GPS...', true);
+                });
+            }
+
+            if (btnCapturePhoto) {
+                btnCapturePhoto.addEventListener('click', function() {
+                    if (!cameraVideo || cameraVideo.classList.contains('d-none')) return;
+
+                    const width = cameraVideo.videoWidth || 640;
+                    const height = cameraVideo.videoHeight || 480;
+                    cameraCanvas.width = width;
+                    cameraCanvas.height = height;
+
+                    const ctx = cameraCanvas.getContext('2d');
+                    ctx.drawImage(cameraVideo, 0, 0, width, height);
+
+                    // Draw watermark bar
+                    const gradient = ctx.createLinearGradient(0, height - 90, 0, height);
+                    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.85)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, height - 90, width, 90);
+
+                    const nowStr = new Date().toLocaleString('vi-VN');
+                    const gpsStr = (verificationLat && verificationLng)
+                        ? `GPS: ${verificationLat.toFixed(6)}, ${verificationLng.toFixed(6)}`
+                        : 'GPS: Chưa có vị trí';
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 18px "Be Vietnam Pro", sans-serif';
+                    ctx.fillText(`XÁC THỰC THỰC ĐỊA • ${nowStr}`, 20, height - 45);
+                    ctx.font = '15px "Be Vietnam Pro", sans-serif';
+                    ctx.fillText(gpsStr, 20, height - 20);
+
+                    const capturedData = cameraCanvas.toDataURL('image/jpeg', 0.88);
+                    verificationPhotos.push(capturedData);
+                    verificationPhotoData = verificationPhotos[0];
+                    if (!verificationTime) verificationTime = new Date().toISOString();
+
+                    if (capturedPreviewContainer) {
+                        capturedPreviewContainer.classList.remove('d-none');
+                        capturedImagePreview.src = capturedData;
+                    }
+
+                    if (watermarkLocation) watermarkLocation.innerHTML = `<i class="bi bi-geo-alt me-1"></i>${gpsStr}`;
+                    if (watermarkTime) watermarkTime.innerHTML = `<i class="bi bi-clock me-1"></i>Thời gian: ${nowStr}`;
+
+                    renderVerificationGallery();
+                    saveWizardState();
+                    showToast(`Đã thêm ảnh xác thực thứ ${verificationPhotos.length}! Có thể chụp tiếp góc khác.`, true);
+                });
+            }
 
             // State Persistence Functions
             function saveWizardState() {
@@ -1113,7 +1445,12 @@
                     receiveSurveys: document.getElementById('receive_surveys') ? document.getElementById('receive_surveys').checked : false,
                     description: inputDesc.value.trim(),
                     menuPhotos: menuPhotos,
-                    storefrontPhotos: storefrontPhotos
+                    storefrontPhotos: storefrontPhotos,
+                    verificationPhotos: verificationPhotos,
+                    verificationPhotoData: verificationPhotoData,
+                    verificationLat: verificationLat,
+                    verificationLng: verificationLng,
+                    verificationTime: verificationTime
                 };
                 localStorage.setItem('biz_wizard_state', JSON.stringify(state));
             }
@@ -1225,6 +1562,21 @@
                         state.storefrontPhotos.forEach(p => storefrontPhotos.push(p));
                         restorePhotoPreviews('storefrontPreviews', storefrontPhotos);
                     }
+                    if (state.verificationPhotos && Array.isArray(state.verificationPhotos)) {
+                        verificationPhotos.length = 0;
+                        state.verificationPhotos.forEach(p => verificationPhotos.push(p));
+                        if (verificationPhotos.length > 0) {
+                            verificationPhotoData = verificationPhotos[0];
+                        }
+                        renderVerificationGallery();
+                    } else if (state.verificationPhotoData) {
+                        verificationPhotoData = state.verificationPhotoData;
+                        verificationPhotos = [verificationPhotoData];
+                        renderVerificationGallery();
+                    }
+                    if (state.verificationLat) verificationLat = state.verificationLat;
+                    if (state.verificationLng) verificationLng = state.verificationLng;
+                    if (state.verificationTime) verificationTime = state.verificationTime;
                     updateMockPhotosGrid();
 
                 } catch (e) {
@@ -1297,7 +1649,7 @@
 
             // Update step UI
             function updateBizStepUI() {
-                if (bizStep === 9) {
+                if (bizStep === 8) {
                     const categoryName = (inputCategorySearch ? inputCategorySearch.value : '') || '';
                     updateStep8Text(categoryName);
                 }
@@ -1336,7 +1688,7 @@
 
                 // Toggle skip button visibility
                 if (bizSkipBtn) {
-                    if (bizStep === 9 || bizStep === 10) {
+                    if (bizStep === 8 || bizStep === 9 || bizStep === 10) {
                         bizSkipBtn.classList.remove('d-none');
                     } else {
                         bizSkipBtn.classList.add('d-none');
@@ -1346,6 +1698,15 @@
                 // If entering Map step, initialize/invalidate map
                 if (bizStep === 6) {
                     initBizMap();
+                }
+
+                // If entering Camera Verification step, trigger GPS fetch & render mini map
+                if (bizStep === 10) {
+                    if (!verificationLat || !verificationLng) {
+                        fetchVerificationGPS();
+                    } else {
+                        renderVerificationMiniMap(verificationLat, verificationLng);
+                    }
                 }
 
                 saveWizardState();
@@ -1530,6 +1891,33 @@
                     });
                 });
 
+                // Prevent dropdown closing when clicking inside input wrapper or typing in input
+                customSelectDropdown.querySelectorAll('.other-category-input-wrapper').forEach(wrapper => {
+                    wrapper.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                });
+
+                customSelectDropdown.querySelectorAll('.input-custom-other-category').forEach(input => {
+                    input.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                    input.addEventListener('input', function(e) {
+                        e.stopPropagation();
+                        const typedVal = this.value.trim();
+                        const finalCategoryName = typedVal || 'Khác';
+
+                        if (inputCategorySearch) inputCategorySearch.value = finalCategoryName;
+                        if (mockBizCategory) mockBizCategory.innerText = finalCategoryName;
+
+                        if (selectedValueSpan) {
+                            selectedValueSpan.textContent = typedVal ? `Khác: ${typedVal}` : 'Khác (Đang nhập...)';
+                            selectedValueSpan.style.color = 'var(--text-main)';
+                        }
+                        saveWizardState();
+                    });
+                });
+
                 // Option click
                 customSelectDropdown.querySelectorAll('.dropdown-option-item').forEach(item => {
                     item.addEventListener('click', function(e) {
@@ -1537,17 +1925,15 @@
                         
                         const dbId = this.getAttribute('data-value');
                         const subName = this.getAttribute('data-name');
+                        const isOther = this.classList.contains('dropdown-option-other');
 
-                        // Set values
+                        // Set category ID
                         inputCategoryId.value = dbId;
-                        if (inputCategorySearch) inputCategorySearch.value = subName;
-                        mockBizCategory.innerText = subName;
 
-                        // Update trigger text
-                        if (selectedValueSpan) {
-                            selectedValueSpan.textContent = subName;
-                            selectedValueSpan.style.color = 'var(--text-main)';
-                        }
+                        // Hide all other category input wrappers across dropdown
+                        customSelectDropdown.querySelectorAll('.other-category-input-wrapper').forEach(w => {
+                            w.classList.add('d-none');
+                        });
 
                         // Remove previous selection highlight
                         customSelectDropdown.querySelectorAll('.dropdown-option-item').forEach(opt => {
@@ -1555,11 +1941,42 @@
                         });
                         this.classList.add('selected');
 
-                        // Close dropdown
-                        customSelectTrigger.classList.remove('active');
-                        customSelectDropdown.classList.add('d-none');
+                        if (isOther) {
+                            // Find the input wrapper under this group
+                            const parentGroup = this.closest('.dropdown-options-group');
+                            const wrapper = parentGroup ? parentGroup.querySelector('.other-category-input-wrapper') : null;
+                            const customInput = wrapper ? wrapper.querySelector('.input-custom-other-category') : null;
 
-                        showToast(`Đã chọn danh mục: ${subName}`, true);
+                            if (wrapper) wrapper.classList.remove('d-none');
+                            if (customInput) {
+                                customInput.focus();
+                                const typedVal = customInput.value.trim();
+                                const finalCategoryName = typedVal || 'Khác';
+                                if (inputCategorySearch) inputCategorySearch.value = finalCategoryName;
+                                if (mockBizCategory) mockBizCategory.innerText = finalCategoryName;
+                                if (selectedValueSpan) {
+                                    selectedValueSpan.textContent = typedVal ? `Khác: ${typedVal}` : 'Khác (Vui lòng nhập...)';
+                                    selectedValueSpan.style.color = 'var(--text-main)';
+                                }
+                            }
+                            // Keep dropdown OPEN for user to type into the text field!
+                        } else {
+                            // Standard preset option selected
+                            if (inputCategorySearch) inputCategorySearch.value = subName;
+                            if (mockBizCategory) mockBizCategory.innerText = subName;
+
+                            if (selectedValueSpan) {
+                                selectedValueSpan.textContent = subName;
+                                selectedValueSpan.style.color = 'var(--text-main)';
+                            }
+
+                            // Close dropdown
+                            customSelectTrigger.classList.remove('active');
+                            customSelectDropdown.classList.add('d-none');
+
+                            showToast(`Đã chọn danh mục: ${subName}`, true);
+                        }
+
                         saveWizardState();
                     });
                 });
@@ -1791,10 +2208,28 @@
                 }
             }
 
+            // Real-time listener to remove red error border on user input/change
+            document.querySelectorAll('.form-control-clean, .custom-select-trigger').forEach(el => {
+                el.addEventListener('input', function() {
+                    this.classList.remove('is-invalid-clean');
+                });
+                el.addEventListener('change', function() {
+                    this.classList.remove('is-invalid-clean');
+                });
+            });
+
             // Step validations
             function validateBizStep() {
+                // Clear previous red error highlights in current step pane
+                const currentPane = document.querySelector(`.biz-step-pane[data-step="${bizStep}"]`);
+                if (currentPane) {
+                    currentPane.querySelectorAll('.is-invalid-clean').forEach(el => el.classList.remove('is-invalid-clean'));
+                }
+
                 if (bizStep === 1) {
                     if (!inputBizName.value.trim()) {
+                        inputBizName.classList.add('is-invalid-clean');
+                        inputBizName.focus();
                         showToast('Vui lòng điền tên doanh nghiệp.', false);
                         return false;
                     }
@@ -1806,21 +2241,45 @@
                     }
                 } else if (bizStep === 3) {
                     if (!inputCategoryId.value) {
+                        const selectTrigger = document.getElementById('custom_category_select');
+                        if (selectTrigger) selectTrigger.classList.add('is-invalid-clean');
                         showToast('Vui lòng chọn đầy đủ danh mục chính và danh mục chi tiết.', false);
                         return false;
                     }
                 } else if (bizStep === 4) {
-                    if (!inputStreet.value.trim() || !inputCity.value.trim() || !inputProvince.value.trim()) {
+                    let hasError = false;
+                    const postalInput = document.getElementById('input_address_postal_code');
+
+                    if (!inputCity.value.trim()) {
+                        inputCity.classList.add('is-invalid-clean');
+                        hasError = true;
+                    }
+                    if (postalInput && !postalInput.value.trim()) {
+                        postalInput.classList.add('is-invalid-clean');
+                        hasError = true;
+                    }
+                    if (!inputStreet.value.trim()) {
+                        inputStreet.classList.add('is-invalid-clean');
+                        hasError = true;
+                    }
+
+                    if (hasError) {
                         showToast('Vui lòng nhập đầy đủ các trường địa chỉ bắt buộc (*).', false);
+                        const firstInvalid = currentPane ? currentPane.querySelector('.is-invalid-clean') : null;
+                        if (firstInvalid) firstInvalid.focus();
                         return false;
                     }
                 } else if (bizStep === 5) {
                     if (!inputPhone.value.trim()) {
+                        inputPhone.classList.add('is-invalid-clean');
+                        inputPhone.focus();
                         showToast('Vui lòng nhập số điện thoại liên hệ.', false);
                         return false;
                     }
                     const phoneVal = inputPhone.value.trim().replace(/\D/g, '');
                     if (phoneVal.length < 8) {
+                        inputPhone.classList.add('is-invalid-clean');
+                        inputPhone.focus();
                         showToast('Số điện thoại liên hệ không hợp lệ (ít nhất 8 số).', false);
                         return false;
                     }
@@ -1829,19 +2288,26 @@
                         showToast('Vui lòng kéo ghim trên bản đồ để chọn tọa độ.', false);
                         return false;
                     }
-                } else if (bizStep === 8) {
+                } else if (bizStep === 7) {
                     if (!inputDesc.value.trim()) {
+                        inputDesc.classList.add('is-invalid-clean');
+                        inputDesc.focus();
                         showToast('Vui lòng nhập mô tả giới thiệu về doanh nghiệp của bạn.', false);
                         return false;
                     }
-                } else if (bizStep === 9) {
+                } else if (bizStep === 8) {
                     if (!menuPhotos || menuPhotos.length === 0) {
                         showToast('Vui lòng tải lên ít nhất 1 hình ảnh thực đơn/bảng giá/dịch vụ.', false);
                         return false;
                     }
-                } else if (bizStep === 10) {
+                } else if (bizStep === 9) {
                     if (!storefrontPhotos || storefrontPhotos.length === 0) {
                         showToast('Vui lòng tải lên ít nhất 1 hình ảnh mặt tiền cửa hàng.', false);
+                        return false;
+                    }
+                } else if (bizStep === 10) {
+                    if (!verificationPhotos || verificationPhotos.length === 0) {
+                        showToast('Bắt buộc phải bật Camera chụp ảnh xác thực thực địa!', false);
                         return false;
                     }
                 }
@@ -1897,6 +2363,11 @@
                     description: inputDesc.value.trim(),
                     menu_photos: menuPhotos,
                     storefront_photos: storefrontPhotos,
+                    verification_photo: verificationPhotos[0] || verificationPhotoData || null,
+                    verification_photos: verificationPhotos,
+                    verification_lat: verificationLat,
+                    verification_lng: verificationLng,
+                    verification_time: verificationTime,
                     _token: '{{ csrf_token() }}'
                 };
 
