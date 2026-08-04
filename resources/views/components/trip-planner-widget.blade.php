@@ -205,6 +205,67 @@
     }
     .tp-card:active { transform: scale(0.97); }
 
+    /* ─── Multi-select Checkbox Card Styling ─── */
+    .tp-card.tp-card-multi {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+        padding: 10px 12px;
+    }
+    .tp-card.tp-card-multi .tp-checkbox-box {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #cbd5e1;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: #ffffff;
+        transition: all 0.15s ease;
+        color: transparent;
+    }
+    .tp-card.tp-card-multi:hover .tp-checkbox-box {
+        border-color: #94a3b8;
+    }
+    .tp-card.tp-card-multi.selected {
+        border-color: #1e3a5f;
+        background: #f0f5fa;
+    }
+    .tp-card.tp-card-multi.selected .tp-checkbox-box {
+        background: #1e3a5f;
+        border-color: #1e3a5f;
+        color: #ffffff;
+    }
+    .tp-card.tp-card-multi.selected::after {
+        display: none !important;
+    }
+
+    /* ─── Other / Custom Input Option Styling ─── */
+    .tp-other-input-wrap {
+        width: 100%;
+        margin-top: 10px;
+        animation: tpSlideIn 0.25s ease forwards;
+    }
+    .tp-other-input {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1.5px solid #0284c7;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        color: #1e3a5f;
+        background: #ffffff;
+        outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+        transition: all 0.2s ease;
+    }
+    .tp-other-input:focus {
+        border-color: #0369a1;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
     .tp-card-icon {
         font-size: 1.15rem;
         margin-bottom: 4px;
@@ -725,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const restartBtn = document.getElementById('tp-btn-restart');
     const closeResultBtn = document.getElementById('tp-btn-close-result');
 
-    window.openTripPlanner = function() {
+    window.openTripPlanner = function(forceNew = false) {
         console.log('openTripPlanner triggered');
         const el = document.getElementById('trip-planner-overlay');
         if (el) {
@@ -733,6 +794,25 @@ document.addEventListener('DOMContentLoaded', function() {
             el.classList.add('active');
             setTimeout(() => el.classList.add('visible'), 20);
         }
+
+        if (!forceNew) {
+            const saved = localStorage.getItem('nb_saved_itinerary');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && (parsed.days || parsed.title)) {
+                        wizardBody.style.display = 'none';
+                        footer.style.display = 'none';
+                        loadingPanel.classList.remove('active');
+                        renderItinerary(parsed, false);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Could not parse saved itinerary:', e);
+                }
+            }
+        }
+
         resetState();
         renderTripTypeStep();
     };
@@ -753,6 +833,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeResultBtn.addEventListener('click', closePlanner);
 
     restartBtn.addEventListener('click', () => {
+        localStorage.removeItem('nb_saved_itinerary');
         resultPanel.classList.remove('active');
         loadingPanel.classList.remove('active');
         wizardBody.style.display = '';
@@ -781,9 +862,66 @@ document.addEventListener('DOMContentLoaded', function() {
         updateProfile();
     }
 
+    const DEFAULT_STEPS = [
+        {
+            key: 'who',
+            greeting: 'Thật tuyệt! Giúp mình hiểu thêm về đoàn của bạn nhé.',
+            question: 'Bạn dự định đi cùng ai?',
+            type: 'single',
+            options: [
+                { value: 'mot_minh', label: 'Đi một mình' },
+                { value: 'doi_lua', label: 'Đôi lứa / Couple' },
+                { value: 'nhom_ban', label: 'Nhóm bạn' },
+                { value: 'gia_dinh_tre_nho', label: 'Gia đình có trẻ nhỏ' },
+                { value: 'gia_dinh_nguoi_lon', label: 'Gia đình có người lớn tuổi' },
+                { value: 'other', label: 'Khác...' }
+            ]
+        },
+        {
+            key: 'transport',
+            greeting: 'Đã ghi nhận! Tiếp theo là phương tiện di chuyển.',
+            question: 'Bạn sẽ di chuyển bằng phương tiện gì?',
+            type: 'single',
+            options: [
+                { value: 'xe_may', label: 'Xe máy' },
+                { value: 'o_to_rieng', label: 'Ô tô riêng / Tự lái' },
+                { value: 'limousine', label: 'Xe Limousine / Xe khách' },
+                { value: 'tau_hoa', label: 'Tàu hỏa' },
+                { value: 'other', label: 'Khác...' }
+            ]
+        },
+        {
+            key: 'duration_hotel',
+            greeting: 'Chuẩn bị xong phương tiện rồi!',
+            question: 'Bạn dự định đi trong bao lâu và có cần khách sạn không?',
+            type: 'single',
+            options: [
+                { value: '1_day', label: 'Đi 1 ngày (Không ở lại)' },
+                { value: '2d1n_hotel', label: '2 ngày 1 đêm (Cần khách sạn)' },
+                { value: '3d2n_hotel', label: '3 ngày 2 đêm (Cần khách sạn)' },
+                { value: 'other', label: 'Khác...' }
+            ]
+        },
+        {
+            key: 'budget',
+            greeting: 'Rất rõ ràng!',
+            question: 'Mức ngân sách / chi phí dự kiến cho mỗi người là bao nhiêu?',
+            type: 'single',
+            options: [
+                { value: 'tiet_kiem', label: 'Tiết kiệm (Dưới 1 triệu)' },
+                { value: 'tieu_chuan', label: 'Tiêu chuẩn (1 - 2.5 triệu)' },
+                { value: 'cao_cap', label: 'Thoải mái / Cao cấp (> 2.5 triệu)' },
+                { value: 'other', label: 'Khác...' }
+            ]
+        }
+    ];
+
+    let defaultStepIndex = 0;
+
     /* ─── Step 0: Trip Type ─── */
     function renderTripTypeStep() {
         currentStep = 0;
+        defaultStepIndex = 0;
         updateProgress();
         backBtn.disabled = true;
         nextBtn.classList.remove('visible');
@@ -813,10 +951,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     stepHistory.push({ step: 0, renderFn: renderTripTypeStep });
                     currentStep = 1;
-                    askAiNextQuestion();
+                    defaultStepIndex = 0;
+                    renderDefaultStep(0);
                 }, 250);
             });
         });
+    }
+
+    function renderDefaultStep(idx) {
+        if (idx < DEFAULT_STEPS.length) {
+            currentAiQuestion = DEFAULT_STEPS[idx];
+            renderAiQuestion(DEFAULT_STEPS[idx]);
+        } else {
+            askAiNextQuestion();
+        }
     }
 
     /* ─── AI Question Flow ─── */
@@ -878,20 +1026,53 @@ document.addEventListener('DOMContentLoaded', function() {
         else { nextBtn.classList.remove('visible'); }
         updateProgress();
 
-        const optCount = (q.options || []).length;
+        const rawOpts = q.options || [];
+        const hasOther = rawOpts.some(o => o.value === 'other' || o.label.toLowerCase().includes('khác'));
+        const optionsList = [...rawOpts];
+        if (!hasOther) {
+            optionsList.push({ value: 'other', label: 'Khác...' });
+        }
+
+        const optCount = optionsList.length;
         let colClass = optCount <= 2 ? 'cols-2' : optCount <= 4 ? 'cols-2' : optCount <= 6 ? 'cols-3' : 'cols-4';
 
         let html = '<div class="tp-step">';
         if (q.greeting) html += `<div class="tp-step-greeting">${q.greeting}</div>`;
         html += `<div class="tp-step-question">${q.question}</div>`;
         html += `<div class="tp-card-grid ${colClass}">`;
-        (q.options || []).forEach(opt => {
-            html += `<div class="tp-card" data-value="${opt.value}" data-label="${opt.label}" data-type="${q.type}">
-                <span class="tp-card-label">${opt.label}</span>
-            </div>`;
+        optionsList.forEach(opt => {
+            const isOther = (opt.value === 'other' || opt.label.toLowerCase().includes('khác'));
+            if (isMulti) {
+                html += `<div class="tp-card tp-card-multi" data-value="${opt.value}" data-label="${opt.label}" data-type="${q.type}" data-is-other="${isOther}">
+                    <div class="tp-checkbox-box">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <span class="tp-card-label">${opt.label}</span>
+                </div>`;
+            } else {
+                html += `<div class="tp-card" data-value="${opt.value}" data-label="${opt.label}" data-type="${q.type}" data-is-other="${isOther}">
+                    <span class="tp-card-label">${opt.label}</span>
+                </div>`;
+            }
         });
-        html += '</div></div>';
+        html += '</div>';
+
+        html += `<div class="tp-other-input-wrap" id="tp-other-input-wrap" style="display: none;">
+            <input type="text" id="tp-other-input" class="tp-other-input" placeholder="Nhập ý kiến / lựa chọn khác của bạn..." maxlength="150" autocomplete="off" />
+        </div>`;
+        html += '</div>';
+
         wizardBody.innerHTML = html;
+
+        const otherInput = document.getElementById('tp-other-input');
+        if (otherInput) {
+            otherInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentAiQuestion) advanceFromAiQuestion(currentAiQuestion);
+                }
+            });
+        }
 
         wizardBody.querySelectorAll('.tp-card').forEach(card => {
             card.addEventListener('click', () => handleAiCardClick(card, q));
@@ -901,24 +1082,72 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleAiCardClick(card, q) {
         const value = card.dataset.value;
         const label = card.dataset.label;
+        const isOther = card.dataset.isOther === 'true';
+        const otherWrap = document.getElementById('tp-other-input-wrap');
+        const otherInput = document.getElementById('tp-other-input');
+
         if (q.type === 'multi') {
             if (!currentSelection) currentSelection = [];
             const idx = currentSelection.findIndex(s => s.value === value);
-            if (idx > -1) { currentSelection.splice(idx, 1); card.classList.remove('selected'); }
-            else { currentSelection.push({ value, label }); card.classList.add('selected'); }
+            if (idx > -1) {
+                currentSelection.splice(idx, 1);
+                card.classList.remove('selected');
+                if (isOther && otherWrap) {
+                    otherWrap.style.display = 'none';
+                    if (otherInput) otherInput.value = '';
+                }
+            } else {
+                currentSelection.push({ value, label, isOther });
+                card.classList.add('selected');
+                if (isOther && otherWrap) {
+                    otherWrap.style.display = 'block';
+                    if (otherInput) setTimeout(() => otherInput.focus(), 100);
+                }
+            }
             nextBtn.disabled = currentSelection.length === 0;
             return;
         }
-        currentSelection = { value, label };
+
+        currentSelection = { value, label, isOther };
         wizardBody.querySelectorAll('.tp-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
-        setTimeout(() => advanceFromAiQuestion(q), 250);
+
+        if (isOther) {
+            if (otherWrap) otherWrap.style.display = 'block';
+            if (otherInput) setTimeout(() => otherInput.focus(), 100);
+            nextBtn.classList.add('visible');
+            nextBtn.disabled = false;
+        } else {
+            if (otherWrap) otherWrap.style.display = 'none';
+            if (otherInput) otherInput.value = '';
+            nextBtn.classList.remove('visible');
+            setTimeout(() => advanceFromAiQuestion(q), 250);
+        }
     }
 
     function advanceFromAiQuestion(q) {
-        let answerText = Array.isArray(currentSelection)
-            ? currentSelection.map(s => s.label).join(', ')
-            : currentSelection.label;
+        const otherInput = document.getElementById('tp-other-input');
+        const customText = otherInput ? otherInput.value.trim() : '';
+
+        let answerText = '';
+        if (Array.isArray(currentSelection)) {
+            let labels = currentSelection.map(s => {
+                if (s.isOther) {
+                    return customText ? `Khác (${customText})` : s.label;
+                }
+                return s.label;
+            });
+            answerText = labels.join(', ');
+        } else if (currentSelection) {
+            if (currentSelection.isOther) {
+                answerText = customText ? `Khác (${customText})` : currentSelection.label;
+            } else {
+                answerText = currentSelection.label;
+            }
+        }
+
+        if (!answerText) return;
+
         aiAnswers.push({ question: q.question, answer: answerText });
         stepHistory.push({
             step: currentStep,
@@ -928,7 +1157,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         updateProfile();
         currentStep++;
-        askAiNextQuestion();
+
+        if (defaultStepIndex < DEFAULT_STEPS.length - 1) {
+            defaultStepIndex++;
+            renderDefaultStep(defaultStepIndex);
+        } else {
+            defaultStepIndex = DEFAULT_STEPS.length;
+            askAiNextQuestion();
+        }
     }
 
     nextBtn.addEventListener('click', () => {
@@ -942,12 +1178,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (prev.step === 0) {
             currentStep = 0; tripType = ''; tripTypeLabel = '';
             aiAnswers = []; aiDone = false; currentAiQuestion = null;
+            defaultStepIndex = 0;
             updateProfile(); renderTripTypeStep();
         } else {
             currentStep = prev.step;
             aiAnswers = prev.answersSnapshot ? prev.answersSnapshot.slice(0, -1) : [];
             aiDone = false; currentAiQuestion = prev.question; generateBtn.disabled = true;
-            updateProfile(); renderAiQuestion(prev.question);
+            if (currentStep <= DEFAULT_STEPS.length) {
+                defaultStepIndex = currentStep - 1;
+                updateProfile();
+                renderDefaultStep(defaultStepIndex);
+            } else {
+                updateProfile();
+                renderAiQuestion(prev.question);
+            }
         }
     });
 
@@ -959,11 +1203,19 @@ document.addEventListener('DOMContentLoaded', function() {
         updateProgress();
         wizardBody.innerHTML = `
             <div class="tp-step" style="text-align: center; padding: 28px 0;">
-                <div class="tp-step-question" style="margin-bottom: 6px;">${greeting}</div>
-                <div style="font-size: 0.72rem; color: #6482a6; max-width: 280px; margin: 0 auto; line-height: 1.5; font-weight: 400;">
-                    Bấm <strong style="color: #1e3a5f;">Tạo lịch trình</strong> bên phải để xem kết quả.
-                </div>
+                <div class="tp-step-question" style="margin-bottom: 10px;">${greeting}</div>
+                <div style="font-size: 0.74rem; color: #6482a6; margin-bottom: 18px;">Hệ thống đã thu thập đầy đủ mong muốn cho chuyến đi của bạn.</div>
+                <button class="tp-btn-generate-main" id="tp-btn-generate-main"
+                    style="margin: 0 auto; background: #0284c7; color: #ffffff; padding: 12px 28px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35); transition: all 0.2s ease;">
+                    <span class="material-symbols-rounded" style="font-size: 20px;">auto_awesome</span>
+                    Tạo lịch trình ngay
+                </button>
             </div>`;
+
+        const mainGenBtn = document.getElementById('tp-btn-generate-main');
+        if (mainGenBtn) {
+            mainGenBtn.addEventListener('click', () => startGeneration());
+        }
     }
 
     function renderInlineError(msg) {
@@ -1080,7 +1332,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function renderItinerary(data) {
+    function renderItinerary(data, saveToStorage = true) {
+        if (saveToStorage) {
+            try {
+                localStorage.setItem('nb_saved_itinerary', JSON.stringify(data));
+            } catch (e) {
+                console.warn('Could not save itinerary to localStorage:', e);
+            }
+        }
         resultPanel.classList.add('active');
         resultTitle.textContent = data.title || 'Lịch trình du lịch Ninh Bình';
         resultSummary.textContent = data.summary || '';
@@ -1113,26 +1372,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderRawResult(raw) {
-        if (typeof raw === 'string') {
-            try {
-                let clean = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-                let match = clean.match(/\{[\s\S]*\}/);
-                if (match) {
-                    let parsed = JSON.parse(match[0]);
-                    if (parsed && (parsed.days || parsed.title)) {
-                        renderItinerary(parsed);
-                        return;
-                    }
+        let strContent = typeof raw === 'string' ? raw : JSON.stringify(raw);
+        try {
+            let clean = strContent.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+            let match = clean.match(/\{[\s\S]*/);
+            if (match) {
+                let jsonStr = match[0];
+                let lastBrace = jsonStr.lastIndexOf('}');
+                if (lastBrace !== -1) {
+                    jsonStr = jsonStr.substring(0, lastBrace + 1);
                 }
-            } catch (e) {
-                console.warn('Could not parse raw JSON on client:', e);
+                jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, ' ').replace(/,\s*([\]\}])/g, '$1');
+                let parsed = JSON.parse(jsonStr);
+                if (parsed && (parsed.days || parsed.title)) {
+                    renderItinerary(parsed, true);
+                    return;
+                }
             }
+        } catch (e) {
+            console.warn('Could not parse raw JSON on client:', e);
         }
 
         resultPanel.classList.add('active');
         resultTitle.textContent = 'Lịch trình du lịch Ninh Bình';
         resultSummary.textContent = '';
-        let f = raw.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        let f = strContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
         resultBody.innerHTML = `<div class="tp-raw-result">${f}</div>`;
     }
 

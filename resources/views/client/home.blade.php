@@ -976,7 +976,7 @@
             width: fit-content;
             max-width: calc(100% - 24px);
             padding: 6px 14px;
-            background: #f1f5f9;
+            background: #ffffff;
             border: 1px solid #cbd5e1;
             border-bottom: none;
             border-radius: 7px 7px 0 0;
@@ -1158,7 +1158,7 @@
             opacity: 0;
             overflow: hidden;
             transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            background: #f1f5f9;
+            background: #ffffff;
             border-top: 1px solid #cbd5e1;
             box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
             pointer-events: auto;
@@ -2205,10 +2205,10 @@
             <!-- Divider -->
             <div class="dock-divider"></div>
 
-            <!-- Random Discovery Button -->
-            <button type="button" class="dock-random-btn" id="randomFlyBtn" title="Khám phá ngẫu nhiên một địa điểm">
+            <!-- Trip Planner Recommendation Button -->
+            <button type="button" class="dock-random-btn" id="randomFlyBtn" title="Gợi ý lịch trình chuyến đi cho bạn">
                 <span class="material-symbols-rounded">auto_awesome</span>
-                <span>Gợi ý ngẫu nhiên</span>
+                <span>Gợi ý cho bạn</span>
             </button>
         </div>
 
@@ -3098,21 +3098,13 @@
             });
         }
 
-        // --- Nút Khám Phá Ngẫu Nhiên ---
+        // --- Nút Gợi Ý Cho Bạn (Lên Lịch Trình AI) ---
         const randomFlyBtn = document.getElementById('randomFlyBtn');
         if (randomFlyBtn) {
             randomFlyBtn.addEventListener('click', () => {
-                if (!locations || locations.length === 0) return;
-                const randomLoc = locations[Math.floor(Math.random() * locations.length)];
-                
-                showToast(`✨ Gợi ý cho bạn: <strong>${randomLoc.name}</strong>`, 'info', 3000);
-
-                stepZoomToMarker(randomLoc, () => {
-                    map.flyTo([randomLoc.lat, randomLoc.lng], 17, { duration: 1.5 });
-                    setTimeout(() => {
-                        if (randomLoc.marker) randomLoc.marker.openPopup();
-                    }, 1000);
-                });
+                if (window.openTripPlanner) {
+                    window.openTripPlanner();
+                }
             });
         }
 

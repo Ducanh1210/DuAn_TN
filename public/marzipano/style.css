@@ -402,9 +402,9 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
 }
 
 @keyframes dot-blink {
-  0% { opacity: 0.85; transform: scale(calc(var(--base-scale, 1) * 0.95)); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
-  15% { opacity: 1; transform: scale(calc(var(--base-scale, 1) * 1.05)); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); }
-  100% { opacity: 0.85; transform: scale(calc(var(--base-scale, 1) * 0.95)); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+  0% { opacity: 0.85; transform: scale(var(--base-scale, 1)); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
+  50% { opacity: 1; transform: scale(var(--base-scale, 1)); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); }
+  100% { opacity: 0.85; transform: scale(var(--base-scale, 1)); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); }
 }
 
 /* The pulsing outward ring */
@@ -426,17 +426,20 @@ body.single-scene #sceneList, body.single-scene #sceneListToggle {
   100% { transform: scale(calc(var(--base-scale, 1) * 4.5)); opacity: 0; border-width: 0px; }
 }
 
-/* Elevate hovered hotspot above all other elements & freeze dot pulse animation on hover */
+/* Elevate hovered hotspot above all other elements & keep dot size fixed on hover */
 .hotspot:hover,
 .hotspot.active-menu {
   z-index: 1000 !important;
 }
 
-.hotspot:hover .pulsing-dot,
-.hotspot:hover .pulsing-dot::before,
-.hotspot:hover .pulsing-dot::after {
+.hotspot:hover .pulsing-dot {
   animation: none !important;
   opacity: 1 !important;
+  transform: scale(var(--base-scale, 1)) !important;
+}
+
+.hotspot:hover .pulsing-dot::before {
+  display: none !important;
 }
 
 /* Modern Dashed Connector & Badge Card Design */
