@@ -959,16 +959,14 @@
             left: 260px;
         }
 
-        /* Khi thu gọn (collapsed): lơ lửng cách đáy 14px, bo góc 10px hiện đại */
+        /* Khi thu gọn (collapsed): giữ dính liền với đáy và khung thanh địa điểm, ẩn bộ lọc chủ đề */
         .bottom-drawer-wrapper:not(.open) {
-            bottom: 14px;
+            bottom: 0;
         }
 
-        .bottom-drawer-wrapper:not(.open) .drawer-header {
-            border-radius: 7px;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1), 0 1px 3px rgba(15, 23, 42, 0.05);
-            padding: 6px 14px;
+        .bottom-drawer-wrapper:not(.open) .drawer-filter-dropdown-wrapper,
+        .bottom-drawer-wrapper:not(.open) .drawer-header-divider:last-of-type {
+            display: none !important;
         }
 
         .drawer-header {
@@ -978,7 +976,7 @@
             width: fit-content;
             max-width: calc(100% - 24px);
             padding: 6px 14px;
-            background: #ffffff;
+            background: #f1f5f9;
             border: 1px solid #cbd5e1;
             border-bottom: none;
             border-radius: 7px 7px 0 0;
@@ -1005,11 +1003,7 @@
             flex-shrink: 0;
         }
 
-        /* Khi thu gọn (collapsed), ẩn bộ lọc chủ đề & vạch chia thứ hai */
-        .bottom-drawer-wrapper:not(.open) .drawer-filter-dropdown-wrapper,
-        .bottom-drawer-wrapper:not(.open) .drawer-header-divider:last-of-type {
-            display: none !important;
-        }
+        /* Giữ nguyên bộ lọc chủ đề khi thu gọn để thanh không bị thu nhỏ thành cục tròn */
 
         .drawer-filter-dropdown-wrapper {
             position: relative;
@@ -1164,7 +1158,7 @@
             opacity: 0;
             overflow: hidden;
             transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            background: #ffffff;
+            background: #f1f5f9;
             border-top: 1px solid #cbd5e1;
             box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
             pointer-events: auto;
