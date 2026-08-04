@@ -28,6 +28,11 @@ class BusinessProfile extends Model
         'description',
         'menu_photos',
         'storefront_photos',
+        'verification_photo',
+        'verification_photos',
+        'verification_lat',
+        'verification_lng',
+        'verification_time',
         'status',
         'reject_reason',
     ];
@@ -36,6 +41,7 @@ class BusinessProfile extends Model
         'business_types' => 'array',
         'menu_photos' => 'array',
         'storefront_photos' => 'array',
+        'verification_photos' => 'array',
         'receive_tips' => 'boolean',
         'receive_surveys' => 'boolean',
     ];

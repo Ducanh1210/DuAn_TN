@@ -359,6 +359,11 @@ class ProfileController extends Controller
             'description' => 'nullable|string|max:750',
             'menu_photos' => 'nullable|array',
             'storefront_photos' => 'nullable|array',
+            'verification_photo' => 'nullable|string',
+            'verification_photos' => 'nullable|array',
+            'verification_lat' => 'nullable|numeric',
+            'verification_lng' => 'nullable|numeric',
+            'verification_time' => 'nullable|string',
         ], [
             'business_name.required' => 'Vui lòng nhập tên doanh nghiệp.',
             'business_types.required' => 'Vui lòng chọn loại hình doanh nghiệp.',
@@ -371,6 +376,32 @@ class ProfileController extends Controller
             'lat.required' => 'Vui lòng chọn tọa độ bản đồ.',
             'lng.required' => 'Vui lòng chọn tọa độ bản đồ.',
         ]);
+
+        $savedVerificationPhotos = [];
+        $rawVerificationPhotos = $validated['verification_photos'] ?? [];
+        if (!empty($validated['verification_photo']) && empty($rawVerificationPhotos)) {
+            $rawVerificationPhotos = [$validated['verification_photo']];
+        }
+
+        foreach ((array)$rawVerificationPhotos as $idx => $photoVal) {
+            if (empty($photoVal)) continue;
+            if (str_starts_with($photoVal, 'data:image/')) {
+                // Base64 encoded image from camera canvas
+                @list($type, $data) = explode(';', $photoVal);
+                @list(, $data)      = explode(',', $data);
+                if ($data) {
+                    $imageData = base64_decode($data);
+                    $filename = 'business/verification/verify_' . $user->id . '_' . time() . '_' . $idx . '_' . \Illuminate\Support\Str::random(6) . '.jpg';
+                    \Illuminate\Support\Facades\Storage::disk('public')->put($filename, $imageData);
+                    $savedVerificationPhotos[] = $filename;
+                }
+            } else {
+                $savedVerificationPhotos[] = $photoVal;
+            }
+        }
+
+        $verificationPhotoPath = $savedVerificationPhotos[0] ?? null;
+        $verificationTime = !empty($validated['verification_time']) ? \Carbon\Carbon::parse($validated['verification_time']) : now();
 
         if ($existing) {
             // Update the existing rejected one
@@ -392,6 +423,11 @@ class ProfileController extends Controller
                 'description' => $validated['description'] ?? null,
                 'menu_photos' => $validated['menu_photos'] ?? [],
                 'storefront_photos' => $validated['storefront_photos'] ?? [],
+                'verification_photo' => $verificationPhotoPath,
+                'verification_photos' => $savedVerificationPhotos,
+                'verification_lat' => $validated['verification_lat'] ?? null,
+                'verification_lng' => $validated['verification_lng'] ?? null,
+                'verification_time' => $verificationTime,
                 'status' => 'pending',
                 'reject_reason' => null,
             ]);
@@ -417,6 +453,11 @@ class ProfileController extends Controller
                 'description' => $validated['description'] ?? null,
                 'menu_photos' => $validated['menu_photos'] ?? [],
                 'storefront_photos' => $validated['storefront_photos'] ?? [],
+                'verification_photo' => $verificationPhotoPath,
+                'verification_photos' => $savedVerificationPhotos,
+                'verification_lat' => $validated['verification_lat'] ?? null,
+                'verification_lng' => $validated['verification_lng'] ?? null,
+                'verification_time' => $verificationTime,
                 'status' => 'pending',
             ]);
         }

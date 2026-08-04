@@ -133,6 +133,95 @@
             </div>
         </div>
 
+        @php
+            $verificationDistMeters = null;
+            if ($businessProfile->verification_lat && $businessProfile->verification_lng && $businessProfile->lat && $businessProfile->lng) {
+                $earthRadius = 6371000;
+                $dLat = deg2rad($businessProfile->verification_lat - $businessProfile->lat);
+                $dLng = deg2rad($businessProfile->verification_lng - $businessProfile->lng);
+                $a = sin($dLat / 2) * sin($dLat / 2) +
+                     cos(deg2rad($businessProfile->lat)) * cos(deg2rad($businessProfile->verification_lat)) *
+                     sin($dLng / 2) * sin($dLng / 2);
+                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                $verificationDistMeters = round($earthRadius * $c);
+            }
+        @endphp
+
+        @php
+            $vPhotos = !empty($businessProfile->verification_photos)
+                ? (array)$businessProfile->verification_photos
+                : (!empty($businessProfile->verification_photo) ? [$businessProfile->verification_photo] : []);
+        @endphp
+
+        <!-- Real-time Camera & GPS Verification Card -->
+        <div class="card-minimal p-4 mb-4 border-start border-4 border-primary">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="fas fa-shield-alt text-primary me-2"></i>Xác thực thực địa (Camera & GPS)
+                </h5>
+                @if(count($vPhotos) > 0)
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2">
+                        <i class="fas fa-check-circle me-1"></i> Đã chụp {{ count($vPhotos) }} ảnh xác thực
+                    </span>
+                @else
+                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2">
+                        <i class="fas fa-exclamation-circle me-1"></i> Chưa có ảnh xác thực
+                    </span>
+                @endif
+            </div>
+
+            @if(count($vPhotos) > 0)
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="fw-semibold small text-secondary mb-2">Ảnh chụp xác thực thực địa ({{ count($vPhotos) }} góc chụp)</div>
+                        <div class="photo-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;">
+                            @foreach($vPhotos as $photo)
+                                <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="d-block border rounded-3 overflow-hidden shadow-sm position-relative" style="height: 100px;">
+                                    <img src="{{ asset('storage/' . $photo) }}" alt="Ảnh xác thực Camera" style="width: 100%; height: 100%; object-fit: cover;">
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 h-100" style="font-size: 0.875rem;">
+                            <div class="mb-2">
+                                <strong><i class="fas fa-map-marker-alt text-danger me-1"></i> Tọa độ GPS khi chụp:</strong>
+                                <span class="font-monospace text-dark fw-bold ms-1">
+                                    {{ $businessProfile->verification_lat ? number_format($businessProfile->verification_lat, 6) . ', ' . number_format($businessProfile->verification_lng, 6) : 'N/A' }}
+                                </span>
+                            </div>
+                            <div class="mb-2">
+                                <strong><i class="fas fa-map text-primary me-1"></i> Vị trí ghim trên bản đồ:</strong>
+                                <span class="font-monospace text-secondary ms-1">
+                                    [{{ number_format($businessProfile->lat, 6) }}, {{ number_format($businessProfile->lng, 6) }}]
+                                </span>
+                            </div>
+                            @if($verificationDistMeters !== null)
+                                <div class="mb-2">
+                                    <strong><i class="fas fa-ruler-horizontal me-1"></i> Khoảng cách lệch:</strong>
+                                    @if($verificationDistMeters <= 100)
+                                        <span class="badge bg-success text-white ms-1"><i class="fas fa-check-double me-1"></i> Trùng khớp (Lệch ~{{ $verificationDistMeters }}m)</span>
+                                    @elseif($verificationDistMeters <= 500)
+                                        <span class="badge bg-warning text-dark ms-1"><i class="fas fa-exclamation-triangle me-1"></i> Lệch ~{{ $verificationDistMeters }}m</span>
+                                    @else
+                                        <span class="badge bg-danger text-white ms-1"><i class="fas fa-times-circle me-1"></i> Cách xa {{ number_format($verificationDistMeters / 1000, 1) }}km</span>
+                                    @endif
+                                </div>
+                            @endif
+                            <div>
+                                <strong><i class="fas fa-clock text-secondary me-1"></i> Thời điểm chụp:</strong>
+                                <span class="text-secondary ms-1">
+                                    {{ $businessProfile->verification_time ? \Carbon\Carbon::parse($businessProfile->verification_time)->format('d/m/Y H:i:s') : 'N/A' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="p-3 bg-light rounded text-muted small">Người đăng ký chưa gửi ảnh chụp thực địa qua camera.</div>
+            @endif
+        </div>
+
         <!-- Photos Card -->
         <div class="card-minimal p-4">
             <h5 class="fw-bold mb-3"><i class="fas fa-images text-primary me-2"></i>Hình ảnh xác minh doanh nghiệp</h5>

@@ -6,7 +6,7 @@ Tài liệu này lưu trữ toàn bộ quy chuẩn giao diện, bảng màu, ph�
 
 ## 1. Tông Màu Chủ Đạo (Color Palette)
 
-Dự án áp dụng phong cách **Misty Ice-Blue & Slate Ink (Xanh sương mờ & Mực xám lam)** thanh lịch, dịu mắt, hòa hợp với hình ảnh sông núi du lịch Ninh Bình:
+Dự án áp dụng phong cách **Misty Ice-Blue & Slate Ink (Xanh sương mờ & Mực xám lam)** thanh lịch, dịu mắt,màu sắc đơn giản, hạn chế dùng icon trang trí rườm rà, hòa hợp với hình ảnh sông núi du lịch Ninh Bình:
 
 | Thành phần | Mã màu CSS | Mô tả |
 | :--- | :--- | :--- |
