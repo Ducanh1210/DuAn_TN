@@ -9,8 +9,15 @@ use Illuminate\Support\Facades\DB;
 
 class PointService
 {
+    /** Instant awards for valuable actions (missions for these keys grant 0 xu). */
+    public const POINTS_COMMENT = 5;
+    public const POINTS_FAVORITE = 2;
+
+    /** Daily check-in: day 1..7 of streak cycle → 10, 20, … 70 */
+    public const CHECKIN_BASE = 10;
+
     /**
-     * Award points to a user.
+     * Award points to a user and unlock rank frames when thresholds are met.
      *
      * @param User $user
      * @param int $amount
@@ -21,17 +28,33 @@ class PointService
     public static function awardPoints(User $user, int $amount, string $action, string $description = null)
     {
         return DB::transaction(function () use ($user, $amount, $action, $description) {
-            // Update user points
-            $user->increment('points', $amount);
+            if ($amount !== 0) {
+                $user->increment('points', $amount);
+            }
 
-            // Log transaction
-            return PointTransaction::create([
+            $tx = PointTransaction::create([
                 'user_id' => $user->id,
                 'amount' => $amount,
                 'action' => $action,
                 'description' => $description,
             ]);
+
+            if ($amount > 0) {
+                MissionService::checkRankFramesUnlocked($user->fresh());
+            }
+
+            return $tx;
         });
+    }
+
+    /**
+     * Check-in reward for the given streak day within a 7-day cycle (1–7).
+     */
+    public static function checkinPointsForStreakDay(int $streakCount): int
+    {
+        $dayCycle = (($streakCount - 1) % 7) + 1;
+
+        return $dayCycle * self::CHECKIN_BASE;
     }
 
     /**

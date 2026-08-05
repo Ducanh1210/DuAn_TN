@@ -1193,9 +1193,9 @@
                         $claimed500 = in_array('daily_milestone_500', $claimedMilestones);
                         $allClaimed = $claimed100 && $claimed200 && $claimed500;
 
-                        $frame100 = \App\Models\AvatarFrame::find(1);
-                        $frame200 = \App\Models\AvatarFrame::find(2);
-                        $frame500 = \App\Models\AvatarFrame::find(4);
+                        $frame100 = \App\Models\AvatarFrame::where('code', 'frame-bronze')->first();
+                        $frame200 = \App\Models\AvatarFrame::where('code', 'frame-silver')->first();
+                        $frame500 = \App\Models\AvatarFrame::where('code', 'frame-diamond')->first();
                     @endphp
 
                     <!-- TIẾN ĐỘ NHIỆM VỤ Widget (3 Mốc 100, 200, 500 Xu) -->
@@ -1232,14 +1232,14 @@
                             <div class="milestone-node">
                                 <div class="milestone-tooltip">
                                     <div class="d-flex align-items-center gap-1">
-                                        <div class="tooltip-mini-card">
-                                            <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain;" class="mb-0.5">
-                                            <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">+10 xu</div>
-                                        </div>
                                         @if($frame100)
                                             <div class="tooltip-mini-card">
                                                 <img src="{{ asset($frame100->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame100->name }}">
-                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 38px;">{{ $frame100->name }}</div>
+                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 48px;">Khung {{ $frame100->name }}</div>
+                                            </div>
+                                        @else
+                                            <div class="tooltip-mini-card">
+                                                <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">Mở khung</div>
                                             </div>
                                         @endif
                                     </div>
@@ -1272,14 +1272,14 @@
                             <div class="milestone-node">
                                 <div class="milestone-tooltip">
                                     <div class="d-flex align-items-center gap-1">
-                                        <div class="tooltip-mini-card">
-                                            <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain;" class="mb-0.5">
-                                            <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">+20 xu</div>
-                                        </div>
                                         @if($frame200)
                                             <div class="tooltip-mini-card">
                                                 <img src="{{ asset($frame200->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame200->name }}">
-                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 38px;">{{ $frame200->name }}</div>
+                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 48px;">Khung {{ $frame200->name }}</div>
+                                            </div>
+                                        @else
+                                            <div class="tooltip-mini-card">
+                                                <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">Mở khung</div>
                                             </div>
                                         @endif
                                     </div>
@@ -1312,14 +1312,14 @@
                             <div class="milestone-node">
                                 <div class="milestone-tooltip">
                                     <div class="d-flex align-items-center gap-1">
-                                        <div class="tooltip-mini-card">
-                                            <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain;" class="mb-0.5">
-                                            <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">+30 xu</div>
-                                        </div>
                                         @if($frame500)
                                             <div class="tooltip-mini-card">
                                                 <img src="{{ asset($frame500->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame500->name }}">
-                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 38px;">{{ $frame500->name }}</div>
+                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 48px;">Khung {{ $frame500->name }}</div>
+                                            </div>
+                                        @else
+                                            <div class="tooltip-mini-card">
+                                                <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">Mở khung</div>
                                             </div>
                                         @endif
                                     </div>
@@ -1375,38 +1375,47 @@
                         <!-- Quest Items List -->
                         <div id="questListContainer">
                             @php
-                                $todayActiveMinutes = \App\Models\PointTransaction::where('user_id', Auth::id())
-                                    ->where('action', 'active_session')
-                                    ->whereDate('created_at', \Carbon\Carbon::today())
-                                    ->sum('amount');
-                                $activePercent = min(100, round(($todayActiveMinutes / 60) * 100));
+                                $sessionMission = $dailyMissions->firstWhere('action_key', 'active_session');
+                                $sessionUm = $sessionMission ? $userMissions->get($sessionMission->id) : null;
+                                $sessionTarget = $sessionMission ? (int) $sessionMission->target_count : 15;
+                                $sessionMinutes = $sessionUm ? (int) $sessionUm->current_count : 0;
+                                $sessionPercent = min(100, round(($sessionMinutes / max(1, $sessionTarget)) * 100));
+                                $sessionClaimed = $sessionUm && $sessionUm->status === 'claimed';
+                                $sessionCompleted = $sessionUm && $sessionUm->status === 'completed';
                             @endphp
-                            <!-- Online Active Session Mission Card -->
+                            @if($sessionMission)
                             <div class="quest-item-card quest-unit" data-type="daily">
                                 <div>
-                                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.86rem;">Hoạt động trên trang</h6>
-                                    <div class="text-muted mb-1" style="font-size: 0.74rem;">Nhận 1 xu cho mỗi 1 phút online (tối đa 60 xu/ngày)</div>
+                                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.86rem;">{{ $sessionMission->title }}</h6>
+                                    <div class="text-muted mb-1" style="font-size: 0.74rem;">{{ $sessionMission->description ?: 'Online đủ thời gian rồi nhận thưởng nhiệm vụ (không cộng xu từng phút).' }}</div>
                                     <div class="d-flex align-items-center gap-2" style="width: 140px;">
                                         <div class="progress flex-grow-1 rounded-pill" style="height: 4px; background: #e2e8f0;">
-                                            <div class="progress-bar bg-primary" id="missionSessionProgressBar" style="width: {{ $activePercent }}%;"></div>
+                                            <div class="progress-bar bg-primary" id="missionSessionProgressBar" style="width: {{ $sessionPercent }}%;" aria-valuenow="{{ $sessionMinutes }}"></div>
                                         </div>
-                                        <span class="text-muted fw-semibold" id="missionSessionProgressText" style="font-size: 0.68rem;">{{ $todayActiveMinutes }}/60 phút</span>
+                                        <span class="text-muted fw-semibold" id="missionSessionProgressText" style="font-size: 0.68rem;">{{ min($sessionMinutes, $sessionTarget) }}/{{ $sessionTarget }} phút</span>
                                     </div>
                                 </div>
                                 <div class="quest-reward-tag">
-                                    +60 <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 15px; height: 15px; object-fit: contain; vertical-align: -2px;" class="ms-0.5">
+                                    @if($sessionMission->reward_points > 0)
+                                        +{{ $sessionMission->reward_points }} <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 15px; height: 15px; object-fit: contain; vertical-align: -2px;" class="ms-0.5">
+                                    @else
+                                        <span class="text-muted" style="font-size:0.72rem;">Theo dõi</span>
+                                    @endif
                                 </div>
                                 <div class="text-end pt-3">
-                                    @if($todayActiveMinutes >= 60)
-                                        <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Đã hoàn thành</button>
+                                    @if($sessionClaimed)
+                                        <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Đã nhận</button>
+                                    @elseif($sessionCompleted)
+                                        <button class="btn-quest-claim btn-claim-mission" data-id="{{ $sessionMission->id }}">Nhận thưởng</button>
                                     @else
                                         <button class="btn-quest-action" disabled style="opacity: 0.7;">Đang tích lũy</button>
                                     @endif
                                 </div>
                             </div>
+                            @endif
 
                             @forelse($dailyMissions as $mission)
-                                @if(in_array($mission->action_key, ['daily_login', 'active_session']) || str_contains(mb_strtolower($mission->title), 'đăng nhập') || str_contains(mb_strtolower($mission->title), 'điểm danh') || str_contains(mb_strtolower($mission->title), 'truy cập online') || str_contains(mb_strtolower($mission->title), 'thời gian truy cập'))
+                                @if($mission->action_key === 'daily_login' || $mission->action_key === 'active_session' || str_contains(mb_strtolower($mission->title), 'điểm danh'))
                                     @continue
                                 @endif
                                 @php
@@ -1414,7 +1423,7 @@
                                     $currentProgress = $um ? $um->current_count : 0;
                                     $isCompleted = $um && ($um->status === 'completed' || $um->status === 'claimed');
                                     $isClaimed = $um && $um->status === 'claimed';
-                                    $percent = min(100, round(($currentProgress / $mission->target_count) * 100));
+                                    $percent = min(100, round(($currentProgress / max(1, $mission->target_count)) * 100));
                                 @endphp
                                 <div class="quest-item-card quest-unit" data-type="daily">
                                     <div>
@@ -1428,11 +1437,15 @@
                                         </div>
                                     </div>
                                     <div class="quest-reward-tag">
-                                        +{{ $mission->reward_points }} <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 15px; height: 15px; object-fit: contain; vertical-align: -2px;" class="ms-0.5">
+                                        @if($mission->reward_points > 0)
+                                            +{{ $mission->reward_points }} <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 15px; height: 15px; object-fit: contain; vertical-align: -2px;" class="ms-0.5">
+                                        @else
+                                            <span class="text-muted" style="font-size:0.72rem;">Xu tức thì</span>
+                                        @endif
                                     </div>
                                     <div class="text-end pt-3">
                                         @if($isClaimed)
-                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Đã nhận</button>
+                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Hoàn thành</button>
                                         @elseif($isCompleted)
                                             <button class="btn-quest-claim btn-claim-mission" data-id="{{ $mission->id }}">Nhận thưởng</button>
                                         @else
@@ -1445,7 +1458,7 @@
 
                             @php $otherMissions = $weeklyMissions->concat($achievementMissions); @endphp
                             @foreach($otherMissions as $mission)
-                                @if(in_array($mission->action_key, ['daily_login', 'active_session']) || str_contains(mb_strtolower($mission->title), 'đăng nhập') || str_contains(mb_strtolower($mission->title), 'điểm danh') || str_contains(mb_strtolower($mission->title), 'truy cập online') || str_contains(mb_strtolower($mission->title), 'thời gian truy cập'))
+                                @if($mission->action_key === 'daily_login' || $mission->action_key === 'active_session')
                                     @continue
                                 @endif
                                 @php
@@ -1453,7 +1466,7 @@
                                     $currentProgress = $um ? $um->current_count : 0;
                                     $isCompleted = $um && ($um->status === 'completed' || $um->status === 'claimed');
                                     $isClaimed = $um && $um->status === 'claimed';
-                                    $percent = min(100, round(($currentProgress / $mission->target_count) * 100));
+                                    $percent = min(100, round(($currentProgress / max(1, $mission->target_count)) * 100));
                                 @endphp
                                 <div class="quest-item-card quest-unit" data-type="{{ $mission->type }}">
                                     <div>
@@ -1464,7 +1477,11 @@
                                         </span>
                                     </div>
                                     <div class="quest-reward-tag">
-                                        +{{ $mission->reward_points }} <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 15px; height: 15px; object-fit: contain; vertical-align: -2px;" class="ms-0.5">
+                                        @if($mission->reward_points > 0)
+                                            +{{ $mission->reward_points }} <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 15px; height: 15px; object-fit: contain; vertical-align: -2px;" class="ms-0.5">
+                                        @else
+                                            <span class="text-muted" style="font-size:0.72rem;">Thành tích</span>
+                                        @endif
                                     </div>
                                     <div class="text-end pt-3">
                                         @if($isClaimed)

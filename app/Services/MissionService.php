@@ -92,9 +92,14 @@ class MissionService
                 $userMission->current_count = min($mission->target_count, $userMission->current_count + $value);
             }
 
-            // Check completion
+            // Check completion — auto-claim progress-only missions (0 xu, no frame)
             if ($userMission->current_count >= $mission->target_count) {
-                $userMission->status = 'completed';
+                if ((int) $mission->reward_points === 0 && empty($mission->reward_frame_id)) {
+                    $userMission->status = 'claimed';
+                    $userMission->claimed_at = Carbon::now();
+                } else {
+                    $userMission->status = 'completed';
+                }
             } else {
                 $userMission->status = 'in_progress';
             }
@@ -130,12 +135,11 @@ class MissionService
             $userMission->claimed_at = Carbon::now();
             $userMission->save();
 
-            // Award Points
+            // Award points only when mission is the sole reward source for that action
             if ($mission->reward_points > 0) {
                 PointService::awardPoints($user, $mission->reward_points, 'mission_reward', 'Phần thưởng nhiệm vụ: ' . $mission->title);
             }
 
-            // Award Frame if specified
             $unlockedFrameName = null;
             if ($mission->reward_frame_id) {
                 $frame = AvatarFrame::find($mission->reward_frame_id);
@@ -145,12 +149,11 @@ class MissionService
                 }
             }
 
-            // Check rank frames unlocking automatically based on total points
-            self::checkRankFramesUnlocked($user);
-
-            $msg = "Nhận thành công +" . $mission->reward_points . " xu thưởng!";
+            $msg = $mission->reward_points > 0
+                ? 'Nhận thành công +' . $mission->reward_points . ' xu thưởng!'
+                : 'Đã hoàn thành nhiệm vụ!';
             if ($unlockedFrameName) {
-                $msg .= " Mở khóa Khung Avatar: " . $unlockedFrameName;
+                $msg .= ' Mở khóa Khung Avatar: ' . $unlockedFrameName;
             }
 
             return ['success' => true, 'message' => $msg, 'points' => $user->fresh()->points];
@@ -184,15 +187,13 @@ class MissionService
             $user->last_daily_bonus_at = Carbon::now();
             $user->save();
 
-            // Calculate points matching UI: Day 1=10, Day 2=20, Day 3=30, Day 4=40, Day 5=50, Day 6=60, Day 7=70
-            $dayCycle = (($user->streak_count - 1) % 7) + 1;
-            $totalPoints = $dayCycle * 10;
+            // Streak cycle Day 1–7 → 10, 20, … 70 (single source; daily_login mission = 0 xu)
+            $totalPoints = PointService::checkinPointsForStreakDay((int) $user->streak_count);
 
             PointService::awardPoints($user, $totalPoints, 'daily_login', 'Điểm danh hàng ngày (Chuỗi ' . $user->streak_count . ' ngày)');
 
-            // Track daily_login & streak missions
             self::trackProgress($user, 'daily_login', 1);
-            self::trackProgress($user, 'streak_7', $user->streak_count);
+            self::trackProgress($user, 'streak_7', $user->streak_count, true);
 
             // Award frame on Day 7 streak
             $streakFrameMsg = "";
