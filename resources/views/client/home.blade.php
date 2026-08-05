@@ -1363,27 +1363,120 @@
             background: #111827;
         }
 
-        /* Bảng Nhiệm Vụ Tích Điểm - Crisp modern theme */
+        /* Bảng Nhiệm Vụ — thu gọn = nút tròn, mở = card */
         .mission-widget-wrapper {
             position: absolute;
             top: 195px;
-            right: 2px;
-            width: 220px;
+            right: 10px;
             z-index: 1000;
+            pointer-events: auto;
+            box-sizing: border-box;
+        }
+
+        .mission-fab-btn {
+            position: relative;
+            display: none;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 1.5px solid #cbdbe8;
+            background: #ffffff;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            box-shadow: 0 4px 16px rgba(30, 58, 95, 0.12), 0 1px 3px rgba(15, 23, 42, 0.06);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease;
+        }
+
+        .mission-fab-btn .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-size: 24px;
+            line-height: 1;
+            color: #1e3a5f;
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            -webkit-font-smoothing: antialiased;
+            transform: translateY(0.5px);
+        }
+
+        .mission-fab-btn:hover {
+            border-color: #94a3b8;
+            background: #fff;
+            box-shadow: 0 4px 14px rgba(30, 58, 95, 0.14), 0 1px 3px rgba(15, 23, 42, 0.06);
+            transform: none;
+        }
+
+        /* Chấm / số báo hiệu */
+        .mission-fab-signal {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: 999px;
+            background: #1e3a5f;
+            color: #fff;
+            font-size: 0.58rem;
+            font-weight: 700;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            line-height: 16px;
+            text-align: center;
+            border: 2px solid #fff;
+            box-sizing: border-box;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .mission-fab-btn.has-signal .mission-fab-signal {
+            display: inline-flex;
+        }
+
+        .mission-fab-signal.is-dot {
+            min-width: 10px;
+            width: 10px;
+            height: 10px;
+            padding: 0;
+            top: 4px;
+            right: 4px;
+        }
+
+        /* Vòng pulse khi còn việc cần làm */
+        .mission-fab-btn.has-signal::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(30, 58, 95, 0.35);
+            animation: missionFabPulse 2s ease-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes missionFabPulse {
+            0% { transform: scale(0.92); opacity: 0.7; }
+            70% { transform: scale(1.12); opacity: 0; }
+            100% { transform: scale(1.12); opacity: 0; }
+        }
+
+        .mission-widget-wrapper.collapsed .mission-fab-btn {
+            display: inline-flex;
+        }
+
+        .mission-widget-wrapper.collapsed .mission-panel {
+            display: none;
+        }
+
+        .mission-panel {
+            width: 220px;
             background: #ffffff;
             border-radius: 6px;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
             border: 1px solid #e2e8f0;
-            box-sizing: border-box;
-            pointer-events: auto;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
             padding: 10px 10px 8px 10px;
-        }
-
-        .mission-widget-wrapper.collapsed {
-            border-radius: 6px;
-            padding-bottom: 8px;
+            box-sizing: border-box;
         }
 
         .mission-widget-wrapper .mission-header {
@@ -1392,8 +1485,34 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
             user-select: none;
             background: transparent;
+            width: 100%;
+        }
+
+        .mission-widget-wrapper .mission-header-label {
+            font-size: 0.76rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #1e3a5f;
+        }
+
+        .mission-widget-wrapper .mission-fab-icon {
+            font-family: 'Material Symbols Outlined';
+            font-size: 18px;
+            line-height: 1;
+            color: #64748b;
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .mission-widget-wrapper .mission-header-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .quest-coin-badge-3d {
@@ -2320,28 +2439,69 @@
             </div>
         @endif
 
-        <!-- Bảng Nhiệm Vụ Tích Điểm - Compact cream theme -->
-        <div class="mission-widget-wrapper" id="mission-widget-wrapper">
-            <!-- Header với Nút Thu Gọn -->
-            <div class="mission-header" id="mission-widget-header" title="Nhấn để thu gọn/mở rộng">
-                <span style="font-size: 0.76rem; font-weight: 700; display: flex; align-items: center; gap: 4px; color: #334155;">
-                    Tiến độ nhiệm vụ
-                </span>
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    @auth
-                        <div style="display: flex; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: 700; color: #334155;">
-                            <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 14px; height: 14px; object-fit: contain;">
-                            <span id="widgetPoints">{{ number_format(Auth::user()->points) }}</span>
-                        </div>
-                    @endauth
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="mission-toggle-arrow" style="transition: transform 0.3s;">
-                        <polyline points="18 15 12 9 6 15"/>
-                    </svg>
-                </div>
-            </div>
+        <!-- Nhiệm vụ: nút tròn → bấm mở panel -->
+        @php
+            $missionFabNeedsAction = false;
+            $missionFabSignalCount = 0;
+            $missionFabTitle = 'Nhiệm vụ';
+            if (Auth::check()) {
+                $fabUser = Auth::user();
+                $fabHasCheckin = $fabUser->last_daily_bonus_at && \Carbon\Carbon::parse($fabUser->last_daily_bonus_at)->isToday();
+                if (!$fabHasCheckin) {
+                    $missionFabNeedsAction = true;
+                    $missionFabSignalCount++;
+                    $missionFabTitle = 'Còn điểm danh hôm nay — mở nhiệm vụ';
+                }
+                $fabClaimable = \App\Models\UserMission::where('user_id', $fabUser->id)
+                    ->where('status', 'completed')
+                    ->count();
+                if ($fabClaimable > 0) {
+                    $missionFabNeedsAction = true;
+                    $missionFabSignalCount += $fabClaimable;
+                    $missionFabTitle = 'Có thưởng chờ nhận — mở nhiệm vụ';
+                }
+            } else {
+                $missionFabNeedsAction = true;
+                $missionFabTitle = 'Đăng nhập để làm nhiệm vụ & nhận xu';
+            }
+        @endphp
+        <div class="mission-widget-wrapper collapsed" id="mission-widget-wrapper">
+            <button type="button"
+                class="mission-fab-btn {{ $missionFabNeedsAction ? 'has-signal' : '' }}"
+                id="mission-fab-btn"
+                title="{{ $missionFabTitle }}"
+                aria-label="{{ $missionFabTitle }}"
+                aria-expanded="false">
+                <span class="material-symbols-outlined" aria-hidden="true">emoji_events</span>
+                @if($missionFabNeedsAction)
+                    @if($missionFabSignalCount > 1)
+                        <span class="mission-fab-signal">{{ min(9, $missionFabSignalCount) }}{{ $missionFabSignalCount > 9 ? '+' : '' }}</span>
+                    @else
+                        <span class="mission-fab-signal is-dot" aria-hidden="true"></span>
+                    @endif
+                @endif
+            </button>
 
-            <!-- List nhiệm vụ -->
-            <div class="mission-list-container" style="background: transparent; transition: max-height 0.3s ease;">
+            <div class="mission-panel" id="mission-panel">
+                <div class="mission-header" id="mission-widget-header" title="Thu gọn" role="button" tabindex="0" aria-label="Thu gọn bảng nhiệm vụ">
+                    <span class="mission-header-label">
+                        <span class="material-symbols-outlined mission-fab-icon">emoji_events</span>
+                        <span class="mission-header-text">Nhiệm vụ</span>
+                    </span>
+                    <div class="mission-header-meta">
+                        @auth
+                            <div style="display: flex; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: 600; color: #1e3a5f;">
+                                <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 14px; height: 14px; object-fit: contain;">
+                                <span id="widgetPoints">{{ number_format(Auth::user()->points) }}</span>
+                            </div>
+                        @endauth
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="mission-toggle-arrow">
+                            <polyline points="18 15 12 9 6 15"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="mission-list-container" id="mission-list-container">
                 @auth
                     <!-- Horizontal Milestone Progress Tracker -->
                     @php
@@ -2530,8 +2690,9 @@
                         <a href="{{ route('login') }}" style="display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 6px 18px; background: #0284c7; color: #ffffff; border-radius: 8px; text-decoration: none; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25); transition: all 0.2s;">Đăng nhập ngay</a>
                     </div>
                 @endauth
-            </div>
-        </div>
+            </div><!-- /.mission-list-container -->
+            </div><!-- /.mission-panel -->
+        </div><!-- /.mission-widget-wrapper -->
     </div>
 
     <!-- Bottom Featured Drawer (Full Width Sheet) -->
@@ -3756,24 +3917,38 @@
         }
         @endauth
 
-        // Toggle Mission Widget Collapse/Expand
+        // Toggle Mission Widget — nút tròn ↔ panel
         const missionWidget = document.getElementById("mission-widget-wrapper");
         const missionHeader = document.getElementById("mission-widget-header");
-        const missionArrow = document.getElementById("mission-toggle-arrow");
+        const missionFabBtn = document.getElementById("mission-fab-btn");
 
-        if (missionWidget && missionHeader) {
-            missionHeader.addEventListener("click", function(e) {
-                missionWidget.classList.toggle("collapsed");
-                if (missionArrow) {
-                    if (missionWidget.classList.contains("collapsed")) {
-                        missionArrow.textContent = "expand_more";
-                    } else {
-                        missionArrow.textContent = "expand_less";
+        function setMissionExpanded(expanded) {
+            if (!missionWidget) return;
+            missionWidget.classList.toggle("collapsed", !expanded);
+            if (missionFabBtn) {
+                missionFabBtn.setAttribute("aria-expanded", expanded ? "true" : "false");
+            }
+        }
+
+        if (missionWidget) {
+            if (missionFabBtn) {
+                missionFabBtn.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    setMissionExpanded(true);
+                });
+            }
+            if (missionHeader) {
+                missionHeader.addEventListener("click", function () {
+                    setMissionExpanded(false);
+                });
+                missionHeader.addEventListener("keydown", function (e) {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setMissionExpanded(false);
                     }
-                }
-            });
+                });
+            }
 
-            // Prevent Leaflet Map events from propagating when clicking or scrolling inside the mission widget
             L.DomEvent.disableClickPropagation(missionWidget);
             L.DomEvent.disableScrollPropagation(missionWidget);
         }

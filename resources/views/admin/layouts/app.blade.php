@@ -79,10 +79,11 @@
 
         .sidebar nav a {
             display: block;
+            position: relative;
             padding: 0.5rem 0.75rem;
             color: var(--text-muted);
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 0 6px 6px 0;
             font-weight: 400;
             font-size: 0.825rem;
             margin-bottom: 0.1rem;
@@ -98,6 +99,102 @@
             color: var(--accent-primary);
             background-color: #f1f5f9;
             font-weight: 600;
+            box-shadow: inset 3px 0 0 var(--accent-primary);
+        }
+
+        .sidebar-nav-group {
+            margin-bottom: 0.1rem;
+        }
+
+        .sidebar-nav-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-weight: 400;
+            font-size: 0.825rem;
+            text-align: left;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-nav-toggle:hover,
+        .sidebar-nav-group.open > .sidebar-nav-toggle {
+            color: var(--text-heading);
+            background-color: #f1f5f9;
+        }
+
+        .sidebar-nav-group.open > .sidebar-nav-toggle {
+            font-weight: 500;
+        }
+
+        .sidebar-nav-toggle .sidebar-chevron {
+            font-size: 0.65rem;
+            transition: transform 0.2s ease;
+            opacity: 0.55;
+            flex-shrink: 0;
+        }
+
+        .sidebar-nav-group.open .sidebar-nav-toggle .sidebar-chevron {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-subnav {
+            display: none;
+            padding: 0.15rem 0 0.25rem 0.5rem;
+        }
+
+        .sidebar-nav-group.open .sidebar-subnav {
+            display: block;
+        }
+
+        .sidebar-subnav a {
+            display: block;
+            position: relative;
+            padding: 0.4rem 0.75rem 0.4rem 1.35rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.8rem;
+            margin-bottom: 0.05rem;
+            transition: all 0.15s ease;
+        }
+
+        .sidebar-subnav a:hover {
+            color: var(--text-heading);
+            background-color: #f8fafc;
+        }
+
+        .sidebar-subnav a.active {
+            color: var(--accent-primary);
+            background-color: #f1f5f9;
+            font-weight: 600;
+            box-shadow: inset 3px 0 0 var(--accent-primary);
+        }
+
+        .admin-workspace-crumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            min-width: 0;
+        }
+
+        .admin-workspace-crumb strong {
+            color: var(--text-heading);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .admin-workspace-crumb .sep {
+            opacity: 0.45;
         }
 
         /* Top Navbar */
@@ -264,8 +361,9 @@
         }
 
         .badge-minimal-warning {
-            background: #fffbeb;
-            color: #b45309;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
         }
 
         .badge-minimal-danger {
@@ -276,6 +374,47 @@
         .badge-minimal-info {
             background: #f0f9ff;
             color: #0369a1;
+        }
+
+        .badge-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.25rem;
+            padding: 0.1rem 0.45rem;
+            border-radius: 999px;
+            background: #e8eef5;
+            color: #1e3a5f;
+            border: 1px solid #cbdbe8;
+            font-size: 0.65rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.3;
+        }
+
+        .pending-task-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0.55rem 0.85rem;
+            font-size: 0.825rem;
+            color: #334155;
+            background: #fff;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .pending-task-link:hover {
+            background: #f8fafc;
+            border-color: #cbdbe8;
+            color: #0f2442;
+        }
+
+        .pending-task-link.has-pending {
+            background: #f8fafc;
+            border-color: #cbdbe8;
         }
 
         /* Forms in Admin */
@@ -348,28 +487,100 @@
                         $pendingBizCount = \App\Models\BusinessProfile::where('status', 'pending')->count();
                     @endphp
                     @if($pendingBizCount > 0)
-                        <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.65rem;">{{ $pendingBizCount }}</span>
+                        <span class="badge-count">{{ $pendingBizCount }}</span>
                     @endif
                 </a>
             </nav>
 
             <div class="sidebar-group-title">Nội dung</div>
+            @php
+                $contentOpen = request()->routeIs('admin.news.*') || request()->routeIs('admin.events.*');
+                $contribOpen = request()->routeIs('admin.contributions.*');
+                $pendingSuggestions = \App\Models\LocationSuggestion::where('status', 'pending')->count();
+                $reportsOpen = request()->routeIs('admin.reports.*');
+                $reportTab = request('tab', 'locations');
+                $pendingReportLocations = \App\Models\Report::where('reportable_type', \App\Models\Location::class)->where('status', 'pending')->count();
+                $pendingReportComments = \App\Models\Report::where('reportable_type', \App\Models\Comment::class)->where('status', 'pending')->count();
+                $pendingFeedbacks = \App\Models\FeedbackReport::where('status', 'pending')->count();
+                $pendingReportsTotal = $pendingReportLocations + $pendingReportComments + $pendingFeedbacks;
+            @endphp
             <nav>
-                <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
-                    Tin tức & Bài viết
-                </a>
+                <div class="sidebar-nav-group {{ $contentOpen ? 'open' : '' }}">
+                    <button type="button" class="sidebar-nav-toggle" aria-expanded="{{ $contentOpen ? 'true' : 'false' }}">
+                        <span>Tin tức &amp; sự kiện</span>
+                        <i class="fas fa-chevron-down sidebar-chevron"></i>
+                    </button>
+                    <div class="sidebar-subnav">
+                        <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.*') ? 'active' : '' }}">Tin tức</a>
+                        <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.*') ? 'active' : '' }}">Sự kiện</a>
+                    </div>
+                </div>
                 <a href="{{ route('admin.comments.index') }}" class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                     Quản lý bình luận
                 </a>
+                <div class="sidebar-nav-group {{ $contribOpen ? 'open' : '' }}">
+                    <button type="button" class="sidebar-nav-toggle" aria-expanded="{{ $contribOpen ? 'true' : 'false' }}">
+                        <span class="d-flex align-items-center gap-2">
+                            <span>Quản lý đóng góp</span>
+                            @if($pendingSuggestions > 0)
+                                <span class="badge-count">{{ $pendingSuggestions }}</span>
+                            @endif
+                        </span>
+                        <i class="fas fa-chevron-down sidebar-chevron"></i>
+                    </button>
+                    <div class="sidebar-subnav">
+                        <a href="{{ route('admin.contributions.index') }}" class="{{ $contribOpen ? 'active' : '' }}">
+                            Đề xuất địa điểm
+                            @if($pendingSuggestions > 0)
+                                <span class="badge-count ms-1">{{ $pendingSuggestions }}</span>
+                            @endif
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-group-title">Kiểm duyệt</div>
+            <nav>
+                <div class="sidebar-nav-group {{ $reportsOpen ? 'open' : '' }}" id="sidebarReportsGroup">
+                    <button type="button" class="sidebar-nav-toggle" id="sidebarReportsToggle" aria-expanded="{{ $reportsOpen ? 'true' : 'false' }}">
+                        <span class="d-flex align-items-center gap-2">
+                            <span>Báo cáo vi phạm</span>
+                            @if($pendingReportsTotal > 0)
+                                <span class="badge-count">{{ $pendingReportsTotal }}</span>
+                            @endif
+                        </span>
+                        <i class="fas fa-chevron-down sidebar-chevron"></i>
+                    </button>
+                    <div class="sidebar-subnav">
+                        <a href="{{ route('admin.reports.index', ['tab' => 'locations']) }}"
+                           class="{{ $reportsOpen && $reportTab === 'locations' ? 'active' : '' }}">
+                            Địa điểm
+                            @if($pendingReportLocations > 0)
+                                <span class="badge-count ms-1">{{ $pendingReportLocations }}</span>
+                            @endif
+                        </a>
+                        <a href="{{ route('admin.reports.index', ['tab' => 'comments']) }}"
+                           class="{{ $reportsOpen && $reportTab === 'comments' ? 'active' : '' }}">
+                            Bình luận
+                            @if($pendingReportComments > 0)
+                                <span class="badge-count ms-1">{{ $pendingReportComments }}</span>
+                            @endif
+                        </a>
+                        <a href="{{ route('admin.reports.index', ['tab' => 'feedbacks']) }}"
+                           class="{{ $reportsOpen && $reportTab === 'feedbacks' ? 'active' : '' }}">
+                            Góp ý / báo lỗi
+                            @if($pendingFeedbacks > 0)
+                                <span class="badge-count ms-1">{{ $pendingFeedbacks }}</span>
+                            @endif
+                        </a>
+                    </div>
+                </div>
             </nav>
 
             <div class="sidebar-group-title">Hệ thống</div>
             <nav>
                 <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     Tài khoản người dùng
-                </a>
-                <a href="{{ route('admin.reports.index') }}" class="{{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
-                    Báo cáo vi phạm
                 </a>
             </nav>
         </div>
@@ -413,8 +624,27 @@
                 @endif
 
                 @if(!request()->routeIs('admin.dashboard'))
+                @php
+                    $adminCrumbGroup = match (true) {
+                        request()->routeIs('admin.dashboard') => 'Quản lý',
+                        request()->routeIs('admin.categories.*'),
+                        request()->routeIs('admin.locations.*'),
+                        request()->routeIs('admin.business-profiles.*') => 'Quản lý',
+                        request()->routeIs('admin.news.*'),
+                        request()->routeIs('admin.events.*'),
+                        request()->routeIs('admin.comments.*'),
+                        request()->routeIs('admin.contributions.*') => 'Nội dung',
+                        request()->routeIs('admin.reports.*') => 'Kiểm duyệt',
+                        request()->routeIs('admin.users.*') => 'Hệ thống',
+                        default => 'Admin',
+                    };
+                @endphp
                 <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                    <h2 class="page-header-title">@yield('title')</h2>
+                    <div class="admin-workspace-crumb">
+                        <span>{{ $adminCrumbGroup }}</span>
+                        <span class="sep">/</span>
+                        <strong>@yield('title')</strong>
+                    </div>
                     <div>
                         @yield('actions')
                     </div>
@@ -435,6 +665,18 @@
                 document.getElementById('sidebar').classList.toggle('show');
             });
         }
+
+        document.querySelectorAll('.sidebar-nav-toggle').forEach(function (toggle) {
+            toggle.addEventListener('click', function () {
+                const group = toggle.closest('.sidebar-nav-group');
+                if (!group) return;
+                group.classList.toggle('open');
+                toggle.setAttribute(
+                    'aria-expanded',
+                    group.classList.contains('open') ? 'true' : 'false'
+                );
+            });
+        });
     </script>
     @stack('scripts')
 </body>

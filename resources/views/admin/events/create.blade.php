@@ -49,6 +49,7 @@
                 <img id="imgPrev" src="" class="rounded w-100" style="display:none; max-height: 160px; object-fit: cover;">
                 <div class="ph text-muted py-3" id="imgPh" style="font-size: 0.775rem;">
                     <div>Tải ảnh lên hoặc Ctrl+V dán ảnh</div>
+                    <div style="font-size: 0.7rem;" class="mt-1">Ảnh nặng sẽ được tự động nén</div>
                 </div>
             </div>
             <input type="file" class="d-none" id="featured_image" name="featured_image" accept="image/*" onchange="prevImg(event)">
@@ -178,3 +179,4 @@ $(document).ready(function() {
 });
 </script>
 @endpush
+@include('admin.partials.featured-image-compress')

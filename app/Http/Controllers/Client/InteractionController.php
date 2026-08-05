@@ -215,7 +215,7 @@ class InteractionController extends Controller
 
         return response()->json([
             'success' => true, 
-            'message' => 'Cảm ơn bạn đã đóng góp! Đề xuất của bạn đã được ghi nhận và đang chờ duyệt.',
+            'message' => 'Cảm ơn bạn đã đóng góp! Đề xuất đã được ghi nhận để Ban quản trị tham khảo (không tự đăng lên bản đồ).',
             'data' => $suggestion
         ]);
     }

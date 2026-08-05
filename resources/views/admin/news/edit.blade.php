@@ -158,3 +158,4 @@ $(document).ready(function() {
 });
 </script>
 @endpush
+@include('admin.partials.featured-image-compress')

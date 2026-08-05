@@ -72,4 +72,81 @@ class PointService
         $result = MissionService::processDailyCheckin($user);
         return $result['success'] ?? false;
     }
+
+    /**
+     * Collapse per-minute active_session rows into daily summaries for readable history.
+     *
+     * @return array{history: array<int, array>, raw_total: int}
+     */
+    public static function aggregatedHistory(int $userId): array
+    {
+        $rawPointTx = PointTransaction::where('user_id', $userId)
+            ->where('amount', '!=', 0)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $sessionBuckets = [];
+        $pointHistory = [];
+
+        foreach ($rawPointTx as $tx) {
+            if ($tx->action === 'active_session') {
+                $dayKey = $tx->created_at->format('Y-m-d');
+                if (!isset($sessionBuckets[$dayKey])) {
+                    $sessionBuckets[$dayKey] = [
+                        'key' => 'session-' . $dayKey,
+                        'action' => 'active_session',
+                        'amount' => 0,
+                        'count' => 0,
+                        'created_at' => $tx->created_at,
+                        'description' => '',
+                        'aggregated' => true,
+                    ];
+                }
+                $sessionBuckets[$dayKey]['amount'] += (int) $tx->amount;
+                $sessionBuckets[$dayKey]['count']++;
+                if ($tx->created_at->gt($sessionBuckets[$dayKey]['created_at'])) {
+                    $sessionBuckets[$dayKey]['created_at'] = $tx->created_at;
+                }
+                continue;
+            }
+
+            $pointHistory[] = [
+                'key' => 'tx-' . $tx->id,
+                'action' => $tx->action,
+                'amount' => (int) $tx->amount,
+                'count' => 1,
+                'created_at' => $tx->created_at,
+                'description' => $tx->description,
+                'aggregated' => false,
+            ];
+        }
+
+        foreach ($sessionBuckets as $dayKey => $bucket) {
+            $bucket['description'] = 'Online ' . $bucket['count'] . ' phút · gộp ' . $bucket['count'] . ' bản ghi · '
+                . Carbon::parse($dayKey)->format('d/m/Y');
+            $pointHistory[] = $bucket;
+        }
+
+        usort($pointHistory, fn ($a, $b) => $b['created_at']->timestamp <=> $a['created_at']->timestamp);
+
+        return [
+            'history' => $pointHistory,
+            'raw_total' => $rawPointTx->count(),
+        ];
+    }
+
+    public static function actionLabel(string $action): string
+    {
+        return match ($action) {
+            'active_session' => 'Thời gian online',
+            'daily_login' => 'Điểm danh',
+            'comment' => 'Bình luận',
+            'favorite' => 'Yêu thích',
+            'mission_reward' => 'Nhiệm vụ',
+            'manual_adjust' => 'Admin chỉnh',
+            'checkin' => 'Check-in',
+            'milestone' => 'Mốc thưởng',
+            default => $action,
+        };
+    }
 }

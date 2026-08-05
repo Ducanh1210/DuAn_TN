@@ -324,26 +324,7 @@
         .sidebar-menu-tabs .nav-link .nav-link-left {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
             min-width: 0;
-        }
-        .sidebar-menu-tabs .nav-link .nav-ico {
-            width: 18px;
-            height: 18px;
-            text-align: center;
-            font-size: 18px;
-            line-height: 1;
-            opacity: 0.85;
-            flex-shrink: 0;
-            color: #64748b;
-            font-family: 'Material Symbols Outlined';
-            font-weight: normal;
-            font-style: normal;
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-            -webkit-font-smoothing: antialiased;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
         }
         .sidebar-menu-tabs .nav-link:hover {
             background-color: #f1f5f9;
@@ -356,7 +337,6 @@
             box-shadow: inset 3px 0 0 #1e3a5f;
             border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
         }
-        .sidebar-menu-tabs .nav-link.active .nav-ico { opacity: 1; color: #1e3a5f; }
         .menu-count-badge {
             background-color: #f1f5f9;
             color: #64748b;
@@ -2209,34 +2189,34 @@
         <div class="nav flex-column sidebar-menu-tabs" id="settings-tabs" role="tablist">
             <div class="sidebar-nav-group">Tài khoản</div>
             <button class="nav-link active" id="tab-profile-btn" data-bs-toggle="pill" data-bs-target="#tab-profile" type="button" role="tab" aria-selected="true">
-                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">badge</span><span>Thông tin cá nhân</span></span>
+                Thông tin cá nhân
             </button>
             @if($user->provider !== 'google')
             <button class="nav-link" id="tab-security-btn" data-bs-toggle="pill" data-bs-target="#tab-security" type="button" role="tab" aria-selected="false">
-                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">lock</span><span>Bảo mật & Mật khẩu</span></span>
+                Bảo mật & Mật khẩu
             </button>
             @endif
 
             <div class="sidebar-nav-group">Hoạt động</div>
             <button class="nav-link" id="tab-points-btn" data-bs-toggle="pill" data-bs-target="#tab-points" type="button" role="tab" aria-selected="false">
-                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">payments</span><span>Lịch sử tích điểm</span></span>
+                Lịch sử tích điểm
             </button>
             <button class="nav-link" id="tab-favorites-btn" data-bs-toggle="pill" data-bs-target="#tab-favorites" type="button" role="tab" aria-selected="false">
-                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">bookmark</span><span>Địa điểm đã lưu</span></span>
+                <span>Địa điểm đã lưu</span>
                 <span class="menu-count-badge" id="favoritesCountBadge">{{ $favorites->count() }}</span>
             </button>
             <button class="nav-link" id="tab-itineraries-btn" data-bs-toggle="pill" data-bs-target="#tab-itineraries" type="button" role="tab" aria-selected="false">
-                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">route</span><span>Lịch trình đã lưu</span></span>
+                <span>Lịch trình đã lưu</span>
                 <span class="menu-count-badge" id="itinerariesCountBadge">{{ isset($itineraries) ? $itineraries->count() : 0 }}</span>
             </button>
             <button class="nav-link" id="tab-comments-btn" data-bs-toggle="pill" data-bs-target="#tab-comments" type="button" role="tab" aria-selected="false">
-                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">chat_bubble_outline</span><span>Nhận xét của tôi</span></span>
+                <span>Nhận xét của tôi</span>
                 <span class="menu-count-badge" id="commentsCountBadge">{{ $comments->count() }}</span>
             </button>
 
             <div class="sidebar-nav-group">Mở rộng</div>
             <button class="nav-link" id="tab-business-btn" data-bs-toggle="pill" data-bs-target="#tab-business" type="button" role="tab" aria-selected="false">
-                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">storefront</span><span>Tài khoản doanh nghiệp</span></span>
+                <span>Tài khoản doanh nghiệp</span>
                 @if(isset($businessProfile))
                     @if($businessProfile->status === 'pending')
                         <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Chờ duyệt</span>

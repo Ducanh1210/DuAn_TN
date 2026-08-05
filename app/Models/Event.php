@@ -71,4 +71,14 @@ class Event extends Model
             default => $this->status,
         };
     }
+
+    public function getFeaturedImageUrlAttribute(): ?string
+    {
+        return News::resolveMediaUrl($this->featured_image);
+    }
+
+    public function getTitleAttribute(): string
+    {
+        return $this->name;
+    }
 }

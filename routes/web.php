@@ -232,14 +232,18 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Reports Management
     Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class)->only(['index']);
     Route::patch('reports/{report}/status', [\App\Http\Controllers\Admin\ReportController::class, 'updateStatus'])->name('reports.update_status');
-    Route::delete('reports/{report}/content', [\App\Http\Controllers\Admin\ReportController::class, 'deleteReportedContent'])->name('reports.delete_content');
+    Route::get('reports/feedbacks/{id}', [\App\Http\Controllers\Admin\ReportController::class, 'showFeedback'])->name('reports.feedbacks.show');
+    Route::put('reports/feedbacks/{id}', [\App\Http\Controllers\Admin\ReportController::class, 'updateFeedback'])->name('reports.feedbacks.update');
 
-    // Location Suggestions (Đề xuất địa điểm)
-    Route::resource('location_suggestions', \App\Http\Controllers\Admin\LocationSuggestionController::class)->only(['index', 'show', 'update']);
-    Route::post('location_suggestions/{id}/approve', [\App\Http\Controllers\Admin\LocationSuggestionController::class, 'approve'])->name('location_suggestions.approve');
+    // Đóng góp người dùng — đề xuất địa điểm (tham khảo)
+    Route::get('contributions', [\App\Http\Controllers\Admin\ContributionController::class, 'index'])->name('contributions.index');
+    Route::get('contributions/suggestions/{id}', [\App\Http\Controllers\Admin\ContributionController::class, 'showSuggestion'])->name('contributions.suggestions.show');
+    Route::put('contributions/suggestions/{id}', [\App\Http\Controllers\Admin\ContributionController::class, 'updateSuggestion'])->name('contributions.suggestions.update');
 
-    // Feedback & Content Reports (Góp ý & Báo lỗi nội dung)
-    Route::resource('feedbacks', \App\Http\Controllers\Admin\FeedbackReportController::class)->only(['index', 'show', 'update']);
+    // Legacy redirects
+    Route::redirect('location_suggestions', '/admin/contributions');
+    Route::redirect('feedbacks', '/admin/reports?tab=feedbacks');
+    Route::get('contributions/feedbacks/{id}', fn ($id) => redirect()->route('admin.reports.feedbacks.show', $id));
 
     // Business Upgrade Requests Management (Quản lý yêu cầu doanh nghiệp)
     Route::resource('business-profiles', \App\Http\Controllers\Admin\BusinessProfileController::class)->only(['index', 'show']);
