@@ -77,6 +77,23 @@ Route::get('/', function () {
 Route::get('locations/{location:slug}/360', function (\App\Models\Location $location) {
     if (auth()->check()) {
         \App\Services\MissionService::trackProgress(auth()->user(), 'vr_360_view', 1, false, $location->id);
+        auth()->user()->loadMissing('equippedFrame');
+    }
+    $location->load([
+        'category',
+        'panoramas.hotspots',
+        'comments.user.equippedFrame',
+    ]);
+    $userIds = $location->comments->pluck('user_id')->filter()->unique()->values();
+    $commentCounts = \App\Models\Comment::whereIn('user_id', $userIds)
+        ->where('status', 'visible')
+        ->selectRaw('user_id, COUNT(*) as aggregate')
+        ->groupBy('user_id')
+        ->pluck('aggregate', 'user_id');
+    foreach ($location->comments as $c) {
+        if ($c->user) {
+            $c->user->setAttribute('comments_count_cached', (int) ($commentCounts[$c->user_id] ?? 1));
+        }
     }
     return view('client.360', compact('location'));
 })->name('client.locations.360');
@@ -89,8 +106,13 @@ Route::get('/su-kien/{slug}', [ClientEventController::class, 'show'])->name('cli
 
 // Client Interactions
 Route::post('/chat/message', [ChatbotController::class, 'sendMessage'])->name('client.chat.message');
-Route::post('/trip-planner/next-question', [\App\Http\Controllers\Client\TripPlannerController::class, 'nextQuestion'])->name('client.trip_planner.next_question');
 Route::post('/trip-planner/generate', [\App\Http\Controllers\Client\TripPlannerController::class, 'generate'])->name('client.trip_planner.generate');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/trip-planner/save', [\App\Http\Controllers\Client\TripPlannerController::class, 'save'])->name('client.trip_planner.save');
+    Route::get('/trip-planner/{id}', [\App\Http\Controllers\Client\TripPlannerController::class, 'show'])->name('client.trip_planner.show');
+    Route::delete('/trip-planner/{id}', [\App\Http\Controllers\Client\TripPlannerController::class, 'destroy'])->name('client.trip_planner.destroy');
+});
 
 Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/favorite', [\App\Http\Controllers\Client\InteractionController::class, 'toggleFavorite'])->name('client.locations.favorite');

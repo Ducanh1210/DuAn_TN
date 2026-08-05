@@ -1380,8 +1380,21 @@
                 btnCapturePhoto.addEventListener('click', function() {
                     if (!cameraVideo || cameraVideo.classList.contains('d-none')) return;
 
-                    const width = cameraVideo.videoWidth || 640;
-                    const height = cameraVideo.videoHeight || 480;
+                    let width = cameraVideo.videoWidth || 640;
+                    let height = cameraVideo.videoHeight || 480;
+
+                    // Downscale canvas to max 1280px to keep payload size lightweight (~180KB instead of 8MB)
+                    const MAX_DIM = 1280;
+                    if (width > MAX_DIM || height > MAX_DIM) {
+                        if (width > height) {
+                            height = Math.round((height * MAX_DIM) / width);
+                            width = MAX_DIM;
+                        } else {
+                            width = Math.round((width * MAX_DIM) / height);
+                            height = MAX_DIM;
+                        }
+                    }
+
                     cameraCanvas.width = width;
                     cameraCanvas.height = height;
 
@@ -1389,24 +1402,28 @@
                     ctx.drawImage(cameraVideo, 0, 0, width, height);
 
                     // Draw watermark bar
-                    const gradient = ctx.createLinearGradient(0, height - 90, 0, height);
+                    const barHeight = Math.max(60, Math.round(height * 0.14));
+                    const gradient = ctx.createLinearGradient(0, height - barHeight, 0, height);
                     gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
                     gradient.addColorStop(1, 'rgba(0, 0, 0, 0.85)');
                     ctx.fillStyle = gradient;
-                    ctx.fillRect(0, height - 90, width, 90);
+                    ctx.fillRect(0, height - barHeight, width, barHeight);
 
                     const nowStr = new Date().toLocaleString('vi-VN');
                     const gpsStr = (verificationLat && verificationLng)
                         ? `GPS: ${verificationLat.toFixed(6)}, ${verificationLng.toFixed(6)}`
                         : 'GPS: Chưa có vị trí';
 
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = 'bold 18px "Be Vietnam Pro", sans-serif';
-                    ctx.fillText(`XÁC THỰC THỰC ĐỊA • ${nowStr}`, 20, height - 45);
-                    ctx.font = '15px "Be Vietnam Pro", sans-serif';
-                    ctx.fillText(gpsStr, 20, height - 20);
+                    const fontSize1 = Math.max(13, Math.round(width * 0.026));
+                    const fontSize2 = Math.max(11, Math.round(width * 0.022));
 
-                    const capturedData = cameraCanvas.toDataURL('image/jpeg', 0.88);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `bold ${fontSize1}px "Be Vietnam Pro", sans-serif`;
+                    ctx.fillText(`XÁC THỰC THỰC ĐỊA • ${nowStr}`, 16, height - Math.round(barHeight * 0.5));
+                    ctx.font = `${fontSize2}px "Be Vietnam Pro", sans-serif`;
+                    ctx.fillText(gpsStr, 16, height - Math.round(barHeight * 0.2));
+
+                    const capturedData = cameraCanvas.toDataURL('image/jpeg', 0.72);
                     verificationPhotos.push(capturedData);
                     verificationPhotoData = verificationPhotos[0];
                     if (!verificationTime) verificationTime = new Date().toISOString();
@@ -1427,32 +1444,42 @@
 
             // State Persistence Functions
             function saveWizardState() {
-                const state = {
-                    bizStep: bizStep,
-                    businessName: inputBizName.value.trim(),
-                    businessTypes: Array.from(document.querySelectorAll('.biz-type-card.selected')).map(c => c.getAttribute('data-val')),
-                    categoryId: inputCategoryId.value,
-                    categorySearchName: inputCategorySearch ? inputCategorySearch.value : '',
-                    addressStreet: inputStreet.value.trim(),
-                    addressCity: inputCity.value.trim(),
-                    addressProvince: inputProvince.value.trim(),
-                    addressPostalCode: document.getElementById('input_address_postal_code') ? document.getElementById('input_address_postal_code').value.trim() : '',
-                    phone: inputPhone ? inputPhone.value.trim() : '',
-                    website: inputWebsite ? inputWebsite.value.trim() : '',
-                    lat: document.getElementById('input_lat') ? document.getElementById('input_lat').value : '',
-                    lng: document.getElementById('input_lng') ? document.getElementById('input_lng').value : '',
-                    receiveTips: document.getElementById('receive_tips') ? document.getElementById('receive_tips').checked : false,
-                    receiveSurveys: document.getElementById('receive_surveys') ? document.getElementById('receive_surveys').checked : false,
-                    description: inputDesc.value.trim(),
-                    menuPhotos: menuPhotos,
-                    storefrontPhotos: storefrontPhotos,
-                    verificationPhotos: verificationPhotos,
-                    verificationPhotoData: verificationPhotoData,
-                    verificationLat: verificationLat,
-                    verificationLng: verificationLng,
-                    verificationTime: verificationTime
-                };
-                localStorage.setItem('biz_wizard_state', JSON.stringify(state));
+                try {
+                    // Filter out huge base64 camera strings to prevent exceeding localStorage quota
+                    const cleanVerificationPhotos = (verificationPhotos || []).filter(p => typeof p === 'string' && !p.startsWith('data:'));
+
+                    const selectedCategorySpan = document.querySelector('#custom_category_select .selected-value');
+                    const categoryNameVal = selectedCategorySpan ? selectedCategorySpan.textContent : '';
+
+                    const state = {
+                        bizStep: bizStep,
+                        businessName: inputBizName ? inputBizName.value.trim() : '',
+                        businessTypes: Array.from(document.querySelectorAll('.biz-type-card.selected')).map(c => c.getAttribute('data-val')),
+                        categoryId: inputCategoryId ? inputCategoryId.value : '',
+                        categoryName: categoryNameVal,
+                        categorySearchName: inputCategorySearch ? inputCategorySearch.value : '',
+                        addressStreet: inputStreet ? inputStreet.value.trim() : '',
+                        addressCity: inputCity ? inputCity.value.trim() : '',
+                        addressProvince: inputProvince ? inputProvince.value.trim() : '',
+                        addressPostalCode: document.getElementById('input_address_postal_code') ? document.getElementById('input_address_postal_code').value.trim() : '',
+                        phone: inputPhone ? inputPhone.value.trim() : '',
+                        website: inputWebsite ? inputWebsite.value.trim() : '',
+                        lat: document.getElementById('input_lat') ? document.getElementById('input_lat').value : '',
+                        lng: document.getElementById('input_lng') ? document.getElementById('input_lng').value : '',
+                        receiveTips: document.getElementById('receive_tips') ? document.getElementById('receive_tips').checked : false,
+                        receiveSurveys: document.getElementById('receive_surveys') ? document.getElementById('receive_surveys').checked : false,
+                        description: inputDesc ? inputDesc.value.trim() : '',
+                        menuPhotos: menuPhotos || [],
+                        storefrontPhotos: storefrontPhotos || [],
+                        verificationPhotos: cleanVerificationPhotos,
+                        verificationLat: typeof verificationLat !== 'undefined' ? verificationLat : null,
+                        verificationLng: typeof verificationLng !== 'undefined' ? verificationLng : null,
+                        verificationTime: typeof verificationTime !== 'undefined' ? verificationTime : null
+                    };
+                    localStorage.setItem('biz_wizard_state', JSON.stringify(state));
+                } catch (e) {
+                    console.warn('Could not save biz wizard state:', e);
+                }
             }
 
             function loadWizardState() {
@@ -1462,19 +1489,20 @@
                 try {
                     const state = JSON.parse(raw);
 
-                    if (state.bizStep) {
+                    if (state.bizStep && !isNaN(state.bizStep)) {
                         bizStep = parseInt(state.bizStep);
                     }
 
                     if (state.businessName) {
                         inputBizName.value = state.businessName;
-                        mockBizName.innerText = state.businessName;
-                        mockSearchText.innerText = state.businessName;
+                        if (mockBizName) mockBizName.innerText = state.businessName;
+                        if (mockSearchText) mockSearchText.innerText = state.businessName;
                     }
 
                     if (state.businessTypes && Array.isArray(state.businessTypes)) {
                         document.querySelectorAll('.biz-type-card').forEach(card => {
-                            if (state.businessTypes.includes(card.getAttribute('data-val'))) {
+                            const val = card.getAttribute('data-val');
+                            if (state.businessTypes.includes(val)) {
                                 card.classList.add('selected');
                             } else {
                                 card.classList.remove('selected');
@@ -1484,35 +1512,38 @@
                         if (inputTypes) inputTypes.value = JSON.stringify(state.businessTypes);
                     }
 
-                    if (state.categoryId && state.categorySearchName) {
+                    if (state.categoryId) {
                         inputCategoryId.value = state.categoryId;
-                        if (inputCategorySearch) inputCategorySearch.value = state.categorySearchName;
-                        mockBizCategory.innerText = state.categorySearchName;
+                        const catName = state.categoryName || state.categorySearchName;
+                        if (catName && catName !== '-- Chọn danh mục kinh doanh --') {
+                            if (inputCategorySearch) inputCategorySearch.value = catName;
+                            if (mockBizCategory) mockBizCategory.innerText = catName;
 
-                        const selectedSpan = document.querySelector('#custom_category_select .selected-value');
-                        if (selectedSpan) {
-                            selectedSpan.textContent = state.categorySearchName;
-                            selectedSpan.style.color = 'var(--text-main)';
-                        }
+                            const selectedSpan = document.querySelector('#custom_category_select .selected-value');
+                            if (selectedSpan) {
+                                selectedSpan.textContent = catName;
+                                selectedSpan.style.color = 'var(--text-main)';
+                            }
 
-                        const customSelectDropdown = document.getElementById('custom_category_dropdown');
-                        if (customSelectDropdown) {
-                            customSelectDropdown.querySelectorAll('.dropdown-option-item').forEach(opt => {
-                                if (opt.getAttribute('data-name') === state.categorySearchName) {
-                                    opt.classList.add('selected');
-                                    const parentGroup = opt.closest('.dropdown-options-group');
-                                    if (parentGroup) {
-                                        parentGroup.classList.remove('d-none');
-                                        const groupId = parentGroup.getAttribute('id');
-                                        const groupHeader = customSelectDropdown.querySelector(`.dropdown-group-header[data-target="${groupId}"]`);
-                                        if (groupHeader) {
-                                            groupHeader.classList.add('active');
+                            const customSelectDropdown = document.getElementById('custom_category_dropdown');
+                            if (customSelectDropdown) {
+                                customSelectDropdown.querySelectorAll('.dropdown-option-item').forEach(opt => {
+                                    if (opt.getAttribute('data-value') === String(state.categoryId) || opt.getAttribute('data-name') === catName) {
+                                        opt.classList.add('selected');
+                                        const parentGroup = opt.closest('.dropdown-options-group');
+                                        if (parentGroup) {
+                                            parentGroup.classList.remove('d-none');
+                                            const groupId = parentGroup.getAttribute('id');
+                                            const groupHeader = customSelectDropdown.querySelector(`.dropdown-group-header[data-target="${groupId}"]`);
+                                            if (groupHeader) {
+                                                groupHeader.classList.add('active');
+                                            }
                                         }
+                                    } else {
+                                        opt.classList.remove('selected');
                                     }
-                                } else {
-                                    opt.classList.remove('selected');
-                                }
-                            });
+                                });
+                            }
                         }
                     }
 
@@ -1547,8 +1578,8 @@
                     }
 
                     if (state.description) {
-                        inputDesc.value = state.description;
-                        mockBizDesc.innerText = state.description;
+                        if (inputDesc) inputDesc.value = state.description;
+                        if (mockBizDesc) mockBizDesc.innerText = state.description;
                         if (descCharCount) descCharCount.innerText = state.description.length + ' / 750';
                     }
 
@@ -1565,13 +1596,6 @@
                     if (state.verificationPhotos && Array.isArray(state.verificationPhotos)) {
                         verificationPhotos.length = 0;
                         state.verificationPhotos.forEach(p => verificationPhotos.push(p));
-                        if (verificationPhotos.length > 0) {
-                            verificationPhotoData = verificationPhotos[0];
-                        }
-                        renderVerificationGallery();
-                    } else if (state.verificationPhotoData) {
-                        verificationPhotoData = state.verificationPhotoData;
-                        verificationPhotos = [verificationPhotoData];
                         renderVerificationGallery();
                     }
                     if (state.verificationLat) verificationLat = state.verificationLat;
@@ -2340,66 +2364,74 @@
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Đang gửi...`;
 
-                const types = [];
-                document.querySelectorAll('.biz-type-card.selected').forEach(c => {
-                    types.push(c.getAttribute('data-val'));
-                });
+                try {
+                    const types = [];
+                    document.querySelectorAll('.biz-type-card.selected').forEach(c => {
+                        types.push(c.getAttribute('data-val'));
+                    });
 
-                const payload = {
-                    business_name: inputBizName.value.trim(),
-                    business_types: types,
-                    category_id: inputCategoryId.value,
-                    address_country: 'Việt Nam',
-                    address_street: inputStreet.value.trim(),
-                    address_city: inputCity.value.trim(),
-                    address_province: inputProvince.value.trim(),
-                    address_postal_code: document.getElementById('input_address_postal_code').value.trim(),
-                    phone: inputPhone.value.trim(),
-                    website: inputWebsite.value.trim(),
-                    lat: parseFloat(document.getElementById('input_lat').value),
-                    lng: parseFloat(document.getElementById('input_lng').value),
-                    receive_tips: document.getElementById('receive_tips').checked ? 1 : 0,
-                    receive_surveys: document.getElementById('receive_surveys').checked ? 1 : 0,
-                    description: inputDesc.value.trim(),
-                    menu_photos: menuPhotos,
-                    storefront_photos: storefrontPhotos,
-                    verification_photo: verificationPhotos[0] || verificationPhotoData || null,
-                    verification_photos: verificationPhotos,
-                    verification_lat: verificationLat,
-                    verification_lng: verificationLng,
-                    verification_time: verificationTime,
-                    _token: '{{ csrf_token() }}'
-                };
+                    const payload = {
+                        business_name: inputBizName.value.trim(),
+                        business_types: types,
+                        category_id: inputCategoryId.value,
+                        address_country: 'Việt Nam',
+                        address_street: inputStreet.value.trim(),
+                        address_city: inputCity.value.trim(),
+                        address_province: inputProvince.value.trim(),
+                        address_postal_code: document.getElementById('input_address_postal_code') ? document.getElementById('input_address_postal_code').value.trim() : '',
+                        phone: inputPhone.value.trim(),
+                        website: inputWebsite ? inputWebsite.value.trim() : '',
+                        lat: parseFloat(document.getElementById('input_lat').value),
+                        lng: parseFloat(document.getElementById('input_lng').value),
+                        receive_tips: (document.getElementById('receive_tips') && document.getElementById('receive_tips').checked) ? 1 : 0,
+                        receive_surveys: (document.getElementById('receive_surveys') && document.getElementById('receive_surveys').checked) ? 1 : 0,
+                        description: inputDesc.value.trim(),
+                        menu_photos: menuPhotos || [],
+                        storefront_photos: storefrontPhotos || [],
+                        verification_photo: (verificationPhotos && verificationPhotos.length > 0) ? verificationPhotos[0] : (verificationPhotoData || null),
+                        verification_photos: verificationPhotos || [],
+                        verification_lat: typeof verificationLat !== 'undefined' ? verificationLat : null,
+                        verification_lng: typeof verificationLng !== 'undefined' ? verificationLng : null,
+                        verification_time: typeof verificationTime !== 'undefined' ? verificationTime : null,
+                        _token: '{{ csrf_token() }}'
+                    };
 
-                fetch("{{ route('client.profile.business.register') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(res => res.json())
-                .then(data => {
+                    fetch("{{ route('client.profile.business.register') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(async res => {
+                        const data = await res.json().catch(() => null);
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'Hoàn tất & Gửi';
+
+                        if (res.ok && data && data.success) {
+                            clearWizardState();
+                            showToast(data.message || 'Đăng ký thành công!', true);
+                            setTimeout(() => {
+                                window.location.href = "{{ route('client.profile') }}";
+                            }, 1200);
+                        } else {
+                            const errMsg = (data && data.message) ? data.message : `Lỗi gửi yêu cầu (Mã lỗi ${res.status}). Vui lòng kiểm tra và thử lại.`;
+                            showToast(errMsg, false);
+                        }
+                    })
+                    .catch(err => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'Hoàn tất & Gửi';
+                        showToast('Đã xảy ra lỗi kết nối khi gửi yêu cầu nâng cấp.', false);
+                        console.error('Submit Error:', err);
+                    });
+                } catch (err) {
                     submitBtn.disabled = false;
                     submitBtn.innerText = 'Hoàn tất & Gửi';
-
-                    if (data.success) {
-                        clearWizardState();
-                        showToast(data.message, true);
-                        setTimeout(() => {
-                            window.location.href = "{{ route('client.profile') }}";
-                        }, 1500);
-                    } else {
-                        showToast(data.message || 'Lỗi gửi yêu cầu.', false);
-                    }
-                })
-                .catch(err => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = 'Hoàn tất & Gửi';
-                    showToast('Đã xảy ra lỗi khi gửi yêu cầu nâng cấp.', false);
-                    console.error(err);
-                });
+                    showToast('Có lỗi xảy ra khi chuẩn bị dữ liệu gửi. Vui lòng thử lại.', false);
+                    console.error('Payload Build Error:', err);
+                }
             }
         }
     });

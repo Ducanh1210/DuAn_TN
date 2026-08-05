@@ -13,6 +13,7 @@
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
 
     <style>
         :root {
@@ -350,9 +351,10 @@
             border: none;
             border-bottom: 1px solid #f1f5f9;
             border-radius: 0;
-            padding: 14px 0;
+            padding: 16px 4px 14px;
             margin-bottom: 0;
             position: relative;
+            overflow: visible;
             animation: fadeIn 0.3s ease;
         }
         .gmaps-review-card:last-child {
@@ -364,13 +366,37 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 8px;
+            overflow: visible;
         }
         .gmaps-user-block {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            overflow: visible;
+            min-width: 0;
         }
-        .gmaps-user-block img, .gmaps-user-block .avatar {
+        .gmaps-user-block .avatar-frame-wrapper {
+            width: 42px !important;
+            height: 42px !important;
+            flex-shrink: 0;
+            overflow: visible;
+        }
+        .gmaps-user-block .avatar-frame-wrapper img:not(.avatar-frame-png-overlay) {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            object-fit: cover;
+            border: none;
+        }
+        .gmaps-user-block .avatar-frame-png-overlay {
+            width: 124% !important;
+            height: 124% !important;
+            border: none !important;
+            border-radius: 0 !important;
+            object-fit: contain !important;
+        }
+        /* Legacy plain img fallback (no frame wrapper) */
+        .gmaps-user-block > img.comment-avatar {
             width: 38px; height: 38px; border-radius: 50%; object-fit: cover;
             border: 1px solid #cbdbe8; flex-shrink: 0;
         }
@@ -611,19 +637,42 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.85);
             border-radius: 14px;
-            padding: 5px 10px 5px 7px;
+            padding: 6px 10px 6px 8px;
             box-shadow: 0 6px 18px rgba(30, 58, 95, 0.12), 0 2px 4px rgba(0, 0, 0, 0.04);
             display: flex;
             align-items: center;
-            gap: 7px;
-            max-width: 210px;
+            gap: 8px;
+            max-width: 230px;
             opacity: 0;
+            overflow: visible;
             backface-visibility: hidden;
             will-change: transform, opacity;
             animation: floatUCurve 1.8s linear forwards;
         }
 
-        .floating-comment-card .user-avatar {
+        .floating-comment-card .avatar-frame-wrapper {
+            width: 30px !important;
+            height: 30px !important;
+            flex-shrink: 0;
+            overflow: visible;
+        }
+        .floating-comment-card .avatar-frame-wrapper img:not(.avatar-frame-png-overlay) {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .floating-comment-card .avatar-frame-png-overlay {
+            width: 128% !important;
+            height: 128% !important;
+            border: none !important;
+            border-radius: 0 !important;
+            object-fit: contain !important;
+            box-shadow: none !important;
+        }
+        .floating-comment-card > img.user-avatar {
             width: 28px;
             height: 28px;
             border-radius: 50%;
@@ -761,6 +810,11 @@
             align-items: center;
             gap: 12px;
             margin-bottom: 12px;
+            overflow: visible;
+        }
+        .review-user-box .avatar-frame-wrapper {
+            overflow: visible;
+            flex-shrink: 0;
         }
         .user-display-name {
             font-size: 14px;
@@ -1314,7 +1368,8 @@
             <div id="commentsItemsWrapper">
                 @forelse($location->comments as $comment)
                     @php
-                        $userCommentsCount = optional($comment->user)->comments ? $comment->user->comments->count() : 1;
+                        $userCommentsCount = optional($comment->user)->comments_count_cached
+                            ?? (optional($comment->user)->comments ? $comment->user->comments->count() : 1);
                         $content = $comment->content;
                         $isLong = mb_strlen($content) > 150;
                     @endphp
@@ -1322,7 +1377,7 @@
                         <!-- Header -->
                         <div class="gmaps-review-header">
                             <div class="gmaps-user-block">
-                                <x-user-avatar :user="$comment->user" size="38" />
+                                <x-user-avatar :user="$comment->user" size="42" />
                                 <div>
                                     <div class="gmaps-username">{{ optional($comment->user)->display_name ?? optional($comment->user)->username ?? 'Thành viên' }}</div>
                                     <div class="gmaps-user-subtitle">Thành viên · {{ $userCommentsCount }} đánh giá</div>
@@ -1922,6 +1977,27 @@
         const locationId = {{ $location->id }};
         const csrfToken = '{{ csrf_token() }}';
 
+        function escapeHtmlAttr(str) {
+            return String(str ?? '').replace(/[&<>"']/g, s => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[s]));
+        }
+
+        function renderCommentAvatarHtml(user) {
+            const name = escapeHtmlAttr(user?.display_name || 'Thành viên');
+            const avatar = escapeHtmlAttr(user?.avatar_url || '');
+            const frameCss = String(user?.frame_css || '').trim();
+            const frameImg = String(user?.frame_image_url || '').trim();
+            const frameClass = frameImg ? 'has-png-frame' : frameCss;
+            const overlay = frameImg
+                ? `<img src="${escapeHtmlAttr(frameImg)}" alt="Frame" class="avatar-frame-png-overlay">`
+                : '';
+            return `<div class="avatar-frame-wrapper ${escapeHtmlAttr(frameClass)}" style="width:42px;height:42px;flex-shrink:0;" title="${name}">
+                <img src="${avatar}" alt="${name}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user?.display_name || 'U')}&background=1e3a5f&color=fff';">
+                ${overlay}
+            </div>`;
+        }
+
         // Toggle Drawer
         if (btnToggleComments) {
             btnToggleComments.addEventListener('click', () => {
@@ -2251,7 +2327,7 @@
                             <div class="gmaps-review-card" id="comment-${c.id}" data-rating="${ratingVal}" data-timestamp="${Math.floor(Date.now()/1000)}">
                                 <div class="gmaps-review-header">
                                     <div class="gmaps-user-block">
-                                        <img src="${c.user.avatar_url}" alt="${c.user.display_name}" class="comment-avatar">
+                                        ${renderCommentAvatarHtml(c.user)}
                                         <div>
                                             <div class="gmaps-username">${c.user.display_name}</div>
                                             <div class="gmaps-user-subtitle">Thành viên · ${userCommentsCount} đánh giá</div>
@@ -2483,7 +2559,7 @@
                             <div class="gmaps-review-card" id="comment-${c.id}" data-rating="${ratingVal}" data-timestamp="${Math.floor(Date.now()/1000)}">
                                 <div class="gmaps-review-header">
                                     <div class="gmaps-user-block">
-                                        <img src="${c.user.avatar_url}" alt="${c.user.display_name}" class="comment-avatar">
+                                        ${renderCommentAvatarHtml(c.user)}
                                         <div>
                                             <div class="gmaps-username">${c.user.display_name}</div>
                                             <div class="gmaps-user-subtitle">Thành viên · ${userCommentsCount} đánh giá</div>
@@ -2624,19 +2700,22 @@
                 return ($c->rating ?? 5) >= 4;
             })
             ->map(function($c) {
+                $frame = optional(optional($c->user)->equippedFrame);
                 return [
                     'name' => optional($c->user)->display_name ?? optional($c->user)->username ?? 'Khách du lịch',
                     'avatar' => optional($c->user)->avatar_formatted_url ?? asset('images/default-avatar.png'),
                     'rating' => $c->rating ?? 5,
-                    'text' => $c->content
+                    'text' => $c->content,
+                    'frame_css' => $frame->css_style ?? '',
+                    'frame_image_url' => !empty($frame->image_url) ? asset($frame->image_url) : '',
                 ];
             })->values();
 
         if ($floatingComments->isEmpty()) {
             $floatingComments = collect([
-                ['name' => 'Nguyễn Văn An', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Không gian 360° tuyệt đẹp! Cảnh quan rất hùng vĩ.'],
-                ['name' => 'Trần Thị Mai', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Trải nghiệm rất thực tế và sinh động.'],
-                ['name' => 'Phạm Quốc Tuấn', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Điểm đến ấn tượng tuyệt vời tại Ninh Bình!']
+                ['name' => 'Nguyễn Văn An', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Không gian 360° tuyệt đẹp! Cảnh quan rất hùng vĩ.', 'frame_css' => '', 'frame_image_url' => ''],
+                ['name' => 'Trần Thị Mai', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Trải nghiệm rất thực tế và sinh động.', 'frame_css' => '', 'frame_image_url' => ''],
+                ['name' => 'Phạm Quốc Tuấn', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Điểm đến ấn tượng tuyệt vời tại Ninh Bình!', 'frame_css' => '', 'frame_image_url' => '']
             ]);
         }
     @endphp
@@ -2650,6 +2729,12 @@
     container.className = 'floating-comment-container';
     document.body.appendChild(container);
 
+    function escapeHtml(str) {
+        return String(str ?? '').replace(/[&<>"']/g, s => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[s]));
+    }
+
     function renderStarsSvg(count) {
         let html = '';
         for (let i = 1; i <= 5; i++) {
@@ -2658,6 +2743,21 @@
             }
         }
         return html;
+    }
+
+    function renderFloatingAvatar(item) {
+        const name = escapeHtml(item.name || 'Khách');
+        const avatar = escapeHtml(item.avatar || '');
+        const frameCss = String(item.frame_css || '').trim();
+        const frameImg = String(item.frame_image_url || '').trim();
+        const frameClass = frameImg ? 'has-png-frame' : frameCss;
+        const overlay = frameImg
+            ? `<img src="${escapeHtml(frameImg)}" alt="Frame" class="avatar-frame-png-overlay">`
+            : '';
+        return `<div class="avatar-frame-wrapper ${escapeHtml(frameClass)}" style="width:30px;height:30px;flex-shrink:0;" title="${name}">
+            <img src="${avatar}" alt="${name}" onerror="this.onerror=null;this.src='{{ asset('images/default-avatar.png') }}';">
+            ${overlay}
+        </div>`;
     }
 
     function spawnFloatingComment() {
@@ -2676,13 +2776,13 @@
         const card = document.createElement('div');
         card.className = 'floating-comment-card';
         card.innerHTML = `
-            <img src="${item.avatar}" alt="${item.name}" class="user-avatar" onerror="this.src='{{ asset('images/default-avatar.png') }}'">
+            ${renderFloatingAvatar(item)}
             <div class="comment-content-box">
                 <div class="user-name-row">
-                    <span class="user-name">${item.name}</span>
+                    <span class="user-name">${escapeHtml(item.name)}</span>
                     <div class="stars-row">${renderStarsSvg(item.rating)}</div>
                 </div>
-                <div class="comment-text">${item.text}</div>
+                <div class="comment-text">${escapeHtml(item.text)}</div>
             </div>
         `;
 

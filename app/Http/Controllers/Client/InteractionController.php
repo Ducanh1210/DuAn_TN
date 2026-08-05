@@ -21,8 +21,13 @@ class InteractionController extends Controller
             return response()->json(['status' => 'removed', 'message' => 'Đã xóa khỏi danh sách yêu thích.']);
         } else {
             $user->favoriteLocations()->create(['location_id' => $location->id]);
+            PointService::awardPoints($user, PointService::POINTS_FAVORITE, 'favorite', 'Yêu thích địa điểm ' . $location->name);
             \App\Services\MissionService::trackProgress($user, 'favorite_location', 1, false, $location->id);
-            return response()->json(['status' => 'added', 'message' => 'Đã thêm vào danh sách yêu thích.']);
+            return response()->json([
+                'status' => 'added',
+                'message' => 'Đã thêm vào danh sách yêu thích (+' . PointService::POINTS_FAVORITE . ' điểm).',
+                'points' => $user->fresh()->points,
+            ]);
         }
     }
 
@@ -51,11 +56,11 @@ class InteractionController extends Controller
             'status' => 'visible',
         ]);
 
-        // Award points for comment
-        PointService::awardPoints(Auth::user(), 5, 'comment', 'Bình luận địa điểm ' . $location->name);
+        PointService::awardPoints(Auth::user(), PointService::POINTS_COMMENT, 'comment', 'Bình luận địa điểm ' . $location->name);
         \App\Services\MissionService::trackProgress(Auth::user(), 'write_comment', 1);
 
         $comment->load('user.equippedFrame');
+        $frame = $comment->user->equippedFrame;
 
         return response()->json([
             'success' => true,
@@ -68,7 +73,9 @@ class InteractionController extends Controller
                 'user' => [
                     'display_name' => $comment->user->display_name ?? $comment->user->username,
                     'avatar_url' => $comment->user->avatar_formatted_url,
-                    'frame_css' => $comment->user->equippedFrame->css_style ?? '',
+                    'frame_css' => $frame->css_style ?? '',
+                    'frame_image_url' => !empty($frame?->image_url) ? asset($frame->image_url) : '',
+                    'comments_count' => Comment::where('user_id', $comment->user_id)->where('status', 'visible')->count(),
                 ]
             ]
         ]);
@@ -91,6 +98,7 @@ class InteractionController extends Controller
         ]);
 
         $comment->load('user.equippedFrame');
+        $frame = $comment->user->equippedFrame;
 
         return response()->json([
             'success' => true,
@@ -103,7 +111,9 @@ class InteractionController extends Controller
                 'user' => [
                     'display_name' => $comment->user->display_name ?? $comment->user->username,
                     'avatar_url' => $comment->user->avatar_formatted_url,
-                    'frame_css' => $comment->user->equippedFrame->css_style ?? '',
+                    'frame_css' => $frame->css_style ?? '',
+                    'frame_image_url' => !empty($frame?->image_url) ? asset($frame->image_url) : '',
+                    'comments_count' => Comment::where('user_id', $comment->user_id)->where('status', 'visible')->count(),
                 ]
             ]
         ]);

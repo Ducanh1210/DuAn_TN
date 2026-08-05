@@ -13,7 +13,7 @@ taskkill /f /im vieneu-stream.exe 2>nul
 
 :: Khoi dong Laravel Server va VieNeu-TTS Server trong Windows Terminal
 echo [*] Dang khoi dong cac server trong Windows Terminal...
-start wt -d "%~dp0." --title "Laravel Server" cmd /k "php artisan serve" ; new-tab -d "%~dp0VieNeu-TTS" --title "VieNeu-TTS API Server" cmd /k "uv sync && uv run vieneu-stream"
+start wt -d "%~dp0." --title "Laravel Server" cmd /k "php artisan serve --host=0.0.0.0" ; new-tab -d "%~dp0VieNeu-TTS" --title "VieNeu-TTS API Server" cmd /k "uv sync && uv run vieneu-stream"
 
 echo ====================================================
 echo  Da kich hoat ca hai! Vui long kiem tra 2 cua so moi.

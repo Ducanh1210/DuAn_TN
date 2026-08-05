@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet" />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome & Avatar Frames CSS -->
@@ -19,18 +20,25 @@
         :root {
             --primary: #1e3a5f;
             --primary-hover: #2b4c7e;
-            --bg-body: #f8fafc;
-            --text-main: #0f2442;
+            --accent: #1e3a5f;
+            --bg-body: #f4f7fb;
+            --bg-sidebar: #ffffff;
+            --bg-sidebar-muted: #f8fafc;
+            --text-main: #0f172a;
             --text-sub: #64748b;
+            --text-on-dark: #334155;
             --border-color: #e2e8f0;
             --card-bg: #ffffff;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
         }
 
         body { 
             font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background-color: var(--bg-body); 
             color: var(--text-main); 
-            font-size: 0.875rem;
+            font-size: 0.8125rem;
             font-weight: 400;
             line-height: 1.5;
             margin: 0;
@@ -52,84 +60,148 @@
 
         /* Top Header Navigation */
         .top-navbar {
-            height: 54px;
-            background-color: var(--card-bg);
+            height: 48px;
+            background-color: #ffffff;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 16px 0 12px;
             z-index: 100;
+            color: var(--text-main);
+        }
+        .top-navbar > div:last-child {
+            font-weight: 700 !important;
+            font-size: 0.82rem !important;
+            letter-spacing: 0.02em;
+            text-transform: none;
+            color: var(--primary) !important;
         }
         .btn-back {
             background-color: transparent;
             border: none;
-            padding: 0;
+            padding: 6px 10px;
             font-weight: 500;
             color: var(--text-sub);
             text-decoration: none;
-            transition: color 0.15s ease;
-            font-size: 0.85rem;
+            transition: color 0.15s ease, background 0.15s ease;
+            font-size: 0.8rem;
             display: inline-flex;
             align-items: center;
+            border-radius: var(--radius-sm);
         }
         .btn-back:hover {
             color: var(--text-main);
+            background: #f1f5f9;
         }
         .back-chevron {
-            font-size: 1.4rem;
+            font-size: 1.25rem;
             margin-right: 4px;
             line-height: 1;
             font-weight: 400;
             position: relative;
-            top: -2px;
+            top: -1px;
         }
 
         /* Main Screen Layout */
         .main-layout {
             display: flex;
             flex: 1;
-            height: calc(100vh - 54px);
+            height: calc(100vh - 48px);
             overflow: hidden;
         }
 
-        /* Sidebar Dashboard Navigation */
+        /* Sidebar — light console */
         .dashboard-sidebar {
             width: 260px;
-            background-color: var(--card-bg);
+            background-color: var(--bg-sidebar);
             border-right: 1px solid var(--border-color);
             height: 100%;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 0;
             overflow-y: auto;
+            overflow-x: hidden;
+            color: var(--text-main);
         }
         .sidebar-user-section {
-            text-align: center;
-            padding-bottom: 20px;
+            text-align: left;
+            padding: 16px 14px 14px;
             border-bottom: 1px solid var(--border-color);
-            margin-bottom: 16px;
+            margin-bottom: 0;
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            grid-template-rows: auto auto;
+            column-gap: 12px;
+            row-gap: 10px;
+            align-items: center;
+            background: #f8fafc;
+            overflow: visible;
         }
         .avatar-container {
-            width: 80px;
-            height: 80px;
+            width: 52px;
+            height: 52px;
             position: relative;
-            margin: 0 auto 12px auto;
+            margin: 0;
             cursor: pointer;
+            grid-row: 1 / 2;
+            overflow: visible;
+            flex-shrink: 0;
+        }
+        .sidebar-user-meta {
+            grid-column: 2;
+            min-width: 0;
+        }
+        .sidebar-user-meta .user-role-badge,
+        .sidebar-user-meta .sidebar-points-chip {
+            margin-top: 0;
+        }
+        .sidebar-user-chips {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .dashboard-sidebar .avatar-frame-wrapper,
+        .dashboard-sidebar .avatar-frame-wrapper.has-png-frame {
+            width: 52px !important;
+            height: 52px !important;
+            position: relative !important;
+            display: block !important;
+            overflow: visible !important;
+        }
+        .dashboard-sidebar .avatar-frame-wrapper img.user-avatar-img,
+        .dashboard-sidebar .avatar-frame-wrapper > img:not(.avatar-frame-png-overlay) {
+            width: 100% !important;
+            height: 100% !important;
+            position: relative;
+            z-index: 1;
+        }
+        /* Giữ translate(-50%,-50%) — đừng ghi đè chỉ bằng scale (gây lệch khung) */
+        .dashboard-sidebar .avatar-frame-png-overlay {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 132% !important;
+            height: 132% !important;
+            transform: translate(-50%, -50%) !important;
+            object-fit: contain;
+            z-index: 2;
+            pointer-events: none;
         }
         .avatar-edit-badge {
             position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 24px;
-            height: 24px;
+            bottom: -2px;
+            right: -2px;
+            width: 18px;
+            height: 18px;
             background-color: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(15,23,42,0.08);
             color: var(--text-sub);
             transition: all 0.2s ease;
             z-index: 10;
@@ -140,8 +212,8 @@
             border-color: var(--primary);
         }
         .edit-name-icon {
-            color: var(--text-sub);
-            opacity: 0.5;
+            color: #94a3b8;
+            opacity: 0.8;
             transition: all 0.15s ease;
             display: inline-flex;
             align-items: center;
@@ -163,7 +235,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(15, 23, 42, 0.45);
             border-radius: 50%;
             opacity: 0;
             display: flex;
@@ -172,8 +244,10 @@
             color: #ffffff;
             cursor: pointer;
             transition: opacity 0.2s ease;
-            font-size: 0.75rem;
-            font-weight: 500;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            z-index: 3;
         }
         .avatar-container:hover .avatar-upload-overlay {
             opacity: 1;
@@ -184,39 +258,92 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             border-radius: 50%;
             display: none;
             align-items: center;
             justify-content: center;
+            z-index: 4;
         }
         .user-role-badge {
             display: inline-block;
-            font-size: 0.725rem;
-            font-weight: 500;
-            padding: 2px 8px;
-            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: var(--radius-sm);
             background-color: #f1f5f9;
-            color: var(--text-sub);
-            margin-top: 4px;
+            color: #475569;
+            margin-top: 0;
+            border: 1px solid #e2e8f0;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+        .sidebar-points-chip {
+            font-size: 0.7rem !important;
+            padding: 3px 8px !important;
+            border-radius: var(--radius-sm) !important;
+            font-weight: 600 !important;
+            background: #f1f5f9 !important;
+            color: #1e3a5f !important;
+            border: 1px solid #cbdbe8 !important;
+            display: inline-flex !important;
+            align-items: center;
+            font-variant-numeric: tabular-nums;
         }
 
         /* Sidebar Tabs Button */
+        .sidebar-menu-tabs {
+            padding: 10px 8px 16px;
+            gap: 2px;
+        }
+        .sidebar-nav-group {
+            margin: 12px 10px 4px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
         .sidebar-menu-tabs .nav-link {
             width: 100%;
             text-align: left;
-            padding: 8px 12px;
+            padding: 8px 10px;
             color: #475569;
-            font-weight: 400;
-            border-radius: 6px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
             border: none;
             background: transparent;
-            margin-bottom: 3px;
-            transition: all 0.15s ease;
-            font-size: 0.85rem;
+            margin-bottom: 1px;
+            transition: all 0.12s ease;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
+        }
+        .sidebar-menu-tabs .nav-link .nav-link-left {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+        .sidebar-menu-tabs .nav-link .nav-ico {
+            width: 18px;
+            height: 18px;
+            text-align: center;
+            font-size: 18px;
+            line-height: 1;
+            opacity: 0.85;
+            flex-shrink: 0;
+            color: #64748b;
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            -webkit-font-smoothing: antialiased;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .sidebar-menu-tabs .nav-link:hover {
             background-color: #f1f5f9;
@@ -224,16 +351,26 @@
         }
         .sidebar-menu-tabs .nav-link.active {
             background-color: #f1f5f9;
-            color: var(--primary);
+            color: #1e3a5f;
             font-weight: 600;
+            box-shadow: inset 3px 0 0 #1e3a5f;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
         }
+        .sidebar-menu-tabs .nav-link.active .nav-ico { opacity: 1; color: #1e3a5f; }
         .menu-count-badge {
-            background-color: #e2e8f0;
-            color: var(--text-sub);
-            font-size: 0.7rem;
-            font-weight: 500;
-            padding: 2px 7px;
-            border-radius: 10px;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            border: 1px solid #e2e8f0;
+            font-variant-numeric: tabular-nums;
+        }
+        .sidebar-menu-tabs .nav-link.active .menu-count-badge {
+            background: #e8eef5;
+            color: #1e3a5f;
+            border-color: #cbdbe8;
         }
 
         /* Content Workspace Area */
@@ -241,21 +378,246 @@
             flex: 1;
             height: 100%;
             overflow-y: auto;
-            padding: 24px;
+            padding: 0;
+            background: #f4f7fb;
+        }
+        .workspace-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 0 20px;
+            height: 46px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 0 rgba(15,23,42,0.03);
+        }
+        .workspace-crumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            min-width: 0;
+        }
+        .workspace-crumb strong {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .workspace-crumb .sep { opacity: 0.45; }
+        .workspace-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .workspace-body {
+            padding: 16px 20px 28px;
+            max-width: 1180px;
         }
         .content-panel {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 960px;
-            margin: 0 auto;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            max-width: none;
+            margin: 0;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            overflow: hidden;
         }
-        .section-title {
-            font-size: 1.05rem;
+        .content-panel:has(.panel-head) {
+            padding: 0;
+        }
+        .content-panel + .content-panel { margin-top: 12px; }
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: #f8fafc;
+        }
+        .panel-head .section-title {
+            margin: 0;
+            font-size: 0.82rem;
             font-weight: 600;
-            margin-bottom: 20px;
+            letter-spacing: 0.01em;
+        }
+        .panel-body { padding: 16px; }
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 16px;
             color: var(--text-main);
+        }
+        /* Mọi tab: section-title đầu panel → header bar đồng bộ */
+        .content-panel > .section-title:first-child {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: -16px -16px 14px;
+            padding: 11px 16px;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+        .panel-sub {
+            color: var(--text-sub);
+            font-size: 0.78rem;
+            margin: -6px 0 14px;
+            line-height: 1.45;
+        }
+        .panel-note {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            border: 1px solid #cbdbe8;
+            background: #f1f5f9;
+            border-radius: var(--radius-sm);
+            color: #1e3a5f;
+            font-size: 0.78rem;
+            line-height: 1.45;
+        }
+        .panel-note.warn {
+            border-color: #fde68a;
+            background: #fffbeb;
+            color: #92400e;
+        }
+        .panel-note.ok {
+            border-color: #bbf7d0;
+            background: #f0fdf4;
+            color: #166534;
+        }
+        .panel-note.danger {
+            border-color: #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 16px;
+            border: 1px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            background: #f8fafc;
+        }
+        .empty-state p {
+            color: var(--text-sub);
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+        .ops-form-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            background: #fff;
+            margin-bottom: 12px;
+        }
+        .ops-form-card .ops-form-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+        }
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: #fff;
+        }
+        .profile-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .stat-tile {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            min-height: 76px;
+        }
+        .stat-tile .stat-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+        .stat-tile .stat-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+        }
+        .stat-tile .stat-hint {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+        .profile-split {
+            display: grid;
+            grid-template-columns: 1.4fr 0.9fr;
+            gap: 12px;
+        }
+        .quick-ops {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .quick-ops a, .quick-ops button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: #fff;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.12s ease, border-color 0.12s ease;
+        }
+        .quick-ops a:hover, .quick-ops button:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: var(--text-main);
+        }
+        .quick-ops .qo-meta {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            font-weight: 400;
+        }
+        @media (max-width: 992px) {
+            .profile-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .profile-split { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .dashboard-sidebar { width: 220px; }
+            .workspace-body { padding: 12px; }
         }
         
         /* Clean Inputs */
@@ -268,9 +630,9 @@
         }
         .form-control-clean {
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 0.95rem;
+            border-radius: var(--radius-sm);
+            padding: 9px 12px;
+            font-size: 0.82rem;
             color: var(--text-main);
             background-color: #ffffff;
             transition: border-color 0.15s ease;
@@ -291,10 +653,10 @@
             background-color: var(--primary);
             color: #ffffff;
             border: none;
-            border-radius: 8px;
-            padding: 7px 18px;
-            font-weight: 500;
-            font-size: 0.85rem;
+            border-radius: var(--radius-sm);
+            padding: 7px 14px;
+            font-weight: 600;
+            font-size: 0.78rem;
             transition: background-color 0.2s ease;
         }
         .btn-action:hover {
@@ -323,10 +685,259 @@
             font-weight: 600;
         }
 
+        /* Data list rows — dashboard dense lists */
+        .data-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-toolbar .dt-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+        .data-toolbar .dt-meta {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-variant-numeric: tabular-nums;
+        }
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 9px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: #475569;
+            border-radius: 3px;
+            cursor: default;
+        }
+        button.filter-chip {
+            cursor: pointer;
+            font-family: inherit;
+            line-height: 1.2;
+        }
+        .filter-chip.on {
+            background: #0f172a;
+            border-color: #0f172a;
+            color: #fff;
+        }
+        .points-history-row {
+            align-items: start;
+        }
+        .points-history-row.is-filtered-out,
+        .points-history-row.is-paged-out {
+            display: none !important;
+        }
+        .data-list {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .data-row {
+            display: grid;
+            grid-template-columns: 72px 1fr auto;
+            gap: 14px;
+            align-items: center;
+            padding: 12px 14px;
+            border-bottom: 1px solid #eef2f7;
+            background: #fff;
+            transition: background 0.12s ease;
+        }
+        .data-row:last-child { border-bottom: none; }
+        .data-row:hover { background: #f8fafc; }
+        .data-row.removing { opacity: 0; transform: translateX(8px); transition: all 0.25s ease; }
+        .data-row.itinerary {
+            grid-template-columns: 1fr auto;
+        }
+        .data-thumb {
+            width: 72px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            background: #e2e8f0;
+        }
+        .data-main { min-width: 0; }
+        .data-title {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0 0 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .data-desc {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        .data-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .btn-ghost {
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: #334155;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 3px;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-ghost:hover { background: #f1f5f9; color: #0f172a; }
+        .btn-solid {
+            border: 1px solid #0f172a;
+            background: #0f172a;
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 3px;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-solid:hover { background: #1e293b; color: #fff; }
+        .btn-danger-ghost {
+            border: 1px solid #fecaca;
+            background: #fff;
+            color: #b91c1c;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-danger-ghost:hover { background: #fef2f2; }
+        .sec-split {
+            display: grid;
+            grid-template-columns: 1.35fr 0.9fr;
+            gap: 12px;
+        }
+        @media (max-width: 900px) {
+            .sec-split { grid-template-columns: 1fr; }
+            .data-row { grid-template-columns: 56px 1fr; }
+            .data-actions { grid-column: 1 / -1; justify-content: flex-start; }
+            .data-row.itinerary { grid-template-columns: 1fr; }
+        }
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 11px 12px;
+            border-bottom: 1px solid #eef2f7;
+            background: #fff;
+            font-size: 0.8rem;
+        }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-item .ci-label { color: var(--text-sub); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 2px; }
+        .checklist-item .ci-value { color: var(--text-main); font-weight: 500; }
+        .ci-ok { color: #15803d; font-size: 0.72rem; font-weight: 700; }
+        .ci-warn { color: #b45309; font-size: 0.72rem; font-weight: 700; }
+        .biz-hero {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 14px;
+            align-items: stretch;
+        }
+        @media (max-width: 900px) {
+            .biz-hero { grid-template-columns: 1fr; }
+        }
+        .biz-feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .biz-feature {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            background: #fff;
+        }
+        .biz-feature strong {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: var(--text-main);
+        }
+        .biz-feature p {
+            margin: 0;
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+        .map-style-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+        @media (max-width: 700px) {
+            .map-style-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        .simple-map-card {
+            border: 1px solid var(--border-color) !important;
+            border-radius: 4px !important;
+            padding: 14px 8px !important;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 0.78rem;
+            font-weight: 500;
+            background: #fff;
+        }
+        .simple-map-card.active {
+            border-color: #0f172a !important;
+            background: #0f172a !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+        .workspace-body {
+            max-width: none !important;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .sidebar-menu-tabs .nav-link.active {
+            border-radius: 0 3px 3px 0 !important;
+        }
+
         /* Simple Card for Favorites */
+
         .simple-fav-card {
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 6px;
             overflow: hidden;
             background-color: #ffffff;
             transition: transform 0.2s ease, border-color 0.2s ease;
@@ -398,25 +1009,289 @@
             cursor: pointer;
         }
 
+        /* Saved itinerary list cards */
+        .itinerary-card-wrapper .simple-fav-card {
+            border: 1px solid #e8eef5;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .it-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .it-card-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: #3b5980;
+            background: #eef4fb;
+            border: 1px solid #dbe7f3;
+            border-radius: 4px;
+            padding: 3px 8px;
+        }
+
+        /* Itinerary view modal */
+        .it-modal-content {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(15, 36, 66, 0.18);
+        }
+        .it-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 22px 24px 16px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2b4c7e 55%, #3b5980 100%);
+            color: #fff;
+        }
+        .it-modal-kicker {
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.75;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .it-modal-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0 0 6px;
+            line-height: 1.35;
+            color: #fff;
+        }
+        .it-modal-summary {
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.82);
+            max-width: 52ch;
+        }
+        .it-modal-close {
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.14);
+            color: #fff;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .it-modal-close:hover { background: rgba(255,255,255,0.24); }
+        .it-modal-body {
+            padding: 18px 20px 8px;
+            background: #f7f9fc;
+            max-height: min(68vh, 640px);
+        }
+        .it-day {
+            background: #fff;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            padding: 14px 14px 8px;
+            margin-bottom: 14px;
+        }
+        .it-day-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .it-day-badge {
+            background: #1e3a5f;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            padding: 4px 8px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .it-day-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            line-height: 1.35;
+            margin: 0;
+        }
+        .it-slot {
+            display: grid;
+            grid-template-columns: 78px 14px 1fr;
+            gap: 10px;
+            padding: 10px 8px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            background: #fafbfd;
+            border: 1px solid transparent;
+        }
+        .it-slot:hover {
+            background: #f0f5fa;
+            border-color: #dbe7f3;
+        }
+        .it-slot-time {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            line-height: 1.35;
+            padding-top: 2px;
+        }
+        .it-slot-rail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 5px;
+        }
+        .it-slot-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #94a3b8;
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18);
+            flex-shrink: 0;
+        }
+        .it-slot-dot.visit { background: #64748b; box-shadow: 0 0 0 3px rgba(100,116,139,0.18); }
+        .it-slot-dot.food { background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.18); }
+        .it-slot-dot.transport { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.18); }
+        .it-slot-dot.rest { background: #8b5cf6; box-shadow: 0 0 0 3px rgba(139,92,246,0.18); }
+        .it-slot-dot.photo { background: #ec4899; box-shadow: 0 0 0 3px rgba(236,72,153,0.18); }
+        .it-slot-activity {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: #0f2442;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+        .it-slot-location {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #2b4c7e;
+            margin-bottom: 2px;
+        }
+        .it-slot-meta {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .it-slot-tip {
+            font-size: 0.74rem;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        .it-type-pill {
+            display: inline-block;
+            font-size: 0.62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 7px;
+            border-radius: 999px;
+            margin-bottom: 5px;
+            background: #eef2f7;
+            color: #64748b;
+        }
+        .it-type-pill.food { background: #fff7ed; color: #c2410c; }
+        .it-type-pill.visit { background: #f1f5f9; color: #475569; }
+        .it-type-pill.transport { background: #f0fdf4; color: #15803d; }
+        .it-type-pill.photo { background: #fdf2f8; color: #be185d; }
+        .it-type-pill.rest { background: #f5f3ff; color: #6d28d9; }
+        .it-tips {
+            background: #fff;
+            border: 1px solid #e8eef5;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+        }
+        .it-tips-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+        }
+        .it-tips ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+        .it-tips li {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 4px;
+            line-height: 1.45;
+        }
+        .it-modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 20px 18px;
+            background: #fff;
+            border-top: 1px solid #eef2f7;
+        }
+        .it-modal-cost {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #166534;
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+        .it-modal-cost:empty { display: none; }
+        .it-modal-btn {
+            border: none;
+            background: #1e3a5f;
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: 999px;
+            padding: 8px 18px;
+            cursor: pointer;
+        }
+        .it-modal-btn:hover { background: #2b4c7e; }
+        .dark-mode-active .it-modal-body { background: #0f172a; }
+        .dark-mode-active .it-day,
+        .dark-mode-active .it-tips { background: #1e293b; border-color: #334155; }
+        .dark-mode-active .it-slot { background: #0f172a; }
+        .dark-mode-active .it-slot-activity { color: #e2e8f0; }
+        .dark-mode-active .it-day-title { color: #e2e8f0; }
+        .dark-mode-active .it-modal-footer { background: #1e293b; border-color: #334155; }
+
         /* Clean Table Style */
         .clean-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
         }
         .clean-table th {
             font-weight: 600;
-            color: var(--text-sub);
+            font-size: 0.68rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #475569;
             border-bottom: 1px solid var(--border-color);
-            padding: 12px;
+            padding: 9px 12px;
             text-align: left;
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
+            white-space: nowrap;
         }
         .clean-table td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 10px 12px;
+            border-bottom: 1px solid #eef2f7;
             color: var(--text-main);
+            vertical-align: middle;
         }
+        .clean-table tbody tr:hover td { background: #f8fafc; }
+        .clean-table tbody tr:last-child td { border-bottom: none; }
         .btn-text-danger {
             background: none;
             border: none;
@@ -472,34 +1347,57 @@
             background-color: var(--bg-body);
             color: var(--text-main);
         }
-        .dark-mode-active .top-navbar {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-        }
         .dark-mode-active .dashboard-sidebar {
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
+            background-color: #0b1220;
+            border-right: 1px solid #1e293b;
+            color: #e2e8f0;
+        }
+        .dark-mode-active .top-navbar {
+            background-color: #070b14;
+            border-bottom: 1px solid #1e293b;
+            color: #e2e8f0;
+        }
+        .dark-mode-active .top-navbar > div:last-child {
+            color: #94a3b8 !important;
         }
         .dark-mode-active .sidebar-user-section {
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #1e293b;
+            background: #111827;
         }
+        .dark-mode-active .sidebar-display-name { color: #f1f5f9; }
+        .dark-mode-active .sidebar-display-name:hover { color: #fff; }
+        .dark-mode-active .sidebar-name-input {
+            background: #0b1220;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+        .dark-mode-active .sidebar-menu-tabs .nav-link { color: #94a3b8; }
         .dark-mode-active .user-role-badge {
             background-color: #1e293b;
             color: #94a3b8;
+            border-color: #334155;
+        }
+        .dark-mode-active .sidebar-points-chip {
+            background: #1e293b !important;
+            color: #cbd5e1 !important;
+            border-color: #334155 !important;
         }
         .dark-mode-active .sidebar-menu-tabs .nav-link:hover {
             background-color: #1e293b;
             color: #f8fafc;
         }
         .dark-mode-active .sidebar-menu-tabs .nav-link.active {
-            background-color: #1e293b;
-            color: var(--text-main);
+            background-color: rgba(30, 58, 95, 0.35);
+            color: #e2e8f0;
+            box-shadow: inset 3px 0 0 #6482a6;
             font-weight: 700;
         }
         .dark-mode-active .menu-count-badge {
             background-color: #1e293b;
             color: #94a3b8;
+            border-color: #334155;
         }
+        .dark-mode-active .dashboard-content { background: #090d16; }
         .dark-mode-active .content-panel {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -510,7 +1408,7 @@
             color: var(--text-main);
         }
         .dark-mode-active .form-control-clean:focus {
-            border-color: #38bdf8;
+            border-color: #6482a6;
         }
         .dark-mode-active .form-control-clean:disabled {
             background-color: #0f172a;
@@ -554,26 +1452,32 @@
             display: flex;
             flex-direction: column;
             width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
         }
         .info-item {
             display: flex;
             align-items: center;
-            padding: 18px 0;
-            border-bottom: 1px solid var(--border-color);
+            padding: 10px 12px;
+            border-bottom: 1px solid #eef2f7;
+            gap: 12px;
+            background: #fff;
         }
+        .info-item:nth-child(even) { background: #fafbfc; }
         .info-item:last-child {
             border-bottom: none;
         }
         .info-label {
-            width: 220px;
+            width: 160px;
             font-weight: 500;
             color: #64748b;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
         .info-value {
-            font-weight: 400;
+            font-weight: 500;
             color: var(--text-main);
-            font-size: 0.875rem;
+            font-size: 0.82rem;
             flex: 1;
         }
         .info-input-wrapper {
@@ -609,36 +1513,41 @@
 
         /* Sidebar name inline editing styling */
         .sidebar-name-container {
-            margin-top: 8px;
+            margin-top: 0;
             display: flex;
             align-items: center;
-            justify-content: center;
-            min-height: 28px;
+            justify-content: flex-start;
+            gap: 4px;
+            min-width: 0;
         }
         .sidebar-display-name {
-            cursor: pointer;
+            font-size: 0.88rem;
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.15s ease;
+            color: var(--text-main);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .sidebar-display-name:hover {
             color: var(--primary);
         }
         .sidebar-name-input {
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 0.95rem;
-            text-align: center;
+            width: 100%;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 3px 6px;
-            background-color: var(--card-bg);
+            border-radius: var(--radius-sm);
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            background: #ffffff;
             color: var(--text-main);
-            width: 90%;
-            outline: none;
         }
         .sidebar-name-input:focus {
-            border-color: var(--primary);
+            outline: none;
+            border-color: var(--accent);
         }
 
         /* Dark Mode for Minimal Info List */
@@ -648,7 +1557,7 @@
             color: var(--text-main);
         }
         .dark-mode-active .form-control-minimal:focus {
-            border-color: #38bdf8;
+            border-color: #6482a6;
         }
         .dark-mode-active .avatar-edit-badge {
             background-color: #1e293b;
@@ -656,9 +1565,9 @@
             color: var(--text-sub);
         }
         .dark-mode-active .avatar-container:hover .avatar-edit-badge {
-            background-color: #38bdf8;
-            color: #0f172a;
-            border-color: #38bdf8;
+            background-color: #2b4c7e;
+            color: #f8fafc;
+            border-color: #2b4c7e;
         }
 
         /* Business Account tab styles */
@@ -1135,8 +2044,8 @@
             display: inline-flex !important;
             align-items: center !important;
             gap: 6px !important;
-            background: #e0f2fe !important;
-            color: #0369a1 !important;
+            background: #f1f5f9 !important;
+            color: #1e3a5f !important;
             font-weight: 600 !important;
             font-size: 0.775rem !important;
             padding: 4px 10px !important;
@@ -1212,8 +2121,8 @@
             border-color: #334155 !important;
         }
         .dark-mode-active #deleteReviewModal .confirm-preview-tag {
-            background: rgba(3, 105, 161, 0.25) !important;
-            color: #38bdf8 !important;
+            background: rgba(30, 58, 95, 0.45) !important;
+            color: #cbd5e1 !important;
         }
         .dark-mode-active #deleteReviewModal .confirm-preview-quote {
             color: #cbd5e1 !important;
@@ -1256,85 +2165,109 @@
                     <img src="{{ asset($user->equippedFrame->image_url) }}" class="avatar-frame-png-overlay">
                 @endif
                 <div class="avatar-upload-overlay">
-                    Thay ảnh
+                    Đổi
                 </div>
                 <div class="avatar-edit-badge">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                         <circle cx="12" cy="13" r="4"></circle>
                     </svg>
                 </div>
                 <div class="avatar-loader-spinner" id="avatarUploadSpinner">
-                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                    <div class="spinner-border spinner-border-sm text-light" role="status"></div>
                 </div>
             </div>
             <!-- Hidden File Input -->
             <input type="file" id="avatarFileInput" accept="image/*" class="d-none">
-            
-            <div class="sidebar-name-container">
-                <span id="sidebarDisplayNameText" class="sidebar-display-name" title="Nhấp để đổi tên">
-                    <span id="sidebarDisplayNameVal">{{ $user->display_name ?? $user->username }}</span>
-                    <span class="edit-name-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px; vertical-align: middle;">
-                            <path d="M12 20h9"></path>
-                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                        </svg>
+
+            <div class="sidebar-user-meta">
+                <div class="sidebar-name-container">
+                    <span id="sidebarDisplayNameText" class="sidebar-display-name" title="Nhấp để đổi tên">
+                        <span id="sidebarDisplayNameVal">{{ $user->display_name ?? $user->username }}</span>
+                        <span class="edit-name-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 20h9"></path>
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                            </svg>
+                        </span>
                     </span>
-                </span>
-                <input type="text" id="sidebarDisplayNameInput" class="sidebar-name-input d-none" value="{{ $user->display_name ?? $user->username }}" maxlength="120">
+                    <input type="text" id="sidebarDisplayNameInput" class="sidebar-name-input d-none" value="{{ $user->display_name ?? $user->username }}" maxlength="120">
+                </div>
             </div>
-            <span class="user-role-badge">
-                {{ $user->role === 'admin' ? 'Quản trị viên' : ($user->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên') }}
-            </span>
-            <div class="mt-2">
-                <span style="font-size: 0.775rem; padding: 4px 12px; border-radius: 16px; font-weight: 500; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; display: inline-flex; align-items: center;">
-                    {{ number_format($user->points) }} điểm tích lũy
+
+            <div class="sidebar-user-chips">
+                <span class="user-role-badge">
+                    {{ $user->role === 'admin' ? 'Admin' : ($user->role === 'moderator' ? 'Mod' : 'Member') }}
+                </span>
+                <span class="sidebar-points-chip">
+                    {{ number_format($user->points) }} pts
                 </span>
             </div>
         </div>
 
         <!-- Navigation Tabs -->
         <div class="nav flex-column sidebar-menu-tabs" id="settings-tabs" role="tablist">
+            <div class="sidebar-nav-group">Tài khoản</div>
             <button class="nav-link active" id="tab-profile-btn" data-bs-toggle="pill" data-bs-target="#tab-profile" type="button" role="tab" aria-selected="true">
-                <span>Thông tin cá nhân</span>
+                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">badge</span><span>Thông tin cá nhân</span></span>
             </button>
+            @if($user->provider !== 'google')
             <button class="nav-link" id="tab-security-btn" data-bs-toggle="pill" data-bs-target="#tab-security" type="button" role="tab" aria-selected="false">
-                <span>Bảo mật & Mật khẩu</span>
+                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">lock</span><span>Bảo mật & Mật khẩu</span></span>
             </button>
+            @endif
+
+            <div class="sidebar-nav-group">Hoạt động</div>
             <button class="nav-link" id="tab-points-btn" data-bs-toggle="pill" data-bs-target="#tab-points" type="button" role="tab" aria-selected="false">
-                <span>Lịch sử tích điểm</span>
+                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">payments</span><span>Lịch sử tích điểm</span></span>
             </button>
             <button class="nav-link" id="tab-favorites-btn" data-bs-toggle="pill" data-bs-target="#tab-favorites" type="button" role="tab" aria-selected="false">
-                <span>Địa điểm đã lưu</span>
+                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">bookmark</span><span>Địa điểm đã lưu</span></span>
                 <span class="menu-count-badge" id="favoritesCountBadge">{{ $favorites->count() }}</span>
             </button>
+            <button class="nav-link" id="tab-itineraries-btn" data-bs-toggle="pill" data-bs-target="#tab-itineraries" type="button" role="tab" aria-selected="false">
+                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">route</span><span>Lịch trình đã lưu</span></span>
+                <span class="menu-count-badge" id="itinerariesCountBadge">{{ isset($itineraries) ? $itineraries->count() : 0 }}</span>
+            </button>
             <button class="nav-link" id="tab-comments-btn" data-bs-toggle="pill" data-bs-target="#tab-comments" type="button" role="tab" aria-selected="false">
-                <span>Nhận xét của tôi</span>
+                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">chat_bubble_outline</span><span>Nhận xét của tôi</span></span>
                 <span class="menu-count-badge" id="commentsCountBadge">{{ $comments->count() }}</span>
             </button>
+
+            <div class="sidebar-nav-group">Mở rộng</div>
             <button class="nav-link" id="tab-business-btn" data-bs-toggle="pill" data-bs-target="#tab-business" type="button" role="tab" aria-selected="false">
-                <span>Tài khoản doanh nghiệp</span>
+                <span class="nav-link-left"><span class="material-symbols-outlined nav-ico">storefront</span><span>Tài khoản doanh nghiệp</span></span>
                 @if(isset($businessProfile))
                     @if($businessProfile->status === 'pending')
-                        <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">Chờ duyệt</span>
+                        <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Chờ duyệt</span>
                     @elseif($businessProfile->status === 'approved')
-                        <span class="badge bg-success" style="font-size: 0.65rem;">Doanh nghiệp</span>
+                        <span class="badge bg-success" style="font-size: 0.6rem;">DN</span>
                     @elseif($businessProfile->status === 'rejected')
-                        <span class="badge bg-danger" style="font-size: 0.65rem;">Bị từ chối</span>
+                        <span class="badge bg-danger" style="font-size: 0.6rem;">Từ chối</span>
                     @endif
                 @endif
-            </button>
-            <button class="nav-link" id="tab-preferences-btn" data-bs-toggle="pill" data-bs-target="#tab-preferences" type="button" role="tab" aria-selected="false">
-                <span>Tùy chỉnh hệ thống</span>
             </button>
         </div>
     </div>
 
     <!-- Content Workspace -->
     <div class="dashboard-content">
+        <div class="workspace-toolbar">
+            <div class="workspace-crumb">
+                <span>Account</span>
+                <span class="sep">/</span>
+                <strong id="workspaceTabTitle">Thông tin cá nhân</strong>
+            </div>
+            <div class="workspace-actions">
+                <span id="workspaceHint" class="text-secondary" style="font-size:0.72rem;margin-right:4px;">Workspace</span>
+                <a href="{{ url('/') }}" class="btn-action" style="text-decoration:none; padding:6px 12px; font-size:0.72rem;">Về bản đồ</a>
+            </div>
+        </div>
+
+        <div class="workspace-body">
         <!-- Toast Alerts System -->
         <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
-            <div id="settingsToast" class="toast align-items-center text-white bg-dark border-0 rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="settingsToast" class="toast align-items-center text-white bg-dark border-0 rounded-1" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
                     <div class="toast-body" id="toastMessage">Thông báo</div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -1343,13 +2276,13 @@
         </div>
 
         @if(session('success'))
-            <div class="alert alert-success rounded-3 border-0 mb-4 py-2 px-3 small" role="alert">
+            <div class="alert alert-success rounded-1 border-0 mb-3 py-2 px-3 small" role="alert">
                 {{ session('success') }}
             </div>
         @endif
 
         @if($errors->any())
-            <div class="alert alert-danger rounded-3 border-0 mb-4 py-2 px-3 small" role="alert">
+            <div class="alert alert-danger rounded-1 border-0 mb-3 py-2 px-3 small" role="alert">
                 <ul class="mb-0 ps-3">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -1363,41 +2296,125 @@
             
             <!-- Tab 1: Profile Details -->
             <div class="tab-pane fade show active" id="tab-profile" role="tabpanel">
-                <div class="content-panel">
-                    <div class="section-title">Thông tin cá nhân</div>
-                    
-                    <div class="info-list mb-4">
-                        <div class="info-item">
-                            <div class="info-label">Tên tài khoản</div>
-                            <div class="info-value">{{ $user->username }}</div>
-                        </div>
-                        
-                        <div class="info-item">
-                            <div class="info-label">Tên hiển thị</div>
-                            <div class="info-value" id="profileFormDisplayNameVal">{{ $user->display_name ?? $user->username }}</div>
-                        </div>
-
-                        <div class="info-item">
-                            <div class="info-label">Địa chỉ Email</div>
-                            <div class="info-value">{{ $user->email }}</div>
-                        </div>
-
-                        <div class="info-item">
-                            <div class="info-label">Điểm tích lũy</div>
-                            <div class="info-value fw-semibold" style="color: #1e3a5f;">{{ $user->points }} điểm</div>
-                        </div>
-
-                        <div class="info-item">
-                            <div class="info-label">Nhóm quyền</div>
-                            <div class="info-value">
-                                {{ $user->role === 'admin' ? 'Quản trị viên' : ($user->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên') }}
+                <div class="content-panel" style="margin-bottom:12px;">
+                    <div class="panel-head">
+                        <div class="section-title">Chỉnh sửa nhanh</div>
+                        <button type="button" class="btn-action" id="btnEditDisplayNameTop" style="padding:5px 12px;font-size:0.72rem;">Sửa tên hiển thị</button>
+                    </div>
+                    <div class="panel-body" style="padding-top:12px;padding-bottom:12px;">
+                        <div class="info-list mb-0">
+                            <div class="info-item">
+                                <div class="info-label">Tên hiển thị</div>
+                                <div class="info-value" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                                    <span id="profileTopDisplayName">{{ $user->display_name ?? $user->username }}</span>
+                                    <span class="text-secondary" style="font-size:0.72rem;">Nhấp biểu tượng bút bên sidebar hoặc nút Sửa ở trên để đổi tên</span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Email</div>
+                                <div class="info-value">{{ $user->email }}</div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="profile-stat-grid">
+                    <div class="stat-tile">
+                        <div class="stat-label">Điểm tích lũy</div>
+                        <div class="stat-value">{{ number_format($user->points) }}</div>
+                        <div class="stat-hint">Điểm thưởng hiện có</div>
+                    </div>
+                    <div class="stat-tile">
+                        <div class="stat-label">Địa điểm đã lưu</div>
+                        <div class="stat-value">{{ $favorites->count() }}</div>
+                        <div class="stat-hint">Favorites</div>
+                    </div>
+                    <div class="stat-tile">
+                        <div class="stat-label">Lịch trình</div>
+                        <div class="stat-value">{{ isset($itineraries) ? $itineraries->count() : 0 }}</div>
+                        <div class="stat-hint">AI itineraries</div>
+                    </div>
+                    <div class="stat-tile">
+                        <div class="stat-label">Nhận xét</div>
+                        <div class="stat-value">{{ $comments->count() }}</div>
+                        <div class="stat-hint">Reviews đã đăng</div>
+                    </div>
+                </div>
 
-                        <div class="info-item">
-                            <div class="info-label">Trạng thái tài khoản</div>
-                            <div class="info-value">
-                                <span class="status-dot active"></span> {{ $user->status === 'active' ? 'Đang hoạt động' : 'Bị khóa' }}
+                <div class="profile-split">
+                    <div class="content-panel">
+                        <div class="panel-head">
+                            <div class="section-title">Hồ sơ tài khoản</div>
+                            <span class="user-role-badge" style="background:#f1f5f9;color:#475569;border-color:#e2e8f0;">
+                                {{ $user->status === 'active' ? 'Active' : 'Locked' }}
+                            </span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="info-list mb-0">
+                                <div class="info-item">
+                                    <div class="info-label">Tên tài khoản</div>
+                                    <div class="info-value"><code style="font-size:0.8rem;">{{ $user->username }}</code></div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Tên hiển thị</div>
+                                    <div class="info-value" id="profileFormDisplayNameVal">{{ $user->display_name ?? $user->username }}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value">{{ $user->email }}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Nhóm quyền</div>
+                                    <div class="info-value">
+                                        {{ $user->role === 'admin' ? 'Quản trị viên' : ($user->role === 'moderator' ? 'Kiểm duyệt viên' : 'Thành viên') }}
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Trạng thái</div>
+                                    <div class="info-value">
+                                        <span class="status-dot active"></span> {{ $user->status === 'active' ? 'Đang hoạt động' : 'Bị khóa' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-head">
+                            <div class="section-title">Thao tác nhanh</div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="quick-ops">
+                                @if($user->provider !== 'google')
+                                <button type="button" data-bs-toggle="pill" data-bs-target="#tab-security" onclick="document.getElementById('tab-security-btn')?.click()">
+                                    <span>Đổi mật khẩu</span>
+                                    <span class="qo-meta">Bảo mật</span>
+                                </button>
+                                @else
+                                <div class="ops-form-card" style="border-color:#cbdbe8;background:#f1f5f9;margin:0;padding:10px 12px;">
+                                    <div style="font-size:0.72rem;font-weight:600;color:#1e3a5f;margin-bottom:4px;">Đăng nhập Google</div>
+                                    <div style="font-size:0.75rem;color:#64748b;">Tài khoản dùng Google OAuth — không cần / không đổi mật khẩu trên hệ thống.</div>
+                                </div>
+                                @endif
+                                <button type="button" data-bs-toggle="pill" data-bs-target="#tab-itineraries" onclick="document.getElementById('tab-itineraries-btn').click()">
+                                    <span>Xem lịch trình đã lưu</span>
+                                    <span class="qo-meta">{{ isset($itineraries) ? $itineraries->count() : 0 }} mục</span>
+                                </button>
+                                <button type="button" data-bs-toggle="pill" data-bs-target="#tab-favorites" onclick="document.getElementById('tab-favorites-btn').click()">
+                                    <span>Địa điểm yêu thích</span>
+                                    <span class="qo-meta">{{ $favorites->count() }} mục</span>
+                                </button>
+                                <button type="button" data-bs-toggle="pill" data-bs-target="#tab-business" onclick="document.getElementById('tab-business-btn').click()">
+                                    <span>Đăng ký doanh nghiệp</span>
+                                    <span class="qo-meta">Mở rộng</span>
+                                </button>
+                                <a href="{{ url('/') }}">
+                                    <span>Mở bản đồ / AI lịch trình</span>
+                                    <span class="qo-meta">Map</span>
+                                </a>
+                                <button type="button" class="btn-danger-ghost" style="justify-content:space-between;width:100%;display:flex;" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">
+                                    <span>Hủy kích hoạt tài khoản</span>
+                                    <span class="qo-meta" style="color:#b91c1c;">Nguy hiểm</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1406,132 +2423,273 @@
 
             <!-- Tab: Lịch sử tích điểm -->
             <div class="tab-pane fade" id="tab-points" role="tabpanel">
-                <div class="content-panel">
-                    <div class="section-title">Lịch sử tích điểm</div>
-                    
-                    <div class="alert alert-info rounded-3 border-0 p-3 mb-4 small" style="background-color: rgba(0, 114, 255, 0.05); color: var(--primary); border: 1px solid rgba(0, 114, 255, 0.1);">
-                        Bạn có thể tích lũy điểm thưởng bằng cách đăng nhập mỗi ngày (+10 điểm), bình luận về địa điểm (+5 điểm), hoặc lưu địa điểm yêu thích (+2 điểm).
+                <div class="profile-stat-grid" style="margin-bottom:12px;">
+                    <div class="stat-tile">
+                        <div class="stat-label">Số dư điểm</div>
+                        <div class="stat-value">{{ number_format($user->points) }}</div>
+                        <div class="stat-hint">Hiện có</div>
                     </div>
-
-                    <div class="table-responsive">
-                        <table class="clean-table">
-                            <thead>
-                                <tr>
-                                    <th>Thời gian</th>
-                                    <th>Hành động</th>
-                                    <th>Số điểm</th>
-                                    <th>Nội dung chi tiết</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($user->pointTransactions as $tx)
-                                <tr>
-                                    <td>{{ $tx->created_at->format('H:i d/m/Y') }}</td>
-                                    <td>
-                                        @if($tx->action === 'daily_login')
-                                            <span class="badge bg-success bg-opacity-10 text-success border-0 px-2 py-1" style="font-size: 0.75rem;">Điểm danh</span>
-                                        @elseif($tx->action === 'comment')
-                                            <span class="badge bg-primary bg-opacity-10 text-primary border-0 px-2 py-1" style="font-size: 0.75rem;">Bình luận</span>
-                                        @elseif($tx->action === 'favorite')
-                                            <span class="badge bg-info bg-opacity-10 text-info border-0 px-2 py-1" style="font-size: 0.75rem;">Yêu thích</span>
-                                        @else
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border-0 px-2 py-1" style="font-size: 0.75rem;">Khác</span>
+                    <div class="stat-tile">
+                        <div class="stat-label">Mục nhật ký</div>
+                        <div class="stat-value">{{ number_format(count($pointHistory ?? [])) }}</div>
+                        <div class="stat-hint">Sau khi gộp · {{ number_format($pointTxTotal ?? 0) }} bản ghi gốc</div>
+                    </div>
+                    <div class="stat-tile">
+                        <div class="stat-label">Điểm danh</div>
+                        <div class="stat-value">10–70</div>
+                        <div class="stat-hint">Theo chuỗi ngày</div>
+                    </div>
+                    <div class="stat-tile">
+                        <div class="stat-label">Bình luận / Lưu</div>
+                        <div class="stat-value">+5 / +2</div>
+                        <div class="stat-hint">Mỗi hành động</div>
+                    </div>
+                </div>
+                <div class="content-panel">
+                    <div class="section-title">
+                        <span>Nhật ký tích điểm</span>
+                        <span class="dt-meta" id="pointsVisibleMeta">0 mục</span>
+                    </div>
+                    <p class="text-secondary mb-2" style="font-size:0.72rem;line-height:1.4;">
+                        Các lần cộng +1 online cũ được gộp theo ngày để dễ đọc. Online mới không còn cộng xu từng phút.
+                    </p>
+                    <div class="data-toolbar" id="pointsFilterBar">
+                        <div class="dt-left">
+                            <button type="button" class="filter-chip on" data-points-filter="all">Tất cả</button>
+                            <button type="button" class="filter-chip" data-points-filter="daily">Điểm danh</button>
+                            <button type="button" class="filter-chip" data-points-filter="comment">Bình luận</button>
+                            <button type="button" class="filter-chip" data-points-filter="favorite">Yêu thích</button>
+                            <button type="button" class="filter-chip" data-points-filter="mission">Nhiệm vụ</button>
+                            <button type="button" class="filter-chip" data-points-filter="session">Online (gộp)</button>
+                        </div>
+                        <div class="dt-meta">Mới nhất trước</div>
+                    </div>
+                    <div class="data-list" id="pointsHistoryList">
+                        @forelse(($pointHistory ?? []) as $row)
+                            @php
+                                $badgeMap = [
+                                    'daily_login' => ['Điểm danh', 'success'],
+                                    'comment' => ['Bình luận', 'primary'],
+                                    'favorite' => ['Yêu thích', 'info'],
+                                    'mission_reward' => ['Nhiệm vụ', 'warning'],
+                                    'active_session' => ['Online', 'secondary'],
+                                    'location_suggestion_approved' => ['Đóng góp', 'success'],
+                                    'feedback_resolved' => ['Đóng góp', 'success'],
+                                ];
+                                [$badgeLabel, $badgeTone] = $badgeMap[$row['action']] ?? ['Khác', 'secondary'];
+                            @endphp
+                            <div class="data-row points-history-row"
+                                 data-filter="{{ $row['filter'] }}">
+                                <div style="min-width:0;">
+                                    <div style="font-variant-numeric:tabular-nums;font-size:0.72rem;font-weight:700;color:#0f172a;">
+                                        {{ $row['created_at']->format('d/m') }}
+                                    </div>
+                                    <div style="font-variant-numeric:tabular-nums;font-size:0.68rem;color:#94a3b8;">
+                                        {{ $row['aggregated'] ? 'cả ngày' : $row['created_at']->format('H:i') }}
+                                    </div>
+                                </div>
+                                <div style="min-width:0;">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                        <span class="badge bg-{{ $badgeTone }} bg-opacity-10 text-{{ $badgeTone }} border-0 px-2 py-1" style="font-size:0.68rem;border-radius:3px!important;">{{ $badgeLabel }}</span>
+                                        @if(!empty($row['aggregated']))
+                                            <span style="font-size:0.65rem;color:#64748b;">{{ $row['count'] }} lần · đã gộp</span>
                                         @endif
-                                    </td>
-                                    <td class="fw-bold {{ $tx->amount >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {{ $tx->amount >= 0 ? '+' : '' }}{{ $tx->amount }}
-                                    </td>
-                                    <td>{{ $tx->description }}</td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">Chưa có lịch sử giao dịch điểm.</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                    </div>
+                                    <div style="font-size:0.78rem;color:#334155;line-height:1.35;word-break:break-word;">
+                                        {{ $row['description'] ?: '—' }}
+                                    </div>
+                                </div>
+                                <div class="fw-bold {{ $row['amount'] >= 0 ? 'text-success' : 'text-danger' }}"
+                                     style="font-variant-numeric:tabular-nums;font-size:0.9rem;text-align:right;">
+                                    {{ $row['amount'] >= 0 ? '+' : '' }}{{ $row['amount'] }}
+                                </div>
+                            </div>
+                        @empty
+                            <div class="empty-state" style="border:0;background:transparent;">Chưa có lịch sử giao dịch điểm.</div>
+                        @endforelse
+                    </div>
+                    <div class="d-flex justify-content-center mt-3" id="pointsLoadMoreWrap" hidden>
+                        <button type="button" class="btn-action" id="pointsLoadMoreBtn" style="min-width:140px;">Xem thêm</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: Security & Password -->
+            <!-- Tab 2: Security & Password (chỉ tài khoản email/mật khẩu, không áp dụng Google OAuth) -->
+            @if($user->provider !== 'google')
             <div class="tab-pane fade" id="tab-security" role="tabpanel">
-                <div class="content-panel">
-                    <div class="section-title">Bảo mật & Mật khẩu</div>
-
-                    @if($user->provider === 'google')
-                        <div class="alert alert-info rounded-3 border-0 p-3 mb-4 small">
-                            Tài khoản liên kết với Google OAuth. Bạn có thể thiết lập mật khẩu riêng để đăng nhập độc lập.
+                <div class="sec-split">
+                    <div class="content-panel">
+                        <div class="section-title">Bảo mật & Mật khẩu</div>
+                        <div class="ops-form-card">
+                            <div class="ops-form-title">Cập nhật mật khẩu</div>
+                            <form action="{{ route('client.profile.password') }}" method="POST">
+                                @csrf
+                                @if(!empty($user->password_hash))
+                                    <div class="mb-3">
+                                        <label class="form-label-clean">Mật khẩu hiện tại</label>
+                                        <input type="password" class="form-control-clean" name="current_password" required autocomplete="current-password">
+                                    </div>
+                                @endif
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label-clean">Mật khẩu mới</label>
+                                        <input type="password" class="form-control-clean" name="password" required autocomplete="new-password">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label-clean">Xác nhận mật khẩu</label>
+                                        <input type="password" class="form-control-clean" name="password_confirmation" required autocomplete="new-password">
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn-action">Lưu mật khẩu</button>
+                                </div>
+                            </form>
                         </div>
-                    @endif
-
-                    <form action="{{ route('client.profile.password') }}" method="POST" class="mb-5">
-                        @csrf
-                        
-                        @if(!empty($user->password_hash) && !$user->provider)
-                            <div class="mb-3">
-                                <label class="form-label-clean">Mật khẩu hiện tại</label>
-                                <input type="password" class="form-control-clean" name="current_password" required>
+                        <div class="ops-form-card" style="border-color:#fecaca;background:#fffafa;margin-bottom:0;">
+                            <div class="ops-form-title" style="color:#b91c1c;">Vùng nguy hiểm</div>
+                            <p class="text-secondary small mb-3">Hủy kích hoạt sẽ tạm dừng tài khoản và ẩn bình luận của bạn.</p>
+                            <button type="button" class="btn-danger-ghost" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">Yêu cầu hủy kích hoạt</button>
+                        </div>
+                    </div>
+                    <div class="content-panel">
+                        <div class="section-title">Trạng thái bảo mật</div>
+                        <div class="checklist">
+                            <div class="checklist-item">
+                                <div>
+                                    <div class="ci-label">Email</div>
+                                    <div class="ci-value">{{ $user->email }}</div>
+                                </div>
+                                <span class="ci-ok">Đã gắn</span>
                             </div>
-                        @endif
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label-clean">Mật khẩu mới</label>
-                                <input type="password" class="form-control-clean" name="password" required>
+                            <div class="checklist-item">
+                                <div>
+                                    <div class="ci-label">Phương thức đăng nhập</div>
+                                    <div class="ci-value">Email / mật khẩu</div>
+                                </div>
+                                <span class="ci-ok">OK</span>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label-clean">Xác nhận mật khẩu mới</label>
-                                <input type="password" class="form-control-clean" name="password_confirmation" required>
+                            <div class="checklist-item">
+                                <div>
+                                    <div class="ci-label">Mật khẩu cục bộ</div>
+                                    <div class="ci-value">{{ !empty($user->password_hash) ? 'Đã thiết lập' : 'Chưa thiết lập' }}</div>
+                                </div>
+                                @if(!empty($user->password_hash))
+                                    <span class="ci-ok">OK</span>
+                                @else
+                                    <span class="ci-warn">Thiếu</span>
+                                @endif
+                            </div>
+                            <div class="checklist-item">
+                                <div>
+                                    <div class="ci-label">Trạng thái tài khoản</div>
+                                    <div class="ci-value">{{ $user->status === 'active' ? 'Đang hoạt động' : 'Bị khóa' }}</div>
+                                </div>
+                                <span class="{{ $user->status === 'active' ? 'ci-ok' : 'ci-warn' }}">{{ $user->status === 'active' ? 'Active' : 'Locked' }}</span>
                             </div>
                         </div>
-
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn-action">Cập nhật mật khẩu</button>
-                        </div>
-                    </form>
-
-                    <hr class="my-4" style="border-color: var(--border-color);">
-
-                    <div class="mb-4">
-                        <div class="fw-bold mb-2">Đăng xuất & Vô hiệu hóa tài khoản</div>
-                        <p class="text-secondary small mb-3">Hủy kích hoạt tài khoản sẽ tạm dừng hoạt động và ẩn bình luận của bạn.</p>
-                        <button type="button" class="btn btn-outline-danger btn-sm rounded-2" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">
-                            Yêu cầu hủy kích hoạt tài khoản
-                        </button>
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Tab 3: Saved Locations -->
             <div class="tab-pane fade" id="tab-favorites" role="tabpanel">
                 <div class="content-panel">
-                    <div class="section-title">Địa điểm đã lưu</div>
-
-                    <div class="row g-3" id="favoritesGrid">
+                    <div class="section-title">
+                        <span>Địa điểm đã lưu</span>
+                        <span class="dt-meta">{{ $favorites->count() }} mục</span>
+                    </div>
+                    <div class="data-toolbar">
+                        <div class="dt-left">
+                            <span class="filter-chip on">Tất cả</span>
+                            <span class="dt-meta">Danh sách yêu thích trên bản đồ</span>
+                        </div>
+                        <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;">+ Thêm từ bản đồ</a>
+                    </div>
+                    <div class="data-list" id="favoritesGrid">
                         @forelse($favorites as $location)
-                            <div class="col-md-6 favorite-card-wrapper" id="fav-card-{{ $location->id }}">
-                                <div class="simple-fav-card">
-                                    <img src="{{ $location->thumbnail_url }}" alt="{{ $location->name }}" class="simple-fav-img">
-                                    <div class="simple-fav-body">
-                                        <div class="simple-fav-title">{{ $location->name }}</div>
-                                        <p class="simple-fav-desc">{{ $location->short_description ?? 'Không có mô tả.' }}</p>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="d-flex gap-2">
-                                                <a href="{{ url('/#loc-' . $location->id) }}" class="btn-card-outline">Xem bản đồ</a>
-                                                <a href="{{ route('client.locations.360', $location->slug) }}" class="btn-card-primary">Xem 360°</a>
-                                            </div>
-                                            <button class="btn-card-remove favorite-toggle-btn" data-location-id="{{ $location->id }}">Bỏ thích</button>
-                                        </div>
-                                    </div>
+                            <div class="data-row favorite-card-wrapper" id="fav-card-{{ $location->id }}">
+                                <img src="{{ $location->thumbnail_url }}" alt="{{ $location->name }}" class="data-thumb" onerror="this.style.opacity='0.35'">
+                                <div class="data-main">
+                                    <div class="data-title">{{ $location->name }}</div>
+                                    <p class="data-desc">{{ $location->short_description ?? 'Không có mô tả.' }}</p>
+                                </div>
+                                <div class="data-actions">
+                                    <a href="{{ url('/#loc-' . $location->id) }}" class="btn-ghost">Bản đồ</a>
+                                    <a href="{{ route('client.locations.360', $location->slug) }}" class="btn-solid">360°</a>
+                                    <button type="button" class="btn-danger-ghost favorite-toggle-btn" data-location-id="{{ $location->id }}">Bỏ thích</button>
                                 </div>
                             </div>
                         @empty
-                            <div class="col-12 text-center py-5" id="noFavoritesMsg">
-                                <p class="text-secondary small mb-3">Bạn chưa lưu địa điểm nào.</p>
-                                <a href="{{ url('/') }}" class="btn btn-primary btn-sm rounded-pill px-4">Tìm kiếm địa điểm</a>
+                            <div id="noFavoritesMsg" class="empty-state" style="border:0;border-radius:0;">
+                                <p>Bạn chưa lưu địa điểm nào.</p>
+                                <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;display:inline-block;">Tìm địa điểm trên bản đồ</a>
                             </div>
                         @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Saved Itineraries -->
+            <div class="tab-pane fade" id="tab-itineraries" role="tabpanel">
+                <div class="content-panel">
+                    <div class="section-title">
+                        <span>Lịch trình đã lưu</span>
+                        <span class="dt-meta">{{ isset($itineraries) ? $itineraries->count() : 0 }} mục</span>
+                    </div>
+                    <div class="data-toolbar">
+                        <div class="dt-left">
+                            <span class="filter-chip on">AI itineraries</span>
+                            <span class="dt-meta">Lưu từ tính năng Lên lịch trình</span>
+                        </div>
+                        <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;" onclick="if(window.openTripPlanner){event.preventDefault(); window.openTripPlanner(true);}">+ Tạo lịch trình</a>
+                    </div>
+                    <div class="data-list" id="itinerariesGrid">
+                        @forelse(($itineraries ?? collect()) as $it)
+                            <div class="data-row itinerary itinerary-card-wrapper" id="itinerary-card-{{ $it->id }}">
+                                <div class="data-main">
+                                    <div class="data-title">{{ $it->title }}</div>
+                                    <p class="data-desc">{{ $it->summary ?? $it->description ?? 'Không có tóm tắt.' }}</p>
+                                    <div class="it-card-meta" style="margin:8px 0 0;">
+                                        <span class="it-card-chip">{{ $it->total_days }} ngày</span>
+                                        @if($it->estimated_cost)
+                                            <span class="it-card-chip">{{ $it->estimated_cost }}</span>
+                                        @endif
+                                        <span class="it-card-chip">{{ $it->created_at?->format('d/m/Y') }}</span>
+                                    </div>
+                                </div>
+                                <div class="data-actions">
+                                    <button type="button" class="btn-solid itinerary-view-btn" data-id="{{ $it->id }}">Xem lại</button>
+                                    <button type="button" class="btn-danger-ghost itinerary-delete-btn" data-id="{{ $it->id }}">Xóa</button>
+                                </div>
+                            </div>
+                        @empty
+                            <div id="noItinerariesMsg" class="empty-state" style="border:0;border-radius:0;">
+                                <p>Bạn chưa lưu lịch trình nào.</p>
+                                <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;display:inline-block;" onclick="if(window.openTripPlanner){event.preventDefault(); window.openTripPlanner(true);}">Lên lịch trình AI</a>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal xem lịch trình -->
+            <div class="modal fade" id="itineraryViewModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                    <div class="modal-content it-modal-content">
+                        <div class="it-modal-header">
+                            <div class="it-modal-header-text">
+                                <div class="it-modal-kicker">Lịch trình đã lưu</div>
+                                <h5 class="it-modal-title" id="itineraryModalTitle">Lịch trình</h5>
+                                <div class="it-modal-summary" id="itineraryModalSummary"></div>
+                            </div>
+                            <button type="button" class="it-modal-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                        </div>
+                        <div class="modal-body it-modal-body" id="itineraryModalBody"></div>
+                        <div class="it-modal-footer">
+                            <div class="it-modal-cost" id="itineraryModalCost"></div>
+                            <button type="button" class="it-modal-btn" data-bs-dismiss="modal">Đóng</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1539,41 +2697,45 @@
             <!-- Tab 4: Comments list -->
             <div class="tab-pane fade" id="tab-comments" role="tabpanel">
                 <div class="content-panel">
-                    <div class="section-title">Nhận xét của tôi</div>
-
+                    <div class="section-title">
+                        <span>Nhận xét của tôi</span>
+                        <span class="dt-meta">{{ $comments->count() }} mục</span>
+                    </div>
+                    <div class="data-toolbar">
+                        <div class="dt-left">
+                            <span class="filter-chip on">Tất cả</span>
+                            <span class="dt-meta">Quản lý nhận xét đã đăng</span>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="clean-table" id="commentsTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 25%;">Địa điểm</th>
-                                    <th style="width: 45%;">Nội dung bình luận</th>
-                                    <th style="width: 15%;">Đánh giá</th>
-                                    <th style="width: 15%; text-align: right;">Hành động</th>
+                                    <th style="width:22%;">Địa điểm</th>
+                                    <th>Nội dung</th>
+                                    <th style="width:90px;">Đánh giá</th>
+                                    <th style="width:120px;">Thời gian</th>
+                                    <th style="width:110px;text-align:right;">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($comments as $comment)
                                     <tr id="comment-row-{{ $comment->id }}">
                                         <td>
-                                            <a href="{{ url('/#loc-' . $comment->location_id) }}" class="text-decoration-none text-dark fw-medium">
+                                            <a href="{{ url('/#loc-' . $comment->location_id) }}" class="text-decoration-none fw-semibold" style="color:var(--text-main);font-size:0.8rem;">
                                                 {{ $comment->location->name ?? 'Địa điểm ẩn' }}
                                             </a>
                                         </td>
-                                        <td class="text-secondary small">{{ $comment->content }}</td>
-                                        <td>
-                                            <span class="text-warning fw-bold">{{ $comment->rating ?? 0 }} &starf;</span>
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <button type="button" class="btn-text-danger delete-comment-btn" data-comment-id="{{ $comment->id }}">
-                                                Xóa nhận xét
-                                            </button>
+                                        <td class="text-secondary" style="font-size:0.78rem;">{{ $comment->content }}</td>
+                                        <td><span class="text-warning fw-bold" style="font-variant-numeric:tabular-nums;">{{ $comment->rating ?? 0 }} ★</span></td>
+                                        <td style="font-size:0.72rem;font-variant-numeric:tabular-nums;white-space:nowrap;">{{ $comment->created_at?->format('d/m/Y H:i') }}</td>
+                                        <td style="text-align:right;">
+                                            <button type="button" class="btn-danger-ghost delete-comment-btn" data-comment-id="{{ $comment->id }}">Xóa</button>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr id="noCommentsRow">
-                                        <td colspan="4" class="text-center py-4 text-secondary small">
-                                            Bạn chưa viết nhận xét nào.
-                                        </td>
+                                        <td colspan="5"><div class="empty-state" style="border:0;background:transparent;">Bạn chưa viết nhận xét nào.</div></td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -1588,9 +2750,8 @@
                     @if($businessProfile->status === 'pending')
                         <div class="content-panel">
                             <div class="section-title">Yêu cầu nâng cấp tài khoản doanh nghiệp</div>
-                            <div class="alert alert-warning rounded-3 border-0 p-4 mb-4 text-center">
-                                <div class="fs-4 mb-2">Yêu cầu đang được chờ phê duyệt</div>
-                                <p class="text-secondary mb-0 small">Chúng tôi đang xác minh thông tin doanh nghiệp của bạn. Thời gian xử lý thường từ 24h - 48h làm việc.</p>
+                            <div class="panel-note warn">
+                                <div><strong>Đang chờ phê duyệt.</strong> Chúng tôi đang xác minh thông tin doanh nghiệp (thường 24–48h làm việc).</div>
                             </div>
                             <!-- Display filled details -->
                             <div class="row">
@@ -1611,7 +2772,7 @@
                                     <div id="pendingBusinessMap" style="height: 260px; width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; z-index: 1;"></div>
                                 </div>
                                 <div class="col-12 mt-4 text-center">
-                                    <button type="button" class="btn btn-outline-danger btn-sm px-4 rounded-3" id="cancelBusinessRequestBtn">
+                                    <button type="button" class="btn-danger-ghost" id="cancelBusinessRequestBtn">
                                         Hủy yêu cầu đăng ký
                                     </button>
                                 </div>
@@ -1620,9 +2781,8 @@
                     @elseif($businessProfile->status === 'approved')
                         <div class="content-panel">
                             <div class="section-title">Quản lý tài khoản doanh nghiệp</div>
-                            <div class="alert alert-success rounded-3 border-0 p-4 mb-4 text-center">
-                                <div class="fs-4 mb-2">Đã nâng cấp lên Tài khoản doanh nghiệp!</div>
-                                <p class="text-secondary mb-0 small">Chúc mừng! Bạn đã sở hữu tài khoản doanh nghiệp. Địa điểm của bạn đã được đưa lên hệ thống.</p>
+                            <div class="panel-note ok">
+                                <div><strong>Đã kích hoạt doanh nghiệp.</strong> Địa điểm của bạn đã được đưa lên hệ thống.</div>
                             </div>
                             <div class="card border border-success bg-success bg-opacity-10 p-3 rounded-3 mb-4">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -1634,154 +2794,79 @@
                                 </div>
                             </div>
                             
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="p-3 border rounded-3 text-center mb-3">
-                                        <div class="fw-bold text-primary mb-1" style="font-size:1.5rem;">●</div>
-                                        <div class="fw-semibold small mb-1">Xem trang địa điểm</div>
-                                        <p class="text-secondary small mb-2">Xem hiển thị thực tế trên bản đồ Ninh Bình Travel Hub</p>
-                                        @php
-                                            $loc = \App\Models\Location::where('created_by', $user->id)->first();
-                                        @endphp
-                                        @if($loc)
-                                            <a href="{{ route('client.locations.360', $loc->slug) }}" target="_blank" class="btn btn-outline-primary btn-sm px-3 rounded-2">Xem chi tiết</a>
-                                        @else
-                                            <span class="text-muted small">Đang đồng bộ dữ liệu địa điểm...</span>
-                                        @endif
-                                    </div>
+                            <div class="biz-feature-grid">
+                                <div class="biz-feature">
+                                    <strong>Xem trang địa điểm</strong>
+                                    <p class="mb-2">Hiển thị thực tế trên bản đồ / 360°.</p>
+                                    @php
+                                        $loc = \App\Models\Location::where('created_by', $user->id)->first();
+                                    @endphp
+                                    @if($loc)
+                                        <a href="{{ route('client.locations.360', $loc->slug) }}" target="_blank" class="btn-ghost" style="display:inline-block;">Xem chi tiết</a>
+                                    @else
+                                        <span class="text-muted" style="font-size:0.72rem;">Đang đồng bộ dữ liệu...</span>
+                                    @endif
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="p-3 border rounded-3 text-center mb-3">
-                                        <div class="fw-bold text-primary mb-1" style="font-size:1.5rem;">●</div>
-                                        <div class="fw-semibold small mb-1">Trang quản trị</div>
-                                        <p class="text-secondary small mb-2">Truy cập Dashboard dành cho chủ doanh nghiệp</p>
-                                        <a href="{{ route('business.dashboard') }}" class="btn btn-primary btn-sm px-3 rounded-2">Vào trang quản trị</a>
-                                    </div>
+                                <div class="biz-feature">
+                                    <strong>Trang quản trị</strong>
+                                    <p class="mb-2">Dashboard dành cho chủ doanh nghiệp.</p>
+                                    <a href="{{ route('business.dashboard') }}" class="btn-solid" style="display:inline-block;text-decoration:none;">Vào quản trị</a>
                                 </div>
                             </div>
                         </div>
                     @elseif($businessProfile->status === 'rejected')
                         <div class="content-panel">
                             <div class="section-title">Đăng ký tài khoản doanh nghiệp</div>
-                            <div class="alert alert-danger rounded-3 border-0 p-4 mb-4 text-center">
-                                <div class="fs-5 mb-2 fw-semibold">Yêu cầu của bạn đã bị từ chối</div>
-                                <p class="text-secondary mb-3 small"><strong>Lý do từ chối:</strong> {{ $businessProfile->reject_reason ?? 'Thông tin cung cấp chưa chính xác hoặc không đủ điều kiện.' }}</p>
-                                <a href="{{ route('client.profile.business.upgrade') }}" class="btn btn-danger btn-sm rounded-3 px-4 py-2 fw-semibold">Đăng ký lại</a>
+                            <div class="panel-note danger">
+                                <div>
+                                    <strong>Yêu cầu bị từ chối.</strong>
+                                    Lý do: {{ $businessProfile->reject_reason ?? 'Thông tin cung cấp chưa chính xác hoặc không đủ điều kiện.' }}
+                                </div>
                             </div>
+                            <a href="{{ route('client.profile.business.upgrade') }}" class="btn-danger-ghost" style="text-decoration:none;display:inline-block;">Đăng ký lại</a>
                         </div>
                     @endif
                 @else
                     <div class="content-panel">
-                        <div class="section-title">Nâng cấp tài khoản doanh nghiệp</div>
-                        <div class="text-center py-4">
-
-                            <h5 class="fw-bold mb-3">Đưa địa điểm kinh doanh của bạn lên bản đồ Ninh Bình Travel Hub</h5>
-                            <p class="text-secondary mx-auto mb-4" style="max-width: 600px;">
-                                Quảng bá nhà hàng, khách sạn, cửa hàng hoặc dịch vụ của bạn hoàn toàn miễn phí. Tiếp cận hàng ngàn người dùng tìm kiếm địa điểm du lịch, ăn uống, và dịch vụ tại Ninh Bình mỗi ngày.
-                            </p>
-                            
-                            <div class="row g-3 mx-auto text-start mb-4" style="max-width: 600px;">
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-start gap-2">
-                                        <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
-                                        <div>
-                                            <div class="fw-semibold small">Xuất hiện trên Bản đồ</div>
-                                            <p class="text-secondary small mb-0">Hiển thị vị trí chính xác trên bản đồ vệ tinh Ninh Bình Travel Hub.</p>
-                                        </div>
-                                    </div>
+                        <div class="section-title">
+                            <span>Nâng cấp tài khoản doanh nghiệp</span>
+                            <span class="dt-meta">Miễn phí</span>
+                        </div>
+                        <div class="biz-hero">
+                            <div>
+                                <h5 class="fw-bold mb-2" style="font-size:1.05rem;letter-spacing:-0.02em;">Đưa địa điểm lên bản đồ Ninh Bình Travel Hub</h5>
+                                <p class="text-secondary mb-3" style="font-size:0.82rem;line-height:1.55;max-width:48ch;">
+                                    Quảng bá nhà hàng, khách sạn, cửa hàng hoặc dịch vụ miễn phí. Tiếp cận người dùng đang tìm địa điểm tại Ninh Bình.
+                                </p>
+                                <a href="{{ route('client.profile.business.upgrade') }}" class="btn-solid" style="text-decoration:none;display:inline-block;padding:9px 16px;">Bắt đầu đăng ký</a>
+                            </div>
+                            <div class="biz-feature-grid">
+                                <div class="biz-feature">
+                                    <strong>Xuất hiện trên bản đồ</strong>
+                                    <p>Hiển thị vị trí chính xác trên bản đồ vệ tinh.</p>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-start gap-2">
-                                        <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
-                                        <div>
-                                            <div class="fw-semibold small">Trình bày hình ảnh</div>
-                                            <p class="text-secondary small mb-0">Đăng tải ảnh mặt tiền, phòng nghỉ hoặc thực đơn của cửa hàng.</p>
-                                        </div>
-                                    </div>
+                                <div class="biz-feature">
+                                    <strong>Trình bày hình ảnh</strong>
+                                    <p>Đăng ảnh mặt tiền, phòng nghỉ hoặc thực đơn.</p>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-start gap-2">
-                                        <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
-                                        <div>
-                                            <div class="fw-semibold small">Tương tác trực tiếp</div>
-                                            <p class="text-secondary small mb-0">Trả lời bình luận, nhận phản hồi chất lượng từ người dùng.</p>
-                                        </div>
-                                    </div>
+                                <div class="biz-feature">
+                                    <strong>Tương tác trực tiếp</strong>
+                                    <p>Trả lời bình luận và nhận phản hồi từ khách.</p>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-start gap-2">
-                                        <span class="text-primary fw-bold" style="font-size: 8px; margin-top: 6px;">●</span>
-                                        <div>
-                                            <div class="fw-semibold small">Trang quản trị (Admin)</div>
-                                            <p class="text-secondary small mb-0">Quản lý nội dung, theo dõi thống kê số liệu tương tác địa điểm.</p>
-                                        </div>
-                                    </div>
+                                <div class="biz-feature">
+                                    <strong>Trang quản trị</strong>
+                                    <p>Quản lý nội dung và theo dõi tương tác.</p>
                                 </div>
                             </div>
-
-                            <a href="{{ route('client.profile.business.upgrade') }}" class="btn btn-primary px-5 py-2.5 rounded-3 fw-bold">
-                                Bắt đầu đăng ký ngay
-                            </a>
                         </div>
                     </div>
                 @endif
             </div>
 
-            <!-- Tab 5: Preferences -->
-            <div class="tab-pane fade" id="tab-preferences" role="tabpanel">
-                <div class="content-panel">
-                    <div class="section-title">Tùy chỉnh hệ thống</div>
-
-                    <div class="mb-4">
-                        <div class="fw-bold mb-1">Chế độ giao diện cá nhân</div>
-                        <div class="d-flex align-items-center justify-content-between p-3 border rounded-3 bg-light mt-2">
-                            <div>
-                                <div class="fw-semibold small">Chế độ tối (Dark Mode)</div>
-                                <small class="text-secondary">Giảm độ chói và bảo vệ mắt của bạn</small>
-                            </div>
-                            <div class="form-check form-switch fs-5">
-                                <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch">
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="my-4" style="border-color: var(--border-color);">
-
-                    <div>
-                        <div class="fw-bold mb-2">Loại bản đồ mặc định</div>
-                        <div class="row g-3">
-                            <div class="col-6 col-md-3">
-                                <label class="w-100">
-                                    <input type="radio" name="map_style" value="standard" checked class="d-none">
-                                    <div class="simple-map-card active" data-style="standard">Chuẩn</div>
-                                </label>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100">
-                                    <input type="radio" name="map_style" value="satellite" class="d-none">
-                                    <div class="simple-map-card" data-style="satellite">Vệ tinh</div>
-                                </label>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100">
-                                    <input type="radio" name="map_style" value="terrain" class="d-none">
-                                    <div class="simple-map-card" data-style="terrain">Địa hình</div>
-                                </label>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <label class="w-100">
-                                    <input type="radio" name="map_style" value="dark" class="d-none">
-                                    <div class="simple-map-card" data-style="dark">Bản đồ tối</div>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </div>
-</div>
+        </div><!-- /.workspace-body -->
+    </div><!-- /.dashboard-content -->
+</div><!-- /.main-layout -->
 
 <!-- Deactivation Confirmation Modal -->
 <div class="modal fade" id="deactivateAccountModal" tabindex="-1" aria-hidden="true">
@@ -2264,14 +3349,23 @@
         const displayNameVal = document.getElementById('sidebarDisplayNameVal');
         const displayNameInput = document.getElementById('sidebarDisplayNameInput');
         const formDisplayNameVal = document.getElementById('profileFormDisplayNameVal');
+        const profileTopDisplayName = document.getElementById('profileTopDisplayName');
+        const btnEditDisplayNameTop = document.getElementById('btnEditDisplayNameTop');
+
+        function startDisplayNameEdit() {
+            if (!displayNameText || !displayNameInput) return;
+            displayNameText.classList.add('d-none');
+            displayNameInput.classList.remove('d-none');
+            displayNameInput.focus();
+            displayNameInput.select();
+        }
+
+        if (btnEditDisplayNameTop) {
+            btnEditDisplayNameTop.addEventListener('click', startDisplayNameEdit);
+        }
 
         if (displayNameText && displayNameInput && displayNameVal) {
-            displayNameText.addEventListener('click', function() {
-                displayNameText.classList.add('d-none');
-                displayNameInput.classList.remove('d-none');
-                displayNameInput.focus();
-                displayNameInput.select();
-            });
+            displayNameText.addEventListener('click', startDisplayNameEdit);
 
             const saveDisplayName = () => {
                 const newValue = displayNameInput.value.trim();
@@ -2322,6 +3416,9 @@
                         // Sync with right form text value if present
                         if (formDisplayNameVal) {
                             formDisplayNameVal.textContent = data.display_name;
+                        }
+                        if (profileTopDisplayName) {
+                            profileTopDisplayName.textContent = data.display_name;
                         }
 
                         showToast(data.message, true);
@@ -2395,9 +3492,9 @@
 
                                 if (currentCount === 0) {
                                     favoritesGrid.innerHTML = `
-                                        <div class="col-12 text-center py-5" id="noFavoritesMsg">
-                                            <p class="text-secondary small mb-3">Bạn chưa lưu địa điểm nào.</p>
-                                            <a href="{{ url('/') }}" class="btn btn-primary btn-sm rounded-pill px-4">Tìm kiếm địa điểm</a>
+                                        <div id="noFavoritesMsg" class="empty-state" style="border:0;border-radius:0;">
+                                            <p>Bạn chưa lưu địa điểm nào.</p>
+                                            <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;display:inline-block;">Tìm địa điểm trên bản đồ</a>
                                         </div>
                                     `;
                                 }
@@ -2413,6 +3510,161 @@
                 });
             });
         }
+
+        // --- Saved Itineraries: view / delete ---
+        const itinerariesGrid = document.getElementById('itinerariesGrid');
+        const itinerariesCountBadge = document.getElementById('itinerariesCountBadge');
+        const itineraryModalEl = document.getElementById('itineraryViewModal');
+        const itineraryModal = itineraryModalEl ? new bootstrap.Modal(itineraryModalEl) : null;
+
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/[&<>"']/g, s => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[s]));
+        }
+
+        function renderItineraryModal(data, meta) {
+            document.getElementById('itineraryModalTitle').textContent = data.title || 'Lịch trình';
+            document.getElementById('itineraryModalSummary').textContent = data.summary || (meta?.created_at ? ('Lưu lúc ' + meta.created_at) : '');
+            const costEl = document.getElementById('itineraryModalCost');
+            costEl.textContent = data.estimated_cost ? ('Chi phí: ' + data.estimated_cost) : '';
+
+            const typeLabel = {
+                visit: 'Tham quan',
+                food: 'Ẩm thực',
+                transport: 'Di chuyển',
+                rest: 'Nghỉ ngơi',
+                photo: 'Check-in',
+            };
+
+            function cleanDayTitle(day) {
+                let title = String(day.title || '').trim();
+                const n = day.day ?? '';
+                // Bỏ trùng kiểu "Ngày 1: Ngày 1: ..."
+                title = title.replace(new RegExp(`^\\s*Ngày\\s*${n}\\s*[:\\-–]?\\s*`, 'i'), '');
+                title = title.replace(/^Ngày\s*\d+\s*[:\-–]?\s*/i, '');
+                return title.trim();
+            }
+
+            let html = '';
+            (data.days || []).forEach(day => {
+                const dayTitle = cleanDayTitle(day);
+                html += `<div class="it-day">
+                    <div class="it-day-head">
+                        <span class="it-day-badge">NGÀY ${escapeHtml(day.day)}</span>
+                        <h6 class="it-day-title">${escapeHtml(dayTitle || ('Hành trình ngày ' + day.day))}</h6>
+                    </div>`;
+
+                (day.slots || []).forEach(slot => {
+                    const type = slot.type || 'visit';
+                    const pill = typeLabel[type] || 'Hoạt động';
+                    html += `<div class="it-slot">
+                        <div class="it-slot-time">${escapeHtml(slot.time || '')}</div>
+                        <div class="it-slot-rail"><span class="it-slot-dot ${escapeHtml(type)}"></span></div>
+                        <div>
+                            <span class="it-type-pill ${escapeHtml(type)}">${escapeHtml(pill)}</span>
+                            <div class="it-slot-activity">${escapeHtml(slot.activity || '')}</div>
+                            ${slot.location ? `<div class="it-slot-location">${escapeHtml(slot.location)}</div>` : ''}
+                            ${slot.distance_from_prev_km ? `<div class="it-slot-meta">↔ ${escapeHtml(slot.distance_from_prev_km)} km từ điểm trước</div>` : ''}
+                            ${slot.tip ? `<div class="it-slot-tip">${escapeHtml(slot.tip)}</div>` : ''}
+                        </div>
+                    </div>`;
+                });
+
+                html += `</div>`;
+            });
+
+            if ((data.tips || []).length) {
+                html += `<div class="it-tips"><div class="it-tips-title">Lưu ý</div><ul>${data.tips.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul></div>`;
+            }
+
+            document.getElementById('itineraryModalBody').innerHTML = html || '<p class="text-secondary mb-0">Không có nội dung.</p>';
+            if (itineraryModal) itineraryModal.show();
+        }
+
+        if (itinerariesGrid) {
+            itinerariesGrid.addEventListener('click', function(e) {
+                const viewBtn = e.target.closest('.itinerary-view-btn');
+                const deleteBtn = e.target.closest('.itinerary-delete-btn');
+
+                if (viewBtn) {
+                    const id = viewBtn.getAttribute('data-id');
+                    viewBtn.disabled = true;
+                    fetch(`/trip-planner/${id}`, {
+                        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        viewBtn.disabled = false;
+                        if (!data.success) {
+                            showToast(data.error || 'Không tải được lịch trình.', false);
+                            return;
+                        }
+                        renderItineraryModal(data.itinerary || {}, data.meta || {});
+                    })
+                    .catch(() => {
+                        viewBtn.disabled = false;
+                        showToast('Có lỗi xảy ra.', false);
+                    });
+                    return;
+                }
+
+                if (deleteBtn) {
+                    const id = deleteBtn.getAttribute('data-id');
+                    if (!confirm('Bạn chắc chắn muốn xóa lịch trình này?')) return;
+
+                    deleteBtn.disabled = true;
+                    fetch(`/trip-planner/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.success) {
+                            deleteBtn.disabled = false;
+                            showToast(data.message || 'Xóa thất bại.', false);
+                            return;
+                        }
+                        const card = document.getElementById(`itinerary-card-${id}`);
+                        if (card) card.remove();
+                        let count = parseInt(itinerariesCountBadge?.innerText || '0') || 0;
+                        count = Math.max(0, count - 1);
+                        if (itinerariesCountBadge) itinerariesCountBadge.innerText = count;
+                        if (count === 0 && itinerariesGrid) {
+                            itinerariesGrid.innerHTML = `
+                                <div id="noItinerariesMsg" class="empty-state" style="border:0;border-radius:0;">
+                                    <p>Bạn chưa lưu lịch trình nào.</p>
+                                    <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;display:inline-block;" onclick="if(window.openTripPlanner){event.preventDefault();window.openTripPlanner(true);}">Lên lịch trình AI</a>
+                                </div>`;
+                        }
+                        showToast('Đã xóa lịch trình.', true);
+                    })
+                    .catch(() => {
+                        deleteBtn.disabled = false;
+                        showToast('Có lỗi xảy ra.', false);
+                    });
+                }
+            });
+        }
+
+        // Deep-link: /profile#itineraries
+        if (window.location.hash === '#itineraries') {
+            const tabBtn = document.getElementById('tab-itineraries-btn');
+            if (tabBtn) tabBtn.click();
+        }
+
+        // Cập nhật tiêu đề workspace theo tab đang mở
+        const workspaceTabTitle = document.getElementById('workspaceTabTitle');
+        document.querySelectorAll('#settings-tabs [data-bs-toggle="pill"]').forEach(btn => {
+            btn.addEventListener('shown.bs.tab', () => {
+                if (!workspaceTabTitle) return;
+                const label = btn.querySelector('.nav-link-left span:last-child') || btn.querySelector('span');
+                workspaceTabTitle.textContent = (label?.textContent || '').trim() || 'Tài khoản';
+            });
+        });
 
         // --- Delete Comment via AJAX with Custom Animated Modal ---
         const commentsTable = document.getElementById('commentsTable');
@@ -2522,40 +3774,12 @@
             });
         }
 
-        // --- Dark Mode Switcher ---
-        const darkModeSwitch = document.getElementById('darkModeSwitch');
-        const profileContainer = document.getElementById('profile-app-container');
-
-        if (localStorage.getItem('profile-dark-mode') === 'enabled') {
-            if (darkModeSwitch) darkModeSwitch.checked = true;
-            if (profileContainer) profileContainer.classList.add('dark-mode-active');
-            document.body.style.backgroundColor = '#090d16';
-        }
-
-        if (darkModeSwitch) {
-            darkModeSwitch.addEventListener('change', function() {
-                if (this.checked) {
-                    if (profileContainer) profileContainer.classList.add('dark-mode-active');
-                    document.body.style.backgroundColor = '#090d16';
-                    localStorage.setItem('profile-dark-mode', 'enabled');
-                } else {
-                    if (profileContainer) profileContainer.classList.remove('dark-mode-active');
-                    document.body.style.backgroundColor = '#f8fafc';
-                    localStorage.setItem('profile-dark-mode', 'disabled');
-                }
-            });
-        }
-
-        // --- Map Preference Cards Switch ---
-        const mapCards = document.querySelectorAll('.simple-map-card');
-        mapCards.forEach(card => {
-            card.addEventListener('click', function() {
-                mapCards.forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                const radio = this.closest('label').querySelector('input[type="radio"]');
-                if (radio) radio.checked = true;
-            });
-        });
+        // Clear leftover profile dark-mode preference (feature removed)
+        try {
+            localStorage.removeItem('profile-dark-mode');
+            document.getElementById('profile-app-container')?.classList.remove('dark-mode-active');
+            document.body.style.backgroundColor = '';
+        } catch (e) {}
 
         // --- Account Deactivation ---
         const confirmDeactivationBtn = document.getElementById('confirmDeactivationBtn');
@@ -2749,6 +3973,64 @@
                 setTimeout(initPendingBizMap, 300);
             }
         @endif
+
+        // Points history: filter chips + load more
+        (function initPointsHistoryUi() {
+            const list = document.getElementById('pointsHistoryList');
+            const bar = document.getElementById('pointsFilterBar');
+            const meta = document.getElementById('pointsVisibleMeta');
+            const moreWrap = document.getElementById('pointsLoadMoreWrap');
+            const moreBtn = document.getElementById('pointsLoadMoreBtn');
+            if (!list || !bar) return;
+
+            const pageSize = 12;
+            let filter = 'all';
+            let visibleLimit = pageSize;
+
+            function applyPointsView() {
+                const rows = Array.from(list.querySelectorAll('.points-history-row'));
+                const matched = rows.filter(row => filter === 'all' || row.dataset.filter === filter);
+
+                rows.forEach(row => {
+                    const match = filter === 'all' || row.dataset.filter === filter;
+                    row.classList.toggle('is-filtered-out', !match);
+                    row.classList.remove('is-paged-out');
+                });
+
+                matched.forEach((row, idx) => {
+                    row.classList.toggle('is-paged-out', idx >= visibleLimit);
+                });
+
+                if (meta) {
+                    meta.textContent = matched.length
+                        ? Math.min(visibleLimit, matched.length) + ' / ' + matched.length + ' mục'
+                        : '0 mục';
+                }
+
+                if (moreWrap) {
+                    moreWrap.hidden = matched.length <= visibleLimit;
+                }
+            }
+
+            bar.querySelectorAll('[data-points-filter]').forEach(chip => {
+                chip.addEventListener('click', function () {
+                    bar.querySelectorAll('[data-points-filter]').forEach(c => c.classList.remove('on'));
+                    this.classList.add('on');
+                    filter = this.getAttribute('data-points-filter') || 'all';
+                    visibleLimit = pageSize;
+                    applyPointsView();
+                });
+            });
+
+            if (moreBtn) {
+                moreBtn.addEventListener('click', function () {
+                    visibleLimit += pageSize;
+                    applyPointsView();
+                });
+            }
+
+            applyPointsView();
+        })();
     });
 </script>
 

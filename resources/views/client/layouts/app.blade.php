@@ -245,7 +245,7 @@
             // Send heartbeat every 60 seconds (1 minute)
             const intervalTime = 60000; 
 
-            // Function to send heartbeat
+            // Function to send heartbeat (tracks online minutes for mission — no per-minute xu)
             function sendHeartbeat() {
                 fetch("{{ route('client.profile.heartbeat') }}", {
                     method: "POST",
@@ -256,42 +256,24 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        console.log("Heartbeat sent: " + data.message + " Current points: " + data.points);
-                        const pointsElement = document.getElementById("navbarUserPoints");
-                        if (pointsElement) {
-                            pointsElement.textContent = data.points + " điểm";
-                        }
-                        const sidebarPoints = document.getElementById("sidebarMissionPoints");
-                        if (sidebarPoints) {
-                            sidebarPoints.textContent = data.points + " điểm";
-                        }
-                        const widgetPoints = document.getElementById("widgetPoints");
-                        if (widgetPoints) {
-                            widgetPoints.textContent = data.points + " điểm";
-                        }
-                        const progressText = document.getElementById("missionSessionProgressText");
-                        const progressBar = document.getElementById("missionSessionProgressBar");
-                        if (progressText && progressBar) {
-                            let currentVal = parseInt(progressText.textContent) || 0;
-                            if (currentVal < 60) {
-                                currentVal += 1;
-                                progressText.textContent = currentVal + "/60 phút";
-                                progressBar.style.width = ((currentVal / 60) * 100) + "%";
-                                progressBar.setAttribute("aria-valuenow", currentVal);
-                            }
-                        }
-                        const widgetSessionText = document.getElementById("widgetSessionText");
-                        const widgetSessionBar = document.getElementById("widgetSessionBar");
-                        if (widgetSessionText && widgetSessionBar) {
-                            let currentVal = parseInt(widgetSessionText.textContent) || 0;
-                            if (currentVal < 60) {
-                                currentVal += 1;
-                                widgetSessionText.textContent = currentVal + "/60 phút";
-                                widgetSessionBar.style.width = ((currentVal / 60) * 100) + "%";
-                                widgetSessionBar.setAttribute("aria-valuenow", currentVal);
-                            }
-                        }
+                    if (typeof data.minutes === 'undefined') return;
+                    const minutes = parseInt(data.minutes, 10) || 0;
+                    const target = parseInt(data.target, 10) || 15;
+                    const pct = Math.min(100, Math.round((minutes / target) * 100));
+
+                    const progressText = document.getElementById("missionSessionProgressText");
+                    const progressBar = document.getElementById("missionSessionProgressBar");
+                    if (progressText && progressBar) {
+                        progressText.textContent = minutes + "/" + target + " phút";
+                        progressBar.style.width = pct + "%";
+                        progressBar.setAttribute("aria-valuenow", minutes);
+                    }
+                    const widgetSessionText = document.getElementById("widgetSessionText");
+                    const widgetSessionBar = document.getElementById("widgetSessionBar");
+                    if (widgetSessionText && widgetSessionBar) {
+                        widgetSessionText.textContent = minutes + "/" + target + " phút";
+                        widgetSessionBar.style.width = pct + "%";
+                        widgetSessionBar.setAttribute("aria-valuenow", minutes);
                     }
                 })
                 .catch(error => console.error("Error sending heartbeat:", error));

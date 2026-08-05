@@ -14,6 +14,8 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0"
         rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0"
+        rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Leaflet CSS -->
@@ -959,16 +961,14 @@
             left: 260px;
         }
 
-        /* Khi thu gọn (collapsed): lơ lửng cách đáy 14px, bo góc 10px hiện đại */
+        /* Khi thu gọn (collapsed): giữ dính liền với đáy và khung thanh địa điểm, ẩn bộ lọc chủ đề */
         .bottom-drawer-wrapper:not(.open) {
-            bottom: 14px;
+            bottom: 0;
         }
 
-        .bottom-drawer-wrapper:not(.open) .drawer-header {
-            border-radius: 7px;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1), 0 1px 3px rgba(15, 23, 42, 0.05);
-            padding: 6px 14px;
+        .bottom-drawer-wrapper:not(.open) .drawer-filter-dropdown-wrapper,
+        .bottom-drawer-wrapper:not(.open) .drawer-header-divider:last-of-type {
+            display: none !important;
         }
 
         .drawer-header {
@@ -1005,11 +1005,7 @@
             flex-shrink: 0;
         }
 
-        /* Khi thu gọn (collapsed), ẩn bộ lọc chủ đề & vạch chia thứ hai */
-        .bottom-drawer-wrapper:not(.open) .drawer-filter-dropdown-wrapper,
-        .bottom-drawer-wrapper:not(.open) .drawer-header-divider:last-of-type {
-            display: none !important;
-        }
+        /* Giữ nguyên bộ lọc chủ đề khi thu gọn để thanh không bị thu nhỏ thành cục tròn */
 
         .drawer-filter-dropdown-wrapper {
             position: relative;
@@ -1905,14 +1901,26 @@
             flex-shrink: 0;
         }
 
-        .user-sidebar .menu-icon .material-symbols-rounded {
-            font-size: 20px;
-            color: #475569;
+        .user-sidebar .menu-icon .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 22px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            color: #64748b;
             transition: color 0.2s ease;
         }
 
-        .user-sidebar .menu-item:hover .menu-icon .material-symbols-rounded,
-        .user-sidebar .menu-item.active .menu-icon .material-symbols-rounded {
+        .user-sidebar .menu-item:hover .menu-icon .material-symbols-outlined,
+        .user-sidebar .menu-item.active .menu-icon .material-symbols-outlined {
             color: #1e3a5f;
         }
 
@@ -1948,8 +1956,8 @@
             margin-bottom: 4px;
         }
 
-        .user-sidebar.collapsed .menu-icon .material-symbols-rounded {
-            font-size: 20px;
+        .user-sidebar.collapsed .menu-icon .material-symbols-outlined {
+            font-size: 22px;
         }
 
         .user-sidebar.collapsed .menu-text {
@@ -2095,37 +2103,37 @@
                 @auth
                 <li>
                     <a href="{{ route('client.missions') }}" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded">emoji_events</span></span>
+                        <span class="menu-icon"><span class="material-symbols-outlined">emoji_events</span></span>
                         <span class="menu-text">Nhiệm vụ</span>
-                        <span class="tooltip">Nhiệm vụ & Đổi quà</span>
+                        <span class="tooltip">Nhiệm vụ & điểm thưởng</span>
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('client.profile') }}#tab-favorites" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded">bookmark</span></span>
+                        <span class="menu-icon"><span class="material-symbols-outlined">bookmark</span></span>
                         <span class="menu-text">Đã lưu</span>
                         <span class="tooltip">Địa điểm đã lưu</span>
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('client.profile') }}#tab-itineraries" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-outlined">route</span></span>
+                        <span class="menu-text">Lịch trình</span>
+                        <span class="tooltip">Lịch trình đã lưu</span>
+                    </a>
+                </li>
+                <li>
                     <a href="#" onclick="openModal('suggestLocationModal'); return false;" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded">add_location_alt</span></span>
+                        <span class="menu-icon"><span class="material-symbols-outlined">add_location_alt</span></span>
                         <span class="menu-text">Đề xuất</span>
                         <span class="tooltip">Đề xuất địa điểm</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded">history</span></span>
-                        <span class="menu-text">Gần đây</span>
-                        <span class="tooltip">Lịch sử xem</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ route('client.profile') }}#tab-profile" class="menu-item">
-                        <span class="menu-icon"><span class="material-symbols-rounded">settings</span></span>
-                        <span class="menu-text">Cài đặt</span>
-                        <span class="tooltip">Cài đặt</span>
+                    <a href="{{ route('client.profile') }}" class="menu-item">
+                        <span class="menu-icon"><span class="material-symbols-outlined">person</span></span>
+                        <span class="menu-text">Hồ sơ</span>
+                        <span class="tooltip">Trang cá nhân</span>
                     </a>
                 </li>
                 <li class="logout-item" style="margin-top: auto; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 6px;">
@@ -2133,7 +2141,7 @@
                         @csrf
                     </form>
                     <a href="#" class="menu-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <span class="menu-icon"><span class="material-symbols-rounded">logout</span></span>
+                        <span class="menu-icon"><span class="material-symbols-outlined">logout</span></span>
                         <span class="menu-text">Đăng xuất</span>
                         <span class="tooltip">Đăng xuất</span>
                     </a>
@@ -2141,14 +2149,14 @@
                 @else
                     <li>
                         <a href="{{ route('login') }}" class="menu-item">
-                            <span class="menu-icon"><span class="material-symbols-rounded">login</span></span>
+                            <span class="menu-icon"><span class="material-symbols-outlined">login</span></span>
                             <span class="menu-text">Đăng nhập</span>
                             <span class="tooltip">Đăng nhập</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('register') }}" class="menu-item">
-                            <span class="menu-icon"><span class="material-symbols-rounded">person_add</span></span>
+                            <span class="menu-icon"><span class="material-symbols-outlined">person_add</span></span>
                             <span class="menu-text">Đăng ký</span>
                             <span class="tooltip">Đăng ký tài khoản</span>
                         </a>
@@ -2211,10 +2219,10 @@
             <!-- Divider -->
             <div class="dock-divider"></div>
 
-            <!-- Random Discovery Button -->
-            <button type="button" class="dock-random-btn" id="randomFlyBtn" title="Khám phá ngẫu nhiên một địa điểm">
+            <!-- Trip Planner Recommendation Button -->
+            <button type="button" class="dock-random-btn" id="randomFlyBtn" title="Gợi ý lịch trình chuyến đi cho bạn">
                 <span class="material-symbols-rounded">auto_awesome</span>
-                <span>Gợi ý ngẫu nhiên</span>
+                <span>Gợi ý cho bạn</span>
             </button>
         </div>
 
@@ -3104,21 +3112,13 @@
             });
         }
 
-        // --- Nút Khám Phá Ngẫu Nhiên ---
+        // --- Nút Gợi Ý Cho Bạn (Lên Lịch Trình AI) ---
         const randomFlyBtn = document.getElementById('randomFlyBtn');
         if (randomFlyBtn) {
             randomFlyBtn.addEventListener('click', () => {
-                if (!locations || locations.length === 0) return;
-                const randomLoc = locations[Math.floor(Math.random() * locations.length)];
-                
-                showToast(`✨ Gợi ý cho bạn: <strong>${randomLoc.name}</strong>`, 'info', 3000);
-
-                stepZoomToMarker(randomLoc, () => {
-                    map.flyTo([randomLoc.lat, randomLoc.lng], 17, { duration: 1.5 });
-                    setTimeout(() => {
-                        if (randomLoc.marker) randomLoc.marker.openPopup();
-                    }, 1000);
-                });
+                if (window.openTripPlanner) {
+                    window.openTripPlanner();
+                }
             });
         }
 

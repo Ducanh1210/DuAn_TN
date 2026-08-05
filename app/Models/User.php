@@ -158,4 +158,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class, 'reporter_id');
     }
+
+    /**
+     * Lịch trình AI đã lưu.
+     */
+    public function itineraries()
+    {
+        return $this->hasMany(Itinerary::class)->orderByDesc('created_at');
+    }
 }

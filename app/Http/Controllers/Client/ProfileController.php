@@ -65,7 +65,83 @@ class ProfileController extends Controller
             ->pluck('avatar_frame_id')
             ->toArray();
 
-        return view('client.profile', compact('user', 'favorites', 'comments', 'categories', 'businessProfile', 'allFrames', 'unlockedFrameIds'));
+        $itineraries = $user->itineraries()->get();
+
+        // Point history: collapse spammy per-minute active_session rows into daily summaries
+        $rawPointTx = \App\Models\PointTransaction::where('user_id', $user->id)
+            ->where('amount', '!=', 0)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $pointTxTotal = $rawPointTx->count();
+        $sessionBuckets = [];
+        $pointHistory = [];
+
+        foreach ($rawPointTx as $tx) {
+            if ($tx->action === 'active_session') {
+                $dayKey = $tx->created_at->format('Y-m-d');
+                if (!isset($sessionBuckets[$dayKey])) {
+                    $sessionBuckets[$dayKey] = [
+                        'key' => 'session-' . $dayKey,
+                        'action' => 'active_session',
+                        'filter' => 'session',
+                        'amount' => 0,
+                        'count' => 0,
+                        'created_at' => $tx->created_at,
+                        'description' => '',
+                        'aggregated' => true,
+                    ];
+                }
+                $sessionBuckets[$dayKey]['amount'] += (int) $tx->amount;
+                $sessionBuckets[$dayKey]['count']++;
+                if ($tx->created_at->gt($sessionBuckets[$dayKey]['created_at'])) {
+                    $sessionBuckets[$dayKey]['created_at'] = $tx->created_at;
+                }
+                continue;
+            }
+
+            $filter = match ($tx->action) {
+                'daily_login' => 'daily',
+                'comment' => 'comment',
+                'favorite' => 'favorite',
+                'mission_reward' => 'mission',
+                default => 'other',
+            };
+
+            $pointHistory[] = [
+                'key' => 'tx-' . $tx->id,
+                'action' => $tx->action,
+                'filter' => $filter,
+                'amount' => (int) $tx->amount,
+                'count' => 1,
+                'created_at' => $tx->created_at,
+                'description' => $tx->description,
+                'aggregated' => false,
+            ];
+        }
+
+        foreach ($sessionBuckets as $dayKey => $bucket) {
+            $bucket['description'] = 'Online ' . $bucket['count'] . ' phút · đã gộp ' . $bucket['count'] . ' bản ghi trong ngày '
+                . \Carbon\Carbon::parse($dayKey)->format('d/m/Y');
+            $pointHistory[] = $bucket;
+        }
+
+        usort($pointHistory, function ($a, $b) {
+            return $b['created_at']->timestamp <=> $a['created_at']->timestamp;
+        });
+
+        return view('client.profile', compact(
+            'user',
+            'favorites',
+            'comments',
+            'categories',
+            'businessProfile',
+            'allFrames',
+            'unlockedFrameIds',
+            'itineraries',
+            'pointHistory',
+            'pointTxTotal'
+        ));
     }
 
     /**
@@ -120,6 +196,12 @@ class ProfileController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
+
+        if ($user->provider === 'google') {
+            return back()->withErrors([
+                'password' => 'Tài khoản đăng nhập bằng Google không thể đổi mật khẩu trên hệ thống.',
+            ]);
+        }
 
         // Check if user registered via Google and hasn't set a password yet
         $hasPassword = !empty($user->password_hash);
@@ -217,10 +299,26 @@ class ProfileController extends Controller
         $result = $user->favorites()->toggle($locationId);
         $isFavorited = count($result['attached']) > 0;
 
+        $points = $user->points;
+        if ($isFavorited) {
+            $location = \App\Models\Location::find($locationId);
+            \App\Services\PointService::awardPoints(
+                $user,
+                \App\Services\PointService::POINTS_FAVORITE,
+                'favorite',
+                'Yêu thích địa điểm ' . ($location->name ?? ('#' . $locationId))
+            );
+            MissionService::trackProgress($user, 'favorite_location', 1, false, $locationId);
+            $points = $user->fresh()->points;
+        }
+
         return response()->json([
             'success' => true,
             'is_favorited' => $isFavorited,
-            'message' => $isFavorited ? 'Đã thêm vào danh sách yêu thích!' : 'Đã xóa khỏi danh sách yêu thích!',
+            'points' => $points,
+            'message' => $isFavorited
+                ? 'Đã thêm vào danh sách yêu thích (+' . \App\Services\PointService::POINTS_FAVORITE . ' điểm)!'
+                : 'Đã xóa khỏi danh sách yêu thích!',
         ]);
     }
 
@@ -576,32 +674,41 @@ class ProfileController extends Controller
     }
 
     /**
-     * Track user activity and award points for time spent on site.
+     * Track online time for the active_session mission (no per-minute xu).
      */
     public function heartbeat(Request $request)
     {
         $user = Auth::user();
-        $today = \Carbon\Carbon::today();
 
-        // Count points gained from active session today
-        $todayPoints = \App\Models\PointTransaction::where('user_id', $user->id)
-            ->where('action', 'active_session')
-            ->whereDate('created_at', $today)
-            ->sum('amount');
+        $sessionMission = \App\Models\Mission::where('status', 'active')
+            ->where('action_key', 'active_session')
+            ->first();
 
-        // Cap active session points to 60 per day (1 point per minute for 1 hour)
-        if ($todayPoints < 60) {
-            \App\Services\PointService::awardPoints($user, 1, 'active_session', 'Tích lũy thời gian hoạt động');
-            return response()->json([
-                'success' => true,
-                'points' => $user->points,
-                'message' => 'Cộng +1 xu hoạt động.'
-            ]);
+        $target = $sessionMission ? (int) $sessionMission->target_count : 15;
+
+        MissionService::trackProgress($user, 'active_session', 1);
+
+        $userMission = null;
+        if ($sessionMission) {
+            $userMission = \App\Models\UserMission::where('user_id', $user->id)
+                ->where('mission_id', $sessionMission->id)
+                ->first();
         }
 
+        $minutes = $userMission ? (int) $userMission->current_count : 0;
+        $capped = $minutes >= $target;
+
         return response()->json([
-            'success' => false,
-            'message' => 'Đã đạt giới hạn xu hoạt động hôm nay.'
+            'success' => !$capped || ($userMission && $userMission->status === 'in_progress'),
+            'minutes' => min($minutes, $target),
+            'target' => $target,
+            'claimable' => $userMission && $userMission->status === 'completed',
+            'points' => $user->fresh()->points,
+            'message' => $capped
+                ? ($userMission && $userMission->status === 'completed'
+                    ? 'Đã đủ thời gian — hãy nhận thưởng nhiệm vụ.'
+                    : 'Đã đủ thời gian online cho nhiệm vụ hôm nay.')
+                : 'Đã ghi nhận thời gian online (' . $minutes . '/' . $target . ' phút).',
         ]);
     }
 
@@ -693,13 +800,12 @@ class ProfileController extends Controller
     }
 
     /**
-     * Claim daily 100-point milestone gift box reward.
+     * Claim milestone gift: unlock avatar frame only (no bonus xu — avoids double economy).
      */
     public function claimMilestone100(Request $request)
     {
         $user = Auth::user();
 
-        // 1. Exclude milestone rewards from earned points progress
         $totalPointsEarned = \App\Models\PointTransaction::where('user_id', $user->id)
             ->where('amount', '>', 0)
             ->where('action', 'not like', 'daily_milestone_%')
@@ -711,58 +817,65 @@ class ProfileController extends Controller
             ->toArray();
 
         $allowedMilestones = [100, 200, 500];
-        $reqMilestone = (int)$request->input('milestone', 100);
+        $reqMilestone = (int) $request->input('milestone', 100);
 
-        if (!in_array($reqMilestone, $allowedMilestones)) {
+        if (!in_array($reqMilestone, $allowedMilestones, true)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mốc phần thưởng không hợp lệ!'
+                'message' => 'Mốc phần thưởng không hợp lệ!',
             ], 400);
         }
 
         if ($totalPointsEarned < $reqMilestone) {
             return response()->json([
                 'success' => false,
-                'message' => 'Bạn cần tích lũy ít nhất ' . $reqMilestone . ' xu để mở Hộp Quà Mốc này.'
+                'message' => 'Bạn cần tích lũy ít nhất ' . $reqMilestone . ' xu để mở Hộp Quà Mốc này.',
             ], 400);
         }
 
         $actionKey = 'daily_milestone_' . $reqMilestone;
-        if (in_array($actionKey, $claimedMilestones)) {
+        if (in_array($actionKey, $claimedMilestones, true)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Bạn đã nhận phần thưởng mốc ' . $reqMilestone . ' xu rồi!'
+                'message' => 'Bạn đã nhận phần thưởng mốc ' . $reqMilestone . ' xu rồi!',
             ], 400);
         }
 
-        // Rewards map (Focus on avatar frames with small coin bonus)
-        $rewardsMap = [
-            100 => ['coins' => 10, 'frame_id' => 1],
-            200 => ['coins' => 20, 'frame_id' => 2],
-            500 => ['coins' => 30, 'frame_id' => 4],
+        // Resolve by frame code (stable), not hardcoded IDs
+        $frameCodes = [
+            100 => 'frame-bronze',
+            200 => 'frame-silver',
+            500 => 'frame-diamond',
         ];
 
-        $rewardCoins = $rewardsMap[$reqMilestone]['coins'];
-        $frameId = $rewardsMap[$reqMilestone]['frame_id'];
+        $frame = \App\Models\AvatarFrame::where('code', $frameCodes[$reqMilestone])->first();
 
-        \App\Services\PointService::awardPoints($user, $rewardCoins, $actionKey, 'Thưởng mốc tích lũy ' . $reqMilestone . ' xu');
+        \App\Services\PointService::awardPoints(
+            $user,
+            0,
+            $actionKey,
+            'Nhận khung mốc tích lũy ' . $reqMilestone . ' xu'
+        );
 
-        $frame = \App\Models\AvatarFrame::find($frameId);
         if ($frame) {
-            \App\Services\MissionService::unlockFrame($user, $frame->id);
+            MissionService::unlockFrame($user, $frame->id);
         }
+
+        MissionService::checkRankFramesUnlocked($user->fresh());
 
         return response()->json([
             'success' => true,
-            'message' => 'Bạn nhận thêm +' . $rewardCoins . ' xu thưởng từ Hộp Quà Mốc ' . $reqMilestone . ' Xu!',
-            'coins' => $rewardCoins,
+            'message' => $frame
+                ? 'Đã mở khóa khung avatar: ' . $frame->name . '!'
+                : 'Đã nhận phần thưởng mốc ' . $reqMilestone . ' xu!',
+            'coins' => 0,
             'points' => $user->fresh()->points,
             'frame' => $frame ? [
                 'id' => $frame->id,
                 'name' => $frame->name,
-                'image_url' => asset($frame->image_url),
-                'css_style' => $frame->css_style
-            ] : null
+                'image_url' => $frame->image_url ? asset($frame->image_url) : '',
+                'css_style' => $frame->css_style,
+            ] : null,
         ]);
     }
 
