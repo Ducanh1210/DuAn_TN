@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+@php $hasPanorama = $location->panoramas()->exists(); @endphp
 <head>
-    <title>Khám phá 360° - {{ $location->name }}</title>
+    <title>{{ ($hasPanorama ? 'Khám phá 360°' : 'Khám phá') }} - {{ $location->name }}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
     <style> @-ms-viewport { width: device-width; } </style>
@@ -53,6 +54,71 @@
         }
         .btn-back-map:hover i {
             transform: translateX(-2px);
+        }
+
+        /* Top-right more menu (share, report) */
+        .viewer-more-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10050;
+        }
+        .viewer-more-btn {
+            border: none;
+            background: none;
+            color: #fff;
+            padding: 4px 6px;
+            font-size: 18px;
+            line-height: 1;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+            opacity: 0.9;
+            transition: opacity 0.15s ease;
+        }
+        .viewer-more-btn:hover {
+            opacity: 0.65;
+        }
+        .viewer-more-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            min-width: 120px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 6px;
+            padding: 4px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.12s ease;
+        }
+        .viewer-more-dropdown.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .viewer-more-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: color 0.12s ease;
+        }
+        .viewer-more-item:hover {
+            color: #1e3a5f;
+        }
+        body.reviews-drawer-open .viewer-more-menu {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        body.reviews-drawer-open .floating-comment-container {
+            display: none !important;
         }
 
         /* Hide all default Marzipano UI elements */
@@ -319,7 +385,7 @@
         .comments-drawer {
             position: absolute; right: -420px; top: 0; bottom: 0; width: 380px; max-width: 100vw;
             background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            z-index: 1001; transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 10060; transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             border-left: 1px solid #cbdbe8; display: flex; flex-direction: column;
             box-shadow: -8px 0 25px rgba(0, 0, 0, 0.06);
         }
@@ -619,7 +685,7 @@
         /* Floating Curved Review Bubbles (Mini Compact Arc Loop Shifted Down) */
         .floating-comment-container {
             position: fixed;
-            top: 80px;
+            top: 110px;
             right: 25px;
             z-index: 9999;
             pointer-events: none;
@@ -1223,6 +1289,137 @@
         .interaction-btn.active i {
             color: #ef4444 !important;
         }
+
+        /* Photo viewer (no 360) — same shell as panorama page */
+        .photo-viewer-stage {
+            position: absolute;
+            inset: 0;
+            background: #0a0a0a;
+            overflow: hidden;
+        }
+        .photo-viewer-stage__img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .photo-viewer-stage__empty {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.75);
+            font-size: 14px;
+            padding: 24px;
+            text-align: center;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 70%);
+        }
+        .photo-viewer-badge {
+            position: absolute;
+            top: 72px;
+            right: 20px;
+            z-index: 50;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.62);
+            backdrop-filter: blur(8px);
+            color: #f8fafc;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .photo-viewer-info {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            bottom: 28px;
+            z-index: 50;
+            pointer-events: none;
+        }
+        .photo-viewer-info__title {
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 4px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.65);
+        }
+        .photo-viewer-info__meta {
+            color: rgba(255,255,255,0.82);
+            font-size: 0.8rem;
+            margin: 0;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+        }
+        .photo-viewer-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 55;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.55);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .photo-viewer-nav:hover { background: rgba(30, 58, 95, 0.85); }
+        .photo-viewer-nav--prev { left: 16px; }
+        .photo-viewer-nav--next { right: 16px; }
+        .photo-viewer-nav:disabled { opacity: 0.35; cursor: default; }
+        .photo-viewer-counter {
+            position: absolute;
+            top: 72px;
+            left: 20px;
+            z-index: 50;
+            color: rgba(255,255,255,0.9);
+            font-size: 12px;
+            font-weight: 600;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+        .photo-viewer-thumbs {
+            position: absolute;
+            left: 50%;
+            bottom: 12px;
+            transform: translateX(-50%);
+            z-index: 55;
+            display: flex;
+            gap: 6px;
+            max-width: min(92vw, 520px);
+            overflow-x: auto;
+            padding: 4px;
+            scrollbar-width: none;
+        }
+        .photo-viewer-thumbs::-webkit-scrollbar { display: none; }
+        .photo-viewer-thumb {
+            flex: 0 0 auto;
+            width: 52px;
+            height: 38px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            opacity: 0.65;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+        }
+        .photo-viewer-thumb.is-active {
+            border-color: #fff;
+            opacity: 1;
+        }
+        .photo-viewer-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
     </style>
 </head>
 
@@ -1272,19 +1469,40 @@
             ];
         })->values()
     ];
+
+    $photoMode = $scenes->isEmpty();
+    $photoSlides = [];
+    if ($photoMode) {
+        $hero = $heroImage ?? $location->resolveThumbnailUrl();
+        $gallery = $galleryImages ?? $location->resolveImageUrls();
+        $seen = [];
+        if ($hero) {
+            $photoSlides[] = ['url' => $hero, 'caption' => $location->name];
+            $seen[$hero] = true;
+        }
+        foreach ($gallery as $img) {
+            $url = $img['url'] ?? null;
+            if ($url && !isset($seen[$url])) {
+                $photoSlides[] = ['url' => $url, 'caption' => $img['caption'] ?? $location->name];
+                $seen[$url] = true;
+            }
+        }
+    }
 @endphp
 
 <body>
 
-@if($scenes->isEmpty())
-    <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#111; color:#fff; flex-direction:column;">
-        <h3>Địa điểm này chưa có không gian 360°</h3>
-        <a href="{{ url('/') }}" class="btn btn-outline-light mt-3">Quay lại Bản đồ</a>
-    </div>
-@else
     <a href="{{ url('/') }}" class="btn-back-map">
         <i class="fa-solid fa-arrow-left"></i> Quay lại Bản đồ
     </a>
+
+    <div class="viewer-more-menu" id="viewerMoreMenu">
+        <button type="button" class="viewer-more-btn" id="viewerMoreBtn" aria-label="Tùy chọn" onclick="toggleViewerMoreMenu(event)">···</button>
+        <div class="viewer-more-dropdown" id="viewerMoreDropdown">
+            <button type="button" class="viewer-more-item" onclick="shareLocation()">Chia sẻ</button>
+            <button type="button" class="viewer-more-item" onclick="openReportModal({{ $location->id }}, 'Location'); closeViewerMoreMenu();">Báo cáo</button>
+        </div>
+    </div>
 
     <!-- Interaction Toolbar -->
     <div class="interaction-toolbar">
@@ -1293,9 +1511,6 @@
         @endphp
         <button class="interaction-btn {{ $isFavorited ? 'active' : '' }}" id="btnToggleFavorite" title="Yêu thích">
             <i class="{{ $isFavorited ? 'fa-solid' : 'fa-regular' }} fa-heart"></i>
-        </button>
-        <button class="interaction-btn" title="Báo cáo địa điểm" onclick="openReportModal({{ $location->id }}, 'Location')">
-            <i class="fa-solid fa-flag"></i>
         </button>
         <button class="interaction-btn" id="btnToggleComments" title="Đánh giá">
             <i class="fa-regular fa-star"></i>
@@ -1571,6 +1786,12 @@
     </div>
 
     <div class="viewer-area">
+        @if($photoMode)
+            @include('client.partials.location-photo-viewer', [
+                'location' => $location,
+                'photoSlides' => $photoSlides,
+            ])
+        @else
         <div id="pano"></div>
 
         <div id="titleBar">
@@ -1620,6 +1841,7 @@
         <a href="javascript:void(0)" id="viewOut" class="viewControlButton viewControlButton-6">
             <img class="icon" src="{{ asset('marzipano/img/minus.png') }}">
         </a>
+        @endif
 
         <!-- Audio Mascot Player -->
         <div class="audio-player" id="audioPlayer">
@@ -1657,6 +1879,7 @@
         </div>
     </div>
 
+    @if(!$photoMode)
     <!-- Setup APP_DATA -->
     <script>
         window.isEditorMode = false; // Disable editing mode!
@@ -1668,6 +1891,7 @@
     <script src="{{ asset('marzipano/vendor/marzipano.js') }}" ></script>
     <!-- Use Marzipano's Original Script -->
     <script src="{{ asset('marzipano/index.js') }}"></script>
+    @endif
 
     <!-- Audio Player & Autoplay Logic -->
     <script>
@@ -1952,7 +2176,6 @@
             }
         });
     </script>
-@endif
 
 <!-- Toast Notification 360 -->
 <div id="toastNotification360" class="toast-notification-360">
@@ -1999,14 +2222,28 @@
         }
 
         // Toggle Drawer
+        function setCommentsDrawerOpen(isOpen) {
+            if (isOpen) {
+                commentsDrawer.classList.add('open');
+                document.body.classList.add('reviews-drawer-open');
+                closeViewerMoreMenu();
+                document.querySelectorAll('.floating-comment-card').forEach(function (card) {
+                    card.remove();
+                });
+            } else {
+                commentsDrawer.classList.remove('open');
+                document.body.classList.remove('reviews-drawer-open');
+            }
+        }
+
         if (btnToggleComments) {
             btnToggleComments.addEventListener('click', () => {
-                commentsDrawer.classList.toggle('open');
+                setCommentsDrawerOpen(!commentsDrawer.classList.contains('open'));
             });
         }
         if (btnCloseComments) {
             btnCloseComments.addEventListener('click', () => {
-                commentsDrawer.classList.remove('open');
+                setCommentsDrawerOpen(false);
             });
         }
 
@@ -2629,6 +2866,52 @@
     let currentReportId = null;
     let currentReportType = null;
 
+    function toggleViewerMoreMenu(e) {
+        if (e) e.stopPropagation();
+        const dropdown = document.getElementById('viewerMoreDropdown');
+        if (dropdown) dropdown.classList.toggle('is-open');
+    }
+
+    function closeViewerMoreMenu() {
+        const dropdown = document.getElementById('viewerMoreDropdown');
+        if (dropdown) dropdown.classList.remove('is-open');
+    }
+
+    document.addEventListener('click', function (e) {
+        const menu = document.getElementById('viewerMoreMenu');
+        if (menu && !menu.contains(e.target)) {
+            closeViewerMoreMenu();
+        }
+    });
+
+    function shareLocation() {
+        const url = window.location.href;
+        const title = @json($location->name);
+        closeViewerMoreMenu();
+
+        if (navigator.share) {
+            navigator.share({ title, url }).catch(function () {});
+            return;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(function () {
+                if (typeof showToast360 === 'function') {
+                    showToast360('Đã sao chép liên kết chia sẻ', 'info');
+                }
+            }).catch(function () {
+                if (typeof showToast360 === 'function') {
+                    showToast360(url, 'info');
+                }
+            });
+            return;
+        }
+
+        if (typeof showToast360 === 'function') {
+            showToast360(url, 'info');
+        }
+    }
+
     function openReportModal(id, type) {
         const checkAuth = {{ Auth::check() ? 'true' : 'false' }};
         if (!checkAuth) {
@@ -2710,14 +2993,6 @@
                     'frame_image_url' => !empty($frame->image_url) ? asset($frame->image_url) : '',
                 ];
             })->values();
-
-        if ($floatingComments->isEmpty()) {
-            $floatingComments = collect([
-                ['name' => 'Nguyễn Văn An', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Không gian 360° tuyệt đẹp! Cảnh quan rất hùng vĩ.', 'frame_css' => '', 'frame_image_url' => ''],
-                ['name' => 'Trần Thị Mai', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Trải nghiệm rất thực tế và sinh động.', 'frame_css' => '', 'frame_image_url' => ''],
-                ['name' => 'Phạm Quốc Tuấn', 'avatar' => asset('images/default-avatar.png'), 'rating' => 5, 'text' => 'Điểm đến ấn tượng tuyệt vời tại Ninh Bình!', 'frame_css' => '', 'frame_image_url' => '']
-            ]);
-        }
     @endphp
 
     const commentsData = @json($floatingComments);
@@ -2761,6 +3036,10 @@
     }
 
     function spawnFloatingComment() {
+        if (document.body.classList.contains('reviews-drawer-open')) {
+            return;
+        }
+
         if (commentIdx >= commentsData.length) {
             // Finished 1 full cycle of all positive reviews! Stop spawning.
             if (spawnTimer) clearInterval(spawnTimer);

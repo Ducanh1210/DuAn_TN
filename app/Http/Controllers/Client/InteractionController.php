@@ -131,7 +131,11 @@ class InteractionController extends Controller
 
     public function myFavorites()
     {
-        $favorites = Auth::user()->favoriteLocations()->with('location.category', 'location.images')->paginate(12);
+        $favorites = Auth::user()->favoriteLocations()
+            ->whereHas('location', fn ($q) => $q->where('status', 'published'))
+            ->with('location.category', 'location.images')
+            ->paginate(12);
+
         return view('client.favorites.index', compact('favorites'));
     }
 
@@ -215,7 +219,7 @@ class InteractionController extends Controller
 
         return response()->json([
             'success' => true, 
-            'message' => 'Cảm ơn bạn đã đóng góp! Đề xuất của bạn đã được ghi nhận và đang chờ duyệt.',
+            'message' => 'Cảm ơn bạn đã đóng góp! Đề xuất đã được ghi nhận để Ban quản trị tham khảo (không tự đăng lên bản đồ).',
             'data' => $suggestion
         ]);
     }

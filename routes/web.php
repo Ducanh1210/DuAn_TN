@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\NewsController as ClientNewsController;
 use App\Http\Controllers\Client\EventController as ClientEventController;
+use App\Http\Controllers\Client\LandingController;
 use App\Http\Controllers\Client\ChatbotController;
 
 /*
@@ -35,24 +36,19 @@ if (app()->environment('local') || php_sapi_name() == 'cli-server') {
     })->where('path', '.*');
 }
 
+Route::get('/trang-chu', [LandingController::class, 'index'])->name('client.landing');
+
 Route::get('/', function () {
-    $locations = \App\Models\Location::with(['category', 'images'])->where('status', 'published')->get();
+    $locations = \App\Models\Location::with(['category', 'images'])->withCount('panoramas')->where('status', 'published')->get();
     if ($locations->isEmpty()) {
-        $locations = \App\Models\Location::with(['category', 'images'])->get();
+        $locations = \App\Models\Location::with(['category', 'images'])->withCount('panoramas')->get();
     }
 
-    // Resolve full asset URLs for icons to ensure they load correctly on any port/domain
     $locations->each(function ($loc) {
         if ($loc->category && $loc->category->icon) {
             $loc->category->icon_url = asset($loc->category->icon);
         }
-
-        if ($loc->thumbnail_url && !str_starts_with($loc->thumbnail_url, 'http')) {
-            $loc->thumbnail_url = asset('storage/' . ltrim($loc->thumbnail_url, '/'));
-        } elseif ($loc->images && $loc->images->count() > 0) {
-            $thumbnail = $loc->images->where('is_thumbnail', true)->first() ?? $loc->images->first();
-            $loc->thumbnail_url = !str_starts_with($thumbnail->image_url, 'http') ? asset('storage/' . ltrim($thumbnail->image_url, '/')) : $thumbnail->image_url;
-        }
+        $loc->thumbnail_url = $loc->resolveThumbnailUrl();
     });
 
     // Lấy 3 tin tức mới nhất cho banner
@@ -73,17 +69,22 @@ Route::get('/', function () {
     return view('client.home', compact('locations', 'newsList'));
 })->name('home');
 
-// Client 360 Viewer
+// Client 360 Viewer / Photo gallery
 Route::get('locations/{location:slug}/360', function (\App\Models\Location $location) {
     if (auth()->check()) {
         \App\Services\MissionService::trackProgress(auth()->user(), 'vr_360_view', 1, false, $location->id);
         auth()->user()->loadMissing('equippedFrame');
     }
+
+    $location->increment('view_count');
+
     $location->load([
         'category',
+        'images',
         'panoramas.hotspots',
         'comments.user.equippedFrame',
     ]);
+
     $userIds = $location->comments->pluck('user_id')->filter()->unique()->values();
     $commentCounts = \App\Models\Comment::whereIn('user_id', $userIds)
         ->where('status', 'visible')
@@ -95,7 +96,11 @@ Route::get('locations/{location:slug}/360', function (\App\Models\Location $loca
             $c->user->setAttribute('comments_count_cached', (int) ($commentCounts[$c->user_id] ?? 1));
         }
     }
-    return view('client.360', compact('location'));
+
+    $galleryImages = $location->resolveImageUrls();
+    $heroImage = $location->resolveThumbnailUrl();
+
+    return view('client.360', compact('location', 'galleryImages', 'heroImage'));
 })->name('client.locations.360');
 
 // Client News & Events
@@ -163,11 +168,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/missions/claim-milestone', [\App\Http\Controllers\Client\ProfileController::class, 'claimMilestone100'])->name('client.missions.claim_milestone');
     Route::post('/avatar-frames/equip', [\App\Http\Controllers\Client\ProfileController::class, 'equipAvatarFrame'])->name('client.avatar_frames.equip');
     Route::post('/avatar-frames/buy/{frame}', [\App\Http\Controllers\Client\ProfileController::class, 'buyAvatarFrame'])->name('client.avatar_frames.buy');
+    Route::post('/rewards/redeem/{reward}', [\App\Http\Controllers\Client\ProfileController::class, 'redeemReward'])->name('client.rewards.redeem');
 
     // Dedicated Business Dashboard Portal (Portal Dành Cho Chủ Doanh Nghiệp)
     Route::get('/doanh-nghiep/dashboard', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'index'])->name('business.dashboard');
     Route::post('/doanh-nghiep/update-info', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'updateInfo'])->name('business.update_info');
     Route::post('/doanh-nghiep/upload-photo', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'uploadPhoto'])->name('business.upload_photo');
+    Route::delete('/doanh-nghiep/photos', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'deletePhoto'])->name('business.delete_photo');
 });
 
 // Public Missions Route
@@ -232,14 +239,18 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Reports Management
     Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class)->only(['index']);
     Route::patch('reports/{report}/status', [\App\Http\Controllers\Admin\ReportController::class, 'updateStatus'])->name('reports.update_status');
-    Route::delete('reports/{report}/content', [\App\Http\Controllers\Admin\ReportController::class, 'deleteReportedContent'])->name('reports.delete_content');
+    Route::get('reports/feedbacks/{id}', [\App\Http\Controllers\Admin\ReportController::class, 'showFeedback'])->name('reports.feedbacks.show');
+    Route::put('reports/feedbacks/{id}', [\App\Http\Controllers\Admin\ReportController::class, 'updateFeedback'])->name('reports.feedbacks.update');
 
-    // Location Suggestions (Đề xuất địa điểm)
-    Route::resource('location_suggestions', \App\Http\Controllers\Admin\LocationSuggestionController::class)->only(['index', 'show', 'update']);
-    Route::post('location_suggestions/{id}/approve', [\App\Http\Controllers\Admin\LocationSuggestionController::class, 'approve'])->name('location_suggestions.approve');
+    // Đóng góp người dùng — đề xuất địa điểm (tham khảo)
+    Route::get('contributions', [\App\Http\Controllers\Admin\ContributionController::class, 'index'])->name('contributions.index');
+    Route::get('contributions/suggestions/{id}', [\App\Http\Controllers\Admin\ContributionController::class, 'showSuggestion'])->name('contributions.suggestions.show');
+    Route::put('contributions/suggestions/{id}', [\App\Http\Controllers\Admin\ContributionController::class, 'updateSuggestion'])->name('contributions.suggestions.update');
 
-    // Feedback & Content Reports (Góp ý & Báo lỗi nội dung)
-    Route::resource('feedbacks', \App\Http\Controllers\Admin\FeedbackReportController::class)->only(['index', 'show', 'update']);
+    // Legacy redirects
+    Route::redirect('location_suggestions', '/admin/contributions');
+    Route::redirect('feedbacks', '/admin/reports?tab=feedbacks');
+    Route::get('contributions/feedbacks/{id}', fn ($id) => redirect()->route('admin.reports.feedbacks.show', $id));
 
     // Business Upgrade Requests Management (Quản lý yêu cầu doanh nghiệp)
     Route::resource('business-profiles', \App\Http\Controllers\Admin\BusinessProfileController::class)->only(['index', 'show']);

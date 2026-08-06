@@ -21,9 +21,9 @@ class NewsController extends Controller
                     ->take(5)
                     ->get();
                     
-        $upcomingEvents = News::where('status', 'published')
-                    ->where('type', 'event')
-                    ->orderBy('published_at', 'desc')
+        $upcomingEvents = \App\Models\Event::where('status', 'active')
+                    ->where('start_time', '>=', now())
+                    ->orderBy('start_time')
                     ->take(4)
                     ->get();
                     

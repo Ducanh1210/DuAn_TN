@@ -95,9 +95,17 @@
         </div>
 
         <div class="card-minimal p-3">
-            <div class="fw-medium text-dark mb-2 pb-2 border-bottom" style="font-size: 0.85rem; border-color: var(--border-light) !important;">Lịch sử giao dịch điểm</div>
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom" style="border-color:var(--border-light)!important;">
+                <div class="fw-medium text-dark" style="font-size:0.85rem;">Lịch sử giao dịch điểm</div>
+                <span class="text-muted" style="font-size:0.72rem;">
+                    {{ $pointHistory->total() }} mục
+                    @if(($historyData['raw_total'] ?? 0) > $pointHistory->total())
+                        · gộp từ {{ $historyData['raw_total'] }} bản ghi
+                    @endif
+                </span>
+            </div>
             <div class="table-responsive">
-                <table class="table table-minimal align-middle">
+                <table class="table table-minimal align-middle mb-0">
                     <thead>
                         <tr>
                             <th>Thời gian</th>
@@ -107,18 +115,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($user->pointTransactions as $tx)
+                        @forelse($pointHistory as $tx)
                             <tr>
-                                <td class="text-muted" style="font-size: 0.775rem;">{{ $tx->created_at->format('d/m/Y H:i') }}</td>
+                                <td class="text-muted" style="font-size:0.775rem;">{{ $tx['created_at']->format('d/m/Y H:i') }}</td>
                                 <td>
                                     <span class="badge-minimal">
-                                        {{ $tx->action }}
+                                        {{ \App\Services\PointService::actionLabel($tx['action']) }}
                                     </span>
+                                    @if(!empty($tx['aggregated']))
+                                        <span class="text-muted" style="font-size:0.68rem;"> · gộp</span>
+                                    @endif
                                 </td>
-                                <td class="fw-medium {{ $tx->amount >= 0 ? 'text-success' : 'text-danger' }}" style="font-size: 0.8rem;">
-                                    {{ $tx->amount >= 0 ? '+' : '' }}{{ $tx->amount }}
+                                <td class="fw-medium {{ $tx['amount'] >= 0 ? 'text-success' : 'text-danger' }}" style="font-size:0.8rem;">
+                                    {{ $tx['amount'] >= 0 ? '+' : '' }}{{ $tx['amount'] }}
                                 </td>
-                                <td class="text-muted" style="font-size: 0.775rem;">{{ $tx->description }}</td>
+                                <td class="text-muted" style="font-size:0.775rem;max-width:280px;white-space:normal;">{{ $tx['description'] ?: '—' }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -128,6 +139,9 @@
                     </tbody>
                 </table>
             </div>
+            @if($pointHistory->hasPages())
+            <div class="p-2 border-top">{{ $pointHistory->links('pagination::bootstrap-5') }}</div>
+            @endif
         </div>
     </div>
 </div>

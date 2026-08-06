@@ -540,11 +540,18 @@
                     </h6>
                     @if(!empty($businessProfile->storefront_photos))
                         <div class="photo-grid">
-                            @foreach($businessProfile->storefront_photos as $photo)
-                                <div class="photo-grid-item">
+                            @foreach($businessProfile->storefront_photos as $index => $photo)
+                                <div class="photo-grid-item position-relative">
                                     <a href="{{ asset('storage/' . $photo) }}" target="_blank">
                                         <img src="{{ asset('storage/' . $photo) }}" alt="Mặt tiền">
                                     </a>
+                                    <form action="{{ route('business.delete_photo') }}" method="POST" class="position-absolute top-0 end-0 m-1" onsubmit="return confirm('Xóa ảnh này?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="type" value="storefront">
+                                        <input type="hidden" name="index" value="{{ $index }}">
+                                        <button type="submit" class="btn btn-sm btn-light border-0 py-0 px-1" style="font-size: 0.7rem;">×</button>
+                                    </form>
                                 </div>
                             @endforeach
                         </div>
@@ -562,11 +569,18 @@
                     </h6>
                     @if(!empty($businessProfile->menu_photos))
                         <div class="photo-grid">
-                            @foreach($businessProfile->menu_photos as $photo)
-                                <div class="photo-grid-item">
+                            @foreach($businessProfile->menu_photos as $index => $photo)
+                                <div class="photo-grid-item position-relative">
                                     <a href="{{ asset('storage/' . $photo) }}" target="_blank">
                                         <img src="{{ asset('storage/' . $photo) }}" alt="Thực đơn">
                                     </a>
+                                    <form action="{{ route('business.delete_photo') }}" method="POST" class="position-absolute top-0 end-0 m-1" onsubmit="return confirm('Xóa ảnh này?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="type" value="menu">
+                                        <input type="hidden" name="index" value="{{ $index }}">
+                                        <button type="submit" class="btn btn-sm btn-light border-0 py-0 px-1" style="font-size: 0.7rem;">×</button>
+                                    </form>
                                 </div>
                             @endforeach
                         </div>

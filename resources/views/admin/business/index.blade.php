@@ -6,24 +6,24 @@
 <!-- Metric & Filter Tabs -->
 <div class="metric-strip mb-3 d-flex flex-wrap align-items-center justify-content-between p-0 overflow-hidden">
     <a href="{{ route('admin.business-profiles.index', ['status' => 'all', 'search' => $search]) }}" 
-       class="metric-item flex-fill text-decoration-none py-3 px-4 transition-all {{ $status === 'all' ? 'bg-light border-bottom border-2 border-dark' : '' }}">
+       class="metric-item flex-fill text-decoration-none py-3 px-4 transition-all {{ $status === 'all' ? 'bg-light border-bottom border-2' : '' }}" style="{{ $status === 'all' ? 'border-bottom-color:#1e3a5f!important;' : '' }}">
         <div class="metric-label">Tất cả yêu cầu</div>
         <div class="metric-value text-dark" style="font-size: 1.2rem;">{{ $counts['all'] }}</div>
     </a>
     <a href="{{ route('admin.business-profiles.index', ['status' => 'pending', 'search' => $search]) }}" 
-       class="metric-item flex-fill text-decoration-none py-3 px-4 transition-all {{ $status === 'pending' ? 'bg-warning bg-opacity-10 border-bottom border-2 border-warning' : '' }}">
-        <div class="metric-label text-warning font-weight-bold">Chờ phê duyệt</div>
-        <div class="metric-value text-warning" style="font-size: 1.2rem;">{{ $counts['pending'] }}</div>
+       class="metric-item flex-fill text-decoration-none py-3 px-4 transition-all {{ $status === 'pending' ? 'bg-light border-bottom border-2' : '' }}" style="{{ $status === 'pending' ? 'border-bottom-color:#1e3a5f!important;' : '' }}">
+        <div class="metric-label {{ $status === 'pending' ? 'text-dark fw-medium' : '' }}">Chờ phê duyệt</div>
+        <div class="metric-value {{ $status === 'pending' ? 'text-dark' : '' }}" style="font-size:1.2rem;">{{ $counts['pending'] }}</div>
     </a>
     <a href="{{ route('admin.business-profiles.index', ['status' => 'approved', 'search' => $search]) }}" 
-       class="metric-item flex-fill text-decoration-none py-3 px-4 transition-all {{ $status === 'approved' ? 'bg-success bg-opacity-10 border-bottom border-2 border-success' : '' }}">
-        <div class="metric-label text-success">Đã duyệt</div>
-        <div class="metric-value text-success" style="font-size: 1.2rem;">{{ $counts['approved'] }}</div>
+       class="metric-item flex-fill text-decoration-none py-3 px-4 transition-all {{ $status === 'approved' ? 'bg-light border-bottom border-2' : '' }}" style="{{ $status === 'approved' ? 'border-bottom-color:#1e3a5f!important;' : '' }}">
+        <div class="metric-label {{ $status === 'approved' ? 'text-dark fw-medium' : '' }}">Đã duyệt</div>
+        <div class="metric-value {{ $status === 'approved' ? 'text-dark' : '' }}" style="font-size:1.2rem;">{{ $counts['approved'] }}</div>
     </a>
     <a href="{{ route('admin.business-profiles.index', ['status' => 'rejected', 'search' => $search]) }}" 
-       class="metric-item flex-fill text-decoration-none py-3 px-4 transition-all {{ $status === 'rejected' ? 'bg-danger bg-opacity-10 border-bottom border-2 border-danger' : '' }}">
-        <div class="metric-label text-danger">Đã từ chối</div>
-        <div class="metric-value text-danger" style="font-size: 1.2rem;">{{ $counts['rejected'] }}</div>
+       class="metric-item flex-fill text-decoration-none py-3 px-4 transition-all {{ $status === 'rejected' ? 'bg-light border-bottom border-2' : '' }}" style="{{ $status === 'rejected' ? 'border-bottom-color:#1e3a5f!important;' : '' }}">
+        <div class="metric-label {{ $status === 'rejected' ? 'text-dark fw-medium' : '' }}">Đã từ chối</div>
+        <div class="metric-value {{ $status === 'rejected' ? 'text-dark' : '' }}" style="font-size:1.2rem;">{{ $counts['rejected'] }}</div>
     </a>
 </div>
 

@@ -68,4 +68,26 @@ class News extends Model
             default => $this->status,
         };
     }
+
+    public function getFeaturedImageUrlAttribute(): ?string
+    {
+        return static::resolveMediaUrl($this->featured_image);
+    }
+
+    public static function resolveMediaUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        if (str_starts_with($path, 'storage/')) {
+            return asset($path);
+        }
+
+        return asset('storage/' . ltrim($path, '/'));
+    }
 }

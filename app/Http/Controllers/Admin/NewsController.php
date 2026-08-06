@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,10 @@ use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller
 {
+    public function __construct(private ImageCompressionService $imageCompression)
+    {
+    }
+
     public function index(Request $request)
     {
         $query = News::with('author')->latest();
@@ -52,7 +57,7 @@ class NewsController extends Controller
             'content' => 'required|string',
             'type' => 'required|in:news,guide,announcement,event',
             'status' => 'required|in:draft,published,hidden',
-            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:5120',
+            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:20480',
             'published_at' => 'nullable|date',
         ]);
 
@@ -61,7 +66,7 @@ class NewsController extends Controller
         $data['author_id'] = Auth::id();
 
         if ($request->hasFile('featured_image')) {
-            $path = $request->file('featured_image')->store('news', 'public');
+            $path = $this->imageCompression->compressAndSave($request->file('featured_image'), 'news');
             $data['featured_image'] = $path;
         }
 
@@ -90,7 +95,7 @@ class NewsController extends Controller
             'content' => 'required|string',
             'type' => 'required|in:news,guide,announcement,event',
             'status' => 'required|in:draft,published,hidden',
-            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:5120',
+            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:20480',
             'published_at' => 'nullable|date',
         ]);
 
@@ -105,7 +110,7 @@ class NewsController extends Controller
             if ($news->featured_image && \Storage::disk('public')->exists($news->featured_image)) {
                 \Storage::disk('public')->delete($news->featured_image);
             }
-            $path = $request->file('featured_image')->store('news', 'public');
+            $path = $this->imageCompression->compressAndSave($request->file('featured_image'), 'news');
             $data['featured_image'] = $path;
         }
 
@@ -179,7 +184,7 @@ class NewsController extends Controller
                 return response()->json(['error' => 'Not an image file.'], 400);
             }
             
-            $path = $file->store('news/content', 'public');
+            $path = $this->imageCompression->compressAndSave($file, 'news/content');
             return response()->json(['url' => Storage::url($path)]);
         }
         return response()->json(['error' => 'No file uploaded.'], 400);

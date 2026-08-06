@@ -57,52 +57,107 @@
         .btn { font-size: 0.875rem; }
         .btn-sm { font-size: 0.775rem; }
 
-        /* Minimal Navbar */
-        .navbar { 
-            background: #ffffff; 
+        /* Site header */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: #ffffff;
             border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-            padding: 8px 0 !important;
-            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 36, 66, 0.04);
         }
-        .navbar-brand { 
-            font-weight: 700; 
-            font-size: 1.15rem !important;
+        .site-header__inner {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            min-height: 56px;
+        }
+        .site-brand {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-shrink: 0;
             color: #0f172a !important;
+            text-decoration: none;
+        }
+        .site-brand__main {
+            font-weight: 700;
+            font-size: 1.05rem;
             letter-spacing: -0.02em;
-            background: none;
-            -webkit-text-fill-color: initial;
+            color: #1e3a5f;
         }
-        .nav-link { 
-            font-weight: 500; 
-            font-size: 0.85rem !important;
-            color: #64748b; 
-            padding: 6px 12px !important;
-            margin: 0 2px;
-            border-radius: 6px;
-            transition: all 0.15s ease;
+        .site-brand__sub {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #64748b;
+            letter-spacing: -0.01em;
         }
-        .nav-link:hover { 
-            color: #0f172a; 
-            background: #f8fafc;
+        .site-nav {
+            display: flex;
+            align-items: stretch;
+            gap: 2px;
+            margin-left: auto;
+            align-self: stretch;
         }
-        .nav-link.active { 
-            color: #0f172a; 
-            background: #f1f5f9;
+        .site-nav__link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 14px;
+            min-height: 56px;
+            font-size: 0.825rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: color 0.15s ease;
+            position: relative;
+            white-space: nowrap;
+        }
+        .site-nav__link:hover {
+            color: #1e3a5f;
+        }
+        .site-nav__link.is-active {
+            color: #1e3a5f;
             font-weight: 600;
+            box-shadow: inset 0 -2px 0 #1e3a5f;
         }
-        .user-nav-dropdown {
-            color: #0f172a !important;
-            background: #f8fafc !important;
-            border: 1px solid #e2e8f0 !important;
-            font-weight: 500 !important;
-            padding: 4px 10px !important;
-            border-radius: 6px !important;
-            transition: all 0.15s ease;
+        .site-header .navbar-toggler {
+            border-color: #e2e8f0;
+            padding: 4px 8px;
         }
-        .user-nav-dropdown:hover {
-            background: #f1f5f9 !important;
-            border-color: #cbd5e1 !important;
+        .site-header .navbar-toggler:focus {
+            box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.12);
+        }
+        @media (min-width: 992px) {
+            .site-header .navbar-collapse {
+                display: flex !important;
+                align-items: center;
+            }
+        }
+        @media (max-width: 991.98px) {
+            .site-header__inner {
+                flex-wrap: wrap;
+                align-items: stretch;
+                padding: 10px 0 12px;
+                gap: 12px;
+            }
+            .site-nav {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+                margin-left: 0;
+                gap: 2px;
+            }
+            .site-nav__link {
+                width: 100%;
+                padding: 10px 14px;
+            }
+            .site-nav__link.is-active {
+                box-shadow: inset 0 -2px 0 #1e3a5f;
+            }
+        }
+
+        /* Legacy — bootstrap navbar expand helper */
+        .site-header.navbar {
+            padding: 0;
         }
 
         /* Modern Card */
@@ -155,66 +210,249 @@
         }
 
         /* Footer */
-        footer { 
-            background: #0f172a; 
-            color: #94a3b8; 
-            padding: 40px 0 20px; 
-            margin-top: 50px; 
+        footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 48px 0 24px;
+            margin-top: 64px;
             font-size: 0.85rem;
+        }
+        footer a {
+            color: #cbd5e1;
+            transition: color 0.15s ease;
+        }
+        footer a:hover { color: #ffffff; }
+        .footer-brand {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #f8fafc;
+            letter-spacing: -0.02em;
+        }
+        .footer-tagline {
+            color: #64748b;
+            font-size: 0.825rem;
+            line-height: 1.55;
+            max-width: 280px;
+        }
+        .footer-heading {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .footer-links li + li { margin-top: 8px; }
+        .footer-bottom {
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            margin-top: 32px;
+            padding-top: 20px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Cover image */
+        .cover-image {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #f1f5f9;
+        }
+        .cover-image__img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.2s ease, transform 0.35s ease;
+        }
+        .cover-image__placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e8eef5 0%, #f1f5f9 100%);
+            color: #6482a6;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+        }
+
+        /* Editorial pages */
+        .page-shell {
+            background: #ffffff;
+            min-height: calc(100vh - 120px);
+            padding-bottom: 48px;
+        }
+        .page-header {
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .page-header__title {
+            color: #1e3a5f;
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 4px;
+        }
+        .page-header__subtitle {
+            color: #6482a6;
+            font-size: 0.875rem;
+            font-weight: 400;
+        }
+        .section-label {
+            color: #3f3f46;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .editorial-link:hover .editorial-link__title {
+            color: #1e3a5f;
+            text-decoration: underline;
+        }
+        .editorial-link:hover .cover-image__img {
+            opacity: 0.92;
+            transform: scale(1.02);
+        }
+        .meta-text {
+            color: #a1a1aa;
+            font-size: 0.775rem;
+        }
+        .tab-filter {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .tab-filter__item {
+            padding: 6px 14px;
+            font-size: 0.825rem;
+            font-weight: 500;
+            color: #64748b;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+        .tab-filter__item:hover {
+            color: #1e3a5f;
+            background: #ffffff;
+        }
+        .tab-filter__item.is-active {
+            background: #ffffff;
+            color: #1e3a5f;
+            box-shadow: 0 1px 2px rgba(15, 36, 66, 0.06);
+        }
+        .event-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 100%;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .event-card:hover {
+            border-color: #cbdbe8;
+            box-shadow: 0 8px 24px rgba(15, 36, 66, 0.06);
+        }
+        .event-card__body { padding: 16px; }
+        .event-card__title {
+            color: #27272a;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .event-card__date {
+            color: #1e3a5f;
+            font-size: 0.775rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .event-card__excerpt {
+            color: #52525b;
+            font-size: 0.825rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+            border: 1px dashed #e2e8f0;
+            border-radius: 12px;
+            background: #fafbfc;
+        }
+        .empty-state__title {
+            color: #1e3a5f;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .empty-state__text {
+            color: #6482a6;
+            font-size: 0.875rem;
+            max-width: 420px;
+            margin: 0 auto 20px;
+            line-height: 1.55;
+        }
+        .custom-pagination .pagination { gap: 4px; }
+        .custom-pagination .page-link {
+            color: #3f3f46;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 5px 11px;
+            font-size: 0.825rem;
+            background: #ffffff;
+        }
+        .custom-pagination .page-item.active .page-link {
+            background-color: #1e3a5f;
+            border-color: #1e3a5f;
+            color: #ffffff;
         }
         
         /* Utilities */
         a { text-decoration: none; }
         .text-primary { color: var(--primary) !important; }
-        .text-gradient {
-            background: linear-gradient(135deg, #0066ff, #00c6ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
     </style>
 
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top py-3">
+    <header class="site-header navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">Ninh Bình Travel Hub</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Bản đồ</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('client.news.*') ? 'active' : '' }}" href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('client.events.*') ? 'active' : '' }}" href="{{ route('client.events.index') }}">Sự kiện nổi bật</a></li>
-                    
-                    @auth
-                        <li class="nav-item dropdown ms-lg-3">
-                            <a class="nav-link dropdown-toggle user-nav-dropdown d-flex align-items-center gap-2" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <x-user-avatar :user="Auth::user()" size="22" />
-                                <span>{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 mt-2" aria-labelledby="navbarUserDropdown">
-                                <li><span class="dropdown-item-text py-2 fw-bold text-muted small"><img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 18px; height: 18px; object-fit: contain; vertical-align: -2px;" class="me-2"><span id="navbarUserPoints">{{ Auth::user()->points }} xu</span></span></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.missions') }}"><i class="fa-solid fa-bullseye me-2 text-warning"></i>Nhiệm vụ & Đổi thưởng</a></li>
-                                <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.profile') }}"><i class="fa-solid fa-user me-2 text-primary"></i>Trang cá nhân</a></li>
-                                <li><a class="dropdown-item py-2 fw-semibold" href="{{ route('client.favorites.index') }}"><i class="fa-solid fa-heart me-2 text-danger"></i>Địa điểm yêu thích</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item py-2 fw-semibold text-danger"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Đăng xuất</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    @else
-                        <li class="nav-item ms-lg-3"><a class="nav-link btn text-white px-4 py-2" style="background: var(--primary); border-radius: 8px; font-weight: 600;" href="{{ route('login') }}">Đăng nhập</a></li>
-                    @endauth
-                </ul>
+            <div class="site-header__inner">
+                <a class="site-brand" href="{{ url('/') }}">
+                    <span class="site-brand__main">Ninh Bình</span>
+                    <span class="site-brand__sub">Travel Hub</span>
+                </a>
+
+                <button class="navbar-toggler ms-auto d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavCollapse" aria-controls="siteNavCollapse" aria-expanded="false" aria-label="Menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse flex-grow-1" id="siteNavCollapse">
+                    <nav class="site-nav" aria-label="Điều hướng chính">
+                        <a class="site-nav__link {{ request()->routeIs('client.landing') ? 'is-active' : '' }}" href="{{ route('client.landing') }}">Trang chủ</a>
+                        <a class="site-nav__link {{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ route('home') }}">Bản đồ</a>
+                        <a class="site-nav__link {{ request()->routeIs('client.news.*') ? 'is-active' : '' }}" href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a>
+                        <a class="site-nav__link {{ request()->routeIs('client.events.*') ? 'is-active' : '' }}" href="{{ route('client.events.index') }}">Sự kiện nổi bật</a>
+                    </nav>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
     @if(session('success_points'))
         <div class="container mt-3">
@@ -229,8 +467,37 @@
     @yield('content')
 
     <footer>
-        <div class="container text-center">
-            <p>&copy; {{ date('Y') }} Cổng Thông Tin Du Lịch Ninh Bình. Thiết kế bằng <i class="fa-solid fa-heart text-danger"></i></p>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <div class="footer-brand mb-2">Ninh Bình Travel Hub</div>
+                    <p class="footer-tagline mb-0">Cổng thông tin du lịch — khám phá điểm đến, tin tức và sự kiện tại Ninh Bình.</p>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="footer-heading">Khám phá</div>
+                    <ul class="footer-links">
+                        <li><a href="{{ route('client.landing') }}">Trang chủ</a></li>
+                        <li><a href="{{ route('home') }}">Bản đồ du lịch</a></li>
+                        <li><a href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a></li>
+                        <li><a href="{{ route('client.events.index') }}">Sự kiện nổi bật</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="footer-heading">Tài khoản</div>
+                    <ul class="footer-links">
+                        @auth
+                            <li><a href="{{ route('client.profile') }}">Trang cá nhân</a></li>
+                            <li><a href="{{ route('client.favorites.index') }}">Địa điểm yêu thích</a></li>
+                        @else
+                            <li><a href="{{ route('login') }}">Đăng nhập</a></li>
+                            <li><a href="{{ route('register') }}">Đăng ký</a></li>
+                        @endauth
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom text-center text-md-start">
+                &copy; {{ date('Y') }} Cổng Thông Tin Du Lịch Ninh Bình
+            </div>
         </div>
     </footer>
 

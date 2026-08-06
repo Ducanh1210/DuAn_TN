@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 class LocationController extends Controller
 {
@@ -99,21 +100,34 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
-        foreach($location->images as $img) {
-            Storage::disk('public')->delete($img->image_url);
+        try {
+            DB::transaction(function () use ($location) {
+                foreach ($location->images as $img) {
+                    if ($img->image_url) {
+                        Storage::disk('public')->delete($img->image_url);
+                    }
+                }
+                foreach ($location->panoramas as $pano) {
+                    if ($pano->image_url) {
+                        Storage::disk('public')->delete($pano->image_url);
+                    }
+                }
+                if ($location->thumbnail_url) {
+                    Storage::disk('public')->delete($location->thumbnail_url);
+                }
+                if ($location->audio_url) {
+                    Storage::disk('public')->delete($location->audio_url);
+                }
+
+                $location->delete();
+            });
+
+            return back()->with('success', 'Xóa địa điểm thành công! Dữ liệu yêu thích và bình luận liên quan cũng đã được gỡ khỏi người dùng.');
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Không thể xóa địa điểm. Vui lòng thử lại hoặc liên hệ quản trị viên.');
         }
-        foreach($location->panoramas as $pano) {
-            Storage::disk('public')->delete($pano->image_url);
-        }
-        if ($location->thumbnail_url) {
-            Storage::disk('public')->delete($location->thumbnail_url);
-        }
-        if ($location->audio_url) {
-            Storage::disk('public')->delete($location->audio_url);
-        }
-        
-        $location->delete();
-        return back()->with('success', 'Xóa địa điểm thành công!');
     }
 
     // Ajax Image Upload

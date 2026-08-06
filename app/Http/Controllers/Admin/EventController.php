@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Location;
+use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
+    public function __construct(private ImageCompressionService $imageCompression)
+    {
+    }
+
     public function index(Request $request)
     {
         $query = Event::with(['location', 'creator'])->latest();
@@ -56,7 +61,7 @@ class EventController extends Controller
             'location_id' => 'nullable|exists:locations,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
-            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:5120',
+            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:20480',
             'is_featured' => 'nullable|boolean',
             'status' => 'required|in:active,cancelled,expired,hidden',
         ]);
@@ -67,7 +72,7 @@ class EventController extends Controller
         $data['is_featured'] = $request->has('is_featured') ? 1 : 0;
 
         if ($request->hasFile('featured_image')) {
-            $path = $request->file('featured_image')->store('events', 'public');
+            $path = $this->imageCompression->compressAndSave($request->file('featured_image'), 'events');
             $data['featured_image'] = $path;
         }
 
@@ -92,7 +97,7 @@ class EventController extends Controller
             'location_id' => 'nullable|exists:locations,id',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
-            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:5120',
+            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:20480',
             'is_featured' => 'nullable|boolean',
             'status' => 'required|in:active,cancelled,expired,hidden',
         ]);
@@ -109,7 +114,7 @@ class EventController extends Controller
             if ($event->featured_image && \Storage::disk('public')->exists($event->featured_image)) {
                 \Storage::disk('public')->delete($event->featured_image);
             }
-            $path = $request->file('featured_image')->store('events', 'public');
+            $path = $this->imageCompression->compressAndSave($request->file('featured_image'), 'events');
             $data['featured_image'] = $path;
         }
 

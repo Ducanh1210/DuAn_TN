@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\User;
+use App\Services\PointService;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserController extends Controller
 {
@@ -69,7 +71,21 @@ class UserController extends Controller
     public function show(string $id)
     {
         $user = User::findOrFail($id);
-        return view('admin.users.show', compact('user'));
+
+        $historyData = PointService::aggregatedHistory($user->id);
+        $perPage = 15;
+        $page = (int) request('points_page', 1);
+        $items = collect($historyData['history']);
+
+        $pointHistory = new LengthAwarePaginator(
+            $items->forPage($page, $perPage)->values(),
+            $items->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'pageName' => 'points_page']
+        );
+
+        return view('admin.users.show', compact('user', 'pointHistory', 'historyData'));
     }
 
     /**

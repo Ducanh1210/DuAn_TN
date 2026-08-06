@@ -35,9 +35,13 @@
                     </div>
 
                     <!-- Featured Image -->
-                    @if($news->featured_image)
-                        <div class="mb-4 overflow-hidden rounded-2 bg-light">
-                            <img src="{{ str_starts_with($news->featured_image, 'http') ? $news->featured_image : asset('storage/' . ltrim($news->featured_image, '/')) }}" class="img-fluid w-100" alt="{{ $news->title }}" style="max-height: 460px; object-fit: cover;">
+                    @if($news->featured_image_url)
+                        <div class="mb-4">
+                            @include('client.partials.cover-image', [
+                                'src' => $news->featured_image_url,
+                                'alt' => $news->title,
+                                'ratio' => '16/9',
+                            ])
                         </div>
                     @endif
 
@@ -68,7 +72,11 @@
                                 <article class="related-item">
                                     <a href="{{ route('client.news.show', $item->slug) }}" class="text-decoration-none group-news-link d-flex gap-3 align-items-start">
                                         <div class="overflow-hidden rounded bg-light flex-shrink-0" style="width: 85px; aspect-ratio: 4/3;">
-                                            <img src="{{ $item->featured_image ? (str_starts_with($item->featured_image, 'http') ? $item->featured_image : asset('storage/' . ltrim($item->featured_image, '/'))) : 'https://via.placeholder.com/150' }}" alt="{{ $item->title }}" class="w-100 h-100 img-fade" style="object-fit: cover; transition: opacity 0.2s ease;">
+                                            @include('client.partials.cover-image', [
+                                                'src' => $item->featured_image_url,
+                                                'alt' => $item->title,
+                                                'ratio' => '4/3',
+                                            ])
                                         </div>
                                         <div class="flex-grow-1">
                                             <h6 class="related-title fw-normal mb-1" style="color: #27272a; font-size: 0.85rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
