@@ -444,7 +444,8 @@
 
                 <div class="collapse navbar-collapse flex-grow-1" id="siteNavCollapse">
                     <nav class="site-nav" aria-label="Điều hướng chính">
-                        <a class="site-nav__link {{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ url('/') }}">Bản đồ</a>
+                        <a class="site-nav__link {{ request()->routeIs('client.landing') ? 'is-active' : '' }}" href="{{ route('client.landing') }}">Trang chủ</a>
+                        <a class="site-nav__link {{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ route('home') }}">Bản đồ</a>
                         <a class="site-nav__link {{ request()->routeIs('client.news.*') ? 'is-active' : '' }}" href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a>
                         <a class="site-nav__link {{ request()->routeIs('client.events.*') ? 'is-active' : '' }}" href="{{ route('client.events.index') }}">Sự kiện nổi bật</a>
                     </nav>
@@ -475,7 +476,8 @@
                 <div class="col-6 col-md-3">
                     <div class="footer-heading">Khám phá</div>
                     <ul class="footer-links">
-                        <li><a href="{{ url('/') }}">Bản đồ du lịch</a></li>
+                        <li><a href="{{ route('client.landing') }}">Trang chủ</a></li>
+                        <li><a href="{{ route('home') }}">Bản đồ du lịch</a></li>
                         <li><a href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a></li>
                         <li><a href="{{ route('client.events.index') }}">Sự kiện nổi bật</a></li>
                     </ul>

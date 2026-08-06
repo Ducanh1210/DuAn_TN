@@ -17,7 +17,10 @@ use App\Models\Mission;
 use App\Models\UserMission;
 use App\Models\AvatarFrame;
 use App\Models\UserAvatarFrame;
+use App\Models\Reward;
+use App\Models\UserRedemption;
 use App\Services\MissionService;
+use App\Services\RewardService;
 use Illuminate\Support\Str;
 
 
@@ -30,8 +33,9 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         
-        // Load favorite locations with category and images
+        // Chỉ hiển thị địa điểm còn tồn tại và đang published
         $favorites = $user->favorites()
+            ->where('locations.status', 'published')
             ->with(['category', 'images'])
             ->get();
             
@@ -50,8 +54,9 @@ class ProfileController extends Controller
             }
         });
 
-        // Load comments with locations
+        // Load comments with locations (bỏ bình luận của địa điểm đã xóa)
         $comments = $user->comments()
+            ->whereHas('location')
             ->with('location')
             ->get();
 
@@ -153,6 +158,15 @@ class ProfileController extends Controller
         $businessProfile = BusinessProfile::where('user_id', $user->id)->first();
 
         if ($businessProfile && in_array($businessProfile->status, ['pending', 'approved'])) {
+            // Cho phép đăng ký lại nếu đã approved nhưng địa điểm trên bản đồ đã bị xóa.
+            if ($businessProfile->status === 'approved') {
+                $hasLocation = Location::where('created_by', $user->id)->exists();
+                if (!$hasLocation) {
+                    $categories = Category::where('status', 'active')->get();
+                    return view('client.business_upgrade', compact('user', 'categories', 'businessProfile'));
+                }
+            }
+
             return redirect()->route('client.profile')->with('info', 'Bạn đã gửi yêu cầu nâng cấp hoặc đã có tài khoản doanh nghiệp.');
         }
 
@@ -772,6 +786,12 @@ class ProfileController extends Controller
         // Fetch Leaderboard (Top 5 Users)
         $leaderboard = User::orderBy('points', 'desc')->take(5)->get();
 
+        $shopRewards = Reward::active()->orderBy('cost_points')->get();
+        $userRedemptions = $user
+            ? UserRedemption::where('user_id', $user->id)->with('reward')->latest()->get()
+            : collect();
+        $redeemedRewardIds = $userRedemptions->pluck('reward_id')->all();
+
         return view('client.missions.index', compact(
             'user',
             'dailyMissions',
@@ -780,8 +800,21 @@ class ProfileController extends Controller
             'userMissions',
             'allFrames',
             'unlockedFrameIds',
-            'leaderboard'
+            'leaderboard',
+            'shopRewards',
+            'userRedemptions',
+            'redeemedRewardIds'
         ));
+    }
+
+    /**
+     * Redeem a shop reward with points.
+     */
+    public function redeemReward(Reward $reward, RewardService $rewardService)
+    {
+        $result = $rewardService->redeem(Auth::user(), $reward);
+
+        return response()->json($result, $result['success'] ? 200 : 400);
     }
 
     /**

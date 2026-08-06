@@ -8,11 +8,17 @@ use App\Models\Comment;
 use App\Models\FavoriteLocation;
 use App\Models\Location;
 use App\Models\LocationImage;
+use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class BusinessDashboardController extends Controller
 {
+    public function __construct(private ImageCompressionService $imageCompression)
+    {
+    }
+
     /**
      * Display the business dashboard for approved business owners.
      */
@@ -36,22 +42,20 @@ class BusinessDashboardController extends Controller
             ->with(['category', 'images'])
             ->first();
 
-        // Get statistics
-        $comments = collect();
-        $favoritesCount = 0;
-        $viewsCount = 0;
-        $averageRating = 0;
-
-        if ($location) {
-            $comments = Comment::where('location_id', $location->id)
-                ->with('user')
-                ->latest()
-                ->get();
-
-            $favoritesCount = FavoriteLocation::where('location_id', $location->id)->count();
-            $viewsCount = $location->view_count ?? 0;
-            $averageRating = $location->average_rating ?? 0;
+        if (!$location) {
+            return redirect()->route('client.profile')
+                ->with('error', 'Địa điểm doanh nghiệp đã bị gỡ khỏi hệ thống. Vui lòng đăng ký lại hoặc liên hệ quản trị viên.');
         }
+
+        // Get statistics
+        $comments = Comment::where('location_id', $location->id)
+            ->with('user')
+            ->latest()
+            ->get();
+
+        $favoritesCount = FavoriteLocation::where('location_id', $location->id)->count();
+        $viewsCount = $location->view_count ?? 0;
+        $averageRating = $location->average_rating ?? 0;
 
         return view('client.business.dashboard', compact(
             'businessProfile',
@@ -126,13 +130,11 @@ class BusinessDashboardController extends Controller
             ->firstOrFail();
 
         $request->validate([
-            'photo' => 'required|image|max:5120',
+            'photo' => 'required|image|max:20480',
             'type' => 'required|in:storefront,menu',
         ]);
 
-        $file = $request->file('photo');
-        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('business_photos', $filename, 'public');
+        $path = $this->imageCompression->compressAndSave($request->file('photo'), 'business_photos');
 
         if ($request->type === 'storefront') {
             $photos = $businessProfile->storefront_photos ?? [];
@@ -158,5 +160,46 @@ class BusinessDashboardController extends Controller
 
         return redirect()->route('business.dashboard')
             ->with('success', 'Đã tải lên hình ảnh mới thành công!');
+    }
+
+    /**
+     * Delete a photo from business gallery.
+     */
+    public function deletePhoto(Request $request)
+    {
+        $user = Auth::user();
+        $businessProfile = BusinessProfile::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'type' => 'required|in:storefront,menu',
+            'index' => 'required|integer|min:0',
+        ]);
+
+        $field = $validated['type'] === 'storefront' ? 'storefront_photos' : 'menu_photos';
+        $photos = $businessProfile->{$field} ?? [];
+
+        if (!isset($photos[$validated['index']])) {
+            return back()->with('error', 'Không tìm thấy ảnh cần xóa.');
+        }
+
+        $removedPath = $photos[$validated['index']];
+        unset($photos[$validated['index']]);
+        $businessProfile->update([$field => array_values($photos)]);
+
+        if ($removedPath && Storage::disk('public')->exists($removedPath)) {
+            Storage::disk('public')->delete($removedPath);
+        }
+
+        $location = Location::where('created_by', $user->id)->first();
+        if ($location) {
+            LocationImage::where('location_id', $location->id)
+                ->where('image_url', $removedPath)
+                ->delete();
+        }
+
+        return redirect()->route('business.dashboard')
+            ->with('success', 'Đã xóa ảnh thành công.');
     }
 }

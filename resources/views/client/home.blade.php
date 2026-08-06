@@ -3030,13 +3030,14 @@
                 const thumbUrl = loc.thumbnail_url ? loc.thumbnail_url : 'https://placehold.co/400x250/e2e8f0/475569?text=No+Image';
                 const iconColor = loc.category && loc.category.icon_color ? loc.category.icon_color : '#ef4444';
 
+                const ctaLabel = (loc.panoramas_count && loc.panoramas_count > 0) ? 'Xem 360°' : 'Xem ảnh';
                 const popupHtml = '<div class="poi-popup-inner" style="--poi-color: ' + iconColor + ';">'
                     + '<img src="' + thumbUrl + '" class="poi-thumbnail" alt="' + loc.name + '">'
                     + '<div class="poi-content">'
                     + '<div class="poi-title">' + loc.name + '</div>'
                     + (loc.short_description ? '<div class="poi-desc">' + loc.short_description + '</div>' : '')
                     + '<a href="/locations/' + loc.slug + '/360" class="poi-btn-360">'
-                    + 'Khám phá ngay'
+                    + ctaLabel
                     + '</a>'
                     + '</div>'
                     + '</div>';

@@ -2759,6 +2759,21 @@
                             </div>
                         </div>
                     @elseif($businessProfile->status === 'approved')
+                        @php
+                            $loc = \App\Models\Location::where('created_by', $user->id)->first();
+                        @endphp
+                        @if(!$loc)
+                            <div class="content-panel">
+                                <div class="section-title">Tài khoản doanh nghiệp</div>
+                                <div class="panel-note danger">
+                                    <div>
+                                        <strong>Địa điểm đã bị gỡ khỏi hệ thống.</strong>
+                                        Hồ sơ “{{ $businessProfile->business_name }}” không còn trên bản đồ. Bạn có thể đăng ký lại nếu cần.
+                                    </div>
+                                </div>
+                                <a href="{{ route('client.profile.business.upgrade') }}" class="btn-solid" style="text-decoration:none;display:inline-block;">Đăng ký lại</a>
+                            </div>
+                        @else
                         <div class="content-panel">
                             <div class="section-title">Quản lý tài khoản doanh nghiệp</div>
                             <div class="panel-note ok">
@@ -2778,14 +2793,7 @@
                                 <div class="biz-feature">
                                     <strong>Xem trang địa điểm</strong>
                                     <p class="mb-2">Hiển thị thực tế trên bản đồ / 360°.</p>
-                                    @php
-                                        $loc = \App\Models\Location::where('created_by', $user->id)->first();
-                                    @endphp
-                                    @if($loc)
-                                        <a href="{{ route('client.locations.360', $loc->slug) }}" target="_blank" class="btn-ghost" style="display:inline-block;">Xem chi tiết</a>
-                                    @else
-                                        <span class="text-muted" style="font-size:0.72rem;">Đang đồng bộ dữ liệu...</span>
-                                    @endif
+                                    <a href="{{ route('client.locations.360', $loc->slug) }}" target="_blank" class="btn-ghost" style="display:inline-block;">Xem chi tiết</a>
                                 </div>
                                 <div class="biz-feature">
                                     <strong>Trang quản trị</strong>
@@ -2794,6 +2802,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
                     @elseif($businessProfile->status === 'rejected')
                         <div class="content-panel">
                             <div class="section-title">Đăng ký tài khoản doanh nghiệp</div>

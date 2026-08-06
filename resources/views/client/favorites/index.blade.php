@@ -13,6 +13,9 @@
             @php
                 $loc = $fav->location;
             @endphp
+            @if(!$loc)
+                @continue
+            @endif
             <div class="col-md-4 col-sm-6 fav-card-wrapper" id="fav-{{ $fav->id }}">
                 <div class="card h-100 shadow-sm border-0 position-relative overflow-hidden fav-card">
                     <a href="{{ route('client.locations.360', $loc->slug) }}" class="text-decoration-none">

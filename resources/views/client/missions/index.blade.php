@@ -1084,50 +1084,55 @@
 
                     <!-- Gift Cards Grid -->
                     <div class="row g-3" id="shopItemGrid">
-
-                        <!-- Demo Voucher Card -->
-                        <div class="col-6 col-md-4 col-lg-3 reward-item-wrapper" data-category="voucher">
-                            <div class="item-card-compact">
-                                <div>
-                                    <div class="item-img-compact bg-light">
-                                        <i class="fa-solid fa-ticket text-warning fs-1"></i>
+                        @forelse($shopRewards as $reward)
+                            @php
+                                $alreadyRedeemed = in_array($reward->id, $redeemedRewardIds ?? [], true);
+                                $canAfford = auth()->check() && auth()->user()->points >= $reward->cost_points;
+                                $isAvailable = $reward->isAvailable();
+                            @endphp
+                            <div class="col-6 col-md-4 col-lg-3 reward-item-wrapper" data-category="{{ $reward->category }}">
+                                <div class="item-card-compact">
+                                    <div>
+                                        <div class="item-img-compact bg-light d-flex align-items-center justify-content-center">
+                                            @if($reward->category === 'voucher')
+                                                <i class="fa-solid fa-ticket text-secondary fs-1"></i>
+                                            @elseif($reward->category === 'badge')
+                                                <i class="fa-solid fa-medal text-secondary fs-1"></i>
+                                            @else
+                                                <i class="fa-solid fa-gift text-secondary fs-1"></i>
+                                            @endif
+                                        </div>
+                                        <h6 class="item-name-compact text-truncate">{{ $reward->title }}</h6>
+                                        <div class="item-desc-compact text-truncate">{{ $reward->description }}</div>
                                     </div>
-                                    <h6 class="item-name-compact text-truncate">Voucher Giảm 50K</h6>
-                                    <div class="item-desc-compact text-truncate">Áp dụng cho mọi địa xu ăn uống</div>
-                                </div>
-                                <div>
-                                    <div class="item-price-compact">
-                                        <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain; vertical-align: -2px;" class="me-0.5">
-                                        <span>5.000 xu</span>
+                                    <div>
+                                        <div class="item-price-compact">
+                                            <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain; vertical-align: -2px;" class="me-0.5">
+                                            <span>{{ number_format($reward->cost_points) }} xu</span>
+                                        </div>
+                                        @guest
+                                            <a href="{{ route('login') }}" class="btn btn-action-compact text-decoration-none text-center d-block">Đăng nhập để đổi</a>
+                                        @else
+                                            @if($alreadyRedeemed)
+                                                <button class="btn btn-action-compact" type="button" disabled>Đã đổi</button>
+                                            @elseif(!$isAvailable)
+                                                <button class="btn btn-action-compact" type="button" disabled>Hết hàng</button>
+                                            @else
+                                                <button class="btn btn-action-compact" type="button" onclick="redeemReward({{ $reward->id }}, this)" {{ $canAfford ? '' : 'disabled' }}>
+                                                    {{ $canAfford ? 'Đổi ngay' : 'Không đủ xu' }}
+                                                </button>
+                                            @endif
+                                        @endguest
                                     </div>
-                                    <button class="btn btn-action-compact" onclick="showShopNotice('Tính năng sắp ra mắt', 'Tính năng đổi voucher sẽ ra mắt trong phiên bản sắp tới!', 'voucher')">
-                                        Đổi ngay
-                                    </button>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Demo Badge Item -->
-                        <div class="col-6 col-md-4 col-lg-3 reward-item-wrapper" data-category="badge">
-                            <div class="item-card-compact">
-                                <div>
-                                    <div class="item-img-compact bg-light">
-                                        <i class="fa-solid fa-medal text-danger fs-1"></i>
-                                    </div>
-                                    <h6 class="item-name-compact text-truncate">Huy Hiệu Nhà Khám Phá</h6>
-                                    <div class="item-desc-compact text-truncate">Huy hiệu VIP trên trang cá nhân</div>
-                                </div>
-                                <div>
-                                    <div class="item-price-compact">
-                                        <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain; vertical-align: -2px;" class="me-0.5">
-                                        <span>3.000 xu</span>
-                                    </div>
-                                    <button class="btn btn-action-compact" onclick="showShopNotice('Thông tin huy hiệu', 'Huy hiệu sẽ được tự động mở khóa khi đạt mốc thành tựu!', 'badge')">
-                                        Nhận huy hiệu
-                                    </button>
+                        @empty
+                            <div class="col-12">
+                                <div class="text-center py-5 bg-white rounded-3 border">
+                                    <p class="text-muted small mb-0">Cửa hàng đổi thưởng đang được cập nhật.</p>
                                 </div>
                             </div>
-                        </div>
+                        @endforelse
                     </div>
 
 
@@ -2176,6 +2181,45 @@ window.switchNavTab = function(paneId) {
         document.querySelectorAll('#rewardTopNav .nav-link').forEach(btn => btn.classList.remove('active'));
         tabBtn.classList.add('active');
     }
+};
+
+window.redeemReward = function(rewardId, btn) {
+    if (!btn || btn.disabled) return;
+
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Đang đổi...';
+
+    fetch("{{ url('/rewards/redeem') }}/" + rewardId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json().then(data => ({ ok: response.ok, data })))
+    .then(({ ok, data }) => {
+        if (ok && data.success) {
+            showShopNotice('Đổi thưởng thành công', data.message || 'Phần thưởng đã được ghi nhận.', 'voucher');
+            btn.textContent = 'Đã đổi';
+            const pointsEl = document.getElementById('userPointsDisplay');
+            if (pointsEl && typeof data.points !== 'undefined') {
+                pointsEl.textContent = new Intl.NumberFormat('vi-VN').format(data.points);
+            }
+            setTimeout(() => window.location.reload(), 1200);
+            return;
+        }
+
+        showShopNotice('Không thể đổi thưởng', data.message || 'Vui lòng thử lại sau.', 'info');
+        btn.disabled = false;
+        btn.textContent = originalText;
+    })
+    .catch(() => {
+        showShopNotice('Lỗi', 'Không thể kết nối máy chủ.', 'info');
+        btn.disabled = false;
+        btn.textContent = originalText;
+    });
 };
 
 window.showShopNotice = function(title, message, iconType = 'info') {

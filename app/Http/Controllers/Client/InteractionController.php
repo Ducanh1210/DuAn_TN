@@ -131,7 +131,11 @@ class InteractionController extends Controller
 
     public function myFavorites()
     {
-        $favorites = Auth::user()->favoriteLocations()->with('location.category', 'location.images')->paginate(12);
+        $favorites = Auth::user()->favoriteLocations()
+            ->whereHas('location', fn ($q) => $q->where('status', 'published'))
+            ->with('location.category', 'location.images')
+            ->paginate(12);
+
         return view('client.favorites.index', compact('favorites'));
     }
 
