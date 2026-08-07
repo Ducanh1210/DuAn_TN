@@ -219,9 +219,9 @@ class TripPlannerService
     {
         $query = Location::with('category')->where('status', 'published');
         $locations = $query->get();
-        if ($locations->isEmpty()) {
-            $locations = Location::with('category')->get();
-        }
+            if ($locations->isEmpty()) {
+                $locations = Location::with('category')->get();
+            }
 
         $prioritySlugs = $this->categorySlugsForTripType($prefs['trip_type'] ?? null);
         $interestSlugs = $this->categorySlugsForInterests($prefs['interests'] ?? []);
@@ -350,14 +350,14 @@ class TripPlannerService
         }
 
         $context = "\n--- DANH SÁCH BẮT BUỘC 100% CÁC ĐỊA ĐIỂM ĐƯỢC PHÉP DÙNG (KÈM GPS) ---\n";
-        foreach ($locations as $loc) {
-            $catName = $loc->category->name ?? 'Địa điểm';
+            foreach ($locations as $loc) {
+                $catName = $loc->category->name ?? 'Địa điểm';
             $lat = $loc->lat ? round((float) $loc->lat, 4) : 'N/A';
             $lng = $loc->lng ? round((float) $loc->lng, 4) : 'N/A';
-            $context .= "- ID:{$loc->id} | \"{$loc->name}\" | Loại:{$catName} | GPS:({$lat},{$lng}) | Địa chỉ:" . ($loc->address ?? '') . "\n";
-        }
-        $context .= "---------------------------------------------------------\n";
-        return $context;
+                $context .= "- ID:{$loc->id} | \"{$loc->name}\" | Loại:{$catName} | GPS:({$lat},{$lng}) | Địa chỉ:" . ($loc->address ?? '') . "\n";
+            }
+            $context .= "---------------------------------------------------------\n";
+            return $context;
     }
 
     protected function callAI(string $systemPrompt, string $userPrompt, int $maxTokens = 800, float $temperature = 0.7): ?string

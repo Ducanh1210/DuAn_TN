@@ -5,395 +5,696 @@
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
+    .biz-show {
+        --ink: #1e3a5f;
+        --body: #3b5980;
+        --muted: #6482a6;
+        --line: #cbdbe8;
+        --line-soft: #e5e7eb;
+        --mist: #f1f5f9;
+        --paper: #ffffff;
+    }
+
+    .biz-show__top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .biz-show__back {
+        color: var(--muted);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.825rem;
+    }
+    .biz-show__back:hover { color: var(--ink); }
+
+    .biz-show__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .biz-panel {
+        background: var(--paper);
+        border: 1px solid var(--line-soft);
+        border-radius: 10px;
+        padding: 22px 24px;
+        margin-bottom: 16px;
+    }
+
+    .biz-panel__title {
+        margin: 0 0 14px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+    }
+
+    .biz-name {
+        margin: 0 0 6px;
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+        line-height: 1.3;
+    }
+
+    .biz-meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 18px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line-soft);
+    }
+
+    .biz-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 6px;
+        background: var(--mist);
+        color: var(--ink);
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid var(--line);
+    }
+
+    .biz-status {
+        margin-left: auto;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--muted);
+        padding: 3px 10px;
+        border-radius: 6px;
+        background: var(--mist);
+        border: 1px solid var(--line);
+    }
+    .biz-status.is-pending { color: #8a6d3b; background: #faf6ef; border-color: #e8dcc8; }
+    .biz-status.is-ok { color: var(--ink); background: var(--mist); }
+    .biz-status.is-bad { color: #9b3b3b; background: #faf2f2; border-color: #ead4d4; }
+
+    .biz-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 20px;
+        margin-bottom: 20px;
+    }
+    @media (max-width: 767px) {
+        .biz-fields { grid-template-columns: 1fr; }
+    }
+    .biz-field--full { grid-column: 1 / -1; }
+
+    .biz-label {
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: var(--muted);
+        margin-bottom: 4px;
+    }
+    .biz-value {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--ink);
+        line-height: 1.5;
+    }
+    .biz-value a {
+        color: var(--ink);
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+    }
+    .biz-value a:hover { border-bottom-color: var(--ink); }
+    .biz-value .empty { color: var(--muted); font-weight: 400; }
+
+    .biz-section-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin: 0 0 10px;
+    }
+
     #adminBizMap {
-        height: 300px;
+        height: 280px;
         width: 100%;
         border-radius: 8px;
-        border: 1px solid #cbd5e1;
+        border: 1px solid var(--line);
+        background: var(--mist);
     }
+
+    .biz-coords {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-bottom: 8px;
+        font-weight: 400;
+    }
+
+    .biz-maps-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 10px;
+        font-size: 0.75rem;
+    }
+    .biz-maps-links a {
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid var(--line);
+    }
+    .biz-maps-links a:hover {
+        border-bottom-color: var(--ink);
+    }
+
+    .biz-sapo {
+        background: #fafafa;
+        border-left: 2.5px solid var(--ink);
+        padding: 12px 14px;
+        color: var(--body);
+        font-size: 0.875rem;
+        line-height: 1.7;
+        white-space: pre-line;
+        border-radius: 0 6px 6px 0;
+    }
+
+    .biz-note {
+        background: var(--mist);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 0.8rem;
+        color: var(--body);
+        line-height: 1.55;
+        margin-bottom: 0;
+    }
+    .biz-note.is-warn {
+        background: #faf6ef;
+        border-color: #e8dcc8;
+        color: #6b5428;
+    }
+    .biz-note.is-bad {
+        background: #faf2f2;
+        border-color: #ead4d4;
+        color: #7a3535;
+    }
+
+    .biz-verify-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+    }
+    @media (max-width: 991px) {
+        .biz-verify-grid { grid-template-columns: 1fr; }
+    }
+
+    .biz-factbox {
+        background: var(--mist);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 0.8rem;
+        color: var(--body);
+        line-height: 1.6;
+    }
+    .biz-factbox dt {
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 0.72rem;
+        margin-top: 10px;
+    }
+    .biz-factbox dt:first-child { margin-top: 0; }
+    .biz-factbox dd {
+        margin: 2px 0 0;
+        color: var(--ink);
+        font-weight: 500;
+    }
+
+    .biz-dist {
+        display: inline-block;
+        margin-top: 2px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--ink);
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 2px 8px;
+    }
+    .biz-dist.is-far { color: #9b3b3b; border-color: #ead4d4; background: #faf2f2; }
+    .biz-dist.is-mid { color: #8a6d3b; border-color: #e8dcc8; background: #faf6ef; }
+
     .photo-gallery-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+        gap: 8px;
     }
     .photo-gallery-item {
         aspect-ratio: 4/3;
         border-radius: 6px;
         overflow: hidden;
-        border: 1px solid #e2e8f0;
-        background: #f8fafc;
-        position: relative;
+        border: 1px solid var(--line-soft);
+        background: var(--mist);
+        display: block;
     }
     .photo-gallery-item img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.2s ease;
+        display: block;
     }
-    .photo-gallery-item:hover img {
-        transform: scale(1.05);
+
+    .biz-empty {
+        padding: 14px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.8rem;
+        background: var(--mist);
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+    }
+
+    .biz-side-user {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+    .biz-side-user__name {
+        font-weight: 600;
+        color: var(--ink);
+        font-size: 0.875rem;
+    }
+    .biz-side-user__email {
+        color: var(--muted);
+        font-size: 0.75rem;
+    }
+
+    .biz-kv {
+        border-top: 1px solid var(--line-soft);
+        padding-top: 12px;
+        display: grid;
+        gap: 8px;
+        font-size: 0.78rem;
+    }
+    .biz-kv div {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    .biz-kv span { color: var(--muted); }
+    .biz-kv strong { color: var(--ink); font-weight: 500; text-align: right; }
+
+    .biz-modal .modal-content {
+        border: 1px solid var(--line-soft);
+        border-radius: 10px;
+    }
+    .biz-modal .modal-header {
+        border-bottom: 1px solid var(--line-soft);
+        background: var(--mist);
+    }
+    .biz-modal .modal-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--ink);
+    }
+    .biz-modal textarea.form-control {
+        border: none;
+        border-bottom: 1px solid var(--line);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+    .biz-modal textarea.form-control:focus {
+        border-bottom: 2px solid var(--ink);
+        box-shadow: none;
+        background: transparent;
     }
 </style>
 @endpush
 
 @section('content')
-<div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <a href="{{ route('admin.business-profiles.index') }}" class="btn-minimal text-decoration-none">
-        ← Quay lại danh sách
-    </a>
+@php
+    $verificationDistMeters = null;
+    if ($businessProfile->verification_lat && $businessProfile->verification_lng && $businessProfile->lat && $businessProfile->lng) {
+        $earthRadius = 6371000;
+        $dLat = deg2rad($businessProfile->verification_lat - $businessProfile->lat);
+        $dLng = deg2rad($businessProfile->verification_lng - $businessProfile->lng);
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($businessProfile->lat)) * cos(deg2rad($businessProfile->verification_lat)) *
+             sin($dLng / 2) * sin($dLng / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $verificationDistMeters = round($earthRadius * $c);
+    }
 
-    <div class="d-flex gap-2 align-items-center">
-        @if($businessProfile->status === 'pending')
-            <button type="button" class="btn-minimal text-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
-                Từ chối yêu cầu
-            </button>
-            <form action="{{ route('admin.business-profiles.approve', $businessProfile->id) }}" method="POST" class="d-inline">
-                @csrf
-                <button type="submit" class="btn-minimal btn-minimal-primary px-3" onclick="return confirm('Bạn có chắc chắn muốn phê duyệt doanh nghiệp này?')">
-                    Phê duyệt đăng ký
+    $vPhotos = !empty($businessProfile->verification_photos)
+        ? (array) $businessProfile->verification_photos
+        : (!empty($businessProfile->verification_photo) ? [$businessProfile->verification_photo] : []);
+
+    $statusClass = match ($businessProfile->status) {
+        'pending' => 'is-pending',
+        'approved' => 'is-ok',
+        default => 'is-bad',
+    };
+    $statusLabel = match ($businessProfile->status) {
+        'pending' => 'Chờ xét duyệt',
+        'approved' => 'Đã kích hoạt',
+        default => 'Bị từ chối',
+    };
+@endphp
+
+<div class="biz-show">
+    <div class="biz-show__top">
+        <a href="{{ route('admin.business-profiles.index') }}" class="biz-show__back">← Quay lại danh sách</a>
+
+        <div class="biz-show__actions">
+            @if($businessProfile->status === 'pending')
+                <button type="button" class="btn-minimal text-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                    Từ chối
                 </button>
-            </form>
-        @elseif($businessProfile->status === 'approved')
-            <span class="badge-minimal badge-minimal-success py-2 px-3" style="font-size: 0.8rem;"><i class="fas fa-check-circle me-1"></i> Đã phê duyệt</span>
-        @elseif($businessProfile->status === 'rejected')
-            <span class="badge-minimal badge-minimal-danger py-2 px-3" style="font-size: 0.8rem;"><i class="fas fa-times-circle me-1"></i> Đã từ chối</span>
-            <button type="button" class="btn-minimal ms-2" data-bs-toggle="modal" data-bs-target="#reApproveModal">
-                Phê duyệt lại
-            </button>
-        @endif
-    </div>
-</div>
-
-<div class="row g-4">
-    <!-- Main Left Column -->
-    <div class="col-lg-8">
-        <!-- Business General Info Card -->
-        <div class="card-minimal p-4 mb-4">
-            <div class="d-flex justify-content-between align-items-start mb-3 border-bottom pb-3">
-                <div>
-                    <h4 class="fw-semibold mb-1 text-dark">{{ $businessProfile->business_name }}</h4>
-                    <span class="badge-minimal me-2">
-                        {{ $businessProfile->category ? $businessProfile->category->name : 'N/A' }}
-                    </span>
-                    @if(!empty($businessProfile->business_types))
-                        @foreach((array)$businessProfile->business_types as $type)
-                            <span class="badge-minimal me-1">{{ $type }}</span>
-                        @endforeach
-                    @endif
-                </div>
-                <div>
-                    @if($businessProfile->status === 'pending')
-                        <span class="badge-minimal badge-minimal-warning px-3 py-2" style="font-size: 0.8rem;">Chờ xét duyệt</span>
-                    @elseif($businessProfile->status === 'approved')
-                        <span class="badge-minimal badge-minimal-success px-3 py-2" style="font-size: 0.8rem;">Đã kích hoạt</span>
-                    @else
-                        <span class="badge-minimal badge-minimal-danger px-3 py-2" style="font-size: 0.8rem;">Bị từ chối</span>
-                    @endif
-                </div>
-            </div>
-
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <div class="text-muted small">Số điện thoại liên hệ</div>
-                    <div class="fw-semibold"><i class="fas fa-phone me-1 text-secondary"></i>{{ $businessProfile->phone }}</div>
-                </div>
-                <div class="col-md-6">
-                    <div class="text-muted small">Trang web (Website)</div>
-                    <div class="fw-semibold">
-                        @if($businessProfile->website)
-                            <a href="{{ $businessProfile->website }}" target="_blank" class="text-primary text-decoration-none">
-                                <i class="fas fa-globe me-1"></i>{{ $businessProfile->website }}
-                            </a>
-                        @else
-                            <span class="text-muted fw-normal">Chưa cập nhật</span>
-                        @endif
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="text-muted small">Địa chỉ kinh doanh</div>
-                    <div class="fw-semibold">
-                        <i class="fas fa-map-marker-alt me-1 text-danger"></i>
-                        {{ $businessProfile->address_street }}, {{ $businessProfile->address_city }}, {{ $businessProfile->address_province }} (Mã bưu chính: {{ $businessProfile->address_postal_code }})
-                    </div>
-                </div>
-            </div>
-
-            <!-- Leaflet Map Inspection -->
-            <div class="mb-4">
-                <div class="fw-semibold mb-2"><i class="fas fa-map-marked-alt text-primary me-1"></i> Tọa độ bản đồ: [{{ $businessProfile->lat }}, {{ $businessProfile->lng }}]</div>
-                <div id="adminBizMap"></div>
-            </div>
-
-            <!-- Description -->
-            <div class="mb-4">
-                <div class="fw-semibold mb-2"><i class="fas fa-align-left text-primary me-1"></i> Giới thiệu về doanh nghiệp</div>
-                <div class="p-3 bg-light rounded-3 text-secondary border" style="white-space: pre-line; font-size: 0.875rem;">
-                    {{ $businessProfile->description ?? 'Chưa có mô tả giới thiệu.' }}
-                </div>
-            </div>
+                <form action="{{ route('admin.business-profiles.approve', $businessProfile->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn-minimal btn-minimal-primary px-3" onclick="return confirm('Phê duyệt doanh nghiệp này?')">
+                        Phê duyệt
+                    </button>
+                </form>
+            @elseif($businessProfile->status === 'approved')
+            @elseif($businessProfile->status === 'rejected')
+                <button type="button" class="btn-minimal btn-minimal-primary px-3" data-bs-toggle="modal" data-bs-target="#reApproveModal">
+                    Phê duyệt lại
+                </button>
+            @endif
         </div>
+    </div>
 
-        @php
-            $verificationDistMeters = null;
-            if ($businessProfile->verification_lat && $businessProfile->verification_lng && $businessProfile->lat && $businessProfile->lng) {
-                $earthRadius = 6371000;
-                $dLat = deg2rad($businessProfile->verification_lat - $businessProfile->lat);
-                $dLng = deg2rad($businessProfile->verification_lng - $businessProfile->lng);
-                $a = sin($dLat / 2) * sin($dLat / 2) +
-                     cos(deg2rad($businessProfile->lat)) * cos(deg2rad($businessProfile->verification_lat)) *
-                     sin($dLng / 2) * sin($dLng / 2);
-                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-                $verificationDistMeters = round($earthRadius * $c);
-            }
-        @endphp
-
-        @php
-            $vPhotos = !empty($businessProfile->verification_photos)
-                ? (array)$businessProfile->verification_photos
-                : (!empty($businessProfile->verification_photo) ? [$businessProfile->verification_photo] : []);
-        @endphp
-
-        <!-- Real-time Camera & GPS Verification Card -->
-        <div class="card-minimal p-4 mb-4 border-start border-4 border-primary">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <h5 class="fw-bold mb-0 text-dark">
-                    <i class="fas fa-shield-alt text-primary me-2"></i>Xác thực thực địa (Camera & GPS)
-                </h5>
-                @if(count($vPhotos) > 0)
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2">
-                        <i class="fas fa-check-circle me-1"></i> Đã chụp {{ count($vPhotos) }} ảnh xác thực
-                    </span>
-                @else
-                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2">
-                        <i class="fas fa-exclamation-circle me-1"></i> Chưa có ảnh xác thực
-                    </span>
-                @endif
-            </div>
-
-            @if(count($vPhotos) > 0)
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="fw-semibold small text-secondary mb-2">Ảnh chụp xác thực thực địa ({{ count($vPhotos) }} góc chụp)</div>
-                        <div class="photo-gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;">
-                            @foreach($vPhotos as $photo)
-                                <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="d-block border rounded-3 overflow-hidden shadow-sm position-relative" style="height: 100px;">
-                                    <img src="{{ asset('storage/' . $photo) }}" alt="Ảnh xác thực Camera" style="width: 100%; height: 100%; object-fit: cover;">
-                                </a>
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <section class="biz-panel">
+                <div class="biz-meta-row">
+                    <div style="min-width:0;flex:1;">
+                        <h1 class="biz-name">{{ $businessProfile->business_name }}</h1>
+                        <div class="d-flex flex-wrap gap-1 mt-1">
+                            <span class="biz-chip">{{ $businessProfile->category->name ?? 'Chưa phân loại' }}</span>
+                            @foreach((array) ($businessProfile->business_types ?? []) as $type)
+                                <span class="biz-chip">{{ $type }}</span>
                             @endforeach
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded-3 h-100" style="font-size: 0.875rem;">
-                            <div class="mb-2">
-                                <strong><i class="fas fa-map-marker-alt text-danger me-1"></i> Tọa độ GPS khi chụp:</strong>
-                                <span class="font-monospace text-dark fw-bold ms-1">
-                                    {{ $businessProfile->verification_lat ? number_format($businessProfile->verification_lat, 6) . ', ' . number_format($businessProfile->verification_lng, 6) : 'N/A' }}
-                                </span>
-                            </div>
-                            <div class="mb-2">
-                                <strong><i class="fas fa-map text-primary me-1"></i> Vị trí ghim trên bản đồ:</strong>
-                                <span class="font-monospace text-secondary ms-1">
-                                    [{{ number_format($businessProfile->lat, 6) }}, {{ number_format($businessProfile->lng, 6) }}]
-                                </span>
-                            </div>
-                            @if($verificationDistMeters !== null)
-                                <div class="mb-2">
-                                    <strong><i class="fas fa-ruler-horizontal me-1"></i> Khoảng cách lệch:</strong>
-                                    @if($verificationDistMeters <= 100)
-                                        <span class="badge bg-success text-white ms-1"><i class="fas fa-check-double me-1"></i> Trùng khớp (Lệch ~{{ $verificationDistMeters }}m)</span>
-                                    @elseif($verificationDistMeters <= 500)
-                                        <span class="badge bg-warning text-dark ms-1"><i class="fas fa-exclamation-triangle me-1"></i> Lệch ~{{ $verificationDistMeters }}m</span>
-                                    @else
-                                        <span class="badge bg-danger text-white ms-1"><i class="fas fa-times-circle me-1"></i> Cách xa {{ number_format($verificationDistMeters / 1000, 1) }}km</span>
-                                    @endif
-                                </div>
+                    <span class="biz-status {{ $statusClass }}">{{ $statusLabel }}</span>
+                </div>
+
+                <div class="biz-fields">
+                    <div>
+                        <div class="biz-label">Số điện thoại</div>
+                        <div class="biz-value">{{ $businessProfile->phone ?: '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="biz-label">Website</div>
+                        <div class="biz-value">
+                            @if($businessProfile->website)
+                                <a href="{{ $businessProfile->website }}" target="_blank" rel="noopener">{{ $businessProfile->website }}</a>
+                            @else
+                                <span class="empty">Chưa cập nhật</span>
                             @endif
-                            <div>
-                                <strong><i class="fas fa-clock text-secondary me-1"></i> Thời điểm chụp:</strong>
-                                <span class="text-secondary ms-1">
-                                    {{ $businessProfile->verification_time ? \Carbon\Carbon::parse($businessProfile->verification_time)->format('d/m/Y H:i:s') : 'N/A' }}
-                                </span>
-                            </div>
+                        </div>
+                    </div>
+                    <div class="biz-field--full">
+                        <div class="biz-label">Địa chỉ</div>
+                        <div class="biz-value">
+                            {{ $businessProfile->address_street }}, {{ $businessProfile->address_city }}, {{ $businessProfile->address_province }}
+                            @if($businessProfile->address_postal_code)
+                                <span class="empty">· {{ $businessProfile->address_postal_code }}</span>
+                            @endif
                         </div>
                     </div>
                 </div>
-            @else
-                <div class="p-3 bg-light rounded text-muted small">Người đăng ký chưa gửi ảnh chụp thực địa qua camera.</div>
-            @endif
-        </div>
 
-        <!-- Photos Card -->
-        <div class="card-minimal p-4">
-            <h5 class="fw-bold mb-3"><i class="fas fa-images text-primary me-2"></i>Hình ảnh xác minh doanh nghiệp</h5>
-            
-            <!-- Storefront Photos -->
-            <div class="mb-4">
-                <div class="fw-semibold small text-secondary mb-2">1. Ảnh mặt tiền cửa hàng ({{ count($businessProfile->storefront_photos ?? []) }})</div>
-                @if(!empty($businessProfile->storefront_photos))
-                    <div class="photo-gallery-grid">
-                        @foreach($businessProfile->storefront_photos as $photo)
-                            <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="photo-gallery-item">
-                                <img src="{{ asset('storage/' . $photo) }}" alt="Mặt tiền">
-                            </a>
-                        @endforeach
+                @php
+                    $mapsAddress = trim(implode(', ', array_filter([
+                        $businessProfile->address_street,
+                        $businessProfile->address_city,
+                        $businessProfile->address_province,
+                    ])));
+                @endphp
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <div class="biz-section-label mb-0">Vị trí</div>
+                        <div class="biz-maps-links">
+                            @if($mapsAddress !== '')
+                                <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($mapsAddress) }}" target="_blank" rel="noopener">Địa chỉ</a>
+                            @endif
+                            @if($businessProfile->lat && $businessProfile->lng)
+                                <a href="https://www.google.com/maps?q={{ $businessProfile->lat }},{{ $businessProfile->lng }}" target="_blank" rel="noopener">Ghim</a>
+                            @endif
+                            @if($businessProfile->verification_lat && $businessProfile->verification_lng)
+                                <a href="https://www.google.com/maps?q={{ $businessProfile->verification_lat }},{{ $businessProfile->verification_lng }}" target="_blank" rel="noopener">GPS chụp</a>
+                            @endif
+                            @if($businessProfile->verification_lat && $businessProfile->lat)
+                                <a href="https://www.google.com/maps/dir/{{ $businessProfile->verification_lat }},{{ $businessProfile->verification_lng }}/{{ $businessProfile->lat }},{{ $businessProfile->lng }}" target="_blank" rel="noopener">So sánh</a>
+                            @endif
+                        </div>
                     </div>
-                @else
-                    <div class="p-3 bg-light rounded text-muted small text-center">Không có ảnh mặt tiền nào được tải lên.</div>
-                @endif
-            </div>
+                    <div class="biz-coords">{{ number_format((float) $businessProfile->lat, 6) }}, {{ number_format((float) $businessProfile->lng, 6) }}</div>
+                    <div id="adminBizMap"></div>
+                </div>
 
-            <!-- Menu Photos -->
-            <div>
-                <div class="fw-semibold small text-secondary mb-2">2. Ảnh thực đơn / Bảng giá / Dịch vụ ({{ count($businessProfile->menu_photos ?? []) }})</div>
-                @if(!empty($businessProfile->menu_photos))
-                    <div class="photo-gallery-grid">
-                        @foreach($businessProfile->menu_photos as $photo)
-                            <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="photo-gallery-item">
-                                <img src="{{ asset('storage/' . $photo) }}" alt="Thực đơn">
-                            </a>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="p-3 bg-light rounded text-muted small text-center">Không có ảnh thực đơn nào được tải lên.</div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Sidebar Right Column -->
-    <div class="col-lg-4">
-        <!-- User Info Card -->
-        <div class="card-minimal p-4 mb-4">
-            <h6 class="fw-bold mb-3 border-bottom pb-2">Người đăng ký</h6>
-            <div class="d-flex align-items-center gap-3 mb-3">
-                <x-user-avatar :user="$businessProfile->user" size="48" />
                 <div>
-                    <div class="fw-bold text-dark">{{ $businessProfile->user->display_name ?? $businessProfile->user->username }}</div>
-                    <div class="text-muted small">{{ $businessProfile->user->email }}</div>
-                    <span class="badge bg-secondary bg-opacity-10 text-secondary mt-1">Role: {{ $businessProfile->user->role }}</span>
+                    <div class="biz-section-label">Giới thiệu</div>
+                    <div class="biz-sapo">{{ $businessProfile->description ?: 'Chưa có mô tả giới thiệu.' }}</div>
                 </div>
-            </div>
-            <div class="border-top pt-2 mt-2 small text-muted">
-                <div><strong>Tên tài khoản:</strong> {{ $businessProfile->user->username }}</div>
-                <div><strong>Ngày đăng ký TK:</strong> {{ $businessProfile->user->created_at ? $businessProfile->user->created_at->format('d/m/Y') : 'N/A' }}</div>
-                <div><strong>Ngày gửi yêu cầu:</strong> {{ $businessProfile->created_at->format('d/m/Y H:i') }}</div>
-            </div>
+            </section>
+
+            <section class="biz-panel">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h2 class="biz-panel__title mb-0">Xác thực thực địa</h2>
+                    <span class="biz-chip">{{ count($vPhotos) > 0 ? count($vPhotos) . ' ảnh' : 'Chưa có ảnh' }}</span>
+                </div>
+
+                @if(count($vPhotos) > 0)
+                    <div class="biz-verify-grid">
+                        <div>
+                            <div class="biz-label mb-2">Ảnh chụp tại chỗ</div>
+                            <div class="photo-gallery-grid">
+                                @foreach($vPhotos as $photo)
+                                    <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="photo-gallery-item">
+                                        <img src="{{ asset('storage/' . $photo) }}" alt="Ảnh xác thực">
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                        <dl class="biz-factbox mb-0">
+                            <dt>GPS khi chụp</dt>
+                            <dd>
+                                @if($businessProfile->verification_lat)
+                                    {{ number_format($businessProfile->verification_lat, 6) }}, {{ number_format($businessProfile->verification_lng, 6) }}
+                                @else
+                                    —
+                                @endif
+                            </dd>
+                            <dt>Ghim trên bản đồ</dt>
+                            <dd>{{ number_format((float) $businessProfile->lat, 6) }}, {{ number_format((float) $businessProfile->lng, 6) }}</dd>
+                            @if($verificationDistMeters !== null)
+                                <dt>Khoảng cách lệch</dt>
+                                <dd>
+                                    @if($verificationDistMeters <= 100)
+                                        <span class="biz-dist">Trùng khớp · ~{{ $verificationDistMeters }}m</span>
+                                    @elseif($verificationDistMeters <= 500)
+                                        <span class="biz-dist is-mid">Lệch ~{{ $verificationDistMeters }}m</span>
+                                    @else
+                                        <span class="biz-dist is-far">Cách xa {{ number_format($verificationDistMeters / 1000, 1) }} km</span>
+                                    @endif
+                                </dd>
+                            @endif
+                            <dt>Thời điểm chụp</dt>
+                            <dd>
+                                {{ $businessProfile->verification_time ? \Carbon\Carbon::parse($businessProfile->verification_time)->format('d/m/Y H:i') : '—' }}
+                            </dd>
+                        </dl>
+                    </div>
+                @else
+                    <div class="biz-empty">Người đăng ký chưa gửi ảnh chụp thực địa.</div>
+                @endif
+            </section>
+
+            <section class="biz-panel">
+                <h2 class="biz-panel__title">Hình ảnh doanh nghiệp</h2>
+
+                <div class="mb-4">
+                    <div class="biz-label mb-2">Mặt tiền ({{ count($businessProfile->storefront_photos ?? []) }})</div>
+                    @if(!empty($businessProfile->storefront_photos))
+                        <div class="photo-gallery-grid">
+                            @foreach($businessProfile->storefront_photos as $photo)
+                                <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="photo-gallery-item">
+                                    <img src="{{ asset('storage/' . $photo) }}" alt="Mặt tiền">
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="biz-empty">Không có ảnh mặt tiền.</div>
+                    @endif
+                </div>
+
+                <div>
+                    <div class="biz-label mb-2">Thực đơn / dịch vụ ({{ count($businessProfile->menu_photos ?? []) }})</div>
+                    @if(!empty($businessProfile->menu_photos))
+                        <div class="photo-gallery-grid">
+                            @foreach($businessProfile->menu_photos as $photo)
+                                <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="photo-gallery-item">
+                                    <img src="{{ asset('storage/' . $photo) }}" alt="Thực đơn">
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="biz-empty">Không có ảnh thực đơn.</div>
+                    @endif
+                </div>
+            </section>
         </div>
 
-        <!-- Status Details & Actions Card -->
-        <div class="card-minimal p-4">
-            <h6 class="fw-bold mb-3 border-bottom pb-2">Trạng thái xử lý</h6>
-            
-            @if($businessProfile->status === 'pending')
-                <div class="alert alert-warning border-0 small mb-3">
-                    <i class="fas fa-exclamation-triangle me-1"></i> Yêu cầu đang chờ quản trị viên duyệt thông tin địa điểm và hình ảnh.
+        <div class="col-lg-4">
+            <aside class="biz-panel">
+                <h2 class="biz-panel__title">Người đăng ký</h2>
+                <div class="biz-side-user">
+                    <x-user-avatar :user="$businessProfile->user" size="44" />
+                    <div>
+                        <div class="biz-side-user__name">{{ $businessProfile->user->display_name ?? $businessProfile->user->username }}</div>
+                        <div class="biz-side-user__email">{{ $businessProfile->user->email }}</div>
+                    </div>
                 </div>
-            @elseif($businessProfile->status === 'approved')
-                <div class="alert alert-success border-0 small mb-3">
-                    <i class="fas fa-check-circle me-1"></i> Yêu cầu đã được phê duyệt. Địa điểm kinh doanh đã được tạo công khai trên bản đồ Ninh Bình Travel Hub.
+                <div class="biz-kv">
+                    <div>
+                        <span>Tài khoản</span>
+                        <strong>{{ $businessProfile->user->username }}</strong>
+                    </div>
+                    <div>
+                        <span>Vai trò</span>
+                        <strong>{{ $businessProfile->user->role }}</strong>
+                    </div>
+                    <div>
+                        <span>Ngày tạo TK</span>
+                        <strong>{{ $businessProfile->user->created_at?->format('d/m/Y') ?? '—' }}</strong>
+                    </div>
+                    <div>
+                        <span>Ngày gửi yêu cầu</span>
+                        <strong>{{ $businessProfile->created_at->format('d/m/Y H:i') }}</strong>
+                    </div>
                 </div>
-            @elseif($businessProfile->status === 'rejected')
-                <div class="alert alert-danger border-0 small mb-3">
-                    <div class="fw-bold mb-1"><i class="fas fa-times-circle me-1"></i> Đã từ chối yêu cầu</div>
-                    <div><strong>Lý do từ chối:</strong> {{ $businessProfile->reject_reason }}</div>
-                </div>
-            @endif
+            </aside>
+
+            <aside class="biz-panel">
+                <h2 class="biz-panel__title">Trạng thái xử lý</h2>
+
+                @if($businessProfile->status === 'pending')
+                    <p class="biz-note is-warn mb-0">
+                        Đang chờ duyệt. Kiểm tra địa chỉ, GPS xác thực và ảnh trước khi phê duyệt.
+                    </p>
+                @elseif($businessProfile->status === 'approved')
+                    <p class="biz-note mb-0">
+                        Đã phê duyệt. Địa điểm đã lên bản đồ.
+                    </p>
+                @elseif($businessProfile->status === 'rejected')
+                    <p class="biz-note is-bad mb-0">
+                        <strong style="font-weight:600;">Đã từ chối.</strong><br>
+                        {{ $businessProfile->reject_reason }}
+                    </p>
+                @endif
+            </aside>
         </div>
     </div>
 </div>
 
-<!-- Modal Reject -->
-<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+{{-- Modal Reject --}}
+<div class="modal fade biz-modal" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <form action="{{ route('admin.business-profiles.reject', $businessProfile->id) }}" method="POST">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-danger">Từ chối yêu cầu doanh nghiệp</h5>
+                    <h5 class="modal-title">Từ chối yêu cầu</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="small text-secondary mb-3">Vui lòng nhập lý do cụ thể để người dùng biết cách chỉnh sửa lại thông tin.</p>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Lý do từ chối *</label>
-                        <textarea name="reject_reason" class="form-control" rows="4" required placeholder="Ví dụ: Hình ảnh mặt tiền không rõ ràng, vị trí tọa độ sai so với địa chỉ đường..."></textarea>
-                    </div>
+                    <p class="small mb-3" style="color:#6482a6;">Nhập lý do để người dùng biết cần chỉnh gì.</p>
+                    <label class="biz-label">Lý do từ chối *</label>
+                    <textarea name="reject_reason" class="form-control" rows="4" required placeholder="Ví dụ: Ảnh mặt tiền không rõ, tọa độ lệch địa chỉ..."></textarea>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-danger btn-sm px-3">Xác nhận từ chối</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-minimal" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn-minimal text-danger px-3">Xác nhận từ chối</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal Re-Approve -->
-<div class="modal fade" id="reApproveModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+{{-- Modal Re-Approve --}}
+<div class="modal fade biz-modal" id="reApproveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <form action="{{ route('admin.business-profiles.approve', $businessProfile->id) }}" method="POST">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-success">Phê duyệt lại doanh nghiệp</h5>
+                    <h5 class="modal-title">Phê duyệt lại</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="small text-secondary mb-0">Bạn có chắc chắn muốn phê duyệt lại yêu cầu này? Địa điểm kinh doanh sẽ được đưa lên hệ thống.</p>
+                    <p class="mb-0" style="color:#3b5980;font-size:0.875rem;line-height:1.6;">
+                        Phê duyệt lại yêu cầu này? Địa điểm sẽ được đưa lên hệ thống.
+                    </p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success btn-sm px-3">Xác nhận phê duyệt</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-minimal" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn-minimal btn-minimal-primary px-3">Xác nhận phê duyệt</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const lat = parseFloat("{{ $businessProfile->lat }}");
-        const lng = parseFloat("{{ $businessProfile->lng }}");
+    document.addEventListener('DOMContentLoaded', function () {
+        const lat = parseFloat(@json($businessProfile->lat));
+        const lng = parseFloat(@json($businessProfile->lng));
 
-        if (!isNaN(lat) && !isNaN(lng)) {
-            const map = L.map('adminBizMap', {
-                zoomControl: true,
-                attributionControl: false
-            }).setView([lat, lng], 15);
+        if (isNaN(lat) || isNaN(lng)) return;
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(map);
+        const map = L.map('adminBizMap', {
+            zoomControl: true,
+            attributionControl: false
+        }).setView([lat, lng], 15);
 
-            // Fetch boundary
-            fetch('{{ asset('geo/ha-nam-old.geojson') }}')
-                .then(res => res.json())
-                .then(data => {
-                    L.geoJSON(data, {
-                        style: {
-                            color: '#7ba7d4',
-                            weight: 2,
-                            opacity: 0.55,
-                            fillColor: '#f8fafc',
-                            fillOpacity: 0.04
-                        }
-                    }).addTo(map);
-                })
-                .catch(err => console.error(err));
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
 
-            const marker = L.marker([lat, lng]).addTo(map);
-            marker.bindPopup(`
-                <div style="font-family: inherit; font-size: 0.85rem;">
-                    <strong style="color: #1e3a5f;">{{ $businessProfile->business_name }}</strong><br>
-                    <span style="color: #64748b;">{{ $businessProfile->address_street }}, {{ $businessProfile->address_city }}</span>
-                </div>
-            `).openPopup();
-        }
+        fetch(@json(asset('geo/ha-nam-old.geojson')))
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: {
+                        color: '#7ba7d4',
+                        weight: 2,
+                        opacity: 0.55,
+                        fillColor: '#f8fafc',
+                        fillOpacity: 0.04
+                    }
+                }).addTo(map);
+            })
+            .catch(() => {});
+
+        L.marker([lat, lng]).addTo(map).bindPopup(
+            '<div style="font-size:0.85rem;line-height:1.45;">' +
+            '<strong style="color:#1e3a5f;">' + @json($businessProfile->business_name) + '</strong><br>' +
+            '<span style="color:#6482a6;">' + @json(trim($businessProfile->address_street . ', ' . $businessProfile->address_city)) + '</span>' +
+            '</div>'
+        ).openPopup();
     });
 </script>
 @endpush

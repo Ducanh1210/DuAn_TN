@@ -61,4 +61,9 @@ class BusinessProfile extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function location()
+    {
+        return $this->hasOne(Location::class, 'created_by', 'user_id');
+    }
 }
