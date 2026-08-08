@@ -2082,6 +2082,7 @@
         <div class="viewer-more-dropdown" id="viewerMoreDropdown">
             <button type="button" class="viewer-more-item" onclick="shareLocation()">Chia sẻ</button>
             <button type="button" class="viewer-more-item" onclick="openReportModal({{ $location->id }}, 'Location'); closeViewerMoreMenu();">Báo cáo</button>
+            <button type="button" class="viewer-more-item" onclick="openFeedbackModal({{ $location->id }}); closeViewerMoreMenu();">Góp ý / báo lỗi</button>
         </div>
     </div>
 
@@ -2420,6 +2421,30 @@
             <div class="report-modal-actions">
                 <button class="btn-report-cancel" onclick="closeReportModal()">Hủy</button>
                 <button class="btn-report-submit" id="btnSubmitReport" onclick="submitReport()">Gửi báo cáo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Góp ý / Báo lỗi -->
+    <div class="report-modal-overlay" id="feedbackModalOverlay">
+        <div class="report-modal">
+            <h4><i class="fa-solid fa-comment-dots"></i> Góp ý / Báo lỗi</h4>
+            <label>Loại góp ý / lỗi</label>
+            <select id="feedbackType">
+                <option value="wrong_info">Thông tin địa điểm sai</option>
+                <option value="wrong_position">Vị trí trên bản đồ sai</option>
+                <option value="image_error">Ảnh bị lỗi / không hiển thị</option>
+                <option value="location_closed">Địa điểm đã đóng cửa / không còn tồn tại</option>
+                <option value="duplicate_location">Địa điểm bị trùng lặp</option>
+                <option value="system_suggestion">Góp ý cải thiện hệ thống</option>
+                <option value="other">Khác</option>
+            </select>
+            <label>Nội dung chi tiết</label>
+            <textarea id="feedbackContent" rows="4" placeholder="Mô tả cụ thể vấn đề hoặc góp ý của bạn để chúng tôi xử lý nhanh hơn..."></textarea>
+
+            <div class="report-modal-actions">
+                <button class="btn-report-cancel" onclick="closeFeedbackModal()">Hủy</button>
+                <button class="btn-report-submit" id="btnSubmitFeedback" onclick="submitFeedback()" style="background:#2563eb;box-shadow:0 2px 6px rgba(37,99,235,0.2);">Gửi góp ý</button>
             </div>
         </div>
     </div>
@@ -3736,6 +3761,66 @@
             console.error(err);
             btn.disabled = false;
             btn.innerHTML = 'Gửi báo cáo';
+            alert('Có lỗi kết nối. Vui lòng thử lại sau.');
+        });
+    }
+
+    // ===== Góp ý / Báo lỗi =====
+    let currentFeedbackLocationId = null;
+
+    function openFeedbackModal(locationId) {
+        currentFeedbackLocationId = locationId;
+        document.getElementById('feedbackType').value = 'wrong_info';
+        document.getElementById('feedbackContent').value = '';
+        document.getElementById('feedbackModalOverlay').classList.add('active');
+    }
+
+    function closeFeedbackModal() {
+        document.getElementById('feedbackModalOverlay').classList.remove('active');
+        currentFeedbackLocationId = null;
+    }
+
+    function submitFeedback() {
+        const btn = document.getElementById('btnSubmitFeedback');
+        const type = document.getElementById('feedbackType').value;
+        const content = document.getElementById('feedbackContent').value.trim();
+        const csrfToken = '{{ csrf_token() }}';
+
+        if (!content) {
+            alert('Vui lòng nhập nội dung góp ý / báo lỗi.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi...';
+
+        fetch("{{ route('client.feedback.submit') }}", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                report_type: type,
+                target_type: 'location',
+                target_id: currentFeedbackLocationId,
+                content: content
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi góp ý';
+            alert(data.message || 'Đã gửi góp ý.');
+            if (data.success) {
+                closeFeedbackModal();
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi góp ý';
             alert('Có lỗi kết nối. Vui lòng thử lại sau.');
         });
     }
