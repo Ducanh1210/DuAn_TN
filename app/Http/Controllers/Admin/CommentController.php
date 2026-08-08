@@ -7,21 +7,23 @@ use App\Models\Comment;
 use App\Services\ModerationService;
 use Illuminate\Http\Request;
 
+/**
+ * Controller quản trị bình luận: liệt kê (tìm kiếm, lọc theo trạng thái/cờ AI), quét kiểm duyệt
+ * bằng AI, xóa và ẩn/hiện bình luận.
+ */
 class CommentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    /** Danh sách bình luận có tìm kiếm, lọc theo trạng thái và cờ kiểm duyệt AI, kèm số liệu tổng quan. */
     public function index(Request $request)
     {
         $query = Comment::with(['user', 'location'])->orderBy('created_at', 'desc');
 
-        // Filter by location id
+        // Lọc theo địa điểm
         if ($request->filled('location_id')) {
             $query->where('location_id', $request->location_id);
         }
 
-        // Search by user name, display name or content
+        // Tìm kiếm theo nội dung hoặc tên/hiển thị/email của người viết
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -34,12 +36,12 @@ class CommentController extends Controller
             });
         }
         
-        // Filter by status
+        // Lọc theo trạng thái hiển thị
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by AI moderation flag
+        // Lọc theo cờ kiểm duyệt AI (unchecked = chưa quét)
         if ($request->filled('ai_flag')) {
             if ($request->ai_flag === 'unchecked') {
                 $query->whereNull('ai_checked_at');
@@ -48,14 +50,14 @@ class CommentController extends Controller
             }
         }
 
-        // Sort riskiest first when reviewing AI flags
+        // Sắp xếp rủi ro cao lên đầu khi rà soát theo cờ AI
         if ($request->boolean('sort_risk')) {
             $query->reorder()->orderByRaw('ai_score IS NULL, ai_score DESC')->orderBy('created_at', 'desc');
         }
 
         $comments = $query->paginate(20)->withQueryString();
 
-        // Summary counters for the AI moderation banner
+        // Số liệu tổng quan cho banner kiểm duyệt AI
         $aiStats = [
             'violation' => Comment::where('ai_flag', 'violation')->count(),
             'suspect' => Comment::where('ai_flag', 'suspect')->count(),
@@ -67,9 +69,7 @@ class CommentController extends Controller
         return view('admin.comments.index', compact('comments', 'aiStats', 'aiConfigured'));
     }
 
-    /**
-     * Scan comments with AI to flag suspicious / violating content.
-     */
+    /** Quét bình luận bằng AI để gắn cờ nội dung nghi ngờ/vi phạm (giới hạn số lượng mỗi lần chạy). */
     public function scanAi(Request $request, ModerationService $moderation)
     {
         if (!$moderation->isConfigured()) {
@@ -85,9 +85,9 @@ class CommentController extends Controller
         if ($scope === 'unchecked') {
             $query->whereNull('ai_checked_at');
         }
-        // scope === 'all' => rescan everything
+        // scope === 'all' => quét lại toàn bộ
 
-        // Cap per run to keep latency & cost under control
+        // Giới hạn số lượng mỗi lần chạy để kiểm soát độ trễ và chi phí
         $comments = $query->orderBy('created_at', 'desc')->limit(60)->get(['id', 'content']);
 
         if ($comments->isEmpty()) {
@@ -146,9 +146,7 @@ class CommentController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    /** Xóa vĩnh viễn một bình luận. */
     public function destroy(Comment $comment)
     {
         $comment->delete();
@@ -157,12 +155,10 @@ class CommentController extends Controller
             ->with('success', 'Đã xóa bình luận thành công.');
     }
 
-    /**
-     * Toggle the status of the comment.
-     */
+    /** Bật/tắt hiển thị bình luận (visible <-> hidden). */
     public function toggleStatus(Comment $comment)
     {
-        // Toggle between visible and hidden
+        // Chuyển đổi giữa hiển thị và ẩn
         $newStatus = $comment->status === 'visible' ? 'hidden' : 'visible';
         
         $comment->update(['status' => $newStatus]);

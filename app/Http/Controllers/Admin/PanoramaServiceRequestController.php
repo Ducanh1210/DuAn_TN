@@ -6,8 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\PanoramaServiceRequest;
 use Illuminate\Http\Request;
 
+/**
+ * Controller quản trị yêu cầu dịch vụ tour 360°: liệt kê (lọc theo trạng thái, tìm kiếm)
+ * và cập nhật trạng thái xử lý từng yêu cầu.
+ */
 class PanoramaServiceRequestController extends Controller
 {
+    /** Danh sách yêu cầu, hỗ trợ lọc theo trạng thái và tìm kiếm theo tên/SĐT/người gửi. */
     public function index(Request $request)
     {
         $status = $request->get('status', 'pending');
@@ -45,6 +50,7 @@ class PanoramaServiceRequestController extends Controller
         return view('admin.panorama_requests.index', compact('requests', 'status', 'search', 'counts'));
     }
 
+    /** Cập nhật trạng thái và ghi chú xử lý cho một yêu cầu tour 360°. */
     public function updateStatus(Request $request, PanoramaServiceRequest $panoramaRequest)
     {
         $data = $request->validate([

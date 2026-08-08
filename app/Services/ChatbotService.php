@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\Location;
 
+/**
+ * Dịch vụ trợ lý ảo (chatbot) tư vấn du lịch Ninh Bình.
+ * Nạp danh sách địa điểm thật trong DB làm ngữ cảnh cho AI (chống bịa địa điểm),
+ * gọi OpenRouter để trả lời và làm sạch các link địa điểm [Tên](loc:ID) do AI sinh ra.
+ */
 class ChatbotService
 {
     protected $openRouterApiKey;
@@ -23,7 +28,7 @@ class ChatbotService
     }
 
     /**
-     * Load & cache locations used for context + link sanitization.
+     * Lấy và cache danh sách địa điểm dùng cho ngữ cảnh AI + làm sạch link.
      */
     protected function getLocations()
     {
@@ -42,7 +47,7 @@ class ChatbotService
 
             $this->locationIndex = $locations;
         } catch (\Exception $e) {
-            Log::warning('Cannot fetch locations for chatbot: ' . $e->getMessage());
+            Log::warning('Không lấy được danh sách địa điểm cho chatbot: ' . $e->getMessage());
             $this->locationIndex = collect();
         }
 
@@ -149,14 +154,14 @@ class ChatbotService
             return null;
         }
 
-        // Exact
+        // Khớp chính xác tên
         foreach ($locations as $loc) {
             if (mb_strtolower($loc->name) === $needle) {
                 return $loc;
             }
         }
 
-        // Contains either way (min length to avoid noise)
+        // Khớp chứa nhau (đặt độ dài tối thiểu để tránh khớp nhiễu)
         if (mb_strlen($needle) < 4) {
             return null;
         }
@@ -172,11 +177,11 @@ class ChatbotService
     }
 
     /**
-     * Send message to OpenRouter API and get response
+     * Gửi tin nhắn tới AI (OpenRouter) và nhận câu trả lời đã làm sạch link.
      *
-     * @param string $message User's message
-     * @param array $history Previous conversation history
-     * @return string API response content
+     * @param string $message Tin nhắn của người dùng
+     * @param array $history Lịch sử hội thoại trước đó
+     * @return string Nội dung phản hồi của trợ lý
      */
     public function sendMessage(string $message, array $history = []): string
     {
@@ -234,6 +239,7 @@ QUY TẮC BẮT BUỘC:
             'content' => $message
         ];
 
+        // Thứ tự mô hình thử: mô hình chính -> bản nhẹ -> tự động (dự phòng)
         $apiKeys = $this->getApiKeys();
         $modelsToTry = array_unique([
             $this->openRouterModel,

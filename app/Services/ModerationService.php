@@ -5,11 +5,16 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Dịch vụ kiểm duyệt bình luận bằng AI (qua OpenRouter/Gemini).
+ * Nhận danh sách bình luận, gọi mô hình AI để gắn cờ nội dung
+ * vi phạm / nghi ngờ, trả về cờ + điểm rủi ro + lý do cho từng bình luận.
+ */
 class ModerationService
 {
-    protected $apiKeys;
-    protected $model;
-    protected $baseUrl;
+    protected $apiKeys;   // Danh sách API key (hỗ trợ xoay vòng nhiều key)
+    protected $model;     // Mô hình AI mặc định
+    protected $baseUrl;   // Địa chỉ gốc API OpenRouter
 
     public function __construct()
     {
@@ -18,6 +23,10 @@ class ModerationService
         $this->apiKeys = $this->getApiKeys();
     }
 
+    /**
+     * Đọc các API key từ .env. Cho phép khai báo nhiều key cách nhau bằng dấu phẩy
+     * để tự động xoay vòng khi một key bị lỗi/hết hạn mức.
+     */
     protected function getApiKeys(): array
     {
         $rawKeys = env('OPENROUTER_API_KEYS') ?: env('OPENROUTER_API_KEY');
@@ -28,6 +37,7 @@ class ModerationService
         return array_values(array_filter($keys));
     }
 
+    /** Có sẵn sàng gọi AI không (đã cấu hình ít nhất 1 API key). */
     public function isConfigured(): bool
     {
         return !empty($this->apiKeys);
@@ -59,8 +69,13 @@ class ModerationService
         return $results;
     }
 
+    /**
+     * Kiểm duyệt một nhóm nhỏ bình luận: dựng prompt, thử lần lượt từng key và
+     * từng mô hình dự phòng cho tới khi nhận được JSON hợp lệ.
+     */
     protected function moderateChunk(array $chunk): array
     {
+        // Ghép nội dung các bình luận thành danh sách "ID x: ..." cho AI đọc
         $listText = '';
         foreach ($chunk as $item) {
             $content = trim((string) ($item['content'] ?? ''));
@@ -97,12 +112,14 @@ PROMPT;
             ['role' => 'user', 'content' => "Đánh giá các bình luận sau:\n{$listText}"],
         ];
 
+        // Danh sách mô hình thử theo thứ tự ưu tiên (có mô hình dự phòng rẻ hơn)
         $modelsToTry = array_unique([
             $this->model,
             'google/gemini-2.5-flash-lite',
             'openrouter/auto',
         ]);
 
+        // Thử từng key, với mỗi key lại thử từng mô hình; gặp lỗi thì chuyển tiếp
         foreach ($this->apiKeys as $keyIndex => $apiKey) {
             foreach ($modelsToTry as $modelName) {
                 try {

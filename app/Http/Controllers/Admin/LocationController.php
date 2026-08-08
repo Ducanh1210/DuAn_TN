@@ -19,8 +19,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Controller quản trị địa điểm (POI): CRUD địa điểm, upload/xóa ảnh, panorama 360°, audio,
+ * tạo audio bằng TTS và xử lý xóa địa điểm doanh nghiệp (kèm thông báo + hạ vai trò chủ sở hữu).
+ */
 class LocationController extends Controller
 {
+    /** Danh sách địa điểm có tìm kiếm/lọc; kèm danh sách chủ doanh nghiệp để bật popup lý do khi xóa. */
     public function index(Request $request)
     {
         $sortDir = $request->input('sort_dir', 'desc');
@@ -51,12 +56,14 @@ class LocationController extends Controller
         return view('admin.locations.index', compact('locations', 'categories', 'sortDir', 'businessOwnerIds'));
     }
 
+    /** Hiển thị form tạo địa điểm mới. */
     public function create()
     {
         $categories = Category::where('status', 'active')->get();
         return view('admin.locations.create', compact('categories'));
     }
 
+    /** Lưu địa điểm mới, tạo slug duy nhất và nén ảnh đại diện nếu có. */
     public function store(StoreLocationRequest $request)
     {
         $validated = $request->validated();
@@ -76,6 +83,7 @@ class LocationController extends Controller
         return redirect()->route('admin.locations.edit', [$location->id] + $request->query())->with('success', 'Thêm địa điểm thành công! Vui lòng tiếp tục cập nhật hình ảnh và 360.');
     }
 
+    /** Form chỉnh sửa địa điểm kèm ảnh và panorama hiện có. */
     public function edit(Location $location)
     {
         $categories = Category::where('status', 'active')->get();
@@ -84,6 +92,7 @@ class LocationController extends Controller
         return view('admin.locations.edit', compact('location', 'categories', 'images', 'panoramas'));
     }
 
+    /** Cập nhật địa điểm, tạo lại slug nếu đổi tên và thay ảnh đại diện nếu upload mới. */
     public function update(UpdateLocationRequest $request, Location $location)
     {
         $validated = $request->validated();
@@ -108,6 +117,10 @@ class LocationController extends Controller
         return redirect()->route('admin.locations.index')->with('success', 'Cập nhật địa điểm thành công!');
     }
 
+    /**
+     * Xóa địa điểm: dọn toàn bộ file liên quan. Nếu là địa điểm doanh nghiệp đã duyệt thì
+     * bắt buộc nhập lý do, gửi thông báo cho chủ, và hạ vai trò/xóa hồ sơ nếu đó là địa điểm cuối.
+     */
     public function destroy(Request $request, Location $location)
     {
         // Xác định địa điểm này có thuộc một doanh nghiệp đã duyệt không
@@ -193,7 +206,7 @@ class LocationController extends Controller
         }
     }
 
-    // Ajax Image Upload
+    /** Upload ảnh cho địa điểm qua Ajax (đã nén). */
     public function uploadImage(Request $request, Location $location)
     {
         $request->validate(['file' => 'required|image|max:20480']);
@@ -208,6 +221,7 @@ class LocationController extends Controller
         return response()->json(['success' => true, 'image' => $image, 'url' => Storage::url($path)]);
     }
 
+    /** Xóa một ảnh của địa điểm qua Ajax. */
     public function deleteImage(LocationImage $image)
     {
         Storage::disk('public')->delete($image->image_url);
@@ -215,25 +229,25 @@ class LocationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // Ajax Panorama Upload
+    /** Upload ảnh panorama 360° qua Ajax; ảnh quá lớn (>11K) sẽ được resize để tối ưu. */
     public function uploadPanorama(Request $request, Location $location)
     {
         $request->validate(['file' => 'required|image|max:51200']);
         
         $file = $request->file('file');
         
-        // Increase memory limit and max execution time for massive images (e.g. 18K panoramas)
+        // Tăng giới hạn bộ nhớ và thời gian chạy cho ảnh cực lớn (vd panorama 18K)
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', '300');
         
-        $maxWidth = 11264; // 11K limit
+        $maxWidth = 11264; // Giới hạn 11K
         $info = getimagesize($file->getRealPath());
         
         if ($info && $info[0] > $maxWidth) {
             $path = $file->hashName('locations/panoramas');
             $absolutePath = storage_path('app/public/' . $path);
             
-            // Ensure directory exists
+            // Tạo thư mục nếu chưa tồn tại
             if (!file_exists(dirname($absolutePath))) {
                 mkdir(dirname($absolutePath), 0755, true);
             }
@@ -277,6 +291,7 @@ class LocationController extends Controller
         return response()->json(['success' => true, 'panorama' => $pano, 'url' => Storage::url($path)]);
     }
 
+    /** Xóa một panorama của địa điểm qua Ajax. */
     public function deletePanorama(Panorama $panorama)
     {
         Storage::disk('public')->delete($panorama->image_url);
@@ -284,14 +299,14 @@ class LocationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // Ajax Audio Upload for Location
+    /** Upload file audio thuyết minh cho địa điểm qua Ajax. */
     public function uploadAudio(Request $request, Location $location)
     {
         $request->validate([
             'audio' => 'required|file|mimes:mp3,wav,ogg,m4a,webm|max:20480',
         ]);
 
-        // Delete old audio if exists
+        // Xóa audio cũ nếu có
         if ($location->audio_url && Storage::disk('public')->exists($location->audio_url)) {
             Storage::disk('public')->delete($location->audio_url);
         }
@@ -314,6 +329,7 @@ class LocationController extends Controller
         ]);
     }
 
+    /** Xóa audio thuyết minh của địa điểm. */
     public function deleteAudio(Location $location)
     {
         if ($location->audio_url && Storage::disk('public')->exists($location->audio_url)) {
@@ -333,6 +349,7 @@ class LocationController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /** Lấy danh sách giọng đọc từ máy chủ VieNeu-TTS. */
     public function getTtsVoices()
     {
         try {
@@ -353,6 +370,7 @@ class LocationController extends Controller
         }
     }
 
+    /** Gọi máy chủ TTS để tạo audio thuyết minh từ văn bản và lưu vào địa điểm. */
     public function generateTtsAudio(Request $request, Location $location)
     {
         $request->validate([

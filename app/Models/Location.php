@@ -5,23 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
+/**
+ * Model địa điểm du lịch (POI) - thực thể trung tâm của hệ thống.
+ * Chứa thông tin mô tả, tọa độ GPS, danh mục, ảnh, panorama 360°, đánh giá...
+ * và xử lý dọn dẹp dữ liệu liên quan khi địa điểm bị xóa.
+ */
 class Location extends Model
 {
     use HasFactory;
 
+    /** Đăng ký các sự kiện vòng đời của model. */
     protected static function booted(): void
     {
+        // Khi xóa địa điểm: dọn dữ liệu liên quan và xử lý hồ sơ doanh nghiệp gắn với nó
         static::deleting(function (Location $location) {
-            // Dọn pivot/bảng cũ để user-side không còn tham chiếu tới địa điểm đã xóa.
+            // Dọn pivot để user-side không còn tham chiếu tới địa điểm đã xóa.
             DB::table('favorite_locations')->where('location_id', $location->id)->delete();
-            if (Schema::hasTable('favorites')) {
-                DB::table('favorites')->where('location_id', $location->id)->delete();
-            }
 
             // Hạ trạng thái hồ sơ doanh nghiệp nếu địa điểm của họ bị admin gỡ.
             if ($location->created_by) {
+                // Chỉ xử lý khi đây là địa điểm cuối cùng của chủ doanh nghiệp
                 $otherLocations = static::where('created_by', $location->created_by)
                     ->where('id', '!=', $location->id)
                     ->exists();
@@ -47,6 +51,7 @@ class Location extends Model
         });
     }
 
+    /** Các trường được phép gán hàng loạt. */
     protected $fillable = [
         'category_id',
         'name',
@@ -77,6 +82,7 @@ class Location extends Model
         'updated_by',
     ];
 
+    /** Ép kiểu: attributes lưu JSON, tọa độ và điểm đánh giá là số thập phân. */
     protected $casts = [
         'attributes' => 'array',
         'lat' => 'decimal:7',
@@ -84,31 +90,40 @@ class Location extends Model
         'average_rating' => 'decimal:2',
     ];
 
+    /** Danh mục của địa điểm. */
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
+    /** Thư viện ảnh của địa điểm, sắp theo thứ tự hiển thị. */
     public function images()
     {
         return $this->hasMany(LocationImage::class)->orderBy('sort_order', 'asc');
     }
 
+    /** Các cảnh panorama 360° của địa điểm. */
     public function panoramas()
     {
         return $this->hasMany(Panorama::class)->orderBy('sort_order', 'asc');
     }
 
+    /** Lượt yêu thích của địa điểm. */
     public function favorites()
     {
         return $this->hasMany(FavoriteLocation::class);
     }
 
+    /** Bình luận đang hiển thị của địa điểm, mới nhất trước. */
     public function comments()
     {
         return $this->hasMany(Comment::class)->where('status', 'visible')->orderBy('created_at', 'desc');
     }
 
+    /**
+     * Trả về URL ảnh đại diện: ưu tiên thumbnail_url, nếu trống thì lấy ảnh
+     * được đánh dấu là thumbnail trong thư viện, cuối cùng lấy ảnh đầu tiên.
+     */
     public function resolveThumbnailUrl(): ?string
     {
         if ($this->thumbnail_url) {
@@ -129,6 +144,7 @@ class Location extends Model
             : asset('storage/' . ltrim($thumbnail->image_url, '/'));
     }
 
+    /** Trả về danh sách URL ảnh (kèm caption) đã chuẩn hóa đường dẫn đầy đủ. */
     public function resolveImageUrls(): array
     {
         $images = $this->relationLoaded('images') ? $this->images : $this->images()->get();
@@ -145,6 +161,7 @@ class Location extends Model
         })->filter(fn ($item) => !empty($item['url']))->values()->all();
     }
 
+    /** Kiểm tra địa điểm có ít nhất một cảnh panorama 360° hay không. */
     public function hasPanorama(): bool
     {
         if ($this->relationLoaded('panoramas')) {

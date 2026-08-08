@@ -8,10 +8,20 @@ use App\Models\User;
 use App\Models\UserRedemption;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Dịch vụ đổi thưởng: kiểm tra điều kiện, trừ xu của người dùng và ghi nhận
+ * lượt đổi. Toàn bộ thao tác trừ xu/ghi lịch sử/giảm tồn kho chạy trong
+ * transaction + khóa dòng phần thưởng để tránh đổi trùng khi nhiều request cùng lúc.
+ */
 class RewardService
 {
+    /**
+     * Thực hiện đổi một phần thưởng cho người dùng.
+     * @return array ['success' => bool, 'message' => string, ...]
+     */
     public function redeem(User $user, Reward $reward): array
     {
+        // Kiểm tra nhanh trước khi vào transaction để phản hồi lỗi sớm
         if (!$reward->isAvailable()) {
             return ['success' => false, 'message' => 'Phần thưởng này hiện không khả dụng.'];
         }
@@ -20,6 +30,7 @@ class RewardService
             return ['success' => false, 'message' => 'Bạn không đủ xu để đổi phần thưởng này.'];
         }
 
+        // Huy hiệu / phần thưởng độc quyền chỉ được đổi một lần
         $alreadyRedeemed = UserRedemption::where('user_id', $user->id)
             ->where('reward_id', $reward->id)
             ->where('status', 'completed')
@@ -30,12 +41,14 @@ class RewardService
         }
 
         return DB::transaction(function () use ($user, $reward) {
+            // Khóa dòng phần thưởng để kiểm tra tồn kho chính xác, tránh race condition
             $lockedReward = Reward::whereKey($reward->id)->lockForUpdate()->first();
 
             if (!$lockedReward || !$lockedReward->isAvailable()) {
                 return ['success' => false, 'message' => 'Phần thưởng vừa hết hàng.'];
             }
 
+            // Đọc lại số xu mới nhất rồi kiểm tra lần nữa trong transaction
             $user->refresh();
             if ($user->points < $lockedReward->cost_points) {
                 return ['success' => false, 'message' => 'Bạn không đủ xu để đổi phần thưởng này.'];
@@ -57,6 +70,7 @@ class RewardService
                 'status' => 'completed',
             ]);
 
+            // Giảm tồn kho nếu phần thưởng có giới hạn số lượng (null = không giới hạn)
             if ($lockedReward->stock !== null) {
                 $lockedReward->decrement('stock');
             }

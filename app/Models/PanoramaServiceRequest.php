@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Model yêu cầu dịch vụ chụp tour 360°. Lưu thông tin liên hệ và nhu cầu của khách
+ * (kể cả khách chưa đăng nhập). Cung cấp các nhãn tiếng Việt cho loại địa điểm,
+ * số lượng góc chụp và trạng thái xử lý.
+ */
 class PanoramaServiceRequest extends Model
 {
     protected $fillable = [
@@ -19,11 +24,13 @@ class PanoramaServiceRequest extends Model
         'admin_note',
     ];
 
+    /** Người dùng gửi yêu cầu (null nếu là khách chưa đăng nhập). */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** Nhãn tiếng Việt cho loại địa điểm. */
     public static function placeTypeLabels(): array
     {
         return [
@@ -34,6 +41,7 @@ class PanoramaServiceRequest extends Model
         ];
     }
 
+    /** Nhãn tiếng Việt cho số lượng góc chụp ước tính. */
     public static function sceneEstimateLabels(): array
     {
         return [
@@ -44,6 +52,7 @@ class PanoramaServiceRequest extends Model
         ];
     }
 
+    /** Nhãn tiếng Việt cho trạng thái xử lý yêu cầu. */
     public static function statusLabels(): array
     {
         return [

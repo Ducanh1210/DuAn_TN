@@ -10,17 +10,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Controller quản trị sự kiện: liệt kê (tìm kiếm, lọc), thêm, sửa, ẩn/hiện và xóa;
+ * xử lý nén & lưu ảnh nổi bật.
+ */
 class EventController extends Controller
 {
     public function __construct(private ImageCompressionService $imageCompression)
     {
     }
 
+    /** Danh sách sự kiện có tìm kiếm và lọc theo trạng thái / nổi bật. */
     public function index(Request $request)
     {
         $query = Event::with(['location', 'creator'])->latest();
 
-        // Search
+        // Tìm kiếm theo tên / mô tả / địa điểm
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -30,12 +35,12 @@ class EventController extends Controller
             });
         }
 
-        // Filter by status
+        // Lọc theo trạng thái
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by featured
+        // Lọc theo sự kiện nổi bật
         if ($request->filled('featured')) {
             $query->where('is_featured', $request->featured);
         }
@@ -45,12 +50,14 @@ class EventController extends Controller
         return view('admin.events.index', compact('events'));
     }
 
+    /** Form tạo sự kiện (kèm danh sách địa điểm để gắn). */
     public function create()
     {
         $locations = Location::where('status', 'published')->orderBy('name')->get();
         return view('admin.events.create', compact('locations'));
     }
 
+    /** Lưu sự kiện mới: tạo slug, gán người tạo và lưu ảnh nổi bật (nếu có). */
     public function store(Request $request)
     {
         $request->validate([
@@ -81,12 +88,14 @@ class EventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Thêm sự kiện thành công!');
     }
 
+    /** Form sửa sự kiện. */
     public function edit(Event $event)
     {
         $locations = Location::where('status', 'published')->orderBy('name')->get();
         return view('admin.events.edit', compact('event', 'locations'));
     }
 
+    /** Cập nhật sự kiện: đổi slug khi đổi tên và thay ảnh nổi bật (xóa ảnh cũ). */
     public function update(Request $request, Event $event)
     {
         $request->validate([
@@ -110,7 +119,7 @@ class EventController extends Controller
         }
 
         if ($request->hasFile('featured_image')) {
-            // Delete old image
+            // Xóa ảnh cũ trước khi lưu ảnh mới
             if ($event->featured_image && \Storage::disk('public')->exists($event->featured_image)) {
                 \Storage::disk('public')->delete($event->featured_image);
             }
@@ -123,9 +132,7 @@ class EventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Cập nhật sự kiện thành công!');
     }
 
-    /**
-     * Toggle visibility (active <-> hidden)
-     */
+    /** Bật/tắt hiển thị sự kiện (active <-> hidden). */
     public function toggleVisibility(Event $event)
     {
         $event->status = $event->status === 'active' ? 'hidden' : 'active';
@@ -135,6 +142,7 @@ class EventController extends Controller
         return back()->with('success', "Đã {$label} sự kiện \"{$event->name}\".");
     }
 
+    /** Xóa sự kiện và ảnh nổi bật đi kèm. */
     public function destroy(Event $event)
     {
         if ($event->featured_image && \Storage::disk('public')->exists($event->featured_image)) {

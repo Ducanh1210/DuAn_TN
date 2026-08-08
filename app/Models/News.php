@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model tin tức / bài viết (tin, sự kiện, cẩm nang, thông báo). Có tác giả, lượt xem,
+ * trạng thái xuất bản và helper chuẩn hóa URL ảnh dùng chung.
+ */
 class News extends Model
 {
     use HasFactory;
@@ -29,22 +33,19 @@ class News extends Model
         'view_count' => 'integer',
     ];
 
+    /** Tác giả bài viết. */
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    /**
-     * Scope: only published articles
-     */
+    /** Scope: chỉ lấy bài đã xuất bản. */
     public function scopePublished($query)
     {
         return $query->where('status', 'published');
     }
 
-    /**
-     * Get Vietnamese label for type
-     */
+    /** Accessor: nhãn loại bài viết tiếng Việt. */
     public function getTypeLabelAttribute()
     {
         return match ($this->type) {
@@ -56,9 +57,7 @@ class News extends Model
         };
     }
 
-    /**
-     * Get Vietnamese label for status
-     */
+    /** Accessor: nhãn trạng thái tiếng Việt. */
     public function getStatusLabelAttribute()
     {
         return match ($this->status) {
@@ -69,11 +68,16 @@ class News extends Model
         };
     }
 
+    /** Accessor: URL ảnh nổi bật đã chuẩn hóa. */
     public function getFeaturedImageUrlAttribute(): ?string
     {
         return static::resolveMediaUrl($this->featured_image);
     }
 
+    /**
+     * Chuẩn hóa đường dẫn media thành URL đầy đủ: giữ nguyên URL http(s),
+     * còn lại thì gắn tiền tố storage/ cho ảnh lưu nội bộ.
+     */
     public static function resolveMediaUrl(?string $path): ?string
     {
         if (!$path) {

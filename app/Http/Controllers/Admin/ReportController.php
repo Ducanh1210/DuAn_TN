@@ -9,8 +9,13 @@ use App\Models\Location;
 use App\Models\Report;
 use Illuminate\Http\Request;
 
+/**
+ * Controller quản trị báo cáo & góp ý: chia tab theo báo cáo địa điểm, báo cáo bình luận
+ * và góp ý/báo lỗi (FeedbackReport); cho phép cập nhật trạng thái xử lý.
+ */
 class ReportController extends Controller
 {
+    /** Danh sách theo tab: locations / comments / feedbacks, kèm số lượng đang chờ xử lý. */
     public function index(Request $request)
     {
         $tab = $request->get('tab', 'locations');
@@ -58,6 +63,7 @@ class ReportController extends Controller
         ));
     }
 
+    /** Cập nhật trạng thái xử lý một báo cáo vi phạm. */
     public function updateStatus(Request $request, Report $report)
     {
         $request->validate([
@@ -72,6 +78,7 @@ class ReportController extends Controller
         return back()->with('success', 'Cập nhật trạng thái báo cáo thành công.');
     }
 
+    /** Chi tiết một góp ý/báo lỗi kèm liên kết tới đối tượng liên quan (địa điểm/tin tức). */
     public function showFeedback($id)
     {
         $feedback = FeedbackReport::with('user', 'resolver')->findOrFail($id);
@@ -96,6 +103,7 @@ class ReportController extends Controller
         return view('admin.reports.show_feedback', compact('feedback', 'targetName', 'targetLink'));
     }
 
+    /** Cập nhật trạng thái và phản hồi của quản trị cho một góp ý/báo lỗi. */
     public function updateFeedback(Request $request, $id)
     {
         $feedback = FeedbackReport::findOrFail($id);

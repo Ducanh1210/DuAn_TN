@@ -10,17 +10,22 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Controller quản trị tin tức/bài viết: liệt kê (tìm kiếm, lọc), thêm, sửa, ẩn/hiện, xóa;
+ * xử lý ảnh nổi bật và các ảnh nhúng trong nội dung (tải ảnh ngoài/base64 về lưu nội bộ).
+ */
 class NewsController extends Controller
 {
     public function __construct(private ImageCompressionService $imageCompression)
     {
     }
 
+    /** Danh sách bài viết có tìm kiếm và lọc theo loại/trạng thái. */
     public function index(Request $request)
     {
         $query = News::with('author')->latest();
 
-        // Search
+        // Tìm kiếm theo tiêu đề / tóm tắt
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -29,12 +34,12 @@ class NewsController extends Controller
             });
         }
 
-        // Filter by type
+        // Lọc theo loại bài
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        // Filter by status
+        // Lọc theo trạng thái
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -44,11 +49,13 @@ class NewsController extends Controller
         return view('admin.news.index', compact('news'));
     }
 
+    /** Form tạo bài viết. */
     public function create()
     {
         return view('admin.news.create');
     }
 
+    /** Lưu bài viết mới: tạo slug, lưu ảnh nổi bật, xử lý ảnh trong nội dung và đặt ngày xuất bản. */
     public function store(Request $request)
     {
         $request->validate([
@@ -70,7 +77,7 @@ class NewsController extends Controller
             $data['featured_image'] = $path;
         }
 
-        // If status is published and no published_at date, set it to now
+        // Nếu xuất bản mà chưa có ngày xuất bản thì đặt là hiện tại
         if ($data['status'] === 'published' && empty($data['published_at'])) {
             $data['published_at'] = now();
         }
@@ -82,11 +89,13 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Thêm bài viết thành công!');
     }
 
+    /** Form sửa bài viết. */
     public function edit(News $news)
     {
         return view('admin.news.edit', compact('news'));
     }
 
+    /** Cập nhật bài viết: đổi slug khi đổi tiêu đề, thay ảnh nổi bật và dọn ảnh nội dung không còn dùng. */
     public function update(Request $request, News $news)
     {
         $request->validate([
@@ -106,7 +115,7 @@ class NewsController extends Controller
         }
 
         if ($request->hasFile('featured_image')) {
-            // Delete old image
+            // Xóa ảnh cũ trước khi lưu ảnh mới
             if ($news->featured_image && \Storage::disk('public')->exists($news->featured_image)) {
                 \Storage::disk('public')->delete($news->featured_image);
             }
@@ -114,7 +123,7 @@ class NewsController extends Controller
             $data['featured_image'] = $path;
         }
 
-        // If transitioning to published and no published_at, set it
+        // Khi chuyển sang xuất bản mà chưa có ngày thì đặt ngày hiện tại
         if ($data['status'] === 'published' && !$news->published_at && empty($data['published_at'])) {
             $data['published_at'] = now();
         }
@@ -122,7 +131,7 @@ class NewsController extends Controller
         $processedContent = $this->processContentImages($request->input('content'));
         $data['content'] = $processedContent;
 
-        // Handle unused content images deletion
+        // Xóa các ảnh nội dung cũ không còn được dùng nữa
         $oldImages = $this->extractImagePaths($news->content);
         $newImages = $this->extractImagePaths($processedContent);
 
@@ -138,9 +147,7 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Cập nhật bài viết thành công!');
     }
 
-    /**
-     * Toggle visibility (published <-> hidden)
-     */
+    /** Bật/tắt hiển thị bài viết (published <-> hidden). */
     public function toggleVisibility(News $news)
     {
         $news->status = $news->status === 'published' ? 'hidden' : 'published';
@@ -153,13 +160,14 @@ class NewsController extends Controller
         return back()->with('success', "Đã {$label} bài viết \"{$news->title}\".");
     }
 
+    /** Xóa bài viết cùng ảnh nổi bật và các ảnh nhúng trong nội dung. */
     public function destroy(News $news)
     {
         if ($news->featured_image && \Storage::disk('public')->exists($news->featured_image)) {
             \Storage::disk('public')->delete($news->featured_image);
         }
         
-        // Delete images in content
+        // Xóa các ảnh nhúng trong nội dung bài viết
         $contentImages = $this->extractImagePaths($news->content);
         foreach ($contentImages as $image) {
             if (\Storage::disk('public')->exists($image)) {
@@ -171,12 +179,13 @@ class NewsController extends Controller
         return redirect()->route('admin.news.index')->with('success', 'Xóa bài viết thành công!');
     }
 
+    /** API tải ảnh cho trình soạn thảo nội dung (dùng bởi editor), trả về URL ảnh đã lưu. */
     public function uploadImage(Request $request)
     {
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             
-            // Reject junk files (too small or not a real image)
+            // Loại bỏ file rác (quá nhỏ hoặc không phải ảnh thật)
             if ($file->getSize() < 500) {
                 return response()->json(['error' => 'File too small.'], 400);
             }
@@ -190,6 +199,7 @@ class NewsController extends Controller
         return response()->json(['error' => 'No file uploaded.'], 400);
     }
 
+    /** Trích các đường dẫn ảnh nội dung (thư mục news/content) từ HTML để dọn dẹp khi cần. */
     private function extractImagePaths($content)
     {
         $paths = [];
@@ -207,6 +217,10 @@ class NewsController extends Controller
         return $paths;
     }
 
+    /**
+     * Quét ảnh trong nội dung HTML: tải ảnh từ URL ngoài hoặc ảnh base64 về lưu nội bộ,
+     * rồi thay src bằng đường dẫn nội bộ (tránh phụ thuộc nguồn ngoài, dễ dọn dẹp).
+     */
     private function processContentImages($content)
     {
         if (empty($content)) return $content;
@@ -215,12 +229,12 @@ class NewsController extends Controller
             $imgTag = $matches[0];
             $src = $matches[1];
 
-            // Local image, skip
+            // Ảnh nội bộ -> bỏ qua
             if (str_starts_with($src, '/') || str_contains($src, request()->getHost())) {
                 return $imgTag;
             }
 
-            // External URL
+            // Ảnh từ URL ngoài -> tải về lưu nội bộ
             if (str_starts_with($src, 'http')) {
                 try {
                     $imageContent = @file_get_contents($src);
@@ -237,7 +251,7 @@ class NewsController extends Controller
                 } catch (\Exception $e) {}
             }
             
-            // Base64
+            // Ảnh base64 -> giải mã và lưu nội bộ
             if (str_starts_with($src, 'data:image')) {
                 preg_match('/data:image\/(.*?);base64,(.*)/', $src, $base64Matches);
                 if (count($base64Matches) == 3) {

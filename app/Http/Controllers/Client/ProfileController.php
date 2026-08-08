@@ -25,11 +25,13 @@ use App\Services\RewardService;
 use Illuminate\Support\Str;
 
 
+/**
+ * Controller trang cá nhân người dùng: thông tin/cài đặt tài khoản, yêu thích, bình luận,
+ * thông báo, đăng ký doanh nghiệp, điểm thưởng, nhiệm vụ và khung avatar.
+ */
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile and settings dashboard.
-     */
+    /** Trang cá nhân + bảng cài đặt: gom dữ liệu yêu thích, bình luận, điểm, nhiệm vụ, thông báo. */
     public function index()
     {
         $user = Auth::user();
@@ -40,7 +42,7 @@ class ProfileController extends Controller
             ->with(['category', 'images'])
             ->get();
             
-        // Resolve thumbnail URLs for favorite locations
+        // Chuẩn hóa URL ảnh đại diện cho các địa điểm yêu thích
         $favorites->each(function($loc) {
             if ($loc->category && $loc->category->icon) {
                 $loc->category->icon_url = asset($loc->category->icon);
@@ -61,11 +63,11 @@ class ProfileController extends Controller
             ->with('location')
             ->get();
 
-        // Load categories and business profile
+        // Tải danh mục và hồ sơ doanh nghiệp
         $categories = Category::where('status', 'active')->get();
         $businessProfile = BusinessProfile::where('user_id', $user->id)->with('category')->first();
 
-        // Load user notifications (e.g. business location removed) then mark unread as read
+        // Tải thông báo (vd: địa điểm doanh nghiệp bị gỡ) rồi đánh dấu các thông báo chưa đọc là đã đọc
         $notifications = \App\Models\UserNotification::where('user_id', $user->id)
             ->latest()
             ->limit(20)
@@ -74,7 +76,7 @@ class ProfileController extends Controller
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
-        // Load Avatar Frames
+        // Tải danh sách khung avatar và các khung người dùng đã mở khóa
         $allFrames = AvatarFrame::where('status', 'active')->orderBy('required_points', 'asc')->get();
         $unlockedFrameIds = UserAvatarFrame::where('user_id', $user->id)
             ->pluck('avatar_frame_id')
@@ -88,7 +90,7 @@ class ProfileController extends Controller
             ->get();
         $hasPendingPanoRequest = $panoramaServiceRequests->contains(fn ($r) => $r->status === 'pending');
 
-        // Point history: collapse spammy per-minute active_session rows into daily summaries
+        // Lịch sử điểm: gộp các bản ghi active_session theo từng phút thành tóm tắt theo ngày cho gọn
         $rawPointTx = \App\Models\PointTransaction::where('user_id', $user->id)
             ->where('amount', '!=', 0)
             ->orderByDesc('created_at')
@@ -168,9 +170,7 @@ class ProfileController extends Controller
         ));
     }
 
-    /**
-     * Show the dedicated business account upgrade page.
-     */
+    /** Hiển thị trang đăng ký nâng cấp lên tài khoản doanh nghiệp. */
     public function showBusinessUpgradeForm()
     {
         $user = Auth::user();
@@ -193,9 +193,7 @@ class ProfileController extends Controller
         return view('client.business_upgrade', compact('user', 'categories', 'businessProfile'));
     }
 
-    /**
-     * Update the user's general profile information.
-     */
+    /** Cập nhật thông tin cá nhân cơ bản (tên hiển thị). */
     public function update(Request $request)
     {
         /** @var \App\Models\User $user */
@@ -222,9 +220,7 @@ class ProfileController extends Controller
         return back()->with('success', 'Cập nhật thông tin cá nhân thành công!');
     }
 
-    /**
-     * Update the user's password.
-     */
+    /** Đổi mật khẩu (tài khoản Google không đổi được; tài khoản thường cần nhập mật khẩu hiện tại). */
     public function updatePassword(Request $request)
     {
         /** @var \App\Models\User $user */
@@ -236,14 +232,14 @@ class ProfileController extends Controller
             ]);
         }
 
-        // Check if user registered via Google and hasn't set a password yet
+        // Người đăng nhập qua Google có thể chưa từng đặt mật khẩu
         $hasPassword = !empty($user->password_hash);
         
         $rules = [
             'password' => 'required|string|min:6|confirmed',
         ];
 
-        // Only require current password if they have a password and are not OAuth-only
+        // Chỉ bắt nhập mật khẩu hiện tại khi tài khoản đã có mật khẩu và không phải chỉ dùng OAuth
         if ($hasPassword && !$user->provider) {
             $rules['current_password'] = 'required|string';
         }
@@ -268,9 +264,7 @@ class ProfileController extends Controller
         return back()->with('success', 'Thay đổi mật khẩu thành công!');
     }
 
-    /**
-     * Update the user's avatar.
-     */
+    /** Cập nhật ảnh đại diện: lưu file mới, xóa file cũ (nếu là ảnh nội bộ). */
     public function updateAvatar(Request $request)
     {
         $request->validate([
@@ -286,18 +280,18 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         if ($request->hasFile('avatar')) {
-            // Upload new avatar file to storage/app/public/avatars
+            // Lưu file avatar mới vào storage/app/public/avatars
             $avatarFile = $request->file('avatar');
             $filename = time() . '_' . uniqid() . '.' . $avatarFile->getClientOriginalExtension();
             $path = $avatarFile->storeAs('avatars', $filename, 'public');
 
-            // Delete old local avatar file if exists
+            // Xóa file avatar cũ nếu là ảnh lưu nội bộ
             if ($user->avatar_url && str_contains($user->avatar_url, 'avatars/') && !str_starts_with($user->avatar_url, 'http')) {
                 $oldFilename = basename($user->avatar_url);
                 Storage::disk('public')->delete('avatars/' . $oldFilename);
             }
 
-            // Update database avatar_url to path accessible via storage route
+            // Lưu đường dẫn avatar mới vào DB
             $avatarUrl = 'avatars/' . $filename;
             $user->update([
                 'avatar_url' => $avatarUrl,
@@ -316,9 +310,7 @@ class ProfileController extends Controller
         ], 400);
     }
 
-    /**
-     * Toggle favorite status of a location via AJAX.
-     */
+    /** Thêm/bỏ yêu thích địa điểm qua AJAX; lần thêm mới sẽ cộng điểm và tính nhiệm vụ. */
     public function toggleFavorite(Request $request)
     {
         $request->validate([
@@ -355,12 +347,10 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Delete a comment created by the user.
-     */
+    /** Xóa bình luận do chính người dùng tạo. */
     public function destroyComment(Comment $comment)
     {
-        // Check ownership
+        // Kiểm tra quyền sở hữu
         if ($comment->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -376,15 +366,13 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Deactivate/delete user account.
-     */
+    /** Vô hiệu hóa/xóa tài khoản: xác minh mật khẩu (hoặc username/email với tài khoản OAuth) rồi khóa. */
     public function deleteAccount(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // If not OAuth user, verify password first
+        // Tài khoản thường: xác minh mật khẩu trước
         if (!$user->provider) {
             $request->validate([
                 'confirm_password' => 'required|string',
@@ -398,7 +386,7 @@ class ProfileController extends Controller
                 ]);
             }
         } else {
-            // OAuth user needs to check username/email to confirm
+            // Tài khoản OAuth: xác nhận bằng username/email thay cho mật khẩu
             $request->validate([
                 'confirm_username' => 'required|string',
             ], [
@@ -412,7 +400,7 @@ class ProfileController extends Controller
             }
         }
 
-        // Set status to locked or deleted so they cannot log in
+        // Đặt trạng thái 'deleted' để không thể đăng nhập nữa
         $user->update([
             'status' => 'deleted',
         ]);
@@ -428,9 +416,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Handle business photo uploads during registration.
-     */
+    /** Xử lý tải ảnh doanh nghiệp trong lúc đăng ký (nén và lưu ở độ nét Full HD). */
     public function uploadBusinessPhoto(Request $request)
     {
         $request->validate([
@@ -442,7 +428,7 @@ class ProfileController extends Controller
         ]);
 
         try {
-            // Business gallery & avatar photos are public-facing: keep them sharp at Full HD
+            // Ảnh thư viện & ảnh đại diện doanh nghiệp là ảnh công khai: giữ nét ở mức Full HD
             $path = $this->compressAndSaveImage($request->file('file'), 'business/photos', 1920, 85);
             return response()->json([
                 'success' => true,
@@ -458,13 +444,15 @@ class ProfileController extends Controller
     }
 
     /**
-     * Handle business account registration.
+     * Xử lý đăng ký/nộp lại hồ sơ doanh nghiệp.
+     * Chặn gửi khi đang chờ duyệt hoặc đã có doanh nghiệp còn địa điểm; cho nộp lại khi
+     * hồ sơ đã duyệt nhưng địa điểm đã bị gỡ hoặc hồ sơ đã bị từ chối.
      */
     public function businessRegister(Request $request)
     {
         $user = Auth::user();
 
-        // Check if user already has an active or pending business profile
+        // Kiểm tra người dùng đã có hồ sơ doanh nghiệp đang hoạt động/chờ duyệt chưa
         $existing = BusinessProfile::where('user_id', $user->id)->first();
         if ($existing) {
             $blocked = false;
@@ -540,7 +528,7 @@ class ProfileController extends Controller
         foreach ((array)$rawVerificationPhotos as $idx => $photoVal) {
             if (empty($photoVal)) continue;
             if (str_starts_with($photoVal, 'data:image/')) {
-                // Base64 encoded image from camera canvas
+                // Ảnh dạng base64 chụp từ camera (canvas) -> giải mã và lưu thành file
                 @list($type, $data) = explode(';', $photoVal);
                 @list(, $data)      = explode(',', $data);
                 if ($data) {
@@ -558,7 +546,7 @@ class ProfileController extends Controller
         $verificationTime = !empty($validated['verification_time']) ? \Carbon\Carbon::parse($validated['verification_time']) : now();
 
         if ($existing) {
-            // Update the existing rejected one
+            // Cập nhật lại hồ sơ cũ (đã bị từ chối hoặc địa điểm đã bị gỡ) và chuyển về trạng thái chờ duyệt
             $existing->update([
                 'business_name' => $validated['business_name'],
                 'business_types' => $validated['business_types'],
@@ -589,7 +577,7 @@ class ProfileController extends Controller
             ]);
             $business = $existing;
         } else {
-            // Create a new business profile
+            // Tạo hồ sơ doanh nghiệp mới
             $business = BusinessProfile::create([
                 'user_id' => $user->id,
                 'business_name' => $validated['business_name'],
@@ -627,9 +615,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Cancel a pending business profile registration.
-     */
+    /** Hủy yêu cầu đăng ký doanh nghiệp đang chờ duyệt và dọn các ảnh đã tải lên. */
     public function cancelBusinessRegistration()
     {
         $user = Auth::user();
@@ -645,7 +631,7 @@ class ProfileController extends Controller
             ], 404);
         }
 
-        // Clean up uploaded files in local storage if they exist
+        // Dọn các file ảnh đã tải lên (nếu còn tồn tại)
         $photos = array_merge($profile->menu_photos ?? [], $profile->storefront_photos ?? []);
         foreach ($photos as $photo) {
             if (Storage::disk('public')->exists($photo)) {
@@ -661,9 +647,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Compress image using GD and save as WebP.
-     */
+    /** Nén ảnh bằng GD và lưu dưới dạng WebP (giữ nền trong suốt cho PNG/WebP). */
     private function compressAndSaveImage($file, $folder, $maxWidth = 1200, $quality = 75)
     {
         $imageInfo = @getimagesize($file->getRealPath());
@@ -733,9 +717,7 @@ class ProfileController extends Controller
         return $relativeStoragePath;
     }
 
-    /**
-     * Track online time for the active_session mission (no per-minute xu).
-     */
+    /** Ghi nhận thời gian online cho nhiệm vụ active_session (không cộng xu theo từng phút). */
     public function heartbeat(Request $request)
     {
         $user = Auth::user();
@@ -772,9 +754,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Claim daily login bonus points with streak bonus.
-     */
+    /** Nhận điểm điểm danh hằng ngày (kèm thưởng theo chuỗi ngày). */
     public function claimDaily(Request $request)
     {
         $user = Auth::user();
@@ -795,18 +775,16 @@ class ProfileController extends Controller
         ], 400);
     }
 
-    /**
-     * Display the Quests & Avatar Frame Reward Center.
-     */
+    /** Trang Trung tâm nhiệm vụ & phần thưởng (nhiệm vụ, khung avatar, bảng xếp hạng, cửa hàng). */
     public function missions()
     {
         $user = Auth::user();
 
         if ($user) {
-            // Track daily login
+            // Ghi nhận lượt đăng nhập trong ngày
             MissionService::trackProgress($user, 'daily_login', 1);
 
-            // Fetch user progress
+            // Lấy tiến độ nhiệm vụ của người dùng
             $userMissions = UserMission::where('user_id', $user->id)
                 ->get()
                 ->keyBy('mission_id');
@@ -819,17 +797,17 @@ class ProfileController extends Controller
             $unlockedFrameIds = [];
         }
 
-        // Fetch active missions
+        // Lấy các nhiệm vụ đang hoạt động và phân theo loại
         $allMissions = Mission::where('status', 'active')->with('rewardFrame')->get();
 
         $dailyMissions = $allMissions->where('type', 'daily');
         $weeklyMissions = $allMissions->where('type', 'weekly');
         $achievementMissions = $allMissions->where('type', 'achievement');
 
-        // Fetch Avatar Frames
+        // Lấy danh sách khung avatar
         $allFrames = AvatarFrame::where('status', 'active')->orderBy('required_points', 'asc')->get();
 
-        // Fetch Leaderboard (Top 5 Users)
+        // Bảng xếp hạng (Top 5 người dùng nhiều điểm nhất)
         $leaderboard = User::orderBy('points', 'desc')->take(5)->get();
 
         $shopRewards = Reward::active()->orderBy('cost_points')->get();
@@ -853,9 +831,7 @@ class ProfileController extends Controller
         ));
     }
 
-    /**
-     * Redeem a shop reward with points.
-     */
+    /** Đổi một phần thưởng trong cửa hàng bằng xu (ủy quyền cho RewardService). */
     public function redeemReward(Reward $reward, RewardService $rewardService)
     {
         $result = $rewardService->redeem(Auth::user(), $reward);
@@ -863,9 +839,7 @@ class ProfileController extends Controller
         return response()->json($result, $result['success'] ? 200 : 400);
     }
 
-    /**
-     * Claim reward for a completed mission.
-     */
+    /** Nhận thưởng cho một nhiệm vụ đã hoàn thành. */
     public function claimMissionReward(Request $request, int $missionId)
     {
         $user = Auth::user();
@@ -878,9 +852,7 @@ class ProfileController extends Controller
         return response()->json($result, 400);
     }
 
-    /**
-     * Claim milestone gift: unlock avatar frame only (no bonus xu — avoids double economy).
-     */
+    /** Nhận quà theo mốc tích lũy xu: chỉ mở khóa khung avatar, không cộng thêm xu (tránh lạm phát điểm). */
     public function claimMilestone100(Request $request)
     {
         $user = Auth::user();
@@ -920,7 +892,7 @@ class ProfileController extends Controller
             ], 400);
         }
 
-        // Resolve by frame code (stable), not hardcoded IDs
+        // Tra khung theo mã code (ổn định) thay vì ID cứng
         $frameCodes = [
             100 => 'frame-bronze',
             200 => 'frame-silver',
@@ -958,9 +930,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Equip or unequip an avatar frame.
-     */
+    /** Trang bị hoặc tháo khung avatar. */
     public function equipAvatarFrame(Request $request)
     {
         $user = Auth::user();
@@ -970,9 +940,7 @@ class ProfileController extends Controller
         return response()->json($result);
     }
 
-    /**
-     * Buy an avatar frame with earned points.
-     */
+    /** (Đã vô hiệu hóa) Mua khung avatar bằng xu — khung chỉ là phần thưởng thành tích. */
     public function buyAvatarFrame(Request $request, int $frameId)
     {
         $user = Auth::user();

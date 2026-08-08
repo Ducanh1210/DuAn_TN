@@ -11,8 +11,14 @@ use App\Models\PanoramaServiceRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Controller trang giới thiệu (landing) và dịch vụ tour 360°.
+ * Gồm trang chủ giới thiệu (địa điểm nổi bật, tin tức, sự kiện) và trang/dịch vụ
+ * nhận yêu cầu chụp tour 360° cho cả khách chưa đăng nhập.
+ */
 class LandingController extends Controller
 {
+    /** Trang chủ giới thiệu: địa điểm nổi bật, tin mới, sự kiện sắp tới và vài số liệu tổng quan. */
     public function index()
     {
         $featuredLocations = Location::query()
@@ -130,6 +136,7 @@ class LandingController extends Controller
         $phone = trim($data['phone']);
         $user = Auth::user();
 
+        // Chặn gửi trùng: đã có yêu cầu đang chờ theo cùng SĐT (hoặc cùng tài khoản)
         $pendingQuery = PanoramaServiceRequest::where('status', 'pending')
             ->where(function ($q) use ($user, $phone) {
                 $q->where('phone', $phone);
