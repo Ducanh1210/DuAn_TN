@@ -382,6 +382,9 @@
                     <span class="badge-count">{{ $commentCount }}</span>
                 @endif
             </a>
+            <a href="{{ route('client.pano_service') }}" class="biz-nav-link d-flex justify-content-between align-items-center" target="_blank" rel="noopener">
+                <span>Dịch vụ tour 360</span>
+            </a>
         </nav>
 
         <div class="sidebar-group-title">Liên kết</div>
@@ -417,6 +420,20 @@
                     {{ session('success') }}
                 </div>
             @endif
+            @if(session('error'))
+                <div class="alert border-0 py-2 px-3 mb-3 bg-white border-start border-3 border-danger shadow-sm" style="font-size: 0.8rem; color: #991b1b;">
+                    {{ session('error') }}
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="alert border-0 py-2 px-3 mb-3 bg-white border-start border-3 border-danger shadow-sm" style="font-size: 0.8rem; color: #991b1b;">
+                    <ul class="mb-0 ps-3">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
                 <div>
@@ -437,7 +454,7 @@
                 </div>
             </div>
 
-            <div class="metric-strip mb-3">
+            <div class="metric-strip mb-3" id="bizMetricStrip">
                 <div class="row g-0 align-items-center">
                     <div class="col-6 col-md-3 metric-item">
                         <div class="metric-label">Lượt xem địa điểm</div>
@@ -591,6 +608,7 @@
                     @endif
                 </div>
             </div>
+
         </main>
     </div>
 </div>
@@ -703,14 +721,23 @@ document.addEventListener('DOMContentLoaded', function () {
         if (window.innerWidth <= 768) {
             document.getElementById('sidebar').classList.remove('show');
         }
+        if (history.replaceState) {
+            history.replaceState(null, '', '#' + tabId);
+        }
     }
 
-    document.querySelectorAll('.biz-nav-link').forEach(function (link) {
+    document.querySelectorAll('.biz-nav-link[data-tab]').forEach(function (link) {
         link.addEventListener('click', function (e) {
             e.preventDefault();
             showTab(link.getAttribute('data-tab'));
         });
     });
+
+    // Mở tab từ hash (#tab-pano)
+    const initialHash = (window.location.hash || '').replace(/^#/, '');
+    if (initialHash && titles[initialHash]) {
+        showTab(initialHash);
+    }
 
     const toggleBtn = document.getElementById('toggleSidebar');
     if (toggleBtn) {

@@ -132,12 +132,65 @@
             display: none !important;
         }
 
-        /* Hide all default Marzipano UI elements */
-        #titleBar { display: none !important; }
-        #sceneList { display: none !important; }
-        #sceneListToggle { display: none !important; }
+        /* Tên scene 360 — giữa top (giữa nút Quay lại và ···) */
+        #titleBar,
+        body.fullscreen-enabled #titleBar,
+        body.multiple-scenes #titleBar,
+        body.fullscreen-enabled.mobile #titleBar,
+        body.multiple-scenes.mobile #titleBar,
+        .mobile #titleBar {
+            display: flex !important;
+            position: absolute;
+            top: 18px !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%);
+            width: min(52vw, 420px) !important;
+            height: auto !important;
+            z-index: 1000;
+            pointer-events: none;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+        #titleBar .sceneName,
+        .mobile #titleBar .sceneName {
+            width: 100%;
+            height: auto;
+            margin: 0;
+            padding: 0 8px;
+            line-height: 1.25 !important;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background: none !important;
+            background-color: transparent !important;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            pointer-events: auto;
+        }
+        body.viewer-guide-open #titleBar,
+        body.reviews-drawer-open #titleBar,
+        body.pano-photo-open #titleBar {
+            opacity: 0;
+            visibility: hidden;
+        }
+        @media (max-width: 640px) {
+            #titleBar {
+                top: 16px;
+                width: min(46vw, 200px);
+            }
+            #titleBar .sceneName {
+                font-size: 13px;
+            }
+        }
+
         #autorotateToggle { display: none !important; }
         #fullscreenToggle { display: none !important; }
+        #sceneList { display: none !important; }
+        #sceneListToggle { display: none !important; }
         .viewControlButton { display: none !important; }
 
         /* Audio Mascot Player */
@@ -1504,6 +1557,206 @@
             pointer-events: none;
         }
 
+        /* Góc dưới trái: Toàn màn hình / Hướng dẫn / Ngừng quay */
+        .viewer-tools {
+            position: absolute;
+            left: 16px;
+            bottom: 18px;
+            z-index: 10051;
+            display: flex;
+            align-items: flex-end;
+            gap: 14px;
+            pointer-events: none;
+        }
+        .viewer-tools__btn {
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 5px;
+            border: none;
+            background: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 0;
+            min-width: 56px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
+            transition: opacity 0.15s ease;
+        }
+        .viewer-tools__btn:hover,
+        .viewer-tools__btn:focus {
+            opacity: 0.88;
+            outline: none;
+        }
+        .viewer-tools__btn > i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            font-size: 18px;
+            line-height: 1;
+            filter: drop-shadow(0 1px 0.5px rgba(0, 0, 0, 0.3));
+        }
+        .viewer-tools__label {
+            font-size: 10px;
+            font-weight: 500;
+            line-height: 1.15;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .viewer-tools__btn.is-active {
+            opacity: 1;
+        }
+        body.viewer-photo-strip-open .viewer-tools,
+        body.reviews-drawer-open .viewer-tools,
+        body.viewer-guide-open .viewer-tools,
+        body.viewer-guide-open .viewer-dock,
+        body.viewer-guide-open .audio-player {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Overlay hướng dẫn sử dụng 360° */
+        .viewer-guide {
+            position: fixed;
+            inset: 0;
+            z-index: 10090;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(56, 120, 180, 0.35), transparent 55%),
+                linear-gradient(165deg, #0f2744 0%, #1e3a5f 48%, #152a45 100%);
+            color: #fff;
+            cursor: pointer;
+        }
+        .viewer-guide.is-open {
+            display: flex;
+        }
+        .viewer-guide__inner {
+            position: relative;
+            width: min(920px, 100%);
+            max-height: 100%;
+            overflow: auto;
+            cursor: default;
+            padding: 8px 4px 16px;
+        }
+        .viewer-guide__close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .viewer-guide__close:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+        .viewer-guide__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px 36px;
+            padding: 28px 12px 8px;
+        }
+        .viewer-guide__cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+        }
+        .viewer-guide__title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            opacity: 0.95;
+            margin: 0 0 4px;
+        }
+        .viewer-guide__row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .viewer-guide__icon {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+        }
+        .viewer-guide__icon--hotspot {
+            position: relative;
+        }
+        .viewer-guide__icon--hotspot::before {
+            content: '';
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 45%, transparent 70%);
+        }
+        .viewer-guide__icon--hotspot::after {
+            content: '';
+            position: relative;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.35);
+            z-index: 1;
+        }
+        .viewer-guide__text {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.35;
+            max-width: 220px;
+            opacity: 0.92;
+        }
+        .viewer-guide__hint {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.55;
+        }
+        .viewer-guide__crosshair {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 18px;
+            height: 18px;
+            margin: -9px 0 0 -9px;
+            opacity: 0.25;
+            pointer-events: none;
+        }
+        .viewer-guide__crosshair::before,
+        .viewer-guide__crosshair::after {
+            content: '';
+            position: absolute;
+            background: #fff;
+        }
+        .viewer-guide__crosshair::before {
+            left: 8px; top: 0; width: 2px; height: 18px;
+        }
+        .viewer-guide__crosshair::after {
+            left: 0; top: 8px; width: 18px; height: 2px;
+        }
+
         /* Horizontal photo strip (mở bằng nút Ảnh) */
         .viewer-photo-strip {
             position: absolute;
@@ -1711,6 +1964,21 @@
                 min-width: 56px;
             }
             .viewer-dock__label { font-size: 10px; }
+            .viewer-tools {
+                left: 10px;
+                bottom: 14px;
+                gap: 10px;
+            }
+            .viewer-tools__btn { min-width: 48px; }
+            .viewer-tools__btn > i { font-size: 16px; }
+            .viewer-tools__label { font-size: 9px; }
+            .viewer-guide__grid {
+                grid-template-columns: 1fr;
+                gap: 22px;
+                padding-top: 40px;
+            }
+            .viewer-guide__title { font-size: 12px; }
+            .viewer-guide__text { font-size: 13px; }
             .viewer-photo-strip { bottom: 16px; padding: 8px 10px; }
             .viewer-photo-strip__item {
                 flex-basis: 80px;
@@ -1824,6 +2092,70 @@
         'photoMode' => $photoMode,
         'hasNarration' => $hasNarration,
     ])
+
+    @if(!$photoMode)
+    {{-- Góc dưới trái: toàn màn hình / hướng dẫn / ngừng quay --}}
+    <div class="viewer-tools" id="viewerTools">
+        <button type="button" class="viewer-tools__btn" id="btnViewerFullscreen" title="Toàn màn hình">
+            <i class="fa-solid fa-expand" id="iconViewerFullscreen"></i>
+            <span class="viewer-tools__label" id="labelViewerFullscreen">Toàn màn hình</span>
+        </button>
+        <button type="button" class="viewer-tools__btn" id="btnViewerGuide" title="Hướng dẫn sử dụng">
+            <i class="fa-regular fa-circle-question"></i>
+            <span class="viewer-tools__label">Hướng dẫn</span>
+        </button>
+        <button type="button" class="viewer-tools__btn is-active" id="btnViewerAutorotate" title="Ngừng quay">
+            <i class="fa-solid fa-pause" id="iconViewerAutorotate"></i>
+            <span class="viewer-tools__label" id="labelViewerAutorotate">Ngừng quay</span>
+        </button>
+    </div>
+
+    <div class="viewer-guide" id="viewerGuideOverlay" role="dialog" aria-modal="true" aria-label="Hướng dẫn sử dụng" hidden>
+        <div class="viewer-guide__crosshair" aria-hidden="true"></div>
+        <div class="viewer-guide__inner" id="viewerGuideInner">
+            <button type="button" class="viewer-guide__close" id="btnCloseViewerGuide" aria-label="Đóng hướng dẫn">×</button>
+            <div class="viewer-guide__grid">
+                <div class="viewer-guide__cell">
+                    <h3 class="viewer-guide__title">Trên màn hình cảm ứng</h3>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-hand-pointer"></i></div>
+                        <div class="viewer-guide__text">Phóng to / thu nhỏ</div>
+                    </div>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-up-down-left-right"></i></div>
+                        <div class="viewer-guide__text">Di chuyển</div>
+                    </div>
+                </div>
+                <div class="viewer-guide__cell">
+                    <h3 class="viewer-guide__title">Thao tác trên chuột</h3>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-computer-mouse"></i></div>
+                        <div class="viewer-guide__text">Nhấn và kéo chuột để di chuyển</div>
+                    </div>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-scroll"></i></div>
+                        <div class="viewer-guide__text">Cuộn chuột để phóng to, thu nhỏ</div>
+                    </div>
+                </div>
+                <div class="viewer-guide__cell">
+                    <h3 class="viewer-guide__title">Thao tác trên bàn phím</h3>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-keyboard"></i></div>
+                        <div class="viewer-guide__text">Dùng phím mũi tên để di chuyển</div>
+                    </div>
+                </div>
+                <div class="viewer-guide__cell">
+                    <h3 class="viewer-guide__title">Xem các vị trí khác</h3>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon viewer-guide__icon--hotspot" aria-hidden="true"></div>
+                        <div class="viewer-guide__text">Bấm để chuyển qua vị trí khác</div>
+                    </div>
+                </div>
+            </div>
+            <p class="viewer-guide__hint">Chạm bất kỳ đâu để đóng</p>
+        </div>
+    </div>
+    @endif
 
     <!-- Comments Drawer -->
     <div class="comments-drawer" id="commentsDrawer">
@@ -2193,6 +2525,135 @@
     <script src="{{ asset('marzipano/vendor/marzipano.js') }}" ></script>
     <!-- Use Marzipano's Original Script -->
     <script src="{{ asset('marzipano/index.js') }}"></script>
+
+    <script>
+    (function () {
+        const btnFs = document.getElementById('btnViewerFullscreen');
+        const btnGuide = document.getElementById('btnViewerGuide');
+        const btnRotate = document.getElementById('btnViewerAutorotate');
+        const iconFs = document.getElementById('iconViewerFullscreen');
+        const labelFs = document.getElementById('labelViewerFullscreen');
+        const iconRotate = document.getElementById('iconViewerAutorotate');
+        const labelRotate = document.getElementById('labelViewerAutorotate');
+        const guide = document.getElementById('viewerGuideOverlay');
+        const btnCloseGuide = document.getElementById('btnCloseViewerGuide');
+        const nativeFs = document.getElementById('fullscreenToggle');
+        const nativeRotate = document.getElementById('autorotateToggle');
+
+        function syncFullscreenUi() {
+            const on = !!(nativeFs && nativeFs.classList.contains('enabled'))
+                || !!(window.screenfull && screenfull.isFullscreen);
+            if (iconFs) {
+                iconFs.className = on ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+            }
+            if (labelFs) {
+                labelFs.textContent = on ? 'Thu nhỏ' : 'Toàn màn hình';
+            }
+            if (btnFs) {
+                btnFs.title = on ? 'Thu nhỏ' : 'Toàn màn hình';
+                btnFs.classList.toggle('is-active', on);
+            }
+        }
+
+        function syncAutorotateUi() {
+            const rotating = !!(nativeRotate && nativeRotate.classList.contains('enabled'));
+            if (iconRotate) {
+                iconRotate.className = rotating ? 'fa-solid fa-pause' : 'fa-solid fa-rotate';
+            }
+            if (labelRotate) {
+                labelRotate.textContent = rotating ? 'Ngừng quay' : 'Tự quay';
+            }
+            if (btnRotate) {
+                btnRotate.title = rotating ? 'Ngừng quay' : 'Bật tự quay';
+                btnRotate.classList.toggle('is-active', rotating);
+            }
+        }
+
+        function openGuide() {
+            if (!guide) return;
+            guide.hidden = false;
+            guide.classList.add('is-open');
+            document.body.classList.add('viewer-guide-open');
+        }
+
+        function closeGuide() {
+            if (!guide) return;
+            guide.classList.remove('is-open');
+            guide.hidden = true;
+            document.body.classList.remove('viewer-guide-open');
+        }
+
+        if (btnFs) {
+            btnFs.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (nativeFs) {
+                    nativeFs.click();
+                } else if (window.screenfull && screenfull.enabled) {
+                    screenfull.toggle();
+                }
+                setTimeout(syncFullscreenUi, 50);
+            });
+        }
+
+        if (btnRotate) {
+            btnRotate.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (nativeRotate) nativeRotate.click();
+                setTimeout(syncAutorotateUi, 30);
+            });
+        }
+
+        if (btnGuide) {
+            btnGuide.addEventListener('click', function (e) {
+                e.preventDefault();
+                openGuide();
+            });
+        }
+
+        if (btnCloseGuide) {
+            btnCloseGuide.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeGuide();
+            });
+        }
+
+        if (guide) {
+            guide.addEventListener('click', function () {
+                closeGuide();
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && guide && guide.classList.contains('is-open')) {
+                closeGuide();
+            }
+        });
+
+        if (window.screenfull && screenfull.enabled) {
+            screenfull.on('change', syncFullscreenUi);
+        }
+
+        if (nativeFs) {
+            new MutationObserver(syncFullscreenUi).observe(nativeFs, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+        if (nativeRotate) {
+            new MutationObserver(syncAutorotateUi).observe(nativeRotate, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+
+        // Marzipano gắn class sau khi load
+        setTimeout(function () {
+            syncFullscreenUi();
+            syncAutorotateUi();
+        }, 100);
+    })();
+    </script>
     @endif
 
     @if($hasNarration)

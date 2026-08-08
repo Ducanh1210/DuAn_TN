@@ -520,37 +520,56 @@
             </section>
 
             <section class="biz-panel">
-                <h2 class="biz-panel__title">Hình ảnh doanh nghiệp</h2>
+                <h2 class="biz-panel__title">Hình ảnh doanh nghiệp <span class="text-muted" style="font-size:.8rem;font-weight:400;">(công khai)</span></h2>
 
                 <div class="mb-4">
-                    <div class="biz-label mb-2">Mặt tiền ({{ count($businessProfile->storefront_photos ?? []) }})</div>
-                    @if(!empty($businessProfile->storefront_photos))
+                    <div class="biz-label mb-2">Ảnh đại diện</div>
+                    @if(!empty($businessProfile->avatar_photo))
                         <div class="photo-gallery-grid">
-                            @foreach($businessProfile->storefront_photos as $photo)
-                                <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="photo-gallery-item">
-                                    <img src="{{ asset('storage/' . $photo) }}" alt="Mặt tiền">
-                                </a>
-                            @endforeach
+                            <a href="{{ asset('storage/' . $businessProfile->avatar_photo) }}" target="_blank" class="photo-gallery-item">
+                                <img src="{{ asset('storage/' . $businessProfile->avatar_photo) }}" alt="Ảnh đại diện">
+                            </a>
                         </div>
                     @else
-                        <div class="biz-empty">Không có ảnh mặt tiền.</div>
+                        <div class="biz-empty">Chưa chọn ảnh đại diện.</div>
                     @endif
                 </div>
 
+                @php
+                    $galleryPhotos = array_values(array_filter(array_unique(array_merge(
+                        $businessProfile->storefront_photos ?? [],
+                        $businessProfile->menu_photos ?? []
+                    ))));
+                @endphp
                 <div>
-                    <div class="biz-label mb-2">Thực đơn / dịch vụ ({{ count($businessProfile->menu_photos ?? []) }})</div>
-                    @if(!empty($businessProfile->menu_photos))
+                    <div class="biz-label mb-2">Ảnh gallery địa điểm ({{ count($galleryPhotos) }})</div>
+                    @if(!empty($galleryPhotos))
                         <div class="photo-gallery-grid">
-                            @foreach($businessProfile->menu_photos as $photo)
+                            @foreach($galleryPhotos as $photo)
                                 <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="photo-gallery-item">
-                                    <img src="{{ asset('storage/' . $photo) }}" alt="Thực đơn">
+                                    <img src="{{ asset('storage/' . $photo) }}" alt="Ảnh địa điểm">
                                 </a>
                             @endforeach
                         </div>
                     @else
-                        <div class="biz-empty">Không có ảnh thực đơn.</div>
+                        <div class="biz-empty">Không có ảnh gallery.</div>
                     @endif
                 </div>
+            </section>
+
+            <section class="biz-panel">
+                <h2 class="biz-panel__title">Giấy tờ chứng minh chủ sở hữu <span class="text-muted" style="font-size:.8rem;font-weight:400;">(riêng tư · chỉ admin)</span></h2>
+                @if(!empty($businessProfile->business_documents))
+                    <div class="photo-gallery-grid">
+                        @foreach($businessProfile->business_documents as $doc)
+                            <a href="{{ asset('storage/' . $doc) }}" target="_blank" class="photo-gallery-item">
+                                <img src="{{ asset('storage/' . $doc) }}" alt="Giấy tờ chứng minh">
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="biz-empty">Người đăng ký không gửi giấy tờ chứng minh (tùy chọn).</div>
+                @endif
             </section>
         </div>
 

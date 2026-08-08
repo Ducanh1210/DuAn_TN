@@ -19,6 +19,7 @@ use App\Models\AvatarFrame;
 use App\Models\UserAvatarFrame;
 use App\Models\Reward;
 use App\Models\UserRedemption;
+use App\Models\PanoramaServiceRequest;
 use App\Services\MissionService;
 use App\Services\RewardService;
 use Illuminate\Support\Str;
@@ -71,6 +72,12 @@ class ProfileController extends Controller
             ->toArray();
 
         $itineraries = $user->itineraries()->get();
+
+        $panoramaServiceRequests = PanoramaServiceRequest::where('user_id', $user->id)
+            ->latest()
+            ->limit(10)
+            ->get();
+        $hasPendingPanoRequest = $panoramaServiceRequests->contains(fn ($r) => $r->status === 'pending');
 
         // Point history: collapse spammy per-minute active_session rows into daily summaries
         $rawPointTx = \App\Models\PointTransaction::where('user_id', $user->id)
@@ -145,7 +152,9 @@ class ProfileController extends Controller
             'unlockedFrameIds',
             'itineraries',
             'pointHistory',
-            'pointTxTotal'
+            'pointTxTotal',
+            'panoramaServiceRequests',
+            'hasPendingPanoRequest'
         ));
     }
 
@@ -423,7 +432,8 @@ class ProfileController extends Controller
         ]);
 
         try {
-            $path = $this->compressAndSaveImage($request->file('file'), 'business/photos');
+            // Business gallery & avatar photos are public-facing: keep them sharp at Full HD
+            $path = $this->compressAndSaveImage($request->file('file'), 'business/photos', 1920, 85);
             return response()->json([
                 'success' => true,
                 'path' => $path,
@@ -471,6 +481,8 @@ class ProfileController extends Controller
             'description' => 'nullable|string|max:750',
             'menu_photos' => 'nullable|array',
             'storefront_photos' => 'nullable|array',
+            'avatar_photo' => 'nullable|string',
+            'business_documents' => 'nullable|array',
             'verification_photo' => 'nullable|string',
             'verification_photos' => 'nullable|array',
             'verification_lat' => 'nullable|numeric',
@@ -535,6 +547,8 @@ class ProfileController extends Controller
                 'description' => $validated['description'] ?? null,
                 'menu_photos' => $validated['menu_photos'] ?? [],
                 'storefront_photos' => $validated['storefront_photos'] ?? [],
+                'avatar_photo' => $validated['avatar_photo'] ?? null,
+                'business_documents' => $validated['business_documents'] ?? [],
                 'verification_photo' => $verificationPhotoPath,
                 'verification_photos' => $savedVerificationPhotos,
                 'verification_lat' => $validated['verification_lat'] ?? null,
@@ -565,6 +579,8 @@ class ProfileController extends Controller
                 'description' => $validated['description'] ?? null,
                 'menu_photos' => $validated['menu_photos'] ?? [],
                 'storefront_photos' => $validated['storefront_photos'] ?? [],
+                'avatar_photo' => $validated['avatar_photo'] ?? null,
+                'business_documents' => $validated['business_documents'] ?? [],
                 'verification_photo' => $verificationPhotoPath,
                 'verification_photos' => $savedVerificationPhotos,
                 'verification_lat' => $validated['verification_lat'] ?? null,

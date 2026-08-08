@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\FavoriteLocation;
 use App\Models\Location;
 use App\Models\LocationImage;
+use App\Models\PanoramaServiceRequest;
 use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,13 +58,21 @@ class BusinessDashboardController extends Controller
         $viewsCount = $location->view_count ?? 0;
         $averageRating = $location->average_rating ?? 0;
 
+        $panoramaServiceRequests = PanoramaServiceRequest::where('user_id', $user->id)
+            ->latest()
+            ->limit(10)
+            ->get();
+        $hasPendingPanoRequest = $panoramaServiceRequests->contains(fn ($r) => $r->status === 'pending');
+
         return view('client.business.dashboard', compact(
             'businessProfile',
             'location',
             'comments',
             'favoritesCount',
             'viewsCount',
-            'averageRating'
+            'averageRating',
+            'panoramaServiceRequests',
+            'hasPendingPanoRequest'
         ));
     }
 

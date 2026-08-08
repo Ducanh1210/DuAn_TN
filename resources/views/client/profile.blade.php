@@ -2261,6 +2261,12 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="alert alert-danger rounded-1 border-0 mb-3 py-2 px-3 small" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
+
         @if($errors->any())
             <div class="alert alert-danger rounded-1 border-0 mb-3 py-2 px-3 small" role="alert">
                 <ul class="mb-0 ps-3">
@@ -2799,6 +2805,11 @@
                                     <strong>Trang quản trị</strong>
                                     <p class="mb-2">Dashboard dành cho chủ doanh nghiệp.</p>
                                     <a href="{{ route('business.dashboard') }}" class="btn-solid" style="display:inline-block;text-decoration:none;">Vào quản trị</a>
+                                </div>
+                                <div class="biz-feature">
+                                    <strong>Dịch vụ tour 360</strong>
+                                    <p class="mb-2">Quay & dựng panorama theo nhu cầu, báo giá sau tư vấn.</p>
+                                    <a href="{{ route('client.pano_service') }}" class="btn-ghost" style="display:inline-block;">Tìm hiểu & gửi yêu cầu</a>
                                 </div>
                             </div>
                         </div>

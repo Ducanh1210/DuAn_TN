@@ -480,6 +480,7 @@
                         <li><a href="{{ route('home') }}">Bản đồ du lịch</a></li>
                         <li><a href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a></li>
                         <li><a href="{{ route('client.events.index') }}">Sự kiện nổi bật</a></li>
+                        <li><a href="{{ route('client.pano_service') }}">Dịch vụ tour 360</a></li>
                     </ul>
                 </div>
                 <div class="col-6 col-md-4">
@@ -552,8 +553,7 @@
     </script>
     @endauth
 
-    <!-- AI Chatbot & Trip Planner Floating Widgets -->
-    <x-chatbot-widget />
+    <!-- Trip Planner (chatbot chỉ hiện ở trang chủ / bản đồ) -->
     <x-trip-planner-widget />
 </body>
 </html>

@@ -34,6 +34,8 @@
             font-weight: 400;
             line-height: 1.6;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -697,28 +699,237 @@
             from { transform: translateY(8px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+
+        /* ============ Registration redesign (Google-Ads style wizard) ============ */
+        .reg-wrap {
+            width: 100%;
+            margin: 0;
+            padding: 30px 36px 40px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 32px;
+            align-items: start;
+            flex: 1 0 auto;
+        }
+
+        /* Left step navigation (grouped phases + sub-steps) */
+        .reg-aside { position: sticky; top: 84px; }
+
+        /* Main content centered within the remaining space */
+        .reg-main { display: flex; justify-content: center; }
+        .reg-main > .content-panel { width: 100%; }
+        .reg-nav { display: flex; flex-direction: column; }
+        .reg-nav__group { display: flex; flex-direction: column; }
+        .reg-nav__phase { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+        .reg-nav__circle { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #cbd5e1; flex-shrink: 0; position: relative; transition: all .2s ease; }
+        .reg-nav__phase.active .reg-nav__circle { border-color: #1e3a5f; }
+        .reg-nav__phase.active .reg-nav__circle::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: #1e3a5f; }
+        .reg-nav__phase.done .reg-nav__circle { border-color: #1e3a5f; background: #1e3a5f; }
+        .reg-nav__phase.done .reg-nav__circle::after { content: '✓'; position: absolute; inset: -1px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: .62rem; font-weight: 700; }
+        .reg-nav__label { font-size: .86rem; color: #5f6368; font-weight: 400; line-height: 1.3; }
+        .reg-nav__phase.active .reg-nav__label { color: #202124; font-weight: 600; }
+        .reg-nav__phase.done .reg-nav__label { color: #202124; }
+        .reg-nav__subs { display: none; flex-direction: column; margin: 0 0 6px 27px; padding-left: 13px; border-left: 1px solid #e8eaed; }
+        .reg-nav__group.is-open .reg-nav__subs { display: flex; }
+        .reg-nav__sub { font-size: .82rem; color: #5f6368; padding: 7px 0; cursor: default; transition: color .15s ease; }
+        .reg-nav__sub.done { color: #80868b; cursor: pointer; }
+        .reg-nav__sub.done:hover { color: #1e3a5f; }
+        .reg-nav__sub.active { color: #1e3a5f; font-weight: 600; }
+
+        /* Main content — centered card */
+        .reg-main { min-width: 0; }
+        .reg-main .content-panel {
+            max-width: 700px; margin: 0 auto; padding: 26px 30px;
+            border: 1px solid #e5e7eb; border-radius: 10px; background: #ffffff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            transition: max-width .2s ease;
+        }
+        .reg-main .content-panel.content-panel--wide { max-width: 1040px; }
+        .camera-verification-box:fullscreen,
+        .camera-verification-box:-webkit-full-screen { background: #000; padding: 0; }
+        .camera-verification-box:fullscreen #cameraVideo,
+        .camera-verification-box:-webkit-full-screen #cameraVideo { width: 100%; height: 100%; max-height: none; object-fit: contain; border-radius: 0; }
+
+        /* Phone-style round camera controls */
+        .cam-controls { padding: 4px 0; }
+        .cam-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%; border: none; cursor: pointer; padding: 0;
+            transition: transform .12s ease, background .15s ease, box-shadow .15s ease;
+        }
+        .cam-btn:active { transform: scale(0.92); }
+        .cam-btn--shutter {
+            width: 62px; height: 62px; background: #1e3a5f; color: #fff;
+            font-size: 1.5rem; box-shadow: 0 0 0 4px #fff, 0 0 0 6px #1e3a5f;
+        }
+        .cam-btn--shutter:hover { background: #16304f; }
+        .cam-btn--secondary {
+            width: 44px; height: 44px; background: #eef2f7; color: #1e3a5f;
+            font-size: 1.05rem; border: 1px solid #d7e0ea;
+        }
+        .cam-btn--secondary:hover { background: #e2e9f1; }
+
+        /* Fullscreen overlay controls (hidden unless the camera box is fullscreen) */
+        .cam-fs-controls {
+            display: none; position: absolute; left: 0; right: 0; bottom: 28px;
+            z-index: 5; align-items: center; justify-content: center; gap: 26px;
+        }
+        .camera-verification-box:fullscreen .cam-fs-controls,
+        .camera-verification-box:-webkit-full-screen .cam-fs-controls { display: flex; }
+        .cam-btn--fs { background: rgba(255,255,255,0.9); border: none; color: #1e3a5f; }
+        .cam-btn--fs:hover { background: #fff; }
+
+        /* Image lightbox for viewing captured verification photos */
+        .biz-lightbox {
+            display: none; position: fixed; inset: 0; z-index: 20000;
+            background: rgba(15, 23, 42, 0.9); align-items: center; justify-content: center;
+            flex-direction: column; gap: 14px; padding: 30px;
+        }
+        .biz-lightbox.is-open { display: flex; }
+        .biz-lightbox__img {
+            max-width: 92vw; max-height: 82vh; object-fit: contain;
+            border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .biz-lightbox__caption { color: #e2e8f0; font-size: 0.9rem; }
+        .biz-lightbox__close {
+            position: absolute; top: 20px; right: 24px; width: 44px; height: 44px;
+            border-radius: 50%; border: none; cursor: pointer;
+            background: rgba(255,255,255,0.15); color: #fff; font-size: 1.1rem;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .biz-lightbox__close:hover { background: rgba(255,255,255,0.3); }
+        .step-progress-container { display: none !important; }
+        .reg-step-head { display: none; }
+
+        /* Tighter typography inside the wizard */
+        .biz-step-pane h4 { font-size: 0.98rem !important; margin-bottom: 6px !important; }
+        .biz-step-pane > p { font-size: 0.82rem; }
+        .form-label-clean { font-size: 0.82rem; }
+        .form-control-clean { font-size: 0.85rem; padding: 8px 12px; }
+
+        /* Quick-approval tip — subtle inline hint */
+        .reg-tip { margin: -6px 0 20px; font-size: 0.78rem; color: #94a3b8; line-height: 1.5; }
+        .reg-tip__label { display: none; }
+        .reg-tip strong { color: #64748b; font-weight: 600; }
+
+        /* Evidence suggestion list */
+        .reg-evidence { margin-bottom: 20px; }
+        .reg-evidence__label { font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 8px; }
+        .reg-evidence__list { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+        .reg-evidence__list li { position: relative; padding-left: 22px; font-size: 0.82rem; color: #52708f; line-height: 1.5; }
+        .reg-evidence__list li::before { content: ''; position: absolute; left: 6px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: #94a3b8; }
+
+        /* Public / private note blocks — neutral, sharp */
+        .reg-note { display: flex; gap: 10px; align-items: flex-start; padding: 11px 13px; border-radius: 7px; margin-bottom: 22px; font-size: 0.82rem; line-height: 1.55; background: #f8fafc; border: 1px solid #e5e7eb; color: #475569; }
+        .reg-tag { display: inline-flex; align-items: center; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; flex-shrink: 0; }
+        .reg-tag--public { background: #1e3a5f; color: #ffffff; }
+        .reg-tag--private { background: #94a3b8; color: #ffffff; }
+
+        /* Dropzone — low radius, subtle */
+        .dropzone-area { padding: 30px 20px; border-radius: 8px; }
+        .dropzone-area .dropzone-icon { font-size: 1.8rem; color: #94a3b8; margin-bottom: 8px; display: block; }
+        .preview-thumbnail { border-radius: 6px; }
+        .biz-type-card { border-radius: 8px; }
+        .form-control-clean, .custom-select-trigger { border-radius: 6px; }
+
+        /* Actions footer */
+        .reg-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 26px; padding-top: 18px; border-top: 1px solid #eef2f7; }
+        .reg-actions__right { display: flex; gap: 10px; margin-left: auto; }
+        .reg-skip { background: none; border: none; color: #5f6368; font-size: .85rem; font-weight: 500; padding: 8px 4px; cursor: pointer; }
+        .reg-skip:hover { color: #1e3a5f; text-decoration: underline; }
+        .reg-actions .btn { border-radius: 6px !important; font-weight: 500 !important; font-size: 0.84rem !important; padding: 7px 18px !important; }
+        .reg-skip { font-size: 0.82rem; }
+        #bizPrevBtn { background: #ffffff !important; border: 1px solid #e5e7eb !important; color: #5f6368 !important; }
+        #bizPrevBtn:hover:not(:disabled) { border-color: #1e3a5f !important; color: #1e3a5f !important; }
+        #bizPrevBtn:disabled { opacity: 0.4; }
+
+        /* Top bar (Google-Ads style) */
+        .top-navbar { padding: 12px 24px; }
+        .nav-left { display: flex; align-items: center; gap: 14px; }
+        .nav-back { color: #5f6368; font-size: 1rem; display: inline-flex; text-decoration: none; }
+        .nav-back:hover { color: #1e3a5f; }
+        .nav-logo { font-size: 1.05rem; font-weight: 600; color: #1e3a5f; letter-spacing: -0.01em; }
+        .nav-logo strong { font-weight: 700; }
+        .nav-sep { width: 1px; height: 20px; background: #e0e0e0; }
+        .nav-page-title { font-size: 0.95rem; color: #3c4043; font-weight: 400; }
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .nav-help { font-size: 0.82rem; color: #5f6368; text-decoration: none; }
+        .nav-help:hover { color: #1e3a5f; }
+        .nav-user-email { font-size: 0.8rem; color: #5f6368; }
+
+        /* Footer help bar */
+        .reg-help-bar { border-top: 1px solid #e8eaed; text-align: center; padding: 16px 20px 24px; font-size: 0.8rem; color: #5f6368; }
+        .reg-help-bar strong { color: #1e3a5f; font-weight: 600; }
+
+        @media (max-width: 900px) {
+            .reg-wrap { grid-template-columns: 1fr; gap: 20px; padding: 20px 14px 24px; }
+            .reg-aside { position: static; }
+        }
+        @media (max-width: 640px) {
+            .nav-page-title, .nav-sep, .nav-user-email { display: none; }
+        }
     </style>
 </head>
 <body>
 
 <!-- Top Navigation Bar -->
 <div class="top-navbar">
-    <a href="{{ route('client.profile') }}" class="btn-back">
-        <i class="bi bi-chevron-left"></i> Quay lại trang cá nhân
-    </a>
-    <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-        Ninh Bình Travel Hub Doanh Nghiệp
+    <div class="nav-left">
+        <a href="{{ route('client.profile') }}" class="nav-back" title="Quay lại trang cá nhân"><i class="bi bi-chevron-left"></i></a>
+        <span class="nav-logo">Ninh Bình <strong>Travel Hub</strong></span>
+        <span class="nav-sep"></span>
+        <span class="nav-page-title">Đăng ký địa điểm doanh nghiệp</span>
     </div>
-    <div></div>
+    <div class="nav-right">
+        <a href="{{ route('client.pano_service') }}" class="nav-help" target="_blank" rel="noopener">Trợ giúp</a>
+        <span class="nav-user-email">{{ Auth::user()->email ?? '' }}</span>
+        <x-user-avatar :user="Auth::user()" size="30" />
+    </div>
 </div>
 
-<div class="container py-4">
-    <!-- Form Wizard for Registration -->
-    <div id="businessRegistrationWizard">
+<div class="reg-wrap">
+    <!-- Left: grouped step navigation -->
+    <aside class="reg-aside">
+        <nav class="reg-nav" id="regNav">
+            <div class="reg-nav__group" data-range="1-3">
+                <div class="reg-nav__phase"><span class="reg-nav__circle"></span><span class="reg-nav__label">Thông tin doanh nghiệp</span></div>
+                <div class="reg-nav__subs">
+                    <div class="reg-nav__sub" data-step="1">Tên doanh nghiệp</div>
+                    <div class="reg-nav__sub" data-step="2">Loại hình</div>
+                    <div class="reg-nav__sub" data-step="3">Danh mục kinh doanh</div>
+                </div>
+            </div>
+            <div class="reg-nav__group" data-range="4-6">
+                <div class="reg-nav__phase"><span class="reg-nav__circle"></span><span class="reg-nav__label">Địa chỉ & liên hệ</span></div>
+                <div class="reg-nav__subs">
+                    <div class="reg-nav__sub" data-step="4">Địa chỉ</div>
+                    <div class="reg-nav__sub" data-step="5">Thông tin liên hệ</div>
+                    <div class="reg-nav__sub" data-step="6">Vị trí trên bản đồ</div>
+                </div>
+            </div>
+            <div class="reg-nav__group" data-range="7-9">
+                <div class="reg-nav__phase"><span class="reg-nav__circle"></span><span class="reg-nav__label">Giới thiệu & hình ảnh</span></div>
+                <div class="reg-nav__subs">
+                    <div class="reg-nav__sub" data-step="7">Mô tả giới thiệu</div>
+                    <div class="reg-nav__sub" data-step="8">Ảnh địa điểm</div>
+                    <div class="reg-nav__sub" data-step="9">Ảnh đại diện</div>
+                </div>
+            </div>
+            <div class="reg-nav__group" data-range="10-11">
+                <div class="reg-nav__phase"><span class="reg-nav__circle"></span><span class="reg-nav__label">Xác minh & hoàn tất</span></div>
+                <div class="reg-nav__subs">
+                    <div class="reg-nav__sub" data-step="10">Bằng chứng xác minh</div>
+                    <div class="reg-nav__sub" data-step="11">Xác thực thực địa</div>
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Right: form wizard -->
+    <div class="reg-main" id="businessRegistrationWizard">
         <div class="content-panel">
-            <div class="section-title">Đăng ký tài khoản doanh nghiệp</div>
-            
-            <!-- Step Progress Bar -->
+
+            <!-- Step Progress Bar (hidden, kept for JS state) -->
             <div class="step-progress-container">
                 <div class="step-progress-line"></div>
                 <div class="step-progress-fill" id="bizStepFill"></div>
@@ -732,6 +943,7 @@
                 <div class="step-progress-node" data-step="8">8</div>
                 <div class="step-progress-node" data-step="9">9</div>
                 <div class="step-progress-node" data-step="10">10</div>
+                <div class="step-progress-node" data-step="11">11</div>
             </div>
 
             <div class="wizard-row">
@@ -931,13 +1143,18 @@
                             </div>
                         </div>
 
-                        <!-- Step 8: Menu Photos -->
+                        <!-- Step 8: Public Gallery Photos (menu + storefront combined) -->
                         <div class="biz-step-pane d-none" data-step="8">
-                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;" id="step8Title">Thêm ảnh chụp thực đơn của bạn *</h4>
-                            <p class="text-secondary small mb-4" id="step8Desc">Khách hàng chủ yếu dựa vào ảnh thực đơn khi quyết định ăn hoặc ghé thăm ở đâu.</p>
-                            
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;" id="step8Title">Thêm ảnh về địa điểm của bạn *</h4>
+                            <p class="text-secondary small mb-2" id="step8Desc">Bao gồm ảnh mặt tiền, không gian, món ăn / dịch vụ, bảng giá... để khách hình dung rõ về bạn.</p>
+                            <div class="reg-note reg-note--public">
+                                <span class="reg-tag reg-tag--public">Công khai</span>
+                                <div>Những ảnh này sẽ được <strong>hiển thị công khai</strong> trên trang địa điểm của bạn cho mọi khách xem.</div>
+                            </div>
+
                             <div class="dropzone-area" id="menuDropzone">
-                                <div class="fw-semibold small" id="step8Text">Kéo các hình ảnh thực đơn vào đây</div>
+                                <i class="bi bi-images dropzone-icon"></i>
+                                <div class="fw-semibold small" id="step8Text">Kéo các hình ảnh vào đây</div>
                                 <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính</div>
                                 <input type="file" id="menuFilesInput" class="d-none" multiple accept="image/*">
                             </div>
@@ -945,22 +1162,57 @@
                             <div class="upload-previews" id="menuPreviews"></div>
                         </div>
 
-                        <!-- Step 9: Storefront Photos -->
+                        <!-- Step 9: Avatar / Representative Photo (single, public) -->
                         <div class="biz-step-pane d-none" data-step="9">
-                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Thêm ảnh mặt tiền cửa hàng *</h4>
-                            <p class="text-secondary small mb-4">Việc chia sẻ ảnh mặt tiền của doanh nghiệp sẽ giúp khách hàng nhận ra vị trí của bạn ngay khi ghé qua.</p>
-                            
-                            <div class="dropzone-area" id="storefrontDropzone">
-                                <div class="fw-semibold small">Kéo các hình ảnh mặt tiền vào đây</div>
-                                <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính</div>
-                                <input type="file" id="storefrontFilesInput" class="d-none" multiple accept="image/*">
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Chọn ảnh đại diện *</h4>
+                            <p class="text-secondary small mb-2">Đây là ảnh chính đại diện cho địa điểm của bạn (hiển thị trên bản đồ, danh sách và đầu trang địa điểm). Nên chọn ảnh mặt tiền hoặc ảnh nổi bật nhất.</p>
+                            <div class="reg-note reg-note--public">
+                                <span class="reg-tag reg-tag--public">Công khai</span>
+                                <div>Ảnh đại diện sẽ <strong>hiển thị công khai</strong>. Chỉ chọn 1 ảnh từ thiết bị của bạn.</div>
                             </div>
 
-                            <div class="upload-previews" id="storefrontPreviews"></div>
+                            <div class="dropzone-area" id="avatarDropzone">
+                                <i class="bi bi-person-square dropzone-icon"></i>
+                                <div class="fw-semibold small">Kéo ảnh đại diện vào đây</div>
+                                <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính (1 ảnh)</div>
+                                <input type="file" id="avatarFileInput" class="d-none" accept="image/*">
+                            </div>
+
+                            <div class="upload-previews" id="avatarPreview"></div>
                         </div>
 
-                        <!-- Step 10: Camera & Location Verification -->
+                        <!-- Step 10: Ownership Verification Documents (optional, private) -->
                         <div class="biz-step-pane d-none" data-step="10">
+                            <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Bằng chứng bạn gắn với địa điểm này *</h4>
+                            <p class="text-secondary small mb-3">Tải lên ít nhất 1 bằng chứng cho thấy bạn là chủ hoặc người quản lý địa điểm.</p>
+
+                            <div class="reg-evidence">
+                                <div class="reg-evidence__label">Gợi ý:</div>
+                                <ul class="reg-evidence__list">
+                                    <li>Ảnh bạn tại địa điểm / trước biển hiệu</li>
+                                    <li>Ảnh biển hiệu, mặt bằng có tên</li>
+                                    <li>Hóa đơn điện / nước / internet mang tên bạn</li>
+                                    <li>Hợp đồng thuê hoặc giấy phép kinh doanh <span class="text-muted">(nếu có)</span></li>
+                                </ul>
+                            </div>
+
+                            <div class="reg-tip">
+                                <span class="reg-tip__label">Mẹo duyệt nhanh</span>
+                                <div>Bằng chứng <strong>càng thuyết phục</strong>, hồ sơ <strong>càng được duyệt nhanh</strong>.</div>
+                            </div>
+
+                            <div class="dropzone-area" id="docDropzone">
+                                <i class="bi bi-shield-check dropzone-icon"></i>
+                                <div class="fw-semibold small">Kéo ảnh bằng chứng vào đây</div>
+                                <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính</div>
+                                <input type="file" id="docFilesInput" class="d-none" multiple accept="image/*">
+                            </div>
+
+                            <div class="upload-previews" id="docPreviews"></div>
+                        </div>
+
+                        <!-- Step 11: Camera & Location Verification -->
+                        <div class="biz-step-pane d-none" data-step="11">
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #1e3a5f;">Xác thực thực địa (Camera & Vị trí GPS) *</h4>
                             <p class="text-secondary small mb-4">Mở camera trên thiết bị của bạn để chụp ảnh thực tế tại địa điểm kinh doanh đồng thời hệ thống sẽ tự động đối chiếu vị trí GPS trên bản đồ giúp tăng tối đa tính xác thực cho hồ sơ doanh nghiệp.</p>
 
@@ -971,8 +1223,8 @@
                                         <div class="fw-semibold text-dark small mb-3">
                                             Camera chụp ảnh trực tiếp cửa hàng
                                         </div>
-                                        <div class="camera-verification-box border rounded-3 p-3 text-center position-relative mb-3" style="background: #1e293b; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; flex: 1;">
-                                            <video id="cameraVideo" autoplay playsinline class="w-100 rounded-2 d-none" style="max-height: 320px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);"></video>
+                                        <div class="camera-verification-box border rounded-3 text-center position-relative mb-3" style="background: #1e293b; min-height: 440px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; flex: 1;">
+                                            <video id="cameraVideo" autoplay playsinline class="rounded-2 d-none" style="width: 100%; height: 100%; max-height: none; object-fit: cover;"></video>
                                             <canvas id="cameraCanvas" class="d-none"></canvas>
 
                                             <div id="cameraPlaceholder" class="text-white py-4">
@@ -981,15 +1233,31 @@
                                                     Bật Camera Xác Thực
                                                 </button>
                                             </div>
+
+                                            <!-- Overlay controls shown only in fullscreen -->
+                                            <div class="cam-fs-controls" id="camFsControls">
+                                                <button type="button" class="cam-btn cam-btn--secondary cam-btn--fs" id="btnSwitchCameraFs" title="Đổi camera" aria-label="Đổi camera">
+                                                    <i class="bi bi-arrow-repeat"></i>
+                                                </button>
+                                                <button type="button" class="cam-btn cam-btn--shutter" id="btnCapturePhotoFs" title="Chụp ảnh & ghi nhận GPS" aria-label="Chụp ảnh & ghi nhận GPS">
+                                                    <i class="bi bi-camera-fill"></i>
+                                                </button>
+                                                <button type="button" class="cam-btn cam-btn--secondary cam-btn--fs" id="btnExitFullscreen" title="Thoát toàn màn hình" aria-label="Thoát toàn màn hình">
+                                                    <i class="bi bi-fullscreen-exit"></i>
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <!-- Camera Action Controls -->
-                                        <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                            <button type="button" class="btn btn-success btn-sm px-3 d-none" id="btnCapturePhoto">
-                                                Chụp ảnh & Ghi nhận GPS
+                                        <div class="cam-controls d-flex align-items-center justify-content-center gap-3">
+                                            <button type="button" class="cam-btn cam-btn--secondary d-none" id="btnSwitchCamera" title="Đổi camera" aria-label="Đổi camera">
+                                                <i class="bi bi-arrow-repeat"></i>
                                             </button>
-                                            <button type="button" class="btn btn-outline-primary btn-sm px-3 d-none" id="btnSwitchCamera">
-                                                Đổi Camera
+                                            <button type="button" class="cam-btn cam-btn--shutter d-none" id="btnCapturePhoto" title="Chụp ảnh & ghi nhận GPS" aria-label="Chụp ảnh & ghi nhận GPS">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </button>
+                                            <button type="button" class="cam-btn cam-btn--secondary d-none" id="btnFullscreenCamera" title="Toàn màn hình" aria-label="Toàn màn hình">
+                                                <i class="bi bi-arrows-fullscreen"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -1022,7 +1290,7 @@
 
                                     <!-- Latest Snapshot Watermark Card -->
                                     <div id="capturedPreviewContainer" class="d-none w-100 position-relative mb-3 border rounded-3 overflow-hidden" style="border-color: #cbdbe8 !important;">
-                                        <img id="capturedImagePreview" src="" class="img-fluid rounded-2" style="max-height: 160px; object-fit: cover; width: 100%;">
+                                        <img id="capturedImagePreview" src="" class="img-fluid rounded-2" style="max-height: 160px; object-fit: cover; width: 100%; cursor: zoom-in;" title="Bấm để xem ảnh lớn">
                                         <div class="position-absolute bottom-0 start-0 end-0 p-2 text-white text-start" style="background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); font-size: 0.75rem;">
                                             <div class="fw-bold" id="watermarkLocation">Tọa độ GPS: --</div>
                                             <div id="watermarkTime">Thời gian: --</div>
@@ -1044,9 +1312,12 @@
                         </div>
 
                         <!-- Actions Row -->
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="button" class="btn btn-light rounded-2 btn-sm px-4" id="bizPrevBtn" disabled>Quay lại</button>
-                            <button type="button" class="btn btn-primary rounded-2 btn-sm px-4" id="bizNextBtn">Tiếp tục</button>
+                        <div class="reg-actions">
+                            <button type="button" class="reg-skip d-none" id="bizSkipBtn">Bỏ qua bước này</button>
+                            <div class="reg-actions__right">
+                                <button type="button" class="btn" id="bizPrevBtn" disabled>Quay lại</button>
+                                <button type="button" class="btn btn-primary" id="bizNextBtn">Tiếp tục</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -1054,6 +1325,11 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Footer help bar -->
+<div class="reg-help-bar">
+    Bạn cần trợ giúp? Gọi <strong>1800&nbsp;400&nbsp;389</strong> để được hỗ trợ đăng ký miễn phí, Thứ Hai – Thứ Sáu, 8:00 – 17:30.
 </div>
 
 <div class="toast-container-custom" id="toastContainer"></div>
@@ -1092,13 +1368,19 @@
         const bizForm = document.getElementById('bizRegisterForm');
         if (bizForm) {
             let bizStep = 1;
-            const totalBizSteps = 10;
+            const totalBizSteps = 11;
             const bizPanes = document.querySelectorAll('.biz-step-pane');
             const bizPrevBtn = document.getElementById('bizPrevBtn');
             const bizNextBtn = document.getElementById('bizNextBtn');
             const bizSkipBtn = document.getElementById('bizSkipBtn');
             const bizStepFill = document.getElementById('bizStepFill');
             const bizStepNodes = document.querySelectorAll('.step-progress-node');
+            const bizStepNames = {
+                1: 'Tên doanh nghiệp', 2: 'Loại hình', 3: 'Danh mục kinh doanh',
+                4: 'Địa chỉ', 5: 'Thông tin liên hệ', 6: 'Vị trí trên bản đồ',
+                7: 'Mô tả giới thiệu', 8: 'Ảnh địa điểm', 9: 'Ảnh đại diện',
+                10: 'Bằng chứng xác minh', 11: 'Xác thực thực địa'
+            };
 
             // Form inputs and preview elements
             const inputBizName = document.getElementById('input_business_name');
@@ -1128,6 +1410,8 @@
             // Image uploading & Verification states
             let menuPhotos = [];
             let storefrontPhotos = [];
+            let avatarPhoto = null;
+            let businessDocs = [];
             let verificationPhotos = [];
             let verificationPhotoData = null;
             let verificationLat = null;
@@ -1137,6 +1421,32 @@
             let cameraFacingMode = 'environment';
 
             // Render Verification Photos Gallery
+            // Lightbox: view a captured photo at full size
+            function openImageLightbox(src, caption) {
+                let overlay = document.getElementById('bizImageLightbox');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.id = 'bizImageLightbox';
+                    overlay.className = 'biz-lightbox';
+                    overlay.innerHTML = `
+                        <button type="button" class="biz-lightbox__close" aria-label="Đóng"><i class="bi bi-x-lg"></i></button>
+                        <img class="biz-lightbox__img" src="" alt="">
+                        <div class="biz-lightbox__caption"></div>
+                    `;
+                    document.body.appendChild(overlay);
+                    const close = () => overlay.classList.remove('is-open');
+                    overlay.addEventListener('click', (e) => {
+                        if (e.target === overlay || e.target.closest('.biz-lightbox__close')) close();
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') close();
+                    });
+                }
+                overlay.querySelector('.biz-lightbox__img').src = src;
+                overlay.querySelector('.biz-lightbox__caption').textContent = caption || '';
+                overlay.classList.add('is-open');
+            }
+
             function renderVerificationGallery() {
                 const galleryGrid = document.getElementById('verificationGalleryGrid');
                 const countSpan = document.getElementById('verificationCount');
@@ -1156,10 +1466,13 @@
                     item.style.cssText = 'width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; position: relative; display: inline-block;';
 
                     const imgSrc = (src.startsWith('data:') || src.startsWith('http') || src.startsWith('/storage')) ? src : `/storage/${src}`;
+                    item.style.cursor = 'zoom-in';
+                    item.title = 'Bấm để xem ảnh lớn';
                     item.innerHTML = `
                         <img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                         <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 start-0 m-1" style="font-size: 0.6rem; padding: 1px 4px;">#${idx + 1}</span>
                     `;
+                    item.addEventListener('click', () => openImageLightbox(imgSrc, `Ảnh thực địa #${idx + 1}`));
 
                     const removeBtn = document.createElement('button');
                     removeBtn.className = 'preview-remove-btn';
@@ -1322,12 +1635,18 @@
             const btnStartCamera = document.getElementById('btnStartCamera');
             const btnCapturePhoto = document.getElementById('btnCapturePhoto');
             const btnSwitchCamera = document.getElementById('btnSwitchCamera');
+            const btnFullscreenCamera = document.getElementById('btnFullscreenCamera');
             const btnRefreshGPS = document.getElementById('btnRefreshGPS');
             const cameraVideo = document.getElementById('cameraVideo');
             const cameraCanvas = document.getElementById('cameraCanvas');
             const cameraPlaceholder = document.getElementById('cameraPlaceholder');
             const capturedPreviewContainer = document.getElementById('capturedPreviewContainer');
             const capturedImagePreview = document.getElementById('capturedImagePreview');
+            if (capturedImagePreview) {
+                capturedImagePreview.addEventListener('click', function() {
+                    if (this.src) openImageLightbox(this.src, 'Ảnh vừa chụp');
+                });
+            }
             const watermarkLocation = document.getElementById('watermarkLocation');
             const watermarkTime = document.getElementById('watermarkTime');
             const btnToggleFallbackUpload = document.getElementById('btnToggleFallbackUpload');
@@ -1350,6 +1669,7 @@
                     if (cameraPlaceholder) cameraPlaceholder.classList.add('d-none');
                     if (btnCapturePhoto) btnCapturePhoto.classList.remove('d-none');
                     if (btnSwitchCamera) btnSwitchCamera.classList.remove('d-none');
+                    if (btnFullscreenCamera) btnFullscreenCamera.classList.remove('d-none');
                     
                     fetchVerificationGPS();
                 } catch (err) {
@@ -1366,6 +1686,43 @@
                 btnSwitchCamera.addEventListener('click', function() {
                     cameraFacingMode = (cameraFacingMode === 'environment') ? 'user' : 'environment';
                     initCameraStream();
+                });
+            }
+
+            if (btnFullscreenCamera) {
+                btnFullscreenCamera.addEventListener('click', function() {
+                    const box = document.querySelector('.camera-verification-box');
+                    const target = box || cameraVideo;
+                    if (!target) return;
+                    const req = target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen;
+                    if (req) {
+                        req.call(target).catch(function() {
+                            if (cameraVideo && cameraVideo.webkitEnterFullscreen) cameraVideo.webkitEnterFullscreen();
+                        });
+                    } else if (cameraVideo && cameraVideo.webkitEnterFullscreen) {
+                        cameraVideo.webkitEnterFullscreen();
+                    }
+                });
+            }
+
+            // Fullscreen overlay controls reuse the main handlers
+            const btnCapturePhotoFs = document.getElementById('btnCapturePhotoFs');
+            const btnSwitchCameraFs = document.getElementById('btnSwitchCameraFs');
+            const btnExitFullscreen = document.getElementById('btnExitFullscreen');
+            if (btnCapturePhotoFs) {
+                btnCapturePhotoFs.addEventListener('click', function() {
+                    if (btnCapturePhoto) btnCapturePhoto.click();
+                });
+            }
+            if (btnSwitchCameraFs) {
+                btnSwitchCameraFs.addEventListener('click', function() {
+                    if (btnSwitchCamera) btnSwitchCamera.click();
+                });
+            }
+            if (btnExitFullscreen) {
+                btnExitFullscreen.addEventListener('click', function() {
+                    const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+                    if (exit) exit.call(document);
                 });
             }
 
@@ -1443,9 +1800,73 @@
             }
 
             // State Persistence Functions
+            // ---- IndexedDB persistence for large base64 camera photos (localStorage would exceed quota) ----
+            const IDB_NAME = 'biz_wizard_db';
+            const IDB_STORE = 'photos';
+            function idbOpen() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(IDB_NAME, 1);
+                    req.onupgradeneeded = () => {
+                        const db = req.result;
+                        if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
+                    };
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            }
+            async function idbPutPhotos(data) {
+                try {
+                    const db = await idbOpen();
+                    await new Promise((resolve, reject) => {
+                        const tx = db.transaction(IDB_STORE, 'readwrite');
+                        tx.objectStore(IDB_STORE).put(data, 'current');
+                        tx.oncomplete = () => resolve();
+                        tx.onerror = () => reject(tx.error);
+                    });
+                    db.close();
+                } catch (e) { console.warn('IDB save failed:', e); }
+            }
+            async function idbGetPhotos() {
+                try {
+                    const db = await idbOpen();
+                    const val = await new Promise((resolve, reject) => {
+                        const tx = db.transaction(IDB_STORE, 'readonly');
+                        const r = tx.objectStore(IDB_STORE).get('current');
+                        r.onsuccess = () => resolve(r.result);
+                        r.onerror = () => reject(r.error);
+                    });
+                    db.close();
+                    return val || null;
+                } catch (e) { console.warn('IDB load failed:', e); return null; }
+            }
+            async function idbClearPhotos() {
+                try {
+                    const db = await idbOpen();
+                    await new Promise((resolve) => {
+                        const tx = db.transaction(IDB_STORE, 'readwrite');
+                        tx.objectStore(IDB_STORE).delete('current');
+                        tx.oncomplete = () => resolve();
+                        tx.onerror = () => resolve();
+                    });
+                    db.close();
+                } catch (e) {}
+            }
+            let _idbSaveTimer = null;
+            function saveVerificationPhotosDebounced() {
+                clearTimeout(_idbSaveTimer);
+                _idbSaveTimer = setTimeout(() => {
+                    idbPutPhotos({
+                        verificationPhotos: verificationPhotos || [],
+                        verificationLat: typeof verificationLat !== 'undefined' ? verificationLat : null,
+                        verificationLng: typeof verificationLng !== 'undefined' ? verificationLng : null,
+                        verificationTime: typeof verificationTime !== 'undefined' ? verificationTime : null
+                    });
+                }, 300);
+            }
+
             function saveWizardState() {
                 try {
-                    // Filter out huge base64 camera strings to prevent exceeding localStorage quota
+                    // Base64 camera photos are stored in IndexedDB (below), not localStorage, to avoid quota overflow
                     const cleanVerificationPhotos = (verificationPhotos || []).filter(p => typeof p === 'string' && !p.startsWith('data:'));
 
                     const selectedCategorySpan = document.querySelector('#custom_category_select .selected-value');
@@ -1471,6 +1892,8 @@
                         description: inputDesc ? inputDesc.value.trim() : '',
                         menuPhotos: menuPhotos || [],
                         storefrontPhotos: storefrontPhotos || [],
+                        avatarPhoto: avatarPhoto || null,
+                        businessDocs: businessDocs || [],
                         verificationPhotos: cleanVerificationPhotos,
                         verificationLat: typeof verificationLat !== 'undefined' ? verificationLat : null,
                         verificationLng: typeof verificationLng !== 'undefined' ? verificationLng : null,
@@ -1479,6 +1902,33 @@
                     localStorage.setItem('biz_wizard_state', JSON.stringify(state));
                 } catch (e) {
                     console.warn('Could not save biz wizard state:', e);
+                }
+                // Persist large base64 camera photos separately in IndexedDB so they survive reload
+                saveVerificationPhotosDebounced();
+            }
+
+            // Restore base64 camera photos (+ GPS metadata) from IndexedDB after reload
+            async function restoreVerificationPhotosFromIDB() {
+                const data = await idbGetPhotos();
+                if (!data) return;
+                if (Array.isArray(data.verificationPhotos) && data.verificationPhotos.length) {
+                    verificationPhotos.length = 0;
+                    data.verificationPhotos.forEach(p => verificationPhotos.push(p));
+                    verificationPhotoData = verificationPhotos[0] || null;
+                    renderVerificationGallery();
+                    if (verificationPhotoData && capturedImagePreview && capturedPreviewContainer) {
+                        capturedImagePreview.src = verificationPhotoData;
+                        capturedPreviewContainer.classList.remove('d-none');
+                    }
+                }
+                if (data.verificationLat) verificationLat = data.verificationLat;
+                if (data.verificationLng) verificationLng = data.verificationLng;
+                if (data.verificationTime) verificationTime = data.verificationTime;
+                if (verificationLat && verificationLng && watermarkLocation) {
+                    watermarkLocation.innerText = 'Tọa độ GPS: ' + Number(verificationLat).toFixed(6) + ', ' + Number(verificationLng).toFixed(6);
+                }
+                if (verificationTime && watermarkTime) {
+                    watermarkTime.innerText = 'Thời gian: ' + new Date(verificationTime).toLocaleString('vi-VN');
                 }
             }
 
@@ -1591,7 +2041,15 @@
                     if (state.storefrontPhotos && Array.isArray(state.storefrontPhotos)) {
                         storefrontPhotos.length = 0;
                         state.storefrontPhotos.forEach(p => storefrontPhotos.push(p));
-                        restorePhotoPreviews('storefrontPreviews', storefrontPhotos);
+                    }
+                    if (state.avatarPhoto) {
+                        avatarPhoto = state.avatarPhoto;
+                        restoreAvatarPreview();
+                    }
+                    if (state.businessDocs && Array.isArray(state.businessDocs)) {
+                        businessDocs.length = 0;
+                        state.businessDocs.forEach(p => businessDocs.push(p));
+                        restorePhotoPreviews('docPreviews', businessDocs);
                     }
                     if (state.verificationPhotos && Array.isArray(state.verificationPhotos)) {
                         verificationPhotos.length = 0;
@@ -1654,20 +2112,17 @@
                 
                 const name = (categoryName || '').toLowerCase();
                 if (name.includes('ẩm thực') || name.includes('ăn uống') || name.includes('nhà hàng') || name.includes('quán')) {
-                    s8Title.innerText = "Thêm ảnh chụp thực đơn của bạn";
-                    s8Desc.innerText = "Khách hàng chủ yếu dựa vào ảnh thực đơn khi quyết định ăn hoặc ghé thăm ở đâu.";
-                    if (s8Icon) s8Icon.innerText = "📋";
-                    if (s8Text) s8Text.innerText = "Kéo các hình ảnh thực đơn vào đây";
+                    s8Title.innerText = "Thêm ảnh về địa điểm của bạn *";
+                    s8Desc.innerText = "Ảnh mặt tiền, không gian, món ăn và thực đơn... giúp khách hình dung rõ về quán của bạn.";
+                    if (s8Text) s8Text.innerText = "Kéo ảnh mặt tiền, không gian, món ăn vào đây";
                 } else if (name.includes('lưu trú') || name.includes('khách sạn') || name.includes('nhà nghỉ') || name.includes('homestay') || name.includes('resort')) {
-                    s8Title.innerText = "Thêm ảnh phòng nghỉ & dịch vụ";
-                    s8Desc.innerText = "Khách hàng chủ yếu dựa vào ảnh phòng nghỉ và bảng giá dịch vụ để quyết định đặt phòng.";
-                    if (s8Icon) s8Icon.innerText = "🛌";
-                    if (s8Text) s8Text.innerText = "Kéo các hình ảnh phòng nghỉ/dịch vụ vào đây";
+                    s8Title.innerText = "Thêm ảnh về địa điểm của bạn *";
+                    s8Desc.innerText = "Ảnh mặt tiền, phòng nghỉ, không gian và dịch vụ... giúp khách quyết định đặt phòng.";
+                    if (s8Text) s8Text.innerText = "Kéo ảnh mặt tiền, phòng nghỉ, dịch vụ vào đây";
                 } else {
-                    s8Title.innerText = "Thêm ảnh bảng giá & dịch vụ";
-                    s8Desc.innerText = "Cung cấp hình ảnh dịch vụ giúp khách hàng hiểu rõ hơn về các gói dịch vụ và bảng giá của bạn.";
-                    if (s8Icon) s8Icon.innerText = "💼";
-                    if (s8Text) s8Text.innerText = "Kéo các hình ảnh bảng giá/dịch vụ vào đây";
+                    s8Title.innerText = "Thêm ảnh về địa điểm của bạn *";
+                    s8Desc.innerText = "Ảnh mặt tiền, không gian, sản phẩm / dịch vụ và bảng giá... giúp khách hiểu rõ về bạn.";
+                    if (s8Text) s8Text.innerText = "Kéo ảnh mặt tiền, không gian, dịch vụ vào đây";
                 }
             }
 
@@ -1686,6 +2141,12 @@
                     }
                 });
 
+                // Widen the content panel on layout-heavy steps (camera + map)
+                const contentPanelEl = document.querySelector('.reg-main .content-panel');
+                if (contentPanelEl) {
+                    contentPanelEl.classList.toggle('content-panel--wide', bizStep === 11);
+                }
+
                 // Update nodes
                 bizStepNodes.forEach(node => {
                     const stepNum = parseInt(node.getAttribute('data-step'));
@@ -1702,6 +2163,31 @@
                 const fillPercent = ((bizStep - 1) / (totalBizSteps - 1)) * 100;
                 bizStepFill.style.width = fillPercent + '%';
 
+                // Update header step counter + name (if present)
+                const regCur = document.getElementById('regStepCurrent');
+                if (regCur) regCur.textContent = bizStep;
+                const regName = document.getElementById('regStepName');
+                if (regName) regName.textContent = bizStepNames[bizStep] || '';
+
+                // Update the left step navigation (grouped phases + sub-steps)
+                document.querySelectorAll('.reg-nav__group').forEach(group => {
+                    const parts = (group.getAttribute('data-range') || '').split('-').map(Number);
+                    const lo = parts[0], hi = parts[1];
+                    const phase = group.querySelector('.reg-nav__phase');
+                    const isActive = bizStep >= lo && bizStep <= hi;
+                    const isDone = bizStep > hi;
+                    group.classList.toggle('is-open', isActive);
+                    if (phase) {
+                        phase.classList.toggle('active', isActive);
+                        phase.classList.toggle('done', isDone);
+                    }
+                });
+                document.querySelectorAll('.reg-nav__sub').forEach(sub => {
+                    const s = parseInt(sub.getAttribute('data-step'));
+                    sub.classList.toggle('active', s === bizStep);
+                    sub.classList.toggle('done', s < bizStep);
+                });
+
                 // Update buttons
                 bizPrevBtn.disabled = (bizStep === 1);
                 if (bizStep === totalBizSteps) {
@@ -1712,11 +2198,7 @@
 
                 // Toggle skip button visibility
                 if (bizSkipBtn) {
-                    if (bizStep === 8 || bizStep === 9 || bizStep === 10) {
-                        bizSkipBtn.classList.remove('d-none');
-                    } else {
-                        bizSkipBtn.classList.add('d-none');
-                    }
+                    bizSkipBtn.classList.add('d-none');
                 }
 
                 // If entering Map step, initialize/invalidate map
@@ -1725,7 +2207,7 @@
                 }
 
                 // If entering Camera Verification step, trigger GPS fetch & render mini map
-                if (bizStep === 10) {
+                if (bizStep === 11) {
                     if (!verificationLat || !verificationLng) {
                         fetchVerificationGPS();
                     } else {
@@ -2205,11 +2687,91 @@
             }
 
             setupUploader('menuDropzone', 'menuFilesInput', 'menuPreviews', menuPhotos);
-            setupUploader('storefrontDropzone', 'storefrontFilesInput', 'storefrontPreviews', storefrontPhotos);
+            setupUploader('docDropzone', 'docFilesInput', 'docPreviews', businessDocs);
+            setupAvatarUploader();
+
+            // Single-image uploader for the representative (avatar) photo
+            function renderAvatarPreview(url, path) {
+                const container = document.getElementById('avatarPreview');
+                if (!container) return;
+                container.innerHTML = '';
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-thumbnail';
+                previewItem.innerHTML = `<img src="${url}" style="display:block;">`;
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'preview-remove-btn';
+                removeBtn.innerHTML = '✕';
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    previewItem.remove();
+                    avatarPhoto = null;
+                    updateMockPhotosGrid();
+                    saveWizardState();
+                });
+                previewItem.appendChild(removeBtn);
+                container.appendChild(previewItem);
+            }
+
+            function restoreAvatarPreview() {
+                if (avatarPhoto) renderAvatarPreview('/storage/' + avatarPhoto, avatarPhoto);
+            }
+
+            function setupAvatarUploader() {
+                const dropzone = document.getElementById('avatarDropzone');
+                const fileInput = document.getElementById('avatarFileInput');
+                if (!dropzone || !fileInput) return;
+
+                dropzone.addEventListener('click', () => fileInput.click());
+                ['dragenter', 'dragover'].forEach(ev => dropzone.addEventListener(ev, (e) => {
+                    e.preventDefault();
+                    dropzone.style.borderColor = 'var(--primary)';
+                    dropzone.style.backgroundColor = 'rgba(0, 112, 255, 0.05)';
+                }, false));
+                ['dragleave', 'drop'].forEach(ev => dropzone.addEventListener(ev, (e) => {
+                    e.preventDefault();
+                    dropzone.style.borderColor = 'var(--border-color)';
+                    dropzone.style.backgroundColor = 'rgba(248, 250, 252, 0.5)';
+                }, false));
+                dropzone.addEventListener('drop', (e) => handleAvatarFile(e.dataTransfer.files[0]));
+                fileInput.addEventListener('change', function() { handleAvatarFile(this.files[0]); });
+
+                function handleAvatarFile(file) {
+                    if (!file) return;
+                    if (!file.type.startsWith('image/')) {
+                        showToast('Chỉ cho phép tải lên hình ảnh.', false);
+                        return;
+                    }
+                    const container = document.getElementById('avatarPreview');
+                    container.innerHTML = `<div class="preview-thumbnail"><div class="position-absolute w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"><span class="spinner-border spinner-border-sm text-white" role="status"></span></div></div>`;
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('_token', '{{ csrf_token() }}');
+                    fetch("{{ route('client.profile.business.upload_photo') }}", { method: 'POST', body: formData })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                avatarPhoto = data.path;
+                                renderAvatarPreview(data.url, data.path);
+                                updateMockPhotosGrid();
+                                saveWizardState();
+                            } else {
+                                container.innerHTML = '';
+                                showToast(data.message || 'Lỗi tải ảnh.', false);
+                            }
+                        })
+                        .catch(() => {
+                            container.innerHTML = '';
+                            showToast('Có lỗi xảy ra khi tải ảnh lên.', false);
+                        });
+                }
+            }
 
             // Load saved wizard state on page load
             loadWizardState();
             updateBizStepUI();
+            // Restore camera photos from IndexedDB (async, large base64 data)
+            restoreVerificationPhotosFromIDB();
 
             // Update Mock Phone Photos grid based on uploaded storefront and menu photos
             function updateMockPhotosGrid() {
@@ -2217,7 +2779,7 @@
                 if (!mockGrid) return;
 
                 mockGrid.innerHTML = '';
-                const allPhotos = [...storefrontPhotos, ...menuPhotos];
+                const allPhotos = [avatarPhoto, ...menuPhotos].filter(Boolean);
 
                 for (let i = 0; i < 3; i++) {
                     const item = document.createElement('div');
@@ -2321,15 +2883,20 @@
                     }
                 } else if (bizStep === 8) {
                     if (!menuPhotos || menuPhotos.length === 0) {
-                        showToast('Vui lòng tải lên ít nhất 1 hình ảnh thực đơn/bảng giá/dịch vụ.', false);
+                        showToast('Vui lòng tải lên ít nhất 1 hình ảnh về địa điểm của bạn.', false);
                         return false;
                     }
                 } else if (bizStep === 9) {
-                    if (!storefrontPhotos || storefrontPhotos.length === 0) {
-                        showToast('Vui lòng tải lên ít nhất 1 hình ảnh mặt tiền cửa hàng.', false);
+                    if (!avatarPhoto) {
+                        showToast('Vui lòng chọn 1 ảnh đại diện cho địa điểm của bạn.', false);
                         return false;
                     }
                 } else if (bizStep === 10) {
+                    if (!businessDocs || businessDocs.length === 0) {
+                        showToast('Vui lòng tải lên ít nhất 1 bằng chứng xác minh.', false);
+                        return false;
+                    }
+                } else if (bizStep === 11) {
                     if (!verificationPhotos || verificationPhotos.length === 0) {
                         showToast('Bắt buộc phải bật Camera chụp ảnh xác thực thực địa!', false);
                         return false;
@@ -2356,6 +2923,29 @@
                     bizStep--;
                     updateBizStepUI();
                 }
+            });
+
+            // Skip button (optional steps) — advance without validation
+            if (bizSkipBtn) {
+                bizSkipBtn.addEventListener('click', function() {
+                    if (bizStep < totalBizSteps) {
+                        bizStep++;
+                        updateBizStepUI();
+                    } else {
+                        submitBizRegistrationForm();
+                    }
+                });
+            }
+
+            // Click a completed sub-step in the left nav to jump back to it
+            document.querySelectorAll('.reg-nav__sub').forEach(sub => {
+                sub.addEventListener('click', function() {
+                    const s = parseInt(sub.getAttribute('data-step'));
+                    if (!isNaN(s) && s < bizStep) {
+                        bizStep = s;
+                        updateBizStepUI();
+                    }
+                });
             });
 
             // Final AJAX form submission
@@ -2388,6 +2978,8 @@
                         description: inputDesc.value.trim(),
                         menu_photos: menuPhotos || [],
                         storefront_photos: storefrontPhotos || [],
+                        avatar_photo: avatarPhoto || null,
+                        business_documents: businessDocs || [],
                         verification_photo: (verificationPhotos && verificationPhotos.length > 0) ? verificationPhotos[0] : (verificationPhotoData || null),
                         verification_photos: verificationPhotos || [],
                         verification_lat: typeof verificationLat !== 'undefined' ? verificationLat : null,
@@ -2411,6 +3003,7 @@
 
                         if (res.ok && data && data.success) {
                             clearWizardState();
+                            idbClearPhotos();
                             showToast(data.message || 'Đăng ký thành công!', true);
                             setTimeout(() => {
                                 window.location.href = "{{ route('client.profile') }}";

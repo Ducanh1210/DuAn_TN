@@ -201,9 +201,11 @@
         color: #0f172a !important;
     }
 
-    /* Hide global app header and footer */
-    body > nav.navbar,
-    body > footer {
+    /* Chỉ giữ 1 header của module nhiệm vụ — ẩn header/footer layout chung */
+    .site-header,
+    header.site-header,
+    body > footer,
+    footer {
         display: none !important;
     }
 
@@ -220,7 +222,7 @@
         background: #ffffff;
         border-bottom: 1px solid #e2e8f0;
         padding: 10px 32px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        box-shadow: none;
         position: sticky;
         top: 0;
         z-index: 100;
@@ -728,15 +730,15 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        border: 3px solid #0284c7;
+        border: 3px solid #1e3a5f;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.95rem;
-        font-weight: 800;
-        color: #0284c7;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #1e3a5f;
         flex-shrink: 0;
-        background: #f0f9ff;
+        background: #f1f5f9;
     }
 
     .leaderboard-row {
@@ -973,7 +975,7 @@
 <!-- Full Width Header Navigation Bar -->
 <div class="reward-top-bar-full">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <a href="{{ url('/') }}" class="reward-brand" title="Quay về trang chủ Bản đồ">
+        <a href="{{ route('home') }}" class="reward-brand" title="Quay về bản đồ">
             <i class="fa-solid fa-gift reward-brand-icon"></i>
             <div>
                 <div class="reward-brand-text" id="headerBrandText">Nhiệm Vụ & Tích Xu</div>
@@ -983,9 +985,6 @@
 
         <!-- Menu Tabs -->
         <ul class="reward-top-menu nav" id="rewardTopNav" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/') }}">Trang chủ</a>
-            </li>
             <li class="nav-item">
                 <button class="nav-link active" id="nav-quests-tab" data-bs-toggle="pill" data-bs-target="#quests-pane" type="button" role="tab" onclick="switchNavTab('quests-pane')">
                     Nhiệm vụ
@@ -1145,23 +1144,8 @@
             <div class="row g-3">
                 <!-- LEFT COLUMN: Menu Sidebar -->
                 <div class="col-lg-3 col-xl-2">
-                    <div class="reward-sidebar-compact">
-                        <div class="sidebar-title">Menu Nhiệm vụ</div>
-                        <div class="d-flex flex-column">
-                            <button class="reward-cat-btn active" type="button">
-                                <span>Nhiệm vụ</span>
-                            </button>
-                            <button class="reward-cat-btn" onclick="switchNavTab('shop-pane')" type="button">
-                                <span>Đổi thưởng</span>
-                            </button>
-                            <button class="reward-cat-btn" onclick="switchNavTab('inventory-pane')" type="button">
-                                <span>Tủ quà của tôi</span>
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- Referral Widget -->
-                    <div class="reward-sidebar-compact mt-2 text-center" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px 10px;">
+                    <div class="reward-sidebar-compact text-center" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px 10px;">
                         <h6 class="fw-bold text-dark mb-1" style="font-size: 0.82rem;">Mời bạn bè</h6>
                         <p class="text-muted mb-2" style="font-size: 0.72rem;">Nhận ngay <strong>2.000 xu</strong> cho mỗi lượt mời!</p>
                         <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="copyReferralLink()" style="font-size: 0.78rem; padding: 7px 10px;">
@@ -1578,21 +1562,64 @@
                         </button>
                     </div>
 
-                    <!-- Widget 2: Nhiệm vụ hàng ngày Circular Gauge -->
-                    <div class="widget-card">
+                    <!-- Widget 2: Nhiệm vụ hàng ngày (tiến độ thật + đếm ngược reset) -->
+                    @php
+                        $dailyTrack = $dailyMissions ?? collect();
+                        $dailyTotal = $dailyTrack->count();
+                        $dailyDone = 0;
+                        $dailyRewardSum = 0;
+                        $dailyClaimable = 0;
+                        foreach ($dailyTrack as $dm) {
+                            $dailyRewardSum += (int) $dm->reward_points;
+                            $dum = $userMissions->get($dm->id);
+                            if ($dum && in_array($dum->status, ['completed', 'claimed'], true)) {
+                                $dailyDone++;
+                            }
+                            if ($dum && $dum->status === 'completed') {
+                                $dailyClaimable++;
+                            }
+                        }
+                        $dailyPercent = $dailyTotal > 0 ? (int) round(($dailyDone / $dailyTotal) * 100) : 0;
+                        $secondsToMidnight = max(0, (int) now()->diffInSeconds(now()->endOfDay(), false));
+                        if ($secondsToMidnight < 0) {
+                            $secondsToMidnight = 0;
+                        }
+                    @endphp
+                    <div class="widget-card" id="dailySummaryWidget">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <h6 class="fw-bold text-dark mb-0" style="font-size: 0.86rem;">Nhiệm vụ hàng ngày</h6>
-                            <span class="badge bg-light text-muted fw-semibold" style="font-size: 0.68rem;">12:45:30</span>
+                            <span class="badge bg-light text-muted fw-semibold" style="font-size: 0.68rem;" title="Thời gian còn lại đến khi reset nhiệm vụ ngày">
+                                <span id="dailyResetCountdown" data-seconds="{{ $secondsToMidnight }}">--:--:--</span>
+                            </span>
                         </div>
                         <div class="d-flex align-items-center gap-3">
-                            <div class="circle-progress-box">
-                                <span>2/5</span>
+                            <div class="circle-progress-box" style="{{ $dailyPercent >= 100 ? 'border-color:#166534;color:#166534;background:#f0fdf4;' : '' }}">
+                                <span id="dailySummaryCount">{{ $dailyDone }}/{{ max(1, $dailyTotal) }}</span>
                             </div>
-                            <div>
-                                <div class="fw-bold text-dark" style="font-size: 0.82rem;">Hoàn thành 5 nhiệm vụ</div>
-                                <div class="text-muted mb-1.5" style="font-size: 0.74rem;">Nhận thưởng <strong class="text-dark">100 xu <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 15px; height: 15px; object-fit: contain; vertical-align: -2px;" class="ms-0.5"></strong></div>
-                                <div class="progress rounded-pill" style="height: 5px; width: 130px; background: #e2e8f0;">
-                                    <div class="progress-bar" style="width: 40%; background: #0284c7;"></div>
+                            <div class="flex-grow-1">
+                                @if($dailyTotal === 0)
+                                    <div class="fw-bold text-dark" style="font-size: 0.82rem;">Chưa có nhiệm vụ ngày</div>
+                                    <div class="text-muted" style="font-size: 0.74rem;">Quay lại sau khi hệ thống cập nhật.</div>
+                                @elseif($dailyDone >= $dailyTotal)
+                                    <div class="fw-bold text-dark" style="font-size: 0.82rem;">Đã hoàn thành hôm nay</div>
+                                    <div class="text-muted mb-1.5" style="font-size: 0.74rem;">
+                                        @if($dailyClaimable > 0)
+                                            Còn {{ $dailyClaimable }} phần thưởng chưa nhận — bấm “Nhận thưởng” bên trái.
+                                        @else
+                                            Reset sau <span class="daily-reset-hint">00:00</span> ngày mai.
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="fw-bold text-dark" style="font-size: 0.82rem;">Hoàn thành {{ $dailyTotal }} nhiệm vụ ngày</div>
+                                    <div class="text-muted mb-1.5" style="font-size: 0.74rem;">
+                                        Tổng thưởng ngày tới
+                                        <strong class="text-dark">{{ number_format($dailyRewardSum) }} xu
+                                            <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 15px; height: 15px; object-fit: contain; vertical-align: -2px;" class="ms-0.5">
+                                        </strong>
+                                    </div>
+                                @endif
+                                <div class="progress rounded-pill" style="height: 5px; width: 100%; max-width: 160px; background: #e2e8f0;">
+                                    <div class="progress-bar" id="dailySummaryBar" style="width: {{ $dailyPercent }}%; background: {{ $dailyPercent >= 100 ? '#166534' : '#1e3a5f' }};"></div>
                                 </div>
                             </div>
                         </div>
@@ -1830,6 +1857,34 @@ window.filterQuestList = function(type, btn) {
 
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = "{{ csrf_token() }}";
+
+    // Đếm ngược đến lúc reset nhiệm vụ ngày (00:00)
+    (function initDailyResetCountdown() {
+        const el = document.getElementById('dailyResetCountdown');
+        if (!el) return;
+        let remain = parseInt(el.getAttribute('data-seconds') || '0', 10);
+        if (isNaN(remain) || remain < 0) remain = 0;
+
+        function pad(n) { return String(n).padStart(2, '0'); }
+        function render() {
+            const h = Math.floor(remain / 3600);
+            const m = Math.floor((remain % 3600) / 60);
+            const s = remain % 60;
+            el.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+            document.querySelectorAll('.daily-reset-hint').forEach(function (hint) {
+                hint.textContent = el.textContent;
+            });
+        }
+        render();
+        setInterval(function () {
+            if (remain <= 0) {
+                el.textContent = '00:00:00';
+                return;
+            }
+            remain -= 1;
+            render();
+        }, 1000);
+    })();
 
     function updatePointsUI(points, streak) {
         document.querySelectorAll('#headerUserPoints, #navbarUserPoints').forEach(el => {

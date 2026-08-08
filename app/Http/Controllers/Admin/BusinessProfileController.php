@@ -85,7 +85,9 @@ class BusinessProfileController extends Controller
             $fullAddress = trim($businessProfile->address_street . ', ' . $businessProfile->address_city . ', ' . $businessProfile->address_province);
 
             $thumbnail = null;
-            if (!empty($businessProfile->storefront_photos) && is_array($businessProfile->storefront_photos)) {
+            if (!empty($businessProfile->avatar_photo)) {
+                $thumbnail = $businessProfile->avatar_photo;
+            } elseif (!empty($businessProfile->storefront_photos) && is_array($businessProfile->storefront_photos)) {
                 $thumbnail = $businessProfile->storefront_photos[0];
             } elseif (!empty($businessProfile->menu_photos) && is_array($businessProfile->menu_photos)) {
                 $thumbnail = $businessProfile->menu_photos[0];
@@ -109,8 +111,13 @@ class BusinessProfileController extends Controller
                 'created_by' => $businessProfile->user_id,
             ]);
 
-            // Save images
-            $allPhotos = array_merge($businessProfile->storefront_photos ?? [], $businessProfile->menu_photos ?? []);
+            // Save images (public gallery only - NOT ownership documents / verification photos)
+            $allPhotos = array_merge(
+                $businessProfile->avatar_photo ? [$businessProfile->avatar_photo] : [],
+                $businessProfile->storefront_photos ?? [],
+                $businessProfile->menu_photos ?? []
+            );
+            $allPhotos = array_values(array_unique(array_filter($allPhotos)));
             foreach ($allPhotos as $index => $photoPath) {
                 LocationImage::create([
                     'location_id' => $location->id,
