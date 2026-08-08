@@ -10,11 +10,12 @@ use App\Services\PointService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * Controller quản trị người dùng: liệt kê, thêm, sửa, xóa, khóa/mở khóa và điều chỉnh điểm.
+ */
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    /** Danh sách người dùng (ẩn tài khoản admin). */
     public function index()
     {
         // Loại bỏ các tài khoản có vai trò 'admin' khỏi danh sách
@@ -22,17 +23,13 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    /** Form tạo người dùng mới. */
     public function create()
     {
         return view('admin.users.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    /** Lưu người dùng mới vào cơ sở dữ liệu. */
     public function store(Request $request)
     {
         $request->validate([
@@ -48,8 +45,8 @@ class UserController extends Controller
         $user->username = $request->username;
         $user->email = $request->email;
         $user->display_name = $request->display_name;
-        // In the model it mentions "custom MD5". Let's use md5 for now, but usually it's better to use Hash::make if possible.
-        // Based on app/Models/User.php: // Disable default hashing casting since we use custom MD5
+        // LƯU Ý: tài khoản tạo từ trang admin đang băm mật khẩu bằng md5 (khác với đăng ký
+        // phía người dùng dùng Hash::make). Nên cân nhắc thống nhất về Hash::make sau này.
         $user->password_hash = md5($request->password);
         $user->role = $request->role;
         $user->status = $request->status;
@@ -65,9 +62,7 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được tạo thành công.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    /** Trang chi tiết người dùng kèm lịch sử điểm (phân trang từ dữ liệu đã tổng hợp). */
     public function show(string $id)
     {
         $user = User::findOrFail($id);
@@ -88,18 +83,14 @@ class UserController extends Controller
         return view('admin.users.show', compact('user', 'pointHistory', 'historyData'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    /** Form sửa người dùng. */
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
         return view('admin.users.edit', compact('user'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    /** Cập nhật người dùng (đổi mật khẩu nếu có nhập, thay avatar nếu có tải lên). */
     public function update(Request $request, string $id)
     {
         $user = User::findOrFail($id);
@@ -124,7 +115,7 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('avatar')) {
-            // Delete old avatar file if exists
+            // Xóa file avatar cũ nếu là ảnh nội bộ
             if ($user->avatar_url && str_contains($user->avatar_url, 'avatars/') && !str_starts_with($user->avatar_url, 'http')) {
                 Storage::disk('public')->delete('avatars/' . basename($user->avatar_url));
             }
@@ -137,9 +128,7 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được cập nhật thành công.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    /** Xóa người dùng (không cho tự xóa chính mình). */
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
@@ -153,9 +142,7 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được xóa thành công.');
     }
 
-    /**
-     * Toggle user status (Lock/Unlock)
-     */
+    /** Khóa/mở khóa tài khoản người dùng (không cho tự khóa chính mình). */
     public function toggleStatus(string $id)
     {
         $user = User::findOrFail($id);
@@ -171,9 +158,7 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', "{$action} tài khoản thành công.");
     }
 
-    /**
-     * Adjust user points (Award or subtract)
-     */
+    /** Điều chỉnh điểm của người dùng (cộng hoặc trừ) kèm mô tả lý do. */
     public function adjustPoints(Request $request, string $id)
     {
         $user = User::findOrFail($id);

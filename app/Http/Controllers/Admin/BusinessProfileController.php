@@ -10,11 +10,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+/**
+ * Controller quản trị yêu cầu nâng cấp doanh nghiệp: liệt kê (lọc/tìm kiếm), xem chi tiết,
+ * phê duyệt (tự tạo địa điểm trên bản đồ + ảnh công khai) hoặc từ chối kèm lý do.
+ */
 class BusinessProfileController extends Controller
 {
-    /**
-     * Display a listing of business upgrade requests.
-     */
+    /** Danh sách yêu cầu nâng cấp doanh nghiệp, có lọc theo trạng thái và tìm kiếm. */
     public function index(Request $request)
     {
         $status = $request->get('status', 'all');
@@ -51,9 +53,7 @@ class BusinessProfileController extends Controller
         return view('admin.business.index', compact('businessProfiles', 'status', 'search', 'counts'));
     }
 
-    /**
-     * Display the specified business upgrade request details.
-     */
+    /** Chi tiết một yêu cầu nâng cấp doanh nghiệp. */
     public function show($id)
     {
         $businessProfile = BusinessProfile::with(['user', 'category'])->findOrFail($id);
@@ -62,7 +62,8 @@ class BusinessProfileController extends Controller
     }
 
     /**
-     * Approve a business upgrade request.
+     * Phê duyệt yêu cầu: đổi trạng thái, nâng vai trò người dùng lên 'business' và
+     * tự tạo địa điểm trên bản đồ (kèm ảnh công khai) nếu chưa có.
      */
     public function approve(Request $request, $id)
     {
@@ -73,19 +74,21 @@ class BusinessProfileController extends Controller
             'reject_reason' => null,
         ]);
 
-        // Update user role if user is regular member
+        // Nâng vai trò lên 'business' nếu người dùng đang là thành viên thường
         if ($businessProfile->user && in_array($businessProfile->user->role, ['user', 'member'])) {
             $businessProfile->user->update(['role' => 'business']);
         }
 
-        // Auto-create Location for the map if it doesn't exist yet
+        // Tự tạo địa điểm trên bản đồ nếu chưa có
         $existingLoc = Location::where('created_by', $businessProfile->user_id)->first();
         if (!$existingLoc) {
             $slug = Str::slug($businessProfile->business_name) . '-' . time();
             $fullAddress = trim($businessProfile->address_street . ', ' . $businessProfile->address_city . ', ' . $businessProfile->address_province);
 
             $thumbnail = null;
-            if (!empty($businessProfile->storefront_photos) && is_array($businessProfile->storefront_photos)) {
+            if (!empty($businessProfile->avatar_photo)) {
+                $thumbnail = $businessProfile->avatar_photo;
+            } elseif (!empty($businessProfile->storefront_photos) && is_array($businessProfile->storefront_photos)) {
                 $thumbnail = $businessProfile->storefront_photos[0];
             } elseif (!empty($businessProfile->menu_photos) && is_array($businessProfile->menu_photos)) {
                 $thumbnail = $businessProfile->menu_photos[0];
@@ -109,8 +112,13 @@ class BusinessProfileController extends Controller
                 'created_by' => $businessProfile->user_id,
             ]);
 
-            // Save images
-            $allPhotos = array_merge($businessProfile->storefront_photos ?? [], $businessProfile->menu_photos ?? []);
+            // Chỉ lưu ảnh công khai (KHÔNG lưu giấy tờ sở hữu / ảnh xác minh riêng tư)
+            $allPhotos = array_merge(
+                $businessProfile->avatar_photo ? [$businessProfile->avatar_photo] : [],
+                $businessProfile->storefront_photos ?? [],
+                $businessProfile->menu_photos ?? []
+            );
+            $allPhotos = array_values(array_unique(array_filter($allPhotos)));
             foreach ($allPhotos as $index => $photoPath) {
                 LocationImage::create([
                     'location_id' => $location->id,
@@ -126,9 +134,7 @@ class BusinessProfileController extends Controller
             ->with('success', "Đã phê duyệt yêu cầu nâng cấp doanh nghiệp \"{$businessProfile->business_name}\" thành công!");
     }
 
-    /**
-     * Reject a business upgrade request.
-     */
+    /** Từ chối yêu cầu nâng cấp doanh nghiệp kèm lý do (bắt buộc). */
     public function reject(Request $request, $id)
     {
         $validated = $request->validate([

@@ -8,25 +8,28 @@ use App\Models\Comment;
 use App\Models\FavoriteLocation;
 use App\Models\Location;
 use App\Models\LocationImage;
+use App\Models\PanoramaServiceRequest;
 use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Controller bảng điều khiển doanh nghiệp: dành cho chủ doanh nghiệp đã được duyệt,
+ * cho phép xem thống kê, cập nhật thông tin và quản lý thư viện ảnh của địa điểm.
+ */
 class BusinessDashboardController extends Controller
 {
     public function __construct(private ImageCompressionService $imageCompression)
     {
     }
 
-    /**
-     * Display the business dashboard for approved business owners.
-     */
+    /** Trang tổng quan doanh nghiệp: thông tin, địa điểm, bình luận và thống kê. */
     public function index()
     {
         $user = Auth::user();
 
-        // Check if user has an approved business profile
+        // Chỉ cho vào nếu có hồ sơ doanh nghiệp đã được duyệt
         $businessProfile = BusinessProfile::where('user_id', $user->id)
             ->where('status', 'approved')
             ->with('category')
@@ -37,7 +40,7 @@ class BusinessDashboardController extends Controller
                 ->with('error', 'Bạn chưa có tài khoản doanh nghiệp được phê duyệt.');
         }
 
-        // Get associated location
+        // Lấy địa điểm gắn với chủ doanh nghiệp này
         $location = Location::where('created_by', $user->id)
             ->with(['category', 'images'])
             ->first();
@@ -47,7 +50,7 @@ class BusinessDashboardController extends Controller
                 ->with('error', 'Địa điểm doanh nghiệp đã bị gỡ khỏi hệ thống. Vui lòng đăng ký lại hoặc liên hệ quản trị viên.');
         }
 
-        // Get statistics
+        // Thống kê: bình luận, lượt thích, lượt xem, điểm đánh giá
         $comments = Comment::where('location_id', $location->id)
             ->with('user')
             ->latest()
@@ -57,19 +60,25 @@ class BusinessDashboardController extends Controller
         $viewsCount = $location->view_count ?? 0;
         $averageRating = $location->average_rating ?? 0;
 
+        $panoramaServiceRequests = PanoramaServiceRequest::where('user_id', $user->id)
+            ->latest()
+            ->limit(10)
+            ->get();
+        $hasPendingPanoRequest = $panoramaServiceRequests->contains(fn ($r) => $r->status === 'pending');
+
         return view('client.business.dashboard', compact(
             'businessProfile',
             'location',
             'comments',
             'favoritesCount',
             'viewsCount',
-            'averageRating'
+            'averageRating',
+            'panoramaServiceRequests',
+            'hasPendingPanoRequest'
         ));
     }
 
-    /**
-     * Update business information from the dashboard.
-     */
+    /** Cập nhật thông tin doanh nghiệp từ dashboard và đồng bộ sang bản ghi địa điểm. */
     public function updateInfo(Request $request)
     {
         $user = Auth::user();
@@ -101,7 +110,7 @@ class BusinessDashboardController extends Controller
             'address_city' => $validated['address_city'],
         ]);
 
-        // Also update associated location record if it exists
+        // Đồng bộ luôn sang bản ghi địa điểm tương ứng (nếu có)
         $location = Location::where('created_by', $user->id)->first();
         if ($location) {
             $fullAddress = trim($validated['address_street'] . ', ' . $validated['address_city'] . ', ' . $businessProfile->address_province);
@@ -119,9 +128,7 @@ class BusinessDashboardController extends Controller
             ->with('success', 'Đã cập nhật thông tin doanh nghiệp thành công!');
     }
 
-    /**
-     * Upload photo to business gallery.
-     */
+    /** Tải ảnh lên thư viện doanh nghiệp (mặt tiền hoặc thực đơn) và thêm vào ảnh địa điểm. */
     public function uploadPhoto(Request $request)
     {
         $user = Auth::user();
@@ -146,7 +153,7 @@ class BusinessDashboardController extends Controller
             $businessProfile->update(['menu_photos' => array_values($photos)]);
         }
 
-        // Also add to location images if location exists
+        // Đồng thời thêm vào thư viện ảnh của địa điểm (nếu có)
         $location = Location::where('created_by', $user->id)->first();
         if ($location) {
             LocationImage::create([
@@ -162,9 +169,7 @@ class BusinessDashboardController extends Controller
             ->with('success', 'Đã tải lên hình ảnh mới thành công!');
     }
 
-    /**
-     * Delete a photo from business gallery.
-     */
+    /** Xóa một ảnh khỏi thư viện doanh nghiệp (đồng thời xóa file và ảnh địa điểm liên quan). */
     public function deletePhoto(Request $request)
     {
         $user = Auth::user();

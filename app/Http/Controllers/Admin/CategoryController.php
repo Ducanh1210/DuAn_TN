@@ -9,19 +9,25 @@ use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
 use Illuminate\Support\Str;
 
+/**
+ * Controller quản trị danh mục địa điểm: liệt kê, thêm, sửa, xóa và xử lý upload icon.
+ */
 class CategoryController extends Controller
 {
+    /** Danh sách danh mục (sắp theo thứ tự hiển thị). */
     public function index()
     {
         $categories = Category::orderBy('display_order', 'asc')->paginate(10);
         return view('admin.categories.index', compact('categories'));
     }
 
+    /** Form tạo danh mục mới. */
     public function create()
     {
         return view('admin.categories.create');
     }
 
+    /** Lưu danh mục mới: tạo slug, tự tăng thứ tự hiển thị và lưu icon (nếu có). */
     public function store(StoreCategoryRequest $request)
     {
         $validated = $request->validated();
@@ -44,11 +50,13 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công!');
     }
 
+    /** Form sửa danh mục. */
     public function edit(Category $category)
     {
         return view('admin.categories.edit', compact('category'));
     }
 
+    /** Cập nhật danh mục: cập nhật slug và thay icon (xóa icon cũ nếu có). */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
         $validated = $request->validated();
@@ -71,6 +79,7 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công!');
     }
 
+    /** Xóa danh mục (chặn nếu còn địa điểm thuộc danh mục này). */
     public function destroy(Category $category)
     {
         if ($category->locations()->count() > 0) {

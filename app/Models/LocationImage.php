@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model ảnh trong thư viện của địa điểm. Đánh dấu ảnh đại diện (is_thumbnail)
+ * và thứ tự hiển thị (sort_order).
+ */
 class LocationImage extends Model
 {
     use HasFactory;
@@ -23,6 +27,7 @@ class LocationImage extends Model
         'is_thumbnail' => 'boolean',
     ];
 
+    /** Địa điểm chứa ảnh. */
     public function location()
     {
         return $this->belongsTo(Location::class);

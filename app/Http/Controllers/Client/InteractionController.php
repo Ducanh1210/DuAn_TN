@@ -9,8 +9,13 @@ use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 use App\Services\PointService;
 
+/**
+ * Controller xử lý các tương tác của người dùng với địa điểm: yêu thích, bình luận/đánh giá,
+ * báo cáo vi phạm, đề xuất địa điểm mới và gửi góp ý. Nhiều hành động cộng điểm và cập nhật nhiệm vụ.
+ */
 class InteractionController extends Controller
 {
+    /** Thêm/bỏ yêu thích một địa điểm (toggle); lần thêm mới sẽ cộng điểm và tính nhiệm vụ. */
     public function toggleFavorite(Request $request, Location $location)
     {
         $user = Auth::user();
@@ -31,11 +36,12 @@ class InteractionController extends Controller
         }
     }
 
+    /** Gửi đánh giá/bình luận cho địa điểm (mỗi người chỉ được đánh giá 1 lần), cộng điểm và tính nhiệm vụ. */
     public function storeComment(Request $request, Location $location)
     {
         $user = Auth::user();
 
-        // Check if user already commented on this location (1 review per user per location)
+        // Mỗi tài khoản chỉ được đánh giá một địa điểm một lần
         $existingComment = $location->comments()->where('user_id', $user->id)->first();
         if ($existingComment) {
             return response()->json([
@@ -81,6 +87,7 @@ class InteractionController extends Controller
         ]);
     }
 
+    /** Cập nhật nội dung/điểm đánh giá của bình luận (chỉ chủ sở hữu mới được sửa). */
     public function updateComment(Request $request, Comment $comment)
     {
         if ($comment->user_id !== Auth::id()) {
@@ -119,6 +126,7 @@ class InteractionController extends Controller
         ]);
     }
 
+    /** Xóa bình luận (chỉ chủ sở hữu mới được xóa). */
     public function deleteComment(Request $request, Comment $comment)
     {
         if ($comment->user_id !== Auth::id()) {
@@ -129,6 +137,7 @@ class InteractionController extends Controller
         return response()->json(['success' => true, 'message' => 'Đã xóa bình luận.']);
     }
 
+    /** Trang danh sách địa điểm yêu thích của người dùng. */
     public function myFavorites()
     {
         $favorites = Auth::user()->favoriteLocations()
@@ -139,6 +148,7 @@ class InteractionController extends Controller
         return view('client.favorites.index', compact('favorites'));
     }
 
+    /** Báo cáo vi phạm một nội dung (dùng quan hệ đa hình), chặn báo cáo trùng đang chờ xử lý. */
     public function report(Request $request)
     {
         $request->validate([
@@ -158,7 +168,7 @@ class InteractionController extends Controller
             return response()->json(['success' => false, 'message' => 'Nội dung không tồn tại.'], 404);
         }
 
-        // Check if user already reported this recently
+        // Chặn nếu người dùng đã báo cáo nội dung này và đang chờ xử lý
         $existingReport = \App\Models\Report::where('reporter_id', Auth::id())
             ->where('reportable_id', $request->reportable_id)
             ->where('reportable_type', $modelClass)
@@ -180,11 +190,13 @@ class InteractionController extends Controller
         return response()->json(['success' => true, 'message' => 'Cảm ơn bạn đã báo cáo. Chúng tôi sẽ xem xét sớm nhất có thể.']);
     }
 
+    /** (Cũ) Trang đóng góp của người dùng — hiện chỉ chuyển về trang chủ. */
     public function myContributions()
     {
         return redirect()->route('home');
     }
 
+    /** Gửi đề xuất địa điểm mới kèm ảnh; lưu ở trạng thái chờ admin duyệt, không tự lên bản đồ. */
     public function suggestLocation(Request $request)
     {
         $request->validate([
@@ -194,7 +206,7 @@ class InteractionController extends Controller
             'category_suggest' => 'nullable|string|max:80',
             'lat' => 'nullable|numeric',
             'lng' => 'nullable|numeric',
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120' // 5MB max
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120' // tối đa 5MB mỗi ảnh
         ]);
 
         $imagePaths = [];
@@ -224,6 +236,7 @@ class InteractionController extends Controller
         ]);
     }
 
+    /** Gửi góp ý / báo lỗi tới ban quản trị (cho phép cả khách chưa đăng nhập). */
     public function submitFeedback(Request $request)
     {
         $request->validate([

@@ -2261,6 +2261,12 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="alert alert-danger rounded-1 border-0 mb-3 py-2 px-3 small" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
+
         @if($errors->any())
             <div class="alert alert-danger rounded-1 border-0 mb-3 py-2 px-3 small" role="alert">
                 <ul class="mb-0 ps-3">
@@ -2297,6 +2303,32 @@
                         </div>
                     </div>
                 </div>
+
+                @if(isset($notifications) && $notifications->count() > 0)
+                <div class="content-panel" style="margin-bottom:16px;">
+                    <div class="section-title" style="display:flex;align-items:center;gap:8px;">
+                        <span>Thông báo</span>
+                        @php $unreadCount = $notifications->whereNull('read_at')->count(); @endphp
+                        @if($unreadCount > 0)
+                            <span style="background:#ef4444;color:#fff;border-radius:999px;font-size:0.68rem;padding:1px 8px;font-weight:600;">{{ $unreadCount }} mới</span>
+                        @endif
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+                        @foreach($notifications as $noti)
+                            <div style="border:1px solid {{ is_null($noti->read_at) ? '#fecaca' : '#e2e8f0' }};background:{{ is_null($noti->read_at) ? '#fef2f2' : '#ffffff' }};border-radius:10px;padding:12px 14px;">
+                                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+                                    <strong style="font-size:0.86rem;color:#1e293b;">{{ $noti->title }}</strong>
+                                    <span style="font-size:0.7rem;color:#94a3b8;white-space:nowrap;">{{ $noti->created_at->format('d/m/Y H:i') }}</span>
+                                </div>
+                                @if($noti->message)
+                                    <div style="font-size:0.8rem;color:#475569;margin-top:4px;white-space:pre-line;line-height:1.5;">{{ $noti->message }}</div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <div class="profile-stat-grid">
                     <div class="stat-tile">
                         <div class="stat-label">Điểm tích lũy</div>
@@ -2799,6 +2831,11 @@
                                     <strong>Trang quản trị</strong>
                                     <p class="mb-2">Dashboard dành cho chủ doanh nghiệp.</p>
                                     <a href="{{ route('business.dashboard') }}" class="btn-solid" style="display:inline-block;text-decoration:none;">Vào quản trị</a>
+                                </div>
+                                <div class="biz-feature">
+                                    <strong>Dịch vụ tour 360</strong>
+                                    <p class="mb-2">Quay & dựng panorama theo nhu cầu, báo giá sau tư vấn.</p>
+                                    <a href="{{ route('client.pano_service') }}" class="btn-ghost" style="display:inline-block;">Tìm hiểu & gửi yêu cầu</a>
                                 </div>
                             </div>
                         </div>

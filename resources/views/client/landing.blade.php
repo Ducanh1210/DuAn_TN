@@ -67,7 +67,7 @@
                                 @endif
                                 <p class="event-card__excerpt mb-0">{{ Str::limit(strip_tags($loc->short_description ?? $loc->description ?? ''), 90) }}</p>
                                 <span class="d-inline-block mt-2 meta-text" style="color: #1e3a5f; font-weight: 500;">
-                                    {{ $loc->panoramas_count > 0 ? 'Xem 360°' : 'Xem ảnh' }} →
+                                    Khám phá ngay →
                                 </span>
                             </div>
                         </article>
