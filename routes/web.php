@@ -238,6 +238,7 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Comments Management
     Route::resource('comments', \App\Http\Controllers\Admin\CommentController::class)->only(['index', 'destroy']);
     Route::patch('comments/{comment}/toggle-status', [\App\Http\Controllers\Admin\CommentController::class, 'toggleStatus'])->name('comments.toggle_status');
+    Route::post('comments/scan-ai', [\App\Http\Controllers\Admin\CommentController::class, 'scanAi'])->name('comments.scan_ai');
 
     // Reports Management
     Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class)->only(['index']);

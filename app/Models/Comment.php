@@ -16,6 +16,15 @@ class Comment extends Model
         'rating',
         'content',
         'status',
+        'ai_flag',
+        'ai_score',
+        'ai_reason',
+        'ai_checked_at',
+    ];
+
+    protected $casts = [
+        'ai_checked_at' => 'datetime',
+        'ai_score' => 'integer',
     ];
 
     public function user()
