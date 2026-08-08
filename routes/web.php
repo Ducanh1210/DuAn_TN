@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\UserController;
@@ -37,6 +36,8 @@ if (app()->environment('local') || php_sapi_name() == 'cli-server') {
 }
 
 Route::get('/trang-chu', [LandingController::class, 'index'])->name('client.landing');
+Route::get('/dich-vu-tour-360', [LandingController::class, 'panoService'])->name('client.pano_service');
+Route::post('/dich-vu-tour-360', [LandingController::class, 'submitPanoService'])->name('client.pano_service.submit');
 
 Route::get('/', function () {
     $locations = \App\Models\Location::with(['category', 'images'])->withCount('panoramas')->where('status', 'published')->get();
@@ -130,8 +131,10 @@ Route::middleware('auth')->group(function () {
     // Community Contributions
     Route::get('/ca-nhan/dong-gop', [\App\Http\Controllers\Client\InteractionController::class, 'myContributions'])->name('client.contributions.index');
     Route::post('/locations/suggest', [\App\Http\Controllers\Client\InteractionController::class, 'suggestLocation'])->name('client.locations.suggest');
-    Route::post('/feedback', [\App\Http\Controllers\Client\InteractionController::class, 'submitFeedback'])->name('client.feedback.submit');
 });
+
+// Góp ý / báo lỗi: cho phép cả khách chưa đăng nhập gửi
+Route::post('/feedback', [\App\Http\Controllers\Client\InteractionController::class, 'submitFeedback'])->name('client.feedback.submit');
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
@@ -158,6 +161,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/business/register', [\App\Http\Controllers\Client\ProfileController::class, 'businessRegister'])->name('client.profile.business.register');
     Route::post('/profile/business/upload-photo', [\App\Http\Controllers\Client\ProfileController::class, 'uploadBusinessPhoto'])->name('client.profile.business.upload_photo');
     Route::post('/profile/business/cancel', [\App\Http\Controllers\Client\ProfileController::class, 'cancelBusinessRegistration'])->name('client.profile.business.cancel');
+    Route::post('/profile/pano-service', [\App\Http\Controllers\Client\LandingController::class, 'submitPanoService'])->name('client.profile.pano_service');
     Route::post('/profile/favorite/toggle', [\App\Http\Controllers\Client\ProfileController::class, 'toggleFavorite'])->name('client.profile.favorite.toggle');
     Route::delete('/profile/comments/{comment}', [\App\Http\Controllers\Client\ProfileController::class, 'destroyComment'])->name('client.profile.comments.destroy');
     Route::post('/profile/heartbeat', [\App\Http\Controllers\Client\ProfileController::class, 'heartbeat'])->name('client.profile.heartbeat');
@@ -235,6 +239,7 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Comments Management
     Route::resource('comments', \App\Http\Controllers\Admin\CommentController::class)->only(['index', 'destroy']);
     Route::patch('comments/{comment}/toggle-status', [\App\Http\Controllers\Admin\CommentController::class, 'toggleStatus'])->name('comments.toggle_status');
+    Route::post('comments/scan-ai', [\App\Http\Controllers\Admin\CommentController::class, 'scanAi'])->name('comments.scan_ai');
 
     // Reports Management
     Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class)->only(['index']);
@@ -256,4 +261,8 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     Route::resource('business-profiles', \App\Http\Controllers\Admin\BusinessProfileController::class)->only(['index', 'show']);
     Route::post('business-profiles/{id}/approve', [\App\Http\Controllers\Admin\BusinessProfileController::class, 'approve'])->name('business-profiles.approve');
     Route::post('business-profiles/{id}/reject', [\App\Http\Controllers\Admin\BusinessProfileController::class, 'reject'])->name('business-profiles.reject');
+
+    // Yêu cầu làm tour 360 thuê
+    Route::get('panorama-requests', [\App\Http\Controllers\Admin\PanoramaServiceRequestController::class, 'index'])->name('panorama-requests.index');
+    Route::patch('panorama-requests/{panoramaRequest}', [\App\Http\Controllers\Admin\PanoramaServiceRequestController::class, 'updateStatus'])->name('panorama-requests.update');
 });

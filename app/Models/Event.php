@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model sự kiện du lịch/lễ hội. Có thời gian bắt đầu/kết thúc, có thể gắn với một địa điểm,
+ * kèm ảnh nổi bật và các scope/nhãn tiếng Việt hỗ trợ hiển thị.
+ */
 class Event extends Model
 {
     use HasFactory;
@@ -32,35 +36,31 @@ class Event extends Model
         'is_featured' => 'boolean',
     ];
 
+    /** Địa điểm tổ chức sự kiện (nếu có). */
     public function location()
     {
         return $this->belongsTo(Location::class);
     }
 
+    /** Người tạo sự kiện. */
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    /**
-     * Scope: only active events
-     */
+    /** Scope: chỉ lấy sự kiện đang diễn ra. */
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
     }
 
-    /**
-     * Scope: upcoming events
-     */
+    /** Scope: chỉ lấy sự kiện sắp diễn ra. */
     public function scopeUpcoming($query)
     {
         return $query->where('start_time', '>=', now());
     }
 
-    /**
-     * Get Vietnamese label for status
-     */
+    /** Accessor: nhãn trạng thái tiếng Việt. */
     public function getStatusLabelAttribute()
     {
         return match ($this->status) {
@@ -72,11 +72,13 @@ class Event extends Model
         };
     }
 
+    /** Accessor: URL ảnh nổi bật đã chuẩn hóa (dùng chung helper của News). */
     public function getFeaturedImageUrlAttribute(): ?string
     {
         return News::resolveMediaUrl($this->featured_image);
     }
 
+    /** Accessor: cho phép dùng $event->title như một alias của tên sự kiện. */
     public function getTitleAttribute(): string
     {
         return $this->name;

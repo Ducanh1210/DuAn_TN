@@ -10,10 +10,16 @@ use App\Models\ItineraryDay;
 use App\Models\ItineraryItem;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Dịch vụ lập lịch trình du lịch bằng AI.
+ * Quy trình: đọc câu trả lời khảo sát -> lọc & gom cụm địa điểm gần nhau theo GPS
+ * -> gọi AI sinh lịch trình JSON -> hậu xử lý (kiểm tra địa điểm hợp lệ, tối ưu tuyến
+ * đường theo khoảng cách thật, chèn bữa ăn/nghỉ, sửa giờ) -> lưu vào DB.
+ */
 class TripPlannerService
 {
-    protected $openRouterModel;
-    protected $openRouterBaseUrl;
+    protected $openRouterModel;    // Mô hình AI dùng để sinh lịch trình
+    protected $openRouterBaseUrl;  // Địa chỉ gốc API OpenRouter
 
     /** @var array<int, Location>|null */
     protected $locationsById = null;
@@ -24,6 +30,7 @@ class TripPlannerService
         $this->openRouterBaseUrl = env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1');
     }
 
+    /** Đọc danh sách API key từ .env (cho phép nhiều key, cách nhau dấu phẩy để xoay vòng). */
     protected function getApiKeys(): array
     {
         $rawKeys = env('OPENROUTER_API_KEYS') ?: env('OPENROUTER_API_KEY');
@@ -33,7 +40,8 @@ class TripPlannerService
     }
 
     /**
-     * Parse preferences from wizard answers.
+     * Phân tích câu trả lời khảo sát thành bộ sở thích chuẩn hóa
+     * (số ngày, ngân sách, nhịp độ, sở thích, ẩm thực...) để dựng prompt.
      */
     public function parsePreferences(array $answers, ?string $tripType = null): array
     {
@@ -157,7 +165,7 @@ class TripPlannerService
     }
 
     /**
-     * Map interest keys → category slugs.
+     * Ánh xạ các key sở thích -> slug danh mục địa điểm tương ứng.
      */
     protected function categorySlugsForInterests(array $interests): array
     {
@@ -180,7 +188,7 @@ class TripPlannerService
     }
 
     /**
-     * Map trip type → category slugs to prioritize.
+     * Ánh xạ kiểu chuyến đi -> danh sách slug danh mục cần ưu tiên.
      */
     protected function categorySlugsForTripType(?string $tripType): array
     {
@@ -219,9 +227,9 @@ class TripPlannerService
     {
         $query = Location::with('category')->where('status', 'published');
         $locations = $query->get();
-        if ($locations->isEmpty()) {
-            $locations = Location::with('category')->get();
-        }
+            if ($locations->isEmpty()) {
+                $locations = Location::with('category')->get();
+            }
 
         $prioritySlugs = $this->categorySlugsForTripType($prefs['trip_type'] ?? null);
         $interestSlugs = $this->categorySlugsForInterests($prefs['interests'] ?? []);
@@ -350,16 +358,20 @@ class TripPlannerService
         }
 
         $context = "\n--- DANH SÁCH BẮT BUỘC 100% CÁC ĐỊA ĐIỂM ĐƯỢC PHÉP DÙNG (KÈM GPS) ---\n";
-        foreach ($locations as $loc) {
-            $catName = $loc->category->name ?? 'Địa điểm';
+            foreach ($locations as $loc) {
+                $catName = $loc->category->name ?? 'Địa điểm';
             $lat = $loc->lat ? round((float) $loc->lat, 4) : 'N/A';
             $lng = $loc->lng ? round((float) $loc->lng, 4) : 'N/A';
-            $context .= "- ID:{$loc->id} | \"{$loc->name}\" | Loại:{$catName} | GPS:({$lat},{$lng}) | Địa chỉ:" . ($loc->address ?? '') . "\n";
-        }
-        $context .= "---------------------------------------------------------\n";
-        return $context;
+                $context .= "- ID:{$loc->id} | \"{$loc->name}\" | Loại:{$catName} | GPS:({$lat},{$lng}) | Địa chỉ:" . ($loc->address ?? '') . "\n";
+            }
+            $context .= "---------------------------------------------------------\n";
+            return $context;
     }
 
+    /**
+     * Gọi AI (OpenRouter): thử lần lượt từng API key và từng mô hình dự phòng cho tới
+     * khi có phản hồi hợp lệ. Trả về nội dung text (đã gỡ code fence) hoặc null nếu thất bại.
+     */
     protected function callAI(string $systemPrompt, string $userPrompt, int $maxTokens = 800, float $temperature = 0.7): ?string
     {
         $apiKeys = $this->getApiKeys();
@@ -414,6 +426,10 @@ class TripPlannerService
         return null;
     }
 
+    /**
+     * Làm sạch và giải mã JSON từ phản hồi AI: gỡ code fence, cắt phần thừa sau dấu }
+     * cuối cùng và thử vá các lỗi JSON thường gặp (dấu phẩy thừa, ký tự điều khiển).
+     */
     protected function cleanAndDecodeJson(string $rawContent): ?array
     {
         $clean = trim($rawContent);
@@ -450,7 +466,7 @@ class TripPlannerService
     }
 
     /**
-     * Haversine distance in km.
+     * Tính khoảng cách giữa 2 tọa độ GPS theo công thức Haversine (đơn vị: km).
      */
     public function distanceKm(float $lat1, float $lng1, float $lat2, float $lng2): float
     {
@@ -463,7 +479,8 @@ class TripPlannerService
     }
 
     /**
-     * Validate location_id, enforce days/budget, optimize route by real distance.
+     * Hậu xử lý lịch trình AI trả về: kiểm tra location_id hợp lệ, ép đúng số ngày/ngân sách,
+     * tối ưu tuyến đường theo khoảng cách thật và bổ sung bữa ăn/nghỉ còn thiếu.
      */
     public function postProcessItinerary(array $itinerary, array $prefs): array
     {
@@ -1412,6 +1429,10 @@ class TripPlannerService
         return $best;
     }
 
+    /**
+     * Điểm vào chính: sinh lịch trình hoàn chỉnh từ câu trả lời khảo sát.
+     * Gộp toàn bộ quy trình phân tích -> lọc địa điểm -> gọi AI -> hậu xử lý.
+     */
     public function generateItinerary(array $answers, ?string $tripType = null): array
     {
         $prefs = $this->parsePreferences($answers, $tripType);

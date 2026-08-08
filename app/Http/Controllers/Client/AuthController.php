@@ -12,19 +12,18 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 use App\Models\User;
 
+/**
+ * Controller xác thực phía người dùng: đăng nhập/đăng ký thường và đăng nhập qua Google (Socialite).
+ */
 class AuthController extends Controller
 {
-    /**
-     * Show the login form.
-     */
+    /** Hiển thị form đăng nhập. */
     public function showLoginForm()
     {
         return view('client.auth.login');
     }
 
-    /**
-     * Handle login logic.
-     */
+    /** Xử lý đăng nhập: kiểm tra thông tin, chặn tài khoản bị khóa và điều hướng theo vai trò. */
     public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
@@ -52,17 +51,13 @@ class AuthController extends Controller
         ])->onlyInput('username');
     }
 
-    /**
-     * Show the register form.
-     */
+    /** Hiển thị form đăng ký. */
     public function showRegisterForm()
     {
         return view('client.auth.register');
     }
 
-    /**
-     * Handle register logic.
-     */
+    /** Xử lý đăng ký tài khoản mới và tự động đăng nhập. */
     public function register(RegisterRequest $request)
     {
         $validated = $request->validated();
@@ -77,15 +72,13 @@ class AuthController extends Controller
             'avatar_url' => 'https://ui-avatars.com/api/?name=' . urlencode($validated['display_name'] ?? $validated['username']) . '&background=0072FF&color=fff',
         ]);
 
-        // Automatically log in after registration
+        // Tự động đăng nhập ngay sau khi đăng ký
         Auth::login($user);
 
         return redirect()->route('home')->with('success', 'Đăng ký tài khoản thành công!');
     }
 
-    /**
-     * Log the user out.
-     */
+    /** Đăng xuất và hủy phiên đăng nhập. */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -96,27 +89,26 @@ class AuthController extends Controller
         return redirect()->route('home')->with('success', 'Đã đăng xuất.');
     }
 
-    /**
-     * Redirect the user to the Google authentication page.
-     */
+    /** Chuyển hướng người dùng sang trang đăng nhập Google. */
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
 
     /**
-     * Obtain the user information from Google.
+     * Xử lý callback từ Google: nếu email đã tồn tại thì đăng nhập (và bổ sung thông tin provider),
+     * ngược lại tạo tài khoản mới rồi đăng nhập.
      */
     public function handleGoogleCallback()
     {
         try {
             $googleUser = Socialite::driver('google')->user();
-            
-            // Check if user already exists
+
+            // Kiểm tra người dùng đã tồn tại theo email chưa
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
-                // If user exists but registered normally, update provider info
+                // Tài khoản đăng ký thường trước đó -> bổ sung thông tin provider Google
                 if (!$user->provider) {
                     $user->update([
                         'provider' => 'google',
@@ -137,10 +129,10 @@ class AuthController extends Controller
                 return redirect()->intended(route('home'))->with('success', 'Đăng nhập thành công!');
             }
 
-            // Generate a random password since password_hash is not nullable
+            // Tạo mật khẩu ngẫu nhiên vì cột password_hash không cho phép null
             $randomPassword = Str::random(24);
 
-            // Register new user
+            // Đăng ký người dùng mới từ thông tin Google
             $newUser = User::create([
                 'username' => 'user_' . uniqid(),
                 'email' => $googleUser->getEmail(),

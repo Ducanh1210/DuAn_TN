@@ -9,13 +9,19 @@ use App\Models\PanoramaHotspot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Controller trình chỉnh sửa tour 360°: quản lý scene panorama, góc nhìn mặc định,
+ * scene mặc định và các hotspot (điểm liên kết/thông tin) trên từng panorama.
+ */
 class PanoramaEditorController extends Controller
 {
+    /** Mở trang trình chỉnh sửa 360° cho một địa điểm. */
     public function index(Location $location)
     {
         return view('admin.locations.editor-360', compact('location'));
     }
 
+    /** Trả về JSON toàn bộ dữ liệu panorama + hotspot cho trình chỉnh sửa phía client. */
     public function getData(Location $location)
     {
         $panoramas = $location->panoramas()->with('hotspots')->orderByDesc('is_default')->orderBy('sort_order')->get();
@@ -47,6 +53,7 @@ class PanoramaEditorController extends Controller
         ]);
     }
 
+    /** Lưu góc nhìn ban đầu (yaw/pitch/fov) cho một panorama. */
     public function setInitialView(Request $request, Panorama $panorama)
     {
         $panorama->update([
@@ -57,17 +64,19 @@ class PanoramaEditorController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /** Đặt panorama làm scene mặc định (bỏ mặc định ở tất cả scene khác cùng địa điểm). */
     public function setDefaultScene(Panorama $panorama)
     {
-        // Set all other panoramas in the same location to false
+        // Bỏ cờ mặc định ở tất cả panorama khác cùng địa điểm
         Panorama::where('location_id', $panorama->location_id)->update(['is_default' => false]);
         
-        // Set this panorama to true
+        // Đặt panorama này làm mặc định
         $panorama->update(['is_default' => true]);
         
         return response()->json(['success' => true]);
     }
 
+    /** Thêm một hotspot mới vào panorama. */
     public function addHotspot(Request $request, Panorama $panorama)
     {
         $hotspot = $panorama->hotspots()->create([
@@ -85,6 +94,7 @@ class PanoramaEditorController extends Controller
         return response()->json(['success' => true, 'hotspot' => $hotspot]);
     }
 
+    /** Cập nhật một phần thông tin hotspot (chỉ các trường được gửi lên). */
     public function updateHotspot(Request $request, PanoramaHotspot $hotspot)
     {
         $data = [];
@@ -102,22 +112,24 @@ class PanoramaEditorController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /** Xóa một hotspot. */
     public function deleteHotspot(PanoramaHotspot $hotspot)
     {
         $hotspot->delete();
         return response()->json(['success' => true]);
     }
 
+    /** Lưu hàng loạt thay đổi hotspot (xóa/sửa/thêm) trong một giao dịch. */
     public function bulkSave(Request $request)
     {
         \DB::beginTransaction();
         try {
-            // 1. Process deletes
+            // 1. Xử lý xóa
             if ($request->has('deletes')) {
                 \App\Models\PanoramaHotspot::whereIn('id', $request->deletes)->delete();
             }
             
-            // 2. Process updates
+            // 2. Xử lý cập nhật
             if ($request->has('updates')) {
                 foreach ($request->updates as $item) {
                     $hotspot = \App\Models\PanoramaHotspot::find($item['id']);
@@ -137,7 +149,7 @@ class PanoramaEditorController extends Controller
                 }
             }
             
-            // 3. Process creates
+            // 3. Xử lý tạo mới
             if ($request->has('creates')) {
                 foreach ($request->creates as $item) {
                     $panorama = \App\Models\Panorama::find($item['sceneId']);
@@ -165,6 +177,7 @@ class PanoramaEditorController extends Controller
         }
     }
 
+    /** Đổi tên hiển thị của một scene panorama. */
     public function updateSceneName(Request $request, Panorama $panorama)
     {
         $panorama->update(['scene_name' => $request->name]);

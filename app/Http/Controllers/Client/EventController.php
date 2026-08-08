@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
+/**
+ * Controller trang sự kiện phía người dùng: danh sách sự kiện sắp diễn ra / đã qua và trang chi tiết.
+ */
 class EventController extends Controller
 {
+    /** Danh sách sự kiện theo tab: "upcoming" (sắp diễn ra) hoặc "past" (đã qua). */
     public function index(Request $request)
     {
         $tab = $request->get('tab', 'upcoming');
@@ -39,6 +43,7 @@ class EventController extends Controller
         return view('client.events.index', compact('events', 'featured', 'tab'));
     }
 
+    /** Trang chi tiết một sự kiện kèm các sự kiện liên quan. */
     public function show($slug)
     {
         $event = Event::where('slug', $slug)

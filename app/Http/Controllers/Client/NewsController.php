@@ -6,8 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\News;
 use Illuminate\Http\Request;
 
+/**
+ * Controller trang tin tức phía người dùng: danh sách bài viết (trừ loại sự kiện),
+ * bài xem nhiều và trang chi tiết kèm bài liên quan.
+ */
 class NewsController extends Controller
 {
+    /** Danh sách tin tức + bài phổ biến + vài sự kiện sắp diễn ra cho sidebar. */
     public function index()
     {
         $newsList = News::where('status', 'published')
@@ -30,6 +35,7 @@ class NewsController extends Controller
         return view('client.news.index', compact('newsList', 'popularNews', 'upcomingEvents'));
     }
 
+    /** Trang chi tiết một bài viết kèm các bài liên quan. */
     public function show($slug)
     {
         $news = News::where('slug', $slug)

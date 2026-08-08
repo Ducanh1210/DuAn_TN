@@ -11,14 +11,22 @@ use App\Services\PointService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Dịch vụ hệ thống nhiệm vụ & khung avatar (gamification):
+ * - Cập nhật tiến độ nhiệm vụ theo hành động của người dùng.
+ * - Nhận thưởng nhiệm vụ, xử lý điểm danh theo chuỗi ngày.
+ * - Mở khóa / trang bị khung avatar theo thành tích và theo hạng điểm.
+ */
 class MissionService
 {
     /**
-     * Track user progress for a specific mission action key.
+     * Cập nhật tiến độ nhiệm vụ ứng với một "action key" cụ thể.
      *
      * @param User $user
-     * @param string $actionKey
-     * @param int $increment
+     * @param string $actionKey Mã hành động (comment, favorite, daily_login...)
+     * @param int $value Giá trị cộng thêm (hoặc giá trị tuyệt đối nếu $isAbsolute)
+     * @param bool $isAbsolute Gán thẳng tiến độ thay vì cộng dồn
+     * @param mixed $entityId ID đối tượng liên quan để chống đếm trùng (vd cùng 1 địa điểm)
      * @return void
      */
     public static function trackProgress(User $user, string $actionKey, int $value = 1, bool $isAbsolute = false, $entityId = null)
@@ -48,7 +56,7 @@ class MissionService
 
             $meta = $userMission->meta ?? [];
 
-            // Handle periodic resets
+            // Reset tiến độ theo chu kỳ: nhiệm vụ ngày reset mỗi ngày, nhiệm vụ tuần reset mỗi tuần
             if ($userMission->last_reset_at) {
                 $lastReset = Carbon::parse($userMission->last_reset_at);
 
@@ -67,16 +75,16 @@ class MissionService
                 }
             }
 
-            // If already claimed or completed in this period, skip
+            // Đã nhận thưởng trong chu kỳ này thì bỏ qua
             if ($userMission->status === 'claimed') {
                 continue;
             }
 
-            // If entityId is specified, check uniqueness to prevent counting duplicate locations
+            // Nếu có entityId: kiểm tra trùng để không đếm lặp cùng một đối tượng (vd cùng địa điểm)
             if ($entityId !== null) {
                 $visitedEntities = $meta['visited_entities'] ?? [];
                 if (in_array((string)$entityId, $visitedEntities, true)) {
-                    // Already counted this location/entity for this mission in current period
+                    // Đối tượng này đã được tính cho nhiệm vụ trong chu kỳ hiện tại
                     continue;
                 }
                 $visitedEntities[] = (string)$entityId;
@@ -85,14 +93,14 @@ class MissionService
 
             $userMission->meta = $meta;
 
-            // Progress assignment
+            // Gán tiến độ: tuyệt đối hoặc cộng dồn, không vượt quá mục tiêu
             if ($isAbsolute) {
                 $userMission->current_count = min($mission->target_count, max(0, $value));
             } else {
                 $userMission->current_count = min($mission->target_count, $userMission->current_count + $value);
             }
 
-            // Check completion — auto-claim progress-only missions (0 xu, no frame)
+            // Kiểm tra hoàn thành — nhiệm vụ chỉ theo dõi tiến độ (0 xu, không khung) thì tự nhận luôn
             if ($userMission->current_count >= $mission->target_count) {
                 if ((int) $mission->reward_points === 0 && empty($mission->reward_frame_id)) {
                     $userMission->status = 'claimed';
@@ -109,7 +117,7 @@ class MissionService
     }
 
     /**
-     * Claim reward for a completed mission.
+     * Nhận thưởng cho một nhiệm vụ đã hoàn thành (cộng xu và/hoặc mở khóa khung avatar).
      *
      * @param User $user
      * @param int $missionId
@@ -135,7 +143,7 @@ class MissionService
             $userMission->claimed_at = Carbon::now();
             $userMission->save();
 
-            // Award points only when mission is the sole reward source for that action
+            // Chỉ cộng xu khi nhiệm vụ là nguồn thưởng duy nhất của hành động đó (tránh cộng trùng)
             if ($mission->reward_points > 0) {
                 PointService::awardPoints($user, $mission->reward_points, 'mission_reward', 'Phần thưởng nhiệm vụ: ' . $mission->title);
             }
@@ -161,7 +169,8 @@ class MissionService
     }
 
     /**
-     * Process daily login streak and check-in bonus.
+     * Xử lý điểm danh hằng ngày: cập nhật chuỗi ngày liên tiếp, cộng xu theo chu kỳ
+     * và trao khung avatar khi đạt chuỗi 7 ngày.
      *
      * @param User $user
      * @return array
@@ -176,7 +185,7 @@ class MissionService
         }
 
         return DB::transaction(function () use ($user, $today, $yesterday) {
-            // Update Streak
+            // Cập nhật chuỗi ngày: điểm danh hôm qua thì +1, ngắt quãng thì về 1
             if ($user->last_streak_at && Carbon::parse($user->last_streak_at)->isSameDay($yesterday)) {
                 $user->streak_count = ($user->streak_count ?? 0) + 1;
             } else {
@@ -187,7 +196,7 @@ class MissionService
             $user->last_daily_bonus_at = Carbon::now();
             $user->save();
 
-            // Streak cycle Day 1–7 → 10, 20, … 70 (single source; daily_login mission = 0 xu)
+            // Chu kỳ chuỗi ngày 1–7 → 10, 20, … 70 (nguồn cộng xu duy nhất; nhiệm vụ daily_login = 0 xu)
             $totalPoints = PointService::checkinPointsForStreakDay((int) $user->streak_count);
 
             PointService::awardPoints($user, $totalPoints, 'daily_login', 'Điểm danh hàng ngày (Chuỗi ' . $user->streak_count . ' ngày)');
@@ -195,7 +204,7 @@ class MissionService
             self::trackProgress($user, 'daily_login', 1);
             self::trackProgress($user, 'streak_7', $user->streak_count, true);
 
-            // Award frame on Day 7 streak
+            // Trao khung avatar khi đạt chuỗi 7 ngày
             $streakFrameMsg = "";
             if ($user->streak_count >= 7) {
                 $streakFrame = AvatarFrame::where('status', 'active')
@@ -232,11 +241,9 @@ class MissionService
     }
 
     /**
-     * Unlock an avatar frame for user.
+     * Mở khóa một khung avatar cho người dùng (nếu chưa sở hữu).
      *
-     * @param User $user
-     * @param int $frameId
-     * @return bool
+     * @return bool True nếu vừa mở khóa mới, false nếu đã sở hữu từ trước
      */
     public static function unlockFrame(User $user, int $frameId)
     {
@@ -252,18 +259,14 @@ class MissionService
                 'unlocked_at' => Carbon::now(),
             ]);
 
-            // Auto-equip removed to let users manually choose to equip frames in their inventory
+            // Không tự trang bị: để người dùng tự chọn khung trong kho đồ của họ
             return true;
         }
         return false;
     }
 
     /**
-     * Equip or unequip an avatar frame.
-     *
-     * @param User $user
-     * @param int|null $frameId
-     * @return array
+     * Trang bị hoặc tháo khung avatar. Truyền $frameId = null để tháo khung hiện tại.
      */
     public static function equipFrame(User $user, ?int $frameId)
     {
@@ -295,11 +298,8 @@ class MissionService
     }
 
     /**
-     * Buy avatar frame with points.
-     *
-     * @param User $user
-     * @param int $frameId
-     * @return array
+     * (Đã vô hiệu hóa) Mua khung avatar bằng xu.
+     * Hiện khung avatar chỉ là phần thưởng thành tích nên luôn trả về thất bại.
      */
     public static function purchaseFrame(User $user, int $frameId)
     {
@@ -307,10 +307,7 @@ class MissionService
     }
 
     /**
-     * Check and unlock rank frames based on total user points automatically.
-     *
-     * @param User $user
-     * @return void
+     * Tự động mở khóa các khung avatar theo hạng dựa trên tổng điểm hiện tại của người dùng.
      */
     public static function checkRankFramesUnlocked(User $user)
     {

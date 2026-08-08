@@ -490,6 +490,15 @@
                         <span class="badge-count">{{ $pendingBizCount }}</span>
                     @endif
                 </a>
+                <a href="{{ route('admin.panorama-requests.index') }}" class="d-flex justify-content-between align-items-center {{ request()->routeIs('admin.panorama-requests.*') ? 'active' : '' }}">
+                    <span>Yêu cầu tour 360</span>
+                    @php
+                        $pendingPanoReqCount = \App\Models\PanoramaServiceRequest::where('status', 'pending')->count();
+                    @endphp
+                    @if($pendingPanoReqCount > 0)
+                        <span class="badge-count">{{ $pendingPanoReqCount }}</span>
+                    @endif
+                </a>
             </nav>
 
             <div class="sidebar-group-title">Nội dung</div>

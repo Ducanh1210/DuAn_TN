@@ -24,7 +24,7 @@
         border-radius: 50%;
         background: #ffffff;
         border: 1px solid #cbdbe8;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.08);
+        box-shadow: none;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -36,13 +36,13 @@
     }
 
     #chatbot-toggle:hover {
-        transform: translateY(-3px) scale(1.06);
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
+        transform: none;
+        box-shadow: none;
         border-color: #1e3a5f;
     }
 
     #chatbot-toggle:active {
-        transform: translateY(0) scale(0.96);
+        transform: none;
     }
 
     #chatbot-toggle .toggle-img {
@@ -50,11 +50,11 @@
         height: 38px;
         object-fit: contain;
         transition: transform 0.25s ease, filter 0.25s ease;
-        filter: drop-shadow(0 2px 5px rgba(15, 23, 42, 0.45)) drop-shadow(0 0 1px rgba(15, 23, 42, 0.3));
+        filter: none;
     }
 
     #chatbot-toggle:hover .toggle-img {
-        filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.55)) drop-shadow(0 0 2px rgba(15, 23, 42, 0.4));
+        filter: none;
     }
 
     /* Green status badge on button */
@@ -67,7 +67,7 @@
         background-color: #22c55e;
         border: 2px solid #ffffff;
         border-radius: 50%;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        box-shadow: none;
         transition: opacity 0.2s ease;
     }
 
@@ -87,7 +87,7 @@
         max-height: calc(100vh - 90px);
         background: #ffffff;
         border-radius: 12px;
-        box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18), 0 0 0 1px #cbdbe8;
+        box-shadow: none;
         position: absolute;
         bottom: 0;
         right: 0;
@@ -142,7 +142,7 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
-        filter: drop-shadow(0 2px 5px rgba(15, 23, 42, 0.5)) drop-shadow(0 0 1px rgba(15, 23, 42, 0.4));
+        filter: none;
     }
 
     .online-indicator {
@@ -250,7 +250,7 @@
         align-self: flex-start;
         border-radius: 8px 8px 8px 2px;
         border: 1px solid #e5e7eb;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        box-shadow: none;
     }
 
     .chat-msg.user {
@@ -471,7 +471,7 @@
         border-radius: 10px 10px 2px 10px;
         font-size: 0.75rem;
         font-weight: 500;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+        box-shadow: none;
         white-space: nowrap;
         display: flex;
         align-items: center;

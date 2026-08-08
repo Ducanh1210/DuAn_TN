@@ -36,7 +36,7 @@
             --primary: #1e3a5f;
             --glass-bg: rgba(255, 255, 255, 0.92);
             --glass-border: rgba(255, 255, 255, 0.5);
-            --glass-shadow: 0 4px 20px 0 rgba(15, 23, 42, 0.08);
+            --glass-shadow: none;
             --region-line: #7ba7d4;
             --region-dim: #94a3b8;
         }
@@ -79,7 +79,7 @@
 
         .leaflet-control-zoom {
             border: none !important;
-            box-shadow: var(--glass-shadow) !important;
+            box-shadow: none;
         }
 
         .leaflet-control-zoom a {
@@ -97,7 +97,7 @@
         /* Custom Popup Styling */
         .leaflet-popup-content-wrapper {
             border-radius: 4px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            box-shadow: none;
             padding: 0;
             overflow: hidden;
             border: 1px solid rgba(0, 0, 0, 0.05);
@@ -252,7 +252,7 @@
             font-size: 12px;
             font-weight: 600;
             white-space: nowrap;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+            box-shadow: none;
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -280,6 +280,13 @@
             z-index: 99999999 !important;
         }
 
+        /* Flat UI — tắt bóng marker Leaflet */
+        .leaflet-marker-shadow,
+        .leaflet-shadow-pane img {
+            display: none !important;
+            opacity: 0 !important;
+        }
+
         /* Cluster Coverage Polygon on Hover */
         .leaflet-cluster-anim .leaflet-marker-icon,
         .leaflet-cluster-anim .leaflet-marker-shadow {
@@ -287,10 +294,17 @@
         }
 
         .marker-cluster {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            box-shadow: none !important;
+        }
+        .marker-cluster-small,
+        .marker-cluster-medium,
+        .marker-cluster-large,
+        .marker-cluster div {
+            box-shadow: none !important;
         }
 
         .marker-cluster div {
@@ -352,7 +366,7 @@
             border-radius: 50%;
             background: var(--primary);
             border: 3px solid #fff;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            box-shadow: none;
             position: relative;
         }
 
@@ -382,42 +396,61 @@
             }
         }
 
-        /* Toast Notification Styling */
+        /* Toast — flat, sạch, không icon trang trí */
         .toast-container {
             position: absolute;
-            top: 24px;
+            top: 72px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             pointer-events: none;
             width: max-content;
-            max-width: 90%;
+            max-width: min(420px, calc(100% - 32px));
         }
 
         .toast {
             pointer-events: auto;
-            background: rgba(24, 24, 27, 0.88);
-            /* translucent deep charcoal */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 8px 16px;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            background: #ffffff;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border: 1px solid #e2e8f0;
+            padding: 8px 14px;
+            border-radius: 6px;
+            box-shadow: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            gap: 8px;
+            font-size: 0.8rem;
             font-weight: 500;
-            color: #ffffff;
-            transform: translateY(-12px);
+            color: #334155;
+            transform: translateY(-8px);
             opacity: 0;
             width: max-content;
-            max-width: 280px;
+            max-width: 100%;
             margin: 0 auto;
+        }
+
+        .toast.success {
+            border-color: #cbd5e1;
+            color: #1e3a5f;
+        }
+        .toast.warning {
+            border-color: #e2e8f0;
+            color: #475569;
+        }
+        .toast.error {
+            border-color: #fecaca;
+            color: #991b1b;
+            background: #fff;
+        }
+        .toast.info,
+        .toast.loading {
+            border-color: #e2e8f0;
+            color: #334155;
         }
 
         .toast-content {
@@ -426,13 +459,12 @@
         }
 
         .toast-spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(255, 255, 255, 0.25);
-            border-top-color: #ffffff;
+            width: 12px;
+            height: 12px;
+            border: 1.5px solid #cbd5e1;
+            border-top-color: #1e3a5f;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin-right: 8px;
             flex-shrink: 0;
         }
 
@@ -451,7 +483,7 @@
             background: #ffffff;
             border-radius: 8px;
             border: 1px solid #cbd5e1;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: none;
             height: 38px;
             padding: 0 4px 0 10px;
             gap: 8px;
@@ -462,7 +494,7 @@
         .unified-command-dock:focus-within,
         .unified-command-dock:hover {
             border-color: #475569;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
+            box-shadow: none;
         }
 
         .dock-search-box {
@@ -630,7 +662,7 @@
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+            box-shadow: none;
             padding: 6px;
             display: none;
             flex-direction: column;
@@ -768,7 +800,7 @@
             border-radius: 6px;
             transform: rotate(45deg);
             margin: 0 4px;
-            box-shadow: 0 2px 6px rgba(0, 114, 255, 0.3);
+            box-shadow: none;
             transition: transform 0.2s, filter 0.2s;
         }
 
@@ -799,7 +831,7 @@
             max-width: calc(100vw - 32px);
             background: #ffffff;
             border-radius: 10px;
-            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.06);
+            box-shadow: none;
             border: 1px solid #cbdbe8;
             overflow: hidden;
             display: none;
@@ -821,7 +853,7 @@
         .mini-status-bar {
             background: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            box-shadow: none;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -837,7 +869,7 @@
         }
 
         .mini-status-bar-wrapper:hover .mini-status-bar {
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+            box-shadow: none;
         }
 
         .mini-status-bar::after {
@@ -851,7 +883,7 @@
             transform: rotate(45deg);
             border-right: 1px solid #e5e7eb;
             border-bottom: 1px solid #e5e7eb;
-            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
             z-index: -1;
             opacity: 0;
             visibility: hidden;
@@ -924,7 +956,7 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-radius: 8px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            box-shadow: none;
             border: 1px solid rgba(255, 255, 255, 0.4);
             opacity: 0;
             visibility: hidden;
@@ -961,13 +993,12 @@
             left: 260px;
         }
 
-        /* Khi thu gọn (collapsed): giữ dính liền với đáy và khung thanh địa điểm, ẩn bộ lọc chủ đề */
         .bottom-drawer-wrapper:not(.open) {
             bottom: 0;
         }
 
         .bottom-drawer-wrapper:not(.open) .drawer-filter-dropdown-wrapper,
-        .bottom-drawer-wrapper:not(.open) .drawer-header-divider:last-of-type {
+        .bottom-drawer-wrapper:not(.open) .drawer-header-divider {
             display: none !important;
         }
 
@@ -979,16 +1010,22 @@
             max-width: calc(100% - 24px);
             padding: 6px 14px;
             background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-bottom: none;
+            border: 1px solid #e2e8f0;
+            border-bottom-color: #ffffff;
             border-radius: 7px 7px 0 0;
-            box-shadow: 0 -3px 12px rgba(15, 23, 42, 0.07);
+            box-shadow: none;
             cursor: pointer;
             user-select: none;
             box-sizing: border-box;
             pointer-events: auto;
             margin-left: 12px;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 2;
+            transition: border-color 0.2s ease;
+        }
+
+        .bottom-drawer-wrapper:not(.open) .drawer-header {
+            border-bottom-color: #e2e8f0;
         }
 
         .drawer-header-left {
@@ -1001,11 +1038,9 @@
         .drawer-header-divider {
             width: 1px;
             height: 12px;
-            background: #cbd5e1;
+            background: #e2e8f0;
             flex-shrink: 0;
         }
-
-        /* Giữ nguyên bộ lọc chủ đề khi thu gọn để thanh không bị thu nhỏ thành cục tròn */
 
         .drawer-filter-dropdown-wrapper {
             position: relative;
@@ -1028,7 +1063,7 @@
         }
 
         .drawer-filter-trigger:hover {
-            color: #0284c7;
+            color: #1e3a5f;
         }
 
         .drawer-filter-trigger .material-symbols-rounded {
@@ -1038,7 +1073,7 @@
         }
 
         .drawer-filter-trigger:hover .material-symbols-rounded {
-            color: #0284c7;
+            color: #1e3a5f;
         }
 
         .drawer-filter-trigger .arrow-icon {
@@ -1053,13 +1088,13 @@
 
         .drawer-filter-menu {
             position: absolute;
-            bottom: calc(100% + 10px);
+            bottom: calc(100% + 8px);
             left: 0;
             width: 180px;
             background: #ffffff;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
-            box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.16), 0 -2px 6px rgba(15, 23, 42, 0.06);
+            box-shadow: none;
             padding: 5px;
             display: flex;
             flex-direction: column;
@@ -1067,16 +1102,16 @@
             z-index: 99999;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(8px) scale(0.95);
+            transform: translateY(4px);
             transform-origin: bottom left;
-            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
+            transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
             pointer-events: none;
         }
 
         .drawer-filter-menu.show {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
             pointer-events: auto;
         }
 
@@ -1094,7 +1129,7 @@
             border: none;
             width: 100%;
             text-align: left;
-            transition: all 0.15s ease;
+            transition: background 0.15s ease, color 0.15s ease;
         }
 
         .drawer-filter-item:hover {
@@ -1103,15 +1138,15 @@
         }
 
         .drawer-filter-item.active {
-            background: #f0f9ff;
-            color: #0284c7;
-            font-weight: 700;
+            background: #f1f5f9;
+            color: #1e3a5f;
+            font-weight: 600;
         }
 
         .drawer-title {
             font-size: 0.72rem;
             font-weight: 600;
-            color: #334155;
+            color: #1e3a5f;
             letter-spacing: -0.15px;
         }
 
@@ -1137,6 +1172,7 @@
             justify-content: center;
             cursor: pointer;
             color: #94a3b8;
+            margin-left: 0;
             transition: background 0.15s, color 0.15s;
         }
 
@@ -1159,16 +1195,23 @@
             max-height: 0;
             opacity: 0;
             overflow: hidden;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
             background: #ffffff;
-            border-top: 1px solid #cbd5e1;
-            box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+            border-top: 1px solid #e2e8f0;
+            box-shadow: none;
             pointer-events: auto;
+            position: relative;
+            z-index: 1;
         }
 
         .bottom-drawer-wrapper.open .drawer-content {
             max-height: 145px;
             opacity: 1;
+        }
+
+        /* Tab “Khám phá” đè lên đường viền nội dung — cùng màu trắng, liền màu */
+        .bottom-drawer-wrapper.open .drawer-header {
+            margin-bottom: -1px;
         }
 
         .featured-loc-scroll {
@@ -1188,26 +1231,25 @@
             overflow: hidden;
             flex-shrink: 0;
             text-decoration: none;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+            box-shadow: none;
             border: 1px solid rgba(0, 0, 0, 0.08);
             transition: all 0.2s ease;
         }
 
         .featured-loc-card:hover {
-            transform: translateY(-1px);
             border-color: rgba(30, 58, 95, 0.4);
-            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+            box-shadow: none;
+            transform: none;
         }
 
         .featured-loc-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s ease;
         }
 
         .featured-loc-card:hover .featured-loc-img {
-            transform: scale(1.02);
+            transform: none;
         }
 
         .featured-loc-badge {
@@ -1353,7 +1395,7 @@
             height: 130px;
             border-radius: 6px;
             overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+            box-shadow: none;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-8px);
@@ -1385,7 +1427,7 @@
             justify-content: center;
             cursor: pointer;
             padding: 0;
-            box-shadow: 0 4px 16px rgba(30, 58, 95, 0.12), 0 1px 3px rgba(15, 23, 42, 0.06);
+            box-shadow: none;
             transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease;
         }
 
@@ -1402,7 +1444,7 @@
         .mission-fab-btn:hover {
             border-color: #94a3b8;
             background: #fff;
-            box-shadow: 0 4px 14px rgba(30, 58, 95, 0.14), 0 1px 3px rgba(15, 23, 42, 0.06);
+            box-shadow: none;
             transform: none;
         }
 
@@ -1472,7 +1514,7 @@
             width: 220px;
             background: #ffffff;
             border-radius: 6px;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: none;
             border: 1px solid #e2e8f0;
             overflow: hidden;
             padding: 10px 10px 8px 10px;
@@ -1520,7 +1562,7 @@
             height: 38px;
             border-radius: 50%;
             background: radial-gradient(circle at 35% 35%, #fef08a, #f59e0b 60%, #b45309 100%);
-            box-shadow: 0 4px 10px rgba(217, 119, 6, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: none;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1567,7 +1609,7 @@
         }
 
         .banner-item:hover img {
-            transform: scale(1.05);
+            transform: none;
         }
 
         .banner-overlay {
@@ -1740,7 +1782,7 @@
             color: #475569;
             cursor: pointer;
             white-space: nowrap;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+            box-shadow: none;
             transition: all 0.2s ease;
         }
 
@@ -1754,7 +1796,7 @@
             background: #334155;
             border-color: #334155;
             color: #ffffff;
-            box-shadow: 0 2px 8px rgba(51, 65, 85, 0.25);
+            box-shadow: none;
         }
 
         .category-pill.active span {
@@ -1786,7 +1828,7 @@
 
         .leaflet-control-zoom {
             border: none !important;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+            box-shadow: none;
             border-radius: 7px !important;
             overflow: hidden;
             margin-bottom: 0 !important;
@@ -1819,9 +1861,9 @@
             color: #3b82f6 !important;
         }
 
-        /* Reposition toast container so it doesn't overlap search */
+        /* Reposition toast so it doesn't overlap search */
         .toast-container {
-            top: 80px !important;
+            top: 72px !important;
         }
 
         /* ========================================= */
@@ -1841,13 +1883,13 @@
             position: relative;
             width: 260px;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35), rgba(241, 245, 249, 0.42)), url('{{ asset('images/nen03.png') }}') no-repeat center center / cover;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+            background: #ffffff;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
             display: flex;
             flex-direction: column;
-            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            border-right: 1px solid #e2e8f0;
             transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             pointer-events: auto;
         }
@@ -2054,6 +2096,50 @@
             transition: max-width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, margin 0.3s ease;
         }
 
+        /* Tour 360 — nhóm với Đăng xuất ở sát đáy */
+        .user-sidebar .sidebar-bottom-item {
+            margin-top: auto !important;
+            padding-top: 4px !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .user-sidebar .menu-item--muted {
+            opacity: 0.72;
+        }
+        .user-sidebar .menu-item--muted:hover,
+        .user-sidebar .menu-item--muted:focus {
+            opacity: 1;
+        }
+        .user-sidebar .menu-item--text-only {
+            justify-content: center;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        .user-sidebar .menu-item--text-only .menu-text {
+            margin-left: 0;
+            white-space: normal;
+            line-height: 1.25;
+            text-align: left;
+            max-width: none;
+        }
+        .user-sidebar .logout-item {
+            margin-top: 0 !important;
+        }
+        .user-sidebar.collapsed .sidebar-bottom-item {
+            margin-top: auto !important;
+            margin-bottom: 0 !important;
+            padding-top: 2px !important;
+        }
+        .user-sidebar.collapsed .menu-item--text-only {
+            padding: 2px 4px 2px;
+        }
+        .user-sidebar.collapsed .menu-item--text-only .menu-text {
+            white-space: normal !important;
+            line-height: 1.2 !important;
+            font-size: 0.58rem;
+            letter-spacing: -0.2px;
+            padding-bottom: 0;
+        }
+
         /* Google Maps Style Collapsed Sidebar Items */
         .user-sidebar.collapsed .sidebar-menu li {
             padding: 0;
@@ -2102,11 +2188,11 @@
             font-weight: 600;
         }
 
-        /* Logout Item in Collapsed State: Icon only, pushed to bottom */
+        /* Logout Item in Collapsed State: Icon only, sát dưới Tour 360 */
         .user-sidebar.collapsed .logout-item {
-            margin-top: auto !important;
-            margin-bottom: 8px !important;
-            padding-top: 12px !important;
+            margin-top: 0 !important;
+            margin-bottom: 6px !important;
+            padding-top: 2px !important;
             padding-bottom: 0 !important;
         }
 
@@ -2147,7 +2233,7 @@
             justify-content: center;
             cursor: pointer;
             z-index: 2001;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
             transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.2s, color 0.2s, width 0.2s;
             pointer-events: auto;
             color: #666;
@@ -2255,7 +2341,13 @@
                         <span class="tooltip">Trang cá nhân</span>
                     </a>
                 </li>
-                <li class="logout-item" style="margin-top: auto; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 6px;">
+                <li class="sidebar-bottom-item">
+                    <a href="{{ route('client.pano_service') }}" class="menu-item menu-item--muted menu-item--text-only">
+                        <span class="menu-text">Dịch vụ<br>tour 360</span>
+                        <span class="tooltip">Thuê làm tour 360</span>
+                    </a>
+                </li>
+                <li class="logout-item" style="border-top: 1px solid rgba(0,0,0,0.06); padding-top: 6px;">
                     <form action="{{ route('logout') }}" method="POST" style="display: none;" id="logout-form">
                         @csrf
                     </form>
@@ -2278,6 +2370,12 @@
                             <span class="menu-icon"><span class="material-symbols-outlined">person_add</span></span>
                             <span class="menu-text">Đăng ký</span>
                             <span class="tooltip">Đăng ký tài khoản</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-bottom-item">
+                        <a href="{{ route('client.pano_service') }}" class="menu-item menu-item--muted menu-item--text-only">
+                            <span class="menu-text">Dịch vụ<br>tour 360</span>
+                            <span class="tooltip">Giới thiệu dịch vụ tour 360</span>
                         </a>
                     </li>
                 @endauth
@@ -2339,9 +2437,9 @@
             <div class="dock-divider"></div>
 
             <!-- Trip Planner Recommendation Button -->
-            <button type="button" class="dock-random-btn" id="randomFlyBtn" title="Gợi ý lịch trình chuyến đi cho bạn">
+            <button type="button" class="dock-random-btn" id="randomFlyBtn" title="Lịch trình chuyến đi cho bạn">
                 <span class="material-symbols-rounded">auto_awesome</span>
-                <span>Gợi ý cho bạn</span>
+                <span>Lịch trình cho bạn</span>
             </button>
         </div>
 
@@ -2687,7 +2785,7 @@
                             </div>
                         </div>
                         <p style="font-size: 0.72rem; color: #64748b; margin-bottom: 10px; font-weight: 500; line-height: 1.35;">Đăng nhập để làm nhiệm vụ & nhận xu thưởng!</p>
-                        <a href="{{ route('login') }}" style="display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 6px 18px; background: #0284c7; color: #ffffff; border-radius: 8px; text-decoration: none; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25); transition: all 0.2s;">Đăng nhập ngay</a>
+                        <a href="{{ route('login') }}" style="display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 6px 18px; background: #0284c7; color: #ffffff; border-radius: 8px; text-decoration: none; box-shadow: none; transition: all 0.2s;">Đăng nhập ngay</a>
                     </div>
                 @endauth
             </div><!-- /.mission-list-container -->
@@ -3030,7 +3128,7 @@
                 const thumbUrl = loc.thumbnail_url ? loc.thumbnail_url : 'https://placehold.co/400x250/e2e8f0/475569?text=No+Image';
                 const iconColor = loc.category && loc.category.icon_color ? loc.category.icon_color : '#ef4444';
 
-                const ctaLabel = (loc.panoramas_count && loc.panoramas_count > 0) ? 'Xem 360°' : 'Xem ảnh';
+                const ctaLabel = 'Khám phá ngay';
                 const popupHtml = '<div class="poi-popup-inner" style="--poi-color: ' + iconColor + ';">'
                     + '<img src="' + thumbUrl + '" class="poi-thumbnail" alt="' + loc.name + '">'
                     + '<div class="poi-content">'
@@ -3284,56 +3382,94 @@
             });
         }
 
-        // --- Lọc Bán Kính Khám Phá ---
+        // --- Lọc Bán Kính Khám Phá (chỉ quanh vị trí GPS thật) ---
         const radiusBtnGroup = document.getElementById('radiusBtnGroup');
         let currentRadiusCircle = null;
+        let pendingRadiusKm = null;
+
+        function setRadiusBtnActive(rVal) {
+            if (!radiusBtnGroup) return;
+            radiusBtnGroup.querySelectorAll('.radius-btn').forEach(b => {
+                b.classList.toggle('active', b.getAttribute('data-radius') === String(rVal));
+            });
+        }
+
+        function clearRadiusFilter() {
+            if (currentRadiusCircle) {
+                map.removeLayer(currentRadiusCircle);
+                currentRadiusCircle = null;
+            }
+            markers.clearLayers();
+            locations.forEach(loc => {
+                if (loc.marker) markers.addLayer(loc.marker);
+            });
+        }
+
+        function applyRadiusFilter(radiusKm) {
+            if (!userCoords) return false;
+
+            if (currentRadiusCircle) {
+                map.removeLayer(currentRadiusCircle);
+                currentRadiusCircle = null;
+            }
+
+            const radiusMeters = radiusKm * 1000;
+            const centerPoint = L.latLng(userCoords.lat, userCoords.lng);
+
+            updateUserMarker(userCoords.lat, userCoords.lng);
+
+            currentRadiusCircle = L.circle(centerPoint, {
+                radius: radiusMeters,
+                color: '#1e3a5f',
+                weight: 1.5,
+                dashArray: '5,5',
+                fillColor: '#1e3a5f',
+                fillOpacity: 0.06
+            }).addTo(map);
+
+            markers.clearLayers();
+            const filtered = locations.filter(loc => {
+                const dist = centerPoint.distanceTo(L.latLng(loc.lat, loc.lng));
+                return dist <= radiusMeters;
+            });
+
+            filtered.forEach(loc => {
+                if (loc.marker) markers.addLayer(loc.marker);
+            });
+
+            map.fitBounds(currentRadiusCircle.getBounds(), { padding: [30, 30] });
+            setRadiusBtnActive(radiusKm);
+            showToast(`Tìm thấy ${filtered.length} địa điểm trong bán kính ${radiusKm}km`, 'info', 3000);
+            return true;
+        }
 
         if (radiusBtnGroup) {
             radiusBtnGroup.querySelectorAll('.radius-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    radiusBtnGroup.querySelectorAll('.radius-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
 
                     const rVal = btn.getAttribute('data-radius');
-                    if (currentRadiusCircle) {
-                        map.removeLayer(currentRadiusCircle);
-                        currentRadiusCircle = null;
-                    }
 
                     if (rVal === 'all') {
-                        markers.clearLayers();
-                        locations.forEach(loc => {
-                            if (loc.marker) markers.addLayer(loc.marker);
-                        });
+                        pendingRadiusKm = null;
+                        setRadiusBtnActive('all');
+                        clearRadiusFilter();
                         return;
                     }
 
                     const radiusKm = parseFloat(rVal);
-                    const radiusMeters = radiusKm * 1000;
-                    const centerPoint = userCoords ? L.latLng(userCoords.lat, userCoords.lng) : map.getCenter();
 
-                    currentRadiusCircle = L.circle(centerPoint, {
-                        radius: radiusMeters,
-                        color: '#0284c7',
-                        weight: 1.5,
-                        dashArray: '5,5',
-                        fillColor: '#0284c7',
-                        fillOpacity: 0.08
-                    }).addTo(map);
+                    // Chưa có vị trí GPS → xin định vị trước, không khoanh tâm bản đồ giả
+                    if (!userCoords) {
+                        pendingRadiusKm = radiusKm;
+                        setRadiusBtnActive(rVal);
+                        showToast('Cần vị trí hiện tại để lọc bán kính gần bạn.', 'info', 2500);
+                        requestUserLocation(false);
+                        return;
+                    }
 
-                    markers.clearLayers();
-                    const filtered = locations.filter(loc => {
-                        const dist = centerPoint.distanceTo(L.latLng(loc.lat, loc.lng));
-                        return dist <= radiusMeters;
-                    });
-
-                    filtered.forEach(loc => {
-                        if (loc.marker) markers.addLayer(loc.marker);
-                    });
-
-                    map.fitBounds(currentRadiusCircle.getBounds(), { padding: [30, 30] });
-                    showToast(`🎯 Tìm thấy ${filtered.length} địa điểm trong bán kính ${radiusKm}km`, 'info', 3000);
+                    setRadiusBtnActive(rVal);
+                    applyRadiusFilter(radiusKm);
                 });
             });
         }
@@ -3437,11 +3573,15 @@
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
 
+            // Bỏ emoji / icon trang trí trong thông báo
+            const clean = String(message || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '').replace(/\s{2,}/g, ' ').trim();
+
             if (type === 'loading') {
-                toast.innerHTML = `<div class="toast-spinner"></div><div class="toast-content">${message}</div>`;
+                toast.innerHTML = `<div class="toast-spinner"></div><div class="toast-content"></div>`;
             } else {
-                toast.innerHTML = `<div class="toast-content">${message}</div>`;
+                toast.innerHTML = `<div class="toast-content"></div>`;
             }
+            toast.querySelector('.toast-content').textContent = clean;
 
             container.appendChild(toast);
 
@@ -3543,10 +3683,21 @@
                         loadingToast = null;
                     }
 
+                    // Lọc bán kính đang chờ vị trí
+                    if (pendingRadiusKm != null) {
+                        const km = pendingRadiusKm;
+                        pendingRadiusKm = null;
+                        pendingFlyTo = false;
+                        applyRadiusFilter(km);
+                        return;
+                    }
+
                     if (pendingFlyTo) {
                         pendingFlyTo = false;
                         updateUserMarker(latitude, longitude);
                         flyToUserLocation();
+                    } else if (!silent) {
+                        updateUserMarker(latitude, longitude);
                     }
                 },
                 (error) => {
@@ -3561,13 +3712,20 @@
                     }
 
                     const wasPending = pendingFlyTo;
+                    const wasRadius = pendingRadiusKm != null;
                     pendingFlyTo = false;
+                    pendingRadiusKm = null;
+
+                    if (wasRadius) {
+                        setRadiusBtnActive('all');
+                        clearRadiusFilter();
+                    }
 
                     console.warn('Geolocation error:', error.message);
-                    if (!silent || wasPending) {
+                    if (!silent || wasPending || wasRadius) {
                         let msg = 'Không thể lấy vị trí của bạn.';
                         if (error.code === error.PERMISSION_DENIED) {
-                            msg = 'Vui lòng cấp quyền vị trí trong cài đặt trình duyệt để sử dụng tính năng này.';
+                            msg = 'Vui lòng cấp quyền vị trí trong cài đặt trình duyệt để dùng bán kính gần bạn.';
                         }
                         showToast(msg, 'warning');
                     }

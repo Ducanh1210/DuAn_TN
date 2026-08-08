@@ -64,20 +64,31 @@
             z-index: 10050;
         }
         .viewer-more-btn {
-            border: none;
-            background: none;
-            color: #fff;
-            padding: 4px 6px;
-            font-size: 18px;
+            width: 36px;
+            height: 36px;
+            border: 1.5px solid #ffffff;
+            border-radius: 50%;
+            background: transparent;
+            color: #ffffff;
+            padding: 0;
+            font-size: 16px;
             line-height: 1;
-            letter-spacing: 1px;
+            letter-spacing: 0;
             cursor: pointer;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-            opacity: 0.9;
-            transition: opacity 0.15s ease;
+            text-shadow: none;
+            box-shadow: none;
+            filter: none;
+            opacity: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease, border-color 0.15s ease;
         }
         .viewer-more-btn:hover {
-            opacity: 0.65;
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #ffffff;
+            color: #ffffff;
+            opacity: 1;
         }
         .viewer-more-dropdown {
             position: absolute;
@@ -121,17 +132,70 @@
             display: none !important;
         }
 
-        /* Hide all default Marzipano UI elements */
-        #titleBar { display: none !important; }
-        #sceneList { display: none !important; }
-        #sceneListToggle { display: none !important; }
+        /* Tên scene 360 — giữa top (giữa nút Quay lại và ···) */
+        #titleBar,
+        body.fullscreen-enabled #titleBar,
+        body.multiple-scenes #titleBar,
+        body.fullscreen-enabled.mobile #titleBar,
+        body.multiple-scenes.mobile #titleBar,
+        .mobile #titleBar {
+            display: flex !important;
+            position: absolute;
+            top: 18px !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%);
+            width: min(52vw, 420px) !important;
+            height: auto !important;
+            z-index: 1000;
+            pointer-events: none;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+        }
+        #titleBar .sceneName,
+        .mobile #titleBar .sceneName {
+            width: 100%;
+            height: auto;
+            margin: 0;
+            padding: 0 8px;
+            line-height: 1.25 !important;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background: none !important;
+            background-color: transparent !important;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            pointer-events: auto;
+        }
+        body.viewer-guide-open #titleBar,
+        body.reviews-drawer-open #titleBar,
+        body.pano-photo-open #titleBar {
+            opacity: 0;
+            visibility: hidden;
+        }
+        @media (max-width: 640px) {
+            #titleBar {
+                top: 16px;
+                width: min(46vw, 200px);
+            }
+            #titleBar .sceneName {
+                font-size: 13px;
+            }
+        }
+
         #autorotateToggle { display: none !important; }
         #fullscreenToggle { display: none !important; }
+        #sceneList { display: none !important; }
+        #sceneListToggle { display: none !important; }
         .viewControlButton { display: none !important; }
 
         /* Audio Mascot Player */
         .audio-player {
-            position: absolute; bottom: 24px; right: 24px; z-index: 1000;
+            position: absolute; bottom: 24px; right: 24px; z-index: 10049;
             display: none; /* Hidden by default, shown when audio available */
             flex-direction: column; align-items: center; gap: 6px;
             user-select: none;
@@ -381,9 +445,9 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
 
-        /* Side Drawer (Misty Ice-Blue & Slate Ink Theme per DESIGN_GUIDE.md) */
+        /* Side Drawer */
         .comments-drawer {
-            position: absolute; right: -420px; top: 0; bottom: 0; width: 380px; max-width: 100vw;
+            position: fixed; right: -420px; top: 0; bottom: 0; width: 380px; max-width: 100vw;
             background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             z-index: 10060; transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             border-left: 1px solid #cbdbe8; display: flex; flex-direction: column;
@@ -1235,6 +1299,7 @@
         .report-modal select option { background: #ffffff; color: #1e3a5f; }
         .report-modal textarea { resize: none; }
         .report-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+
         .btn-report-cancel { background: #f1f5f9; border: 1px solid #cbdbe8; padding: 8px 16px; border-radius: 8px; color: #52525b; cursor: pointer; transition: all 0.2s ease; font-size: 13px; font-weight: 500; }
         .btn-report-cancel:hover { background: #e5e7eb; color: #1e3a5f; }
         .btn-report-submit { background: #dc2626; border: none; padding: 8px 18px; border-radius: 8px; color: white; cursor: pointer; font-weight: 500; transition: background 0.2s ease; font-size: 13px; box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2); }
@@ -1290,20 +1355,76 @@
             color: #ef4444 !important;
         }
 
-        /* Photo viewer (no 360) — same shell as panorama page */
+        /* Photo viewer (no 360) — nền ảnh blur full, ảnh nét contain giữa */
         .photo-viewer-stage {
             position: absolute;
-            inset: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
             background: #0a0a0a;
             overflow: hidden;
+            cursor: default;
+        }
+        .photo-viewer-stage__blur {
+            position: absolute;
+            inset: -24px;
+            width: calc(100% + 48px);
+            height: calc(100% + 48px);
+            object-fit: cover;
+            object-position: center;
+            filter: blur(28px) saturate(1.05) brightness(0.72);
+            transform: scale(1.08);
+            display: block;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
         }
         .photo-viewer-stage__img {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: contain;
+            object-position: center;
             display: block;
             user-select: none;
             -webkit-user-drag: none;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .photo-viewer-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+            width: auto;
+            height: auto;
+            padding: 12px 10px;
+            border: none;
+            border-radius: 0;
+            background: none;
+            box-shadow: none;
+            color: #ffffff;
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.9;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .photo-viewer-nav:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.06);
+        }
+        .photo-viewer-nav:active {
+            transform: translateY(-50%) scale(0.98);
+        }
+        .photo-viewer-nav--prev { left: 12px; }
+        .photo-viewer-nav--next { right: 12px; }
+        .photo-viewer-nav i {
+            filter: drop-shadow(0 1px 0.5px rgba(0, 0, 0, 0.3));
         }
         .photo-viewer-stage__empty {
             width: 100%;
@@ -1316,109 +1437,565 @@
             font-size: 14px;
             padding: 24px;
             text-align: center;
-            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 70%);
+            background: #000;
         }
-        .photo-viewer-badge {
+
+        /* Bottom dock (Lưu / Bình luận / Ảnh) */
+        .viewer-dock {
             position: absolute;
-            top: 72px;
-            right: 20px;
-            z-index: 50;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.62);
-            backdrop-filter: blur(8px);
-            color: #f8fafc;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.02em;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10050;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            padding: 20px 16px 14px;
+            background: none;
+            pointer-events: none;
+            transition: padding 0.22s ease;
         }
-        .photo-viewer-info {
+        .viewer-dock__btn {
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 6px;
+            border: none;
+            background: none !important;
+            box-shadow: none !important;
+            outline: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 0;
+            width: 64px;
+            min-width: 64px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
+            filter: none !important;
+            transform: none !important;
+            -webkit-font-smoothing: antialiased;
+            transition: opacity 0.15s ease;
+        }
+        .viewer-dock__btn:hover,
+        .viewer-dock__btn:focus,
+        .viewer-dock__btn:active {
+            opacity: 0.88;
+            background: none !important;
+            box-shadow: none !important;
+            outline: none;
+            transform: none !important;
+        }
+        .viewer-dock__btn > i,
+        .viewer-dock__btn .viewer-dock__icon-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            font-size: 20px;
+            line-height: 1;
+            filter: drop-shadow(0 1px 0.5px rgba(0, 0, 0, 0.3));
+            text-shadow: none !important;
+        }
+        .viewer-dock__icon-wrap {
+            position: relative;
+        }
+        .viewer-dock__label {
+            display: block;
+            width: 100%;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0;
+            line-height: 1.2;
+            text-align: center;
+            white-space: nowrap;
+            opacity: 1;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
+            filter: none !important;
+        }
+        .viewer-dock__badge {
             position: absolute;
-            left: 20px;
-            right: 20px;
-            bottom: 28px;
-            z-index: 50;
+            top: -5px;
+            right: -9px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: 8px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-shadow: none;
+            box-shadow: none;
             pointer-events: none;
         }
-        .photo-viewer-info__title {
-            color: #ffffff;
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin: 0 0 4px;
-            text-shadow: 0 2px 12px rgba(0,0,0,0.65);
+        .viewer-dock__btn.is-active i.fa-heart {
+            color: #f43f5e;
         }
-        .photo-viewer-info__meta {
-            color: rgba(255,255,255,0.82);
-            font-size: 0.8rem;
-            margin: 0;
-            text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+        .viewer-dock__btn.is-active {
+            opacity: 1;
         }
-        .photo-viewer-nav {
+        /* Khi dải ảnh mở: ẩn hẳn thanh thao tác */
+        body.viewer-photo-strip-open .viewer-dock {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        body.viewer-photo-strip-open .viewer-photo-strip {
+            bottom: 16px;
+        }
+        body.reviews-drawer-open .viewer-dock,
+        body.reviews-drawer-open .viewer-photo-strip {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Góc dưới trái: Toàn màn hình / Hướng dẫn / Ngừng quay */
+        .viewer-tools {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 55;
+            left: 16px;
+            bottom: 18px;
+            z-index: 10051;
+            display: flex;
+            align-items: flex-end;
+            gap: 14px;
+            pointer-events: none;
+        }
+        .viewer-tools__btn {
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 5px;
+            border: none;
+            background: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 0;
+            min-width: 56px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
+            transition: opacity 0.15s ease;
+        }
+        .viewer-tools__btn:hover,
+        .viewer-tools__btn:focus {
+            opacity: 0.88;
+            outline: none;
+        }
+        .viewer-tools__btn > i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            font-size: 18px;
+            line-height: 1;
+            filter: drop-shadow(0 1px 0.5px rgba(0, 0, 0, 0.3));
+        }
+        .viewer-tools__label {
+            font-size: 10px;
+            font-weight: 500;
+            line-height: 1.15;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .viewer-tools__btn.is-active {
+            opacity: 1;
+        }
+        body.viewer-photo-strip-open .viewer-tools,
+        body.reviews-drawer-open .viewer-tools,
+        body.viewer-guide-open .viewer-tools,
+        body.viewer-guide-open .viewer-dock,
+        body.viewer-guide-open .audio-player {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Overlay hướng dẫn sử dụng 360° */
+        .viewer-guide {
+            position: fixed;
+            inset: 0;
+            z-index: 10090;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(56, 120, 180, 0.35), transparent 55%),
+                linear-gradient(165deg, #0f2744 0%, #1e3a5f 48%, #152a45 100%);
+            color: #fff;
+            cursor: pointer;
+        }
+        .viewer-guide.is-open {
+            display: flex;
+        }
+        .viewer-guide__inner {
+            position: relative;
+            width: min(920px, 100%);
+            max-height: 100%;
+            overflow: auto;
+            cursor: default;
+            padding: 8px 4px 16px;
+        }
+        .viewer-guide__close {
+            position: absolute;
+            top: 0;
+            right: 0;
             width: 40px;
             height: 40px;
             border: none;
             border-radius: 50%;
-            background: rgba(15, 23, 42, 0.55);
+            background: rgba(255, 255, 255, 0.12);
             color: #fff;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .viewer-guide__close:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+        .viewer-guide__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px 36px;
+            padding: 28px 12px 8px;
+        }
+        .viewer-guide__cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+        }
+        .viewer-guide__title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            opacity: 0.95;
+            margin: 0 0 4px;
+        }
+        .viewer-guide__row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .viewer-guide__icon {
+            width: 56px;
+            height: 56px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: background 0.15s ease;
+            font-size: 28px;
+            color: #fff;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
         }
-        .photo-viewer-nav:hover { background: rgba(30, 58, 95, 0.85); }
-        .photo-viewer-nav--prev { left: 16px; }
-        .photo-viewer-nav--next { right: 16px; }
-        .photo-viewer-nav:disabled { opacity: 0.35; cursor: default; }
-        .photo-viewer-counter {
+        .viewer-guide__icon--hotspot {
+            position: relative;
+        }
+        .viewer-guide__icon--hotspot::before {
+            content: '';
             position: absolute;
-            top: 72px;
-            left: 20px;
-            z-index: 50;
-            color: rgba(255,255,255,0.9);
-            font-size: 12px;
-            font-weight: 600;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 45%, transparent 70%);
         }
-        .photo-viewer-thumbs {
+        .viewer-guide__icon--hotspot::after {
+            content: '';
+            position: relative;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.35);
+            z-index: 1;
+        }
+        .viewer-guide__text {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.35;
+            max-width: 220px;
+            opacity: 0.92;
+        }
+        .viewer-guide__hint {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.55;
+        }
+        .viewer-guide__crosshair {
             position: absolute;
             left: 50%;
-            bottom: 12px;
-            transform: translateX(-50%);
-            z-index: 55;
+            top: 50%;
+            width: 18px;
+            height: 18px;
+            margin: -9px 0 0 -9px;
+            opacity: 0.25;
+            pointer-events: none;
+        }
+        .viewer-guide__crosshair::before,
+        .viewer-guide__crosshair::after {
+            content: '';
+            position: absolute;
+            background: #fff;
+        }
+        .viewer-guide__crosshair::before {
+            left: 8px; top: 0; width: 2px; height: 18px;
+        }
+        .viewer-guide__crosshair::after {
+            left: 0; top: 8px; width: 18px; height: 2px;
+        }
+
+        /* Horizontal photo strip (mở bằng nút Ảnh) */
+        .viewer-photo-strip {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 72px;
+            z-index: 10048;
             display: flex;
-            gap: 6px;
-            max-width: min(92vw, 520px);
-            overflow-x: auto;
-            padding: 4px;
-            scrollbar-width: none;
-        }
-        .photo-viewer-thumbs::-webkit-scrollbar { display: none; }
-        .photo-viewer-thumb {
-            flex: 0 0 auto;
-            width: 52px;
-            height: 38px;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 2px solid transparent;
-            opacity: 0.65;
-            cursor: pointer;
-            padding: 0;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 16px 4px;
             background: none;
+            pointer-events: none;
+            animation: viewerStripIn 0.22s ease;
+            transition: bottom 0.22s ease;
         }
-        .photo-viewer-thumb.is-active {
-            border-color: #fff;
-            opacity: 1;
+        .viewer-photo-strip[hidden] {
+            display: none !important;
         }
-        .photo-viewer-thumb img {
+        @keyframes viewerStripIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .viewer-photo-strip__inner {
+            pointer-events: auto;
+            position: relative;
+            width: max-content;
+            max-width: min(920px, 94vw);
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .viewer-photo-strip__collapse {
+            flex: 0 0 auto;
+            order: 2;
+            margin-top: 16px;
+            align-self: flex-start;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .viewer-photo-strip__collapse:hover {
+            background: rgba(30, 58, 95, 0.8);
+        }
+        .viewer-photo-strip__scroller {
+            order: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 10px;
+            max-width: min(860px, calc(94vw - 48px));
+            overflow-x: auto;
+            padding: 4px 0 6px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .viewer-photo-strip__scroller::-webkit-scrollbar { display: none; }
+        .viewer-photo-strip__item {
+            flex: 0 0 96px;
+            width: 96px;
+            height: 64px;
+            border: none;
+            background: #111;
+            padding: 0;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: 2px solid rgba(255,255,255,0.18);
+            outline-offset: -2px;
+            transition: transform 0.15s ease, outline-color 0.15s ease;
+        }
+        .viewer-photo-strip__item:hover {
+            transform: translateY(-2px);
+        }
+        .viewer-photo-strip__item img {
+            width: 96px !important;
+            height: 64px !important;
+            object-fit: cover !important;
+            object-position: center;
+            display: block;
+            border: none;
+            pointer-events: none;
+        }
+        .viewer-photo-strip__item.is-active {
+            outline-color: #fff;
+        }
+        .viewer-photo-strip__check {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.8);
+            color: #fff;
+            font-size: 9px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .viewer-photo-strip__item.is-active .viewer-photo-strip__check {
+            display: flex;
+        }
+        .viewer-photo-strip__caption {
+            display: none !important;
+        }
+
+        /* Photo peek overlay — nền blur từ chính ảnh, ảnh nét ở giữa */
+        .pano-photo-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10055;
             width: 100%;
             height: 100%;
+            margin: 0;
+            padding: 48px 24px 120px;
+            border: 0;
+            box-sizing: border-box;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .pano-photo-overlay[hidden] {
+            display: none !important;
+        }
+        .pano-photo-overlay__blur {
+            position: absolute;
+            inset: -32px;
+            width: calc(100% + 64px);
+            height: calc(100% + 64px);
             object-fit: cover;
-            display: block;
+            object-position: center;
+            filter: blur(32px) saturate(1.05) brightness(0.7);
+            transform: scale(1.1);
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            z-index: 0;
+        }
+        .pano-photo-overlay__img {
+            position: relative;
+            z-index: 1;
+            max-width: min(90%, 960px);
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .pano-photo-overlay .photo-viewer-nav {
+            position: fixed;
+            z-index: 10059;
+        }
+        .pano-photo-overlay__close {
+            position: fixed;
+            top: 18px;
+            right: 58px; /* tránh đè lên nút ··· */
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.55);
+            color: #fff;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 10059;
+        }
+        .pano-photo-overlay__close:hover {
+            background: rgba(30, 58, 95, 0.85);
+        }
+        body.pano-photo-open .viewer-dock { z-index: 10058; }
+        body.pano-photo-open .viewer-photo-strip { z-index: 10057; }
+        body.pano-photo-open .audio-player { z-index: 10057; }
+        body.pano-photo-open .viewer-more-menu { z-index: 10058; }
+
+        @media (max-width: 640px) {
+            .viewer-dock {
+                gap: 20px;
+                padding: 18px 8px 10px;
+            }
+            .viewer-dock__btn {
+                width: 56px;
+                min-width: 56px;
+            }
+            .viewer-dock__label { font-size: 10px; }
+            .viewer-tools {
+                left: 10px;
+                bottom: 14px;
+                gap: 10px;
+            }
+            .viewer-tools__btn { min-width: 48px; }
+            .viewer-tools__btn > i { font-size: 16px; }
+            .viewer-tools__label { font-size: 9px; }
+            .viewer-guide__grid {
+                grid-template-columns: 1fr;
+                gap: 22px;
+                padding-top: 40px;
+            }
+            .viewer-guide__title { font-size: 12px; }
+            .viewer-guide__text { font-size: 13px; }
+            .viewer-photo-strip { bottom: 16px; padding: 8px 10px; }
+            .viewer-photo-strip__item {
+                flex-basis: 80px;
+                width: 80px;
+                height: 54px;
+            }
+            .viewer-photo-strip__item img {
+                width: 80px !important;
+                height: 54px !important;
+            }
+            .pano-photo-overlay {
+                padding: 56px 12px 108px;
+            }
+            .pano-photo-overlay__close {
+                right: 52px;
+                top: 64px;
+            }
         }
     </style>
 </head>
@@ -1472,22 +2049,24 @@
 
     $photoMode = $scenes->isEmpty();
     $photoSlides = [];
-    if ($photoMode) {
-        $hero = $heroImage ?? $location->resolveThumbnailUrl();
-        $gallery = $galleryImages ?? $location->resolveImageUrls();
-        $seen = [];
-        if ($hero) {
-            $photoSlides[] = ['url' => $hero, 'caption' => $location->name];
-            $seen[$hero] = true;
-        }
-        foreach ($gallery as $img) {
-            $url = $img['url'] ?? null;
-            if ($url && !isset($seen[$url])) {
-                $photoSlides[] = ['url' => $url, 'caption' => $img['caption'] ?? $location->name];
-                $seen[$url] = true;
-            }
+    $hero = $heroImage ?? $location->resolveThumbnailUrl();
+    $gallery = $galleryImages ?? $location->resolveImageUrls();
+    $seen = [];
+    if ($hero) {
+        $photoSlides[] = ['url' => $hero, 'caption' => $location->name];
+        $seen[$hero] = true;
+    }
+    foreach ($gallery as $img) {
+        $url = $img['url'] ?? null;
+        if ($url && !isset($seen[$url])) {
+            $photoSlides[] = ['url' => $url, 'caption' => $img['caption'] ?? $location->name];
+            $seen[$url] = true;
         }
     }
+    $hasNarrationAudio = filled($location->audio_url);
+    $hasNarrationText = filled(data_get($location->attributes, 'tts_text'));
+    $hasNarration = $hasNarrationAudio || $hasNarrationText;
+    $audioNarrationText = data_get($location->attributes, 'tts_text') ?: 'Chưa có nội dung thuyết minh.';
 @endphp
 
 <body>
@@ -1497,26 +2076,87 @@
     </a>
 
     <div class="viewer-more-menu" id="viewerMoreMenu">
-        <button type="button" class="viewer-more-btn" id="viewerMoreBtn" aria-label="Tùy chọn" onclick="toggleViewerMoreMenu(event)">···</button>
+        <button type="button" class="viewer-more-btn" id="viewerMoreBtn" aria-label="Tùy chọn" onclick="toggleViewerMoreMenu(event)">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
         <div class="viewer-more-dropdown" id="viewerMoreDropdown">
             <button type="button" class="viewer-more-item" onclick="shareLocation()">Chia sẻ</button>
             <button type="button" class="viewer-more-item" onclick="openReportModal({{ $location->id }}, 'Location'); closeViewerMoreMenu();">Báo cáo</button>
+            <button type="button" class="viewer-more-item" onclick="openFeedbackModal({{ $location->id }}); closeViewerMoreMenu();">Góp ý / báo lỗi</button>
         </div>
     </div>
 
-    <!-- Interaction Toolbar -->
-    <div class="interaction-toolbar">
-        @php
-            $isFavorited = Auth::check() && Auth::user()->favoriteLocations()->where('location_id', $location->id)->exists();
-        @endphp
-        <button class="interaction-btn {{ $isFavorited ? 'active' : '' }}" id="btnToggleFavorite" title="Yêu thích">
-            <i class="{{ $isFavorited ? 'fa-solid' : 'fa-regular' }} fa-heart"></i>
+    <!-- Bottom dock: Lưu / Bình luận / Ảnh / Âm thanh -->
+    @include('client.partials.location-viewer-dock', [
+        'location' => $location,
+        'photoSlides' => $photoSlides,
+        'photoMode' => $photoMode,
+        'hasNarration' => $hasNarration,
+    ])
+
+    @if(!$photoMode)
+    {{-- Góc dưới trái: toàn màn hình / hướng dẫn / ngừng quay --}}
+    <div class="viewer-tools" id="viewerTools">
+        <button type="button" class="viewer-tools__btn" id="btnViewerFullscreen" title="Toàn màn hình">
+            <i class="fa-solid fa-expand" id="iconViewerFullscreen"></i>
+            <span class="viewer-tools__label" id="labelViewerFullscreen">Toàn màn hình</span>
         </button>
-        <button class="interaction-btn" id="btnToggleComments" title="Đánh giá">
-            <i class="fa-regular fa-star"></i>
-            <span class="interaction-badge" id="commentsCountBadge">{{ $location->comments->count() }}</span>
+        <button type="button" class="viewer-tools__btn" id="btnViewerGuide" title="Hướng dẫn sử dụng">
+            <i class="fa-regular fa-circle-question"></i>
+            <span class="viewer-tools__label">Hướng dẫn</span>
+        </button>
+        <button type="button" class="viewer-tools__btn is-active" id="btnViewerAutorotate" title="Ngừng quay">
+            <i class="fa-solid fa-pause" id="iconViewerAutorotate"></i>
+            <span class="viewer-tools__label" id="labelViewerAutorotate">Ngừng quay</span>
         </button>
     </div>
+
+    <div class="viewer-guide" id="viewerGuideOverlay" role="dialog" aria-modal="true" aria-label="Hướng dẫn sử dụng" hidden>
+        <div class="viewer-guide__crosshair" aria-hidden="true"></div>
+        <div class="viewer-guide__inner" id="viewerGuideInner">
+            <button type="button" class="viewer-guide__close" id="btnCloseViewerGuide" aria-label="Đóng hướng dẫn">×</button>
+            <div class="viewer-guide__grid">
+                <div class="viewer-guide__cell">
+                    <h3 class="viewer-guide__title">Trên màn hình cảm ứng</h3>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-hand-pointer"></i></div>
+                        <div class="viewer-guide__text">Phóng to / thu nhỏ</div>
+                    </div>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-up-down-left-right"></i></div>
+                        <div class="viewer-guide__text">Di chuyển</div>
+                    </div>
+                </div>
+                <div class="viewer-guide__cell">
+                    <h3 class="viewer-guide__title">Thao tác trên chuột</h3>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-computer-mouse"></i></div>
+                        <div class="viewer-guide__text">Nhấn và kéo chuột để di chuyển</div>
+                    </div>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-scroll"></i></div>
+                        <div class="viewer-guide__text">Cuộn chuột để phóng to, thu nhỏ</div>
+                    </div>
+                </div>
+                <div class="viewer-guide__cell">
+                    <h3 class="viewer-guide__title">Thao tác trên bàn phím</h3>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon"><i class="fa-solid fa-keyboard"></i></div>
+                        <div class="viewer-guide__text">Dùng phím mũi tên để di chuyển</div>
+                    </div>
+                </div>
+                <div class="viewer-guide__cell">
+                    <h3 class="viewer-guide__title">Xem các vị trí khác</h3>
+                    <div class="viewer-guide__row">
+                        <div class="viewer-guide__icon viewer-guide__icon--hotspot" aria-hidden="true"></div>
+                        <div class="viewer-guide__text">Bấm để chuyển qua vị trí khác</div>
+                    </div>
+                </div>
+            </div>
+            <p class="viewer-guide__hint">Chạm bất kỳ đâu để đóng</p>
+        </div>
+    </div>
+    @endif
 
     <!-- Comments Drawer -->
     <div class="comments-drawer" id="commentsDrawer">
@@ -1785,6 +2425,30 @@
         </div>
     </div>
 
+    <!-- Modal Góp ý / Báo lỗi -->
+    <div class="report-modal-overlay" id="feedbackModalOverlay">
+        <div class="report-modal">
+            <h4><i class="fa-solid fa-comment-dots"></i> Góp ý / Báo lỗi</h4>
+            <label>Loại góp ý / lỗi</label>
+            <select id="feedbackType">
+                <option value="wrong_info">Thông tin địa điểm sai</option>
+                <option value="wrong_position">Vị trí trên bản đồ sai</option>
+                <option value="image_error">Ảnh bị lỗi / không hiển thị</option>
+                <option value="location_closed">Địa điểm đã đóng cửa / không còn tồn tại</option>
+                <option value="duplicate_location">Địa điểm bị trùng lặp</option>
+                <option value="system_suggestion">Góp ý cải thiện hệ thống</option>
+                <option value="other">Khác</option>
+            </select>
+            <label>Nội dung chi tiết</label>
+            <textarea id="feedbackContent" rows="4" placeholder="Mô tả cụ thể vấn đề hoặc góp ý của bạn để chúng tôi xử lý nhanh hơn..."></textarea>
+
+            <div class="report-modal-actions">
+                <button class="btn-report-cancel" onclick="closeFeedbackModal()">Hủy</button>
+                <button class="btn-report-submit" id="btnSubmitFeedback" onclick="submitFeedback()" style="background:#2563eb;box-shadow:0 2px 6px rgba(37,99,235,0.2);">Gửi góp ý</button>
+            </div>
+        </div>
+    </div>
+
     <div class="viewer-area">
         @if($photoMode)
             @include('client.partials.location-photo-viewer', [
@@ -1843,21 +2507,15 @@
         </a>
         @endif
 
-        <!-- Audio Mascot Player -->
-        <div class="audio-player" id="audioPlayer">
-            <!-- Small Popover right above mascot -->
+        @if($hasNarration)
+        <!-- Audio Mascot Player — góc dưới bên phải -->
+        <div class="audio-player visible" id="audioPlayer">
             <div class="audio-info-popover" id="audioInfoPopover">
                 <div class="audio-popover-header">
                     <span>{{ $location->name }}</span>
                     <button class="btn-close-popover" onclick="toggleAudioInfoPopover(event)"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <div class="audio-popover-body">
-                    @php
-                        $audioNarrationText = data_get($location->attributes, 'tts_text') 
-                                ?: ($location->description 
-                                ?: ($location->short_description 
-                                ?: 'Chưa có nội dung thuyết minh.'));
-                    @endphp
                     {!! nl2br(e($audioNarrationText)) !!}
                 </div>
             </div>
@@ -1866,17 +2524,18 @@
                 <button class="audio-info-btn" id="btnAudioInfo" onclick="toggleAudioInfoPopover(event)" title="Xem nội dung thuyết minh">
                     i
                 </button>
-                <img src="{{ asset('images/loax.png') }}" 
-                     alt="Thuyết minh 360" 
-                     class="audio-mascot-btn" 
-                     id="audioMascotImg" 
-                     onclick="toggleAudio()" 
+                <img src="{{ asset('images/loax.png') }}"
+                     alt="Thuyết minh"
+                     class="audio-mascot-btn"
+                     id="audioMascotImg"
+                     onclick="toggleAudio()"
                      title="Nhấp để Bật/Tắt thuyết minh">
             </div>
             <div class="audio-progress-bar" id="audioProgressBar" onclick="seekAudio(event)" title="Thanh tiến trình thuyết minh">
                 <div class="audio-progress-fill" id="audioProgressFill"></div>
             </div>
         </div>
+        @endif
     </div>
 
     @if(!$photoMode)
@@ -1891,33 +2550,157 @@
     <script src="{{ asset('marzipano/vendor/marzipano.js') }}" ></script>
     <!-- Use Marzipano's Original Script -->
     <script src="{{ asset('marzipano/index.js') }}"></script>
+
+    <script>
+    (function () {
+        const btnFs = document.getElementById('btnViewerFullscreen');
+        const btnGuide = document.getElementById('btnViewerGuide');
+        const btnRotate = document.getElementById('btnViewerAutorotate');
+        const iconFs = document.getElementById('iconViewerFullscreen');
+        const labelFs = document.getElementById('labelViewerFullscreen');
+        const iconRotate = document.getElementById('iconViewerAutorotate');
+        const labelRotate = document.getElementById('labelViewerAutorotate');
+        const guide = document.getElementById('viewerGuideOverlay');
+        const btnCloseGuide = document.getElementById('btnCloseViewerGuide');
+        const nativeFs = document.getElementById('fullscreenToggle');
+        const nativeRotate = document.getElementById('autorotateToggle');
+
+        function syncFullscreenUi() {
+            const on = !!(nativeFs && nativeFs.classList.contains('enabled'))
+                || !!(window.screenfull && screenfull.isFullscreen);
+            if (iconFs) {
+                iconFs.className = on ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+            }
+            if (labelFs) {
+                labelFs.textContent = on ? 'Thu nhỏ' : 'Toàn màn hình';
+            }
+            if (btnFs) {
+                btnFs.title = on ? 'Thu nhỏ' : 'Toàn màn hình';
+                btnFs.classList.toggle('is-active', on);
+            }
+        }
+
+        function syncAutorotateUi() {
+            const rotating = !!(nativeRotate && nativeRotate.classList.contains('enabled'));
+            if (iconRotate) {
+                iconRotate.className = rotating ? 'fa-solid fa-pause' : 'fa-solid fa-rotate';
+            }
+            if (labelRotate) {
+                labelRotate.textContent = rotating ? 'Ngừng quay' : 'Tự quay';
+            }
+            if (btnRotate) {
+                btnRotate.title = rotating ? 'Ngừng quay' : 'Bật tự quay';
+                btnRotate.classList.toggle('is-active', rotating);
+            }
+        }
+
+        function openGuide() {
+            if (!guide) return;
+            guide.hidden = false;
+            guide.classList.add('is-open');
+            document.body.classList.add('viewer-guide-open');
+        }
+
+        function closeGuide() {
+            if (!guide) return;
+            guide.classList.remove('is-open');
+            guide.hidden = true;
+            document.body.classList.remove('viewer-guide-open');
+        }
+
+        if (btnFs) {
+            btnFs.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (nativeFs) {
+                    nativeFs.click();
+                } else if (window.screenfull && screenfull.enabled) {
+                    screenfull.toggle();
+                }
+                setTimeout(syncFullscreenUi, 50);
+            });
+        }
+
+        if (btnRotate) {
+            btnRotate.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (nativeRotate) nativeRotate.click();
+                setTimeout(syncAutorotateUi, 30);
+            });
+        }
+
+        if (btnGuide) {
+            btnGuide.addEventListener('click', function (e) {
+                e.preventDefault();
+                openGuide();
+            });
+        }
+
+        if (btnCloseGuide) {
+            btnCloseGuide.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeGuide();
+            });
+        }
+
+        if (guide) {
+            guide.addEventListener('click', function () {
+                closeGuide();
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && guide && guide.classList.contains('is-open')) {
+                closeGuide();
+            }
+        });
+
+        if (window.screenfull && screenfull.enabled) {
+            screenfull.on('change', syncFullscreenUi);
+        }
+
+        if (nativeFs) {
+            new MutationObserver(syncFullscreenUi).observe(nativeFs, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+        if (nativeRotate) {
+            new MutationObserver(syncAutorotateUi).observe(nativeRotate, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+
+        // Marzipano gắn class sau khi load
+        setTimeout(function () {
+            syncFullscreenUi();
+            syncAutorotateUi();
+        }, 100);
+    })();
+    </script>
     @endif
 
+    @if($hasNarration)
     <!-- Audio Player & Autoplay Logic -->
     <script>
     (function() {
-        const playerEl = document.getElementById('audioPlayer');
         const mascotImg = document.getElementById('audioMascotImg');
         const progressFill = document.getElementById('audioProgressFill');
 
         const loaOnSrc = @json(asset('images/loa.png'));
         const loaOffSrc = @json(asset('images/loax.png'));
         const audioUrl = @json($location->audio_url ? asset('storage/' . $location->audio_url) : null);
-
-        @php
-            $rawNarrationText = data_get($location->attributes, 'tts_text') 
-                    ?: ($location->description 
-                    ?: ($location->short_description 
-                    ?: ''));
-        @endphp
-        const narrationText = @json(trim(strip_tags($rawNarrationText)));
-
-        if (playerEl) playerEl.classList.add('visible');
+        const narrationText = @json(trim(strip_tags((string) data_get($location->attributes, 'tts_text', ''))));
 
         let audioEl = null;
         let isTtsMode = false;
         let ttsUtterance = null;
         let isPlaying = false;
+
+        function setAudioUiPlaying(playing) {
+            if (mascotImg) mascotImg.src = playing ? loaOnSrc : loaOffSrc;
+        }
 
         if (audioUrl) {
             audioEl = new Audio(audioUrl);
@@ -1928,16 +2711,16 @@
             });
             audioEl.addEventListener('ended', function() {
                 isPlaying = false;
-                if (mascotImg) mascotImg.src = loaOffSrc;
+                setAudioUiPlaying(false);
                 if (progressFill) progressFill.style.width = '0%';
             });
             audioEl.addEventListener('play', function() {
                 isPlaying = true;
-                if (mascotImg) mascotImg.src = loaOnSrc;
+                setAudioUiPlaying(true);
             });
             audioEl.addEventListener('pause', function() {
                 isPlaying = false;
-                if (mascotImg) mascotImg.src = loaOffSrc;
+                setAudioUiPlaying(false);
             });
         } else if ('speechSynthesis' in window && narrationText) {
             isTtsMode = true;
@@ -1947,7 +2730,7 @@
             if (audioEl) {
                 audioEl.play().then(() => {
                     isPlaying = true;
-                    if (mascotImg) mascotImg.src = loaOnSrc;
+                    setAudioUiPlaying(true);
                 }).catch(err => {
                     console.log('Autoplay blocked by browser, waiting for user click:', err);
                     setupFirstClickAutoplay();
@@ -1960,15 +2743,15 @@
                 
                 ttsUtterance.onstart = function() {
                     isPlaying = true;
-                    if (mascotImg) mascotImg.src = loaOnSrc;
+                    setAudioUiPlaying(true);
                 };
                 ttsUtterance.onend = function() {
                     isPlaying = false;
-                    if (mascotImg) mascotImg.src = loaOffSrc;
+                    setAudioUiPlaying(false);
                 };
                 ttsUtterance.onerror = function() {
                     isPlaying = false;
-                    if (mascotImg) mascotImg.src = loaOffSrc;
+                    setAudioUiPlaying(false);
                 };
 
                 window.speechSynthesis.speak(ttsUtterance);
@@ -1982,7 +2765,7 @@
                 window.speechSynthesis.cancel();
             }
             isPlaying = false;
-            if (mascotImg) mascotImg.src = loaOffSrc;
+            setAudioUiPlaying(false);
         }
 
         function setupFirstClickAutoplay() {
@@ -2043,6 +2826,7 @@
         }
     })();
     </script>
+    @endif
 
     <!-- Review Search & Sort JS Helpers -->
     <script>
@@ -2301,12 +3085,20 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'added') {
-                        btnToggleFavorite.classList.add('active');
-                        btnToggleFavorite.innerHTML = '<i class="fa-solid fa-heart" style="color: #ef4444;"></i>';
+                        btnToggleFavorite.classList.add('is-active', 'active');
+                        const icon = btnToggleFavorite.querySelector('i');
+                        if (icon) {
+                            icon.className = 'fa-solid fa-heart';
+                            icon.style.color = '#ef4444';
+                        }
                         showToast360(data.message || 'Đã thêm vào danh sách yêu thích (+2 điểm)', 'added');
                     } else {
-                        btnToggleFavorite.classList.remove('active');
-                        btnToggleFavorite.innerHTML = '<i class="fa-regular fa-heart"></i>';
+                        btnToggleFavorite.classList.remove('is-active', 'active');
+                        const icon = btnToggleFavorite.querySelector('i');
+                        if (icon) {
+                            icon.className = 'fa-regular fa-heart';
+                            icon.style.color = '';
+                        }
                         showToast360(data.message || 'Đã xóa khỏi danh sách yêu thích', 'removed');
                     }
                 })
@@ -2969,6 +3761,66 @@
             console.error(err);
             btn.disabled = false;
             btn.innerHTML = 'Gửi báo cáo';
+            alert('Có lỗi kết nối. Vui lòng thử lại sau.');
+        });
+    }
+
+    // ===== Góp ý / Báo lỗi =====
+    let currentFeedbackLocationId = null;
+
+    function openFeedbackModal(locationId) {
+        currentFeedbackLocationId = locationId;
+        document.getElementById('feedbackType').value = 'wrong_info';
+        document.getElementById('feedbackContent').value = '';
+        document.getElementById('feedbackModalOverlay').classList.add('active');
+    }
+
+    function closeFeedbackModal() {
+        document.getElementById('feedbackModalOverlay').classList.remove('active');
+        currentFeedbackLocationId = null;
+    }
+
+    function submitFeedback() {
+        const btn = document.getElementById('btnSubmitFeedback');
+        const type = document.getElementById('feedbackType').value;
+        const content = document.getElementById('feedbackContent').value.trim();
+        const csrfToken = '{{ csrf_token() }}';
+
+        if (!content) {
+            alert('Vui lòng nhập nội dung góp ý / báo lỗi.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi...';
+
+        fetch("{{ route('client.feedback.submit') }}", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                report_type: type,
+                target_type: 'location',
+                target_id: currentFeedbackLocationId,
+                content: content
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi góp ý';
+            alert(data.message || 'Đã gửi góp ý.');
+            if (data.success) {
+                closeFeedbackModal();
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi góp ý';
             alert('Có lỗi kết nối. Vui lòng thử lại sau.');
         });
     }

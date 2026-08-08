@@ -317,16 +317,18 @@
         opacity: 0.85;
     }
     .tp-card-label {
+        display: block;
         font-size: 0.72rem;
         font-weight: 500;
         color: #3b5980;
         line-height: 1.25;
     }
     .tp-card-desc {
+        display: block;
         font-size: 0.62rem;
         color: #a1a1aa;
-        margin-top: 2px;
-        line-height: 1.25;
+        margin-top: 3px;
+        line-height: 1.3;
         font-weight: 400;
     }
 
@@ -917,8 +919,85 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentItinerary = null;
     let lastAnswersPayload = [];
     const IS_AUTHENTICATED = @json(auth()->check());
+    const CURRENT_USER_ID = @json(auth()->id());
     const LOGIN_URL = @json(route('login'));
     const PROFILE_URL = @json(route('client.profile'));
+
+    // Bản nháp chỉ giữ trong tab hiện tại + theo user — không dùng chung localStorage mãi
+    const TP_DRAFT_KEY = 'nb_trip_draft_' + (CURRENT_USER_ID ? ('u' + CURRENT_USER_ID) : 'guest');
+    const TP_LEGACY_KEYS = ['nb_saved_itinerary', 'nb_trip_draft_guest'];
+
+    function clearTripDraftStorage() {
+        try {
+            sessionStorage.removeItem(TP_DRAFT_KEY);
+            TP_LEGACY_KEYS.forEach(function (k) { localStorage.removeItem(k); });
+            // Xóa draft của user khác còn sót trong sessionStorage
+            Object.keys(sessionStorage).forEach(function (k) {
+                if (k.indexOf('nb_trip_draft_') === 0 && k !== TP_DRAFT_KEY) {
+                    sessionStorage.removeItem(k);
+                }
+            });
+        } catch (e) {}
+    }
+
+    function saveTripDraft(data) {
+        try {
+            sessionStorage.setItem(TP_DRAFT_KEY, JSON.stringify({
+                userId: CURRENT_USER_ID || null,
+                savedAt: Date.now(),
+                itinerary: data,
+            }));
+            // Gỡ bản cũ trên localStorage để hết “dính” khi đổi acc
+            TP_LEGACY_KEYS.forEach(function (k) { localStorage.removeItem(k); });
+        } catch (e) {
+            console.warn('Could not save trip draft:', e);
+        }
+    }
+
+    function loadTripDraft() {
+        try {
+            // Dọn key cũ toàn cục
+            TP_LEGACY_KEYS.forEach(function (k) { localStorage.removeItem(k); });
+
+            const raw = sessionStorage.getItem(TP_DRAFT_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            const ownerId = parsed && Object.prototype.hasOwnProperty.call(parsed, 'userId')
+                ? parsed.userId
+                : null;
+            const currentId = CURRENT_USER_ID || null;
+            if (ownerId !== currentId) {
+                clearTripDraftStorage();
+                return null;
+            }
+            // Hết hạn sau 2 giờ
+            if (parsed.savedAt && (Date.now() - parsed.savedAt > 2 * 60 * 60 * 1000)) {
+                clearTripDraftStorage();
+                return null;
+            }
+            return parsed.itinerary || null;
+        } catch (e) {
+            clearTripDraftStorage();
+            return null;
+        }
+    }
+
+    // Đăng xuất → xóa draft ngay
+    document.querySelectorAll('form#logout-form, form[action*="logout"]').forEach(function (form) {
+        form.addEventListener('submit', function () {
+            clearTripDraftStorage();
+        });
+    });
+
+    // Dọn localStorage cũ ngay khi load trang (tránh lịch trình “dính” giữa các tài khoản)
+    try {
+        TP_LEGACY_KEYS.forEach(function (k) { localStorage.removeItem(k); });
+        Object.keys(localStorage).forEach(function (k) {
+            if (k.indexOf('nb_saved_itinerary') === 0 || k.indexOf('nb_trip_draft_') === 0) {
+                localStorage.removeItem(k);
+            }
+        });
+    } catch (e) {}
 
     const overlay = document.getElementById('trip-planner-overlay');
     const backdrop = document.getElementById('tp-backdrop');
@@ -989,21 +1068,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (!forceNew) {
-            const saved = localStorage.getItem('nb_saved_itinerary');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (parsed && (parsed.days || parsed.title)) {
-                        wizardBody.style.display = 'none';
-                        footer.style.display = 'none';
-                        loadingPanel.classList.remove('active');
-                        renderItinerary(parsed, false);
-                        return;
-                    }
-                } catch (e) {
-                    console.warn('Could not parse saved itinerary:', e);
-                }
+            const saved = loadTripDraft();
+            if (saved && (saved.days || saved.title)) {
+                wizardBody.style.display = 'none';
+                footer.style.display = 'none';
+                loadingPanel.classList.remove('active');
+                renderItinerary(saved, false);
+                return;
             }
+        } else {
+            clearTripDraftStorage();
         }
 
         resetState();
@@ -1028,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Thu popup bay vào nút "Gợi ý cho bạn".
+     * Thu popup bay vào nút "Lịch trình cho bạn".
      * @param {() => void} [onDone]
      */
     function minimizePlannerToDock(onDone) {
@@ -1096,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.closeTripPlanner = closePlanner;
 
-    /** Zoom map + thu panel bay vào nút "Gợi ý cho bạn". */
+    /** Zoom map + thu panel bay vào nút "Lịch trình cho bạn". */
     window.zoomFromTripPlanner = function(identifier) {
         minimizePlannerToDock(() => {
             if (typeof window.zoomToLocationFromChat === 'function') {
@@ -1110,7 +1184,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeResultBtn.addEventListener('click', () => minimizePlannerToDock());
 
     restartBtn.addEventListener('click', () => {
-        localStorage.removeItem('nb_saved_itinerary');
+        clearTripDraftStorage();
         resultPanel.classList.remove('active');
         loadingPanel.classList.remove('active');
         wizardBody.style.display = '';
@@ -2283,11 +2357,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveBtn.classList.remove('saved');
         }
         if (saveToStorage) {
-            try {
-                localStorage.setItem('nb_saved_itinerary', JSON.stringify(data));
-            } catch (e) {
-                console.warn('Could not save itinerary to localStorage:', e);
-            }
+            saveTripDraft(data);
         }
         resultPanel.classList.add('active');
         setPlannerMode('result');
@@ -2369,7 +2439,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 saveBtn.classList.add('saved');
                 saveBtn.textContent = 'Đã lưu ✓';
-                try { localStorage.removeItem('nb_saved_itinerary'); } catch (e) {}
+                try { clearTripDraftStorage(); } catch (e) {}
                 if (confirm('Đã lưu vào trang cá nhân. Mở trang cá nhân để xem?')) {
                     window.location.href = (data.profile_url || PROFILE_URL + '#itineraries');
                 }

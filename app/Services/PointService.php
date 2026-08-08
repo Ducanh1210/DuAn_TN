@@ -7,22 +7,27 @@ use App\Models\PointTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Dịch vụ quản lý điểm (xu) của người dùng: cộng/trừ điểm, ghi lịch sử giao dịch,
+ * tính thưởng điểm danh theo chuỗi ngày và tổng hợp lịch sử để hiển thị.
+ */
 class PointService
 {
-    /** Instant awards for valuable actions (missions for these keys grant 0 xu). */
+    /** Thưởng ngay cho hành động có giá trị (nhiệm vụ ứng với các key này cộng 0 xu để tránh cộng trùng). */
     public const POINTS_COMMENT = 5;
     public const POINTS_FAVORITE = 2;
 
-    /** Daily check-in: day 1..7 of streak cycle → 10, 20, … 70 */
+    /** Điểm danh hằng ngày: ngày 1..7 trong chu kỳ chuỗi → 10, 20, … 70 */
     public const CHECKIN_BASE = 10;
 
     /**
-     * Award points to a user and unlock rank frames when thresholds are met.
+     * Cộng điểm cho người dùng và tự mở khóa khung avatar theo hạng khi đạt ngưỡng.
+     * Chạy trong transaction để đảm bảo cộng điểm và ghi giao dịch luôn đồng bộ.
      *
      * @param User $user
-     * @param int $amount
-     * @param string $action
-     * @param string|null $description
+     * @param int $amount Số điểm (có thể âm khi trừ)
+     * @param string $action Mã hành động (comment, favorite, checkin...)
+     * @param string|null $description Mô tả hiển thị trong lịch sử
      * @return PointTransaction
      */
     public static function awardPoints(User $user, int $amount, string $action, string $description = null)
@@ -39,6 +44,7 @@ class PointService
                 'description' => $description,
             ]);
 
+            // Chỉ kiểm tra mở khóa khung theo hạng khi có cộng thêm điểm
             if ($amount > 0) {
                 MissionService::checkRankFramesUnlocked($user->fresh());
             }
@@ -48,7 +54,8 @@ class PointService
     }
 
     /**
-     * Check-in reward for the given streak day within a 7-day cycle (1–7).
+     * Tính điểm thưởng điểm danh cho ngày thứ mấy trong chu kỳ 7 ngày (1–7).
+     * Ví dụ: chuỗi ngày 8 tương ứng ngày 1 của chu kỳ mới → 10 điểm.
      */
     public static function checkinPointsForStreakDay(int $streakCount): int
     {
@@ -58,13 +65,14 @@ class PointService
     }
 
     /**
-     * Check and award daily login points.
+     * Kiểm tra và cộng điểm đăng nhập hằng ngày (điểm danh).
      *
      * @param User $user
-     * @return bool True if points were awarded, false otherwise
+     * @return bool True nếu đã cộng điểm, false nếu hôm nay đã điểm danh rồi
      */
     public static function checkDailyLoginBonus(User $user)
     {
+        // Đã nhận thưởng trong ngày hôm nay thì bỏ qua
         if ($user->last_daily_bonus_at && Carbon::parse($user->last_daily_bonus_at)->isToday()) {
             return false;
         }
@@ -74,7 +82,8 @@ class PointService
     }
 
     /**
-     * Collapse per-minute active_session rows into daily summaries for readable history.
+     * Gộp các bản ghi điểm "active_session" (cộng theo từng phút online) thành
+     * tóm tắt theo ngày để lịch sử điểm dễ đọc, tránh hiển thị hàng trăm dòng vụn.
      *
      * @return array{history: array<int, array>, raw_total: int}
      */
@@ -89,6 +98,7 @@ class PointService
         $pointHistory = [];
 
         foreach ($rawPointTx as $tx) {
+            // Điểm thời gian online: gom chung theo ngày thay vì hiện từng phút
             if ($tx->action === 'active_session') {
                 $dayKey = $tx->created_at->format('Y-m-d');
                 if (!isset($sessionBuckets[$dayKey])) {
@@ -127,6 +137,7 @@ class PointService
             $pointHistory[] = $bucket;
         }
 
+        // Sắp xếp toàn bộ lịch sử theo thời gian mới nhất lên đầu
         usort($pointHistory, fn ($a, $b) => $b['created_at']->timestamp <=> $a['created_at']->timestamp);
 
         return [
@@ -135,6 +146,7 @@ class PointService
         ];
     }
 
+    /** Chuyển mã hành động sang nhãn tiếng Việt để hiển thị trong lịch sử điểm. */
     public static function actionLabel(string $action): string
     {
         return match ($action) {
