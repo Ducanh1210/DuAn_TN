@@ -55,8 +55,14 @@
                                 <div class="bg-light rounded d-flex align-items-center justify-content-center text-muted" style="width: 48px; height: 32px; font-size: 0.65rem;">No Img</div>
                             @endif
                         </td>
+                        @php $isBizLoc = $item->created_by && in_array($item->created_by, $businessOwnerIds); @endphp
                         <td>
-                            <div class="fw-medium text-dark" style="font-size: 0.825rem;">{{ $item->name }}</div>
+                            <div class="fw-medium text-dark" style="font-size: 0.825rem;">
+                                {{ $item->name }}
+                                @if($isBizLoc)
+                                    <span class="badge-minimal" style="background:#eef2ff;color:#4338ca;font-weight:500;font-size:0.65rem;">Doanh nghiệp</span>
+                                @endif
+                            </div>
                             <div class="text-muted text-truncate" style="max-width: 260px; font-size: 0.725rem;">{{ $item->address ?? 'Ninh Bình' }}</div>
                         </td>
                         <td>
@@ -78,11 +84,17 @@
                         </td>
                         <td class="text-end pe-4">
                             <a href="{{ route('admin.locations.edit', [$item->id] + request()->query()) }}" class="btn-minimal py-1 px-2 text-decoration-none me-1" style="font-size: 0.75rem;">Sửa</a>
-                            <form action="{{ route('admin.locations.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa điểm này?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size: 0.75rem;">Xóa</button>
-                            </form>
+                            @if($isBizLoc)
+                                <button type="button" class="btn-minimal py-1 px-2 text-danger btn-delete-biz" style="font-size: 0.75rem;"
+                                    data-action="{{ route('admin.locations.destroy', $item->id) }}"
+                                    data-name="{{ $item->name }}">Xóa</button>
+                            @else
+                                <form action="{{ route('admin.locations.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa điểm này?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size: 0.75rem;">Xóa</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -99,4 +111,65 @@
     </div>
     @endif
 </div>
+
+<!-- Modal: Xóa địa điểm doanh nghiệp (bắt buộc nhập lý do) -->
+<div class="modal fade" id="deleteBizModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="deleteBizForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="modal-header">
+                    <h5 class="modal-title" style="font-size: 1rem;">Xóa địa điểm doanh nghiệp</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary mb-2" style="font-size: 0.85rem;">
+                        Bạn đang xóa địa điểm <strong id="deleteBizName"></strong>. Đây là địa điểm của một tài khoản doanh nghiệp.
+                    </p>
+                    <p class="text-secondary mb-3" style="font-size: 0.82rem;">
+                        Vui lòng nhập <strong>lý do xóa</strong>. Lý do này sẽ được gửi làm thông báo đến tài khoản doanh nghiệp, đồng thời hồ sơ sẽ được gỡ khỏi mục Quản lý yêu cầu doanh nghiệp.
+                    </p>
+                    <label class="form-label" style="font-size: 0.82rem;">Lý do xóa <span class="text-danger">*</span></label>
+                    <textarea name="delete_reason" id="deleteBizReason" class="form-control form-control-sm" rows="4" maxlength="1000" required placeholder="Ví dụ: Địa điểm không còn hoạt động / thông tin sai lệch / vi phạm quy định..."></textarea>
+                    <div class="invalid-feedback" id="deleteBizReasonError">Vui lòng nhập lý do xóa.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-minimal" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn-minimal text-danger" style="border-color:#fecaca;">Xóa & Thông báo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalEl = document.getElementById('deleteBizModal');
+        if (!modalEl) return;
+        const modal = new bootstrap.Modal(modalEl);
+        const form = document.getElementById('deleteBizForm');
+        const nameEl = document.getElementById('deleteBizName');
+        const reasonEl = document.getElementById('deleteBizReason');
+
+        document.querySelectorAll('.btn-delete-biz').forEach(btn => {
+            btn.addEventListener('click', function() {
+                form.action = this.dataset.action;
+                nameEl.textContent = this.dataset.name || '';
+                reasonEl.value = '';
+                reasonEl.classList.remove('is-invalid');
+                modal.show();
+            });
+        });
+
+        form.addEventListener('submit', function(e) {
+            if (!reasonEl.value.trim()) {
+                e.preventDefault();
+                reasonEl.classList.add('is-invalid');
+            }
+        });
+    });
+</script>
+@endpush

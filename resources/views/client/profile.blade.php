@@ -2303,6 +2303,32 @@
                         </div>
                     </div>
                 </div>
+
+                @if(isset($notifications) && $notifications->count() > 0)
+                <div class="content-panel" style="margin-bottom:16px;">
+                    <div class="section-title" style="display:flex;align-items:center;gap:8px;">
+                        <span>Thông báo</span>
+                        @php $unreadCount = $notifications->whereNull('read_at')->count(); @endphp
+                        @if($unreadCount > 0)
+                            <span style="background:#ef4444;color:#fff;border-radius:999px;font-size:0.68rem;padding:1px 8px;font-weight:600;">{{ $unreadCount }} mới</span>
+                        @endif
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+                        @foreach($notifications as $noti)
+                            <div style="border:1px solid {{ is_null($noti->read_at) ? '#fecaca' : '#e2e8f0' }};background:{{ is_null($noti->read_at) ? '#fef2f2' : '#ffffff' }};border-radius:10px;padding:12px 14px;">
+                                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+                                    <strong style="font-size:0.86rem;color:#1e293b;">{{ $noti->title }}</strong>
+                                    <span style="font-size:0.7rem;color:#94a3b8;white-space:nowrap;">{{ $noti->created_at->format('d/m/Y H:i') }}</span>
+                                </div>
+                                @if($noti->message)
+                                    <div style="font-size:0.8rem;color:#475569;margin-top:4px;white-space:pre-line;line-height:1.5;">{{ $noti->message }}</div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <div class="profile-stat-grid">
                     <div class="stat-tile">
                         <div class="stat-label">Điểm tích lũy</div>

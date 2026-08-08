@@ -7,6 +7,9 @@ use App\Models\Category;
 use App\Models\Location;
 use App\Models\LocationImage;
 use App\Models\Panorama;
+use App\Models\BusinessProfile;
+use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use App\Http\Requests\Admin\StoreLocationRequest;
 use App\Http\Requests\Admin\UpdateLocationRequest;
@@ -38,7 +41,14 @@ class LocationController extends Controller
         $locations = $query->paginate(20)->withQueryString();
         $categories = Category::where('status', 'active')->get();
 
-        return view('admin.locations.index', compact('locations', 'categories', 'sortDir'));
+        // Danh sách user_id là chủ doanh nghiệp đã được duyệt -> địa điểm của họ cần popup lý do khi xóa
+        $businessOwnerIds = BusinessProfile::where('status', 'approved')
+            ->pluck('user_id')
+            ->filter()
+            ->values()
+            ->all();
+
+        return view('admin.locations.index', compact('locations', 'categories', 'sortDir', 'businessOwnerIds'));
     }
 
     public function create()
@@ -98,10 +108,31 @@ class LocationController extends Controller
         return redirect()->route('admin.locations.index')->with('success', 'Cập nhật địa điểm thành công!');
     }
 
-    public function destroy(Location $location)
+    public function destroy(Request $request, Location $location)
     {
+        // Xác định địa điểm này có thuộc một doanh nghiệp đã duyệt không
+        $ownerId = $location->created_by;
+        $businessProfile = null;
+        if ($ownerId) {
+            $businessProfile = BusinessProfile::where('user_id', $ownerId)
+                ->where('status', 'approved')
+                ->first();
+        }
+        $isBusinessLocation = (bool) $businessProfile;
+
+        // Nếu là địa điểm doanh nghiệp -> bắt buộc nhập lý do xóa
+        if ($isBusinessLocation) {
+            $request->validate([
+                'delete_reason' => 'required|string|max:1000',
+            ], [
+                'delete_reason.required' => 'Vui lòng nhập lý do xóa để thông báo cho doanh nghiệp.',
+            ]);
+        }
+
+        $deleteReason = trim((string) $request->input('delete_reason', ''));
+
         try {
-            DB::transaction(function () use ($location) {
+            DB::transaction(function () use ($location, $ownerId, $businessProfile, $isBusinessLocation, $deleteReason) {
                 foreach ($location->images as $img) {
                     if ($img->image_url) {
                         Storage::disk('public')->delete($img->image_url);
@@ -119,10 +150,42 @@ class LocationController extends Controller
                     Storage::disk('public')->delete($location->audio_url);
                 }
 
+                // Xử lý phía doanh nghiệp: gửi thông báo kèm lý do, xóa hồ sơ khỏi quản lý, hạ vai trò
+                if ($isBusinessLocation && $businessProfile) {
+                    // Chỉ dọn hồ sơ doanh nghiệp nếu đây là địa điểm cuối cùng của họ
+                    $hasOtherLocations = Location::where('created_by', $ownerId)
+                        ->where('id', '!=', $location->id)
+                        ->exists();
+
+                    UserNotification::create([
+                        'user_id' => $ownerId,
+                        'type' => 'business_location_removed',
+                        'title' => 'Địa điểm doanh nghiệp đã bị gỡ',
+                        'message' => 'Địa điểm "' . $location->name . '" của bạn đã bị quản trị viên gỡ khỏi hệ thống.'
+                            . "\nLý do: " . $deleteReason
+                            . ($hasOtherLocations ? '' : "\nBạn có thể đăng ký lại nếu cần."),
+                        'link' => route('client.profile'),
+                    ]);
+
+                    if (!$hasOtherLocations) {
+                        // Hạ vai trò user về thường
+                        $owner = User::find($ownerId);
+                        if ($owner && $owner->role === 'business') {
+                            $owner->update(['role' => 'user']);
+                        }
+                        // Xóa hẳn hồ sơ khỏi "Quản lý yêu cầu doanh nghiệp"
+                        $businessProfile->delete();
+                    }
+                }
+
                 $location->delete();
             });
 
-            return back()->with('success', 'Xóa địa điểm thành công! Dữ liệu yêu thích và bình luận liên quan cũng đã được gỡ khỏi người dùng.');
+            $msg = $isBusinessLocation
+                ? 'Đã xóa địa điểm và gửi thông báo lý do đến tài khoản doanh nghiệp.'
+                : 'Xóa địa điểm thành công! Dữ liệu yêu thích và bình luận liên quan cũng đã được gỡ khỏi người dùng.';
+
+            return back()->with('success', $msg);
         } catch (\Throwable $e) {
             report($e);
 

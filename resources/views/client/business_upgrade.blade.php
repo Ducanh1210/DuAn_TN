@@ -3011,6 +3011,10 @@
                         } else {
                             const errMsg = (data && data.message) ? data.message : `Lỗi gửi yêu cầu (Mã lỗi ${res.status}). Vui lòng kiểm tra và thử lại.`;
                             showToast(errMsg, false);
+                            // Nếu bị chặn do đã có hồ sơ, đưa người dùng về trang cá nhân để xem trạng thái
+                            if (data && data.redirect) {
+                                setTimeout(() => { window.location.href = data.redirect; }, 1600);
+                            }
                         }
                     })
                     .catch(err => {

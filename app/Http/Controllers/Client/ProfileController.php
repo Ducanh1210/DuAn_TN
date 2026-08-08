@@ -65,6 +65,15 @@ class ProfileController extends Controller
         $categories = Category::where('status', 'active')->get();
         $businessProfile = BusinessProfile::where('user_id', $user->id)->with('category')->first();
 
+        // Load user notifications (e.g. business location removed) then mark unread as read
+        $notifications = \App\Models\UserNotification::where('user_id', $user->id)
+            ->latest()
+            ->limit(20)
+            ->get();
+        \App\Models\UserNotification::where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
         // Load Avatar Frames
         $allFrames = AvatarFrame::where('status', 'active')->orderBy('required_points', 'asc')->get();
         $unlockedFrameIds = UserAvatarFrame::where('user_id', $user->id)
@@ -154,7 +163,8 @@ class ProfileController extends Controller
             'pointHistory',
             'pointTxTotal',
             'panoramaServiceRequests',
-            'hasPendingPanoRequest'
+            'hasPendingPanoRequest',
+            'notifications'
         ));
     }
 
@@ -456,11 +466,31 @@ class ProfileController extends Controller
 
         // Check if user already has an active or pending business profile
         $existing = BusinessProfile::where('user_id', $user->id)->first();
-        if ($existing && in_array($existing->status, ['pending', 'approved'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Bạn đã gửi yêu cầu nâng cấp hoặc đã có tài khoản doanh nghiệp.'
-            ], 400);
+        if ($existing) {
+            $blocked = false;
+            $message = '';
+
+            if ($existing->status === 'pending') {
+                // Đang chờ duyệt -> không cho gửi lại
+                $blocked = true;
+                $message = 'Yêu cầu của bạn đang chờ duyệt. Vui lòng chờ quản trị viên xử lý.';
+            } elseif ($existing->status === 'approved') {
+                // Chỉ chặn nếu địa điểm vẫn còn trên bản đồ.
+                // Nếu địa điểm đã bị xóa thì cho phép đăng ký lại (khớp logic showBusinessUpgradeForm).
+                $hasLocation = Location::where('created_by', $user->id)->exists();
+                if ($hasLocation) {
+                    $blocked = true;
+                    $message = 'Bạn đã có tài khoản doanh nghiệp đang hoạt động.';
+                }
+            }
+
+            if ($blocked) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                    'redirect' => route('client.profile'),
+                ], 400);
+            }
         }
 
         $validated = $request->validate([
