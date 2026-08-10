@@ -247,7 +247,7 @@ class InteractionController extends Controller
         ]);
 
         $feedback = \App\Models\FeedbackReport::create([
-            'user_id' => Auth::check() ? Auth::id() : null,
+            'user_id' => Auth::id(),
             'report_type' => $request->report_type,
             'target_type' => $request->target_type,
             'target_id' => $request->target_id,

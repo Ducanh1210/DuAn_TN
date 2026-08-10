@@ -131,10 +131,10 @@ Route::middleware('auth')->group(function () {
     // Community Contributions
     Route::get('/ca-nhan/dong-gop', [\App\Http\Controllers\Client\InteractionController::class, 'myContributions'])->name('client.contributions.index');
     Route::post('/locations/suggest', [\App\Http\Controllers\Client\InteractionController::class, 'suggestLocation'])->name('client.locations.suggest');
-});
 
-// Góp ý / báo lỗi: cho phép cả khách chưa đăng nhập gửi
-Route::post('/feedback', [\App\Http\Controllers\Client\InteractionController::class, 'submitFeedback'])->name('client.feedback.submit');
+    // Góp ý / báo lỗi: bắt buộc đăng nhập
+    Route::post('/feedback', [\App\Http\Controllers\Client\InteractionController::class, 'submitFeedback'])->name('client.feedback.submit');
+});
 
 // Auth Routes
 Route::middleware('guest')->group(function () {

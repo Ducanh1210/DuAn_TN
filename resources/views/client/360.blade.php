@@ -3769,6 +3769,11 @@
     let currentFeedbackLocationId = null;
 
     function openFeedbackModal(locationId) {
+        const checkAuth = {{ Auth::check() ? 'true' : 'false' }};
+        if (!checkAuth) {
+            window.location.href = "{{ route('login') }}";
+            return;
+        }
         currentFeedbackLocationId = locationId;
         document.getElementById('feedbackType').value = 'wrong_info';
         document.getElementById('feedbackContent').value = '';

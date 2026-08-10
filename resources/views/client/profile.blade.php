@@ -879,62 +879,22 @@
             color: var(--text-sub);
             line-height: 1.4;
         }
-        .biz-pano-cta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 10px;
-            padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background: #fff;
-        }
-        .biz-pano-cta__icon {
-            flex: 0 0 auto;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f1f5f9;
-            color: #475569;
-            font-size: 0.9rem;
-        }
-        .biz-pano-cta__body { flex: 1 1 auto; min-width: 0; }
-        .biz-pano-cta__body strong {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-main);
-            margin-bottom: 2px;
-        }
-        .biz-pano-cta__body p {
-            margin: 0;
-            font-size: 0.72rem;
-            color: var(--text-sub);
-            line-height: 1.4;
-        }
-        .biz-pano-cta__btn {
-            flex: 0 0 auto;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 12px;
-            border-radius: 4px;
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
+        .biz-pano-note {
+            margin: 12px 0 0;
             font-size: 0.75rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+        .biz-pano-note i {
+            color: #94a3b8;
+            margin-right: 5px;
+        }
+        .biz-pano-note a {
+            color: #1e3a5f;
             font-weight: 500;
             text-decoration: none;
-            white-space: nowrap;
-            transition: background 0.15s ease, border-color 0.15s ease;
         }
-        .biz-pano-cta__btn:hover { background: #f8fafc; border-color: #94a3b8; color: var(--text-main); }
-        @media (max-width: 640px) {
-            .biz-pano-cta { flex-wrap: wrap; }
-            .biz-pano-cta__btn { width: 100%; justify-content: center; }
-        }
+        .biz-pano-note a:hover { text-decoration: underline; }
         .map-style-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2942,18 +2902,11 @@
                             </div>
                         </div>
 
-                        <div class="biz-pano-cta">
-                            <div class="biz-pano-cta__icon">
-                                <i class="fa-solid fa-panorama"></i>
-                            </div>
-                            <div class="biz-pano-cta__body">
-                                <strong>Dịch vụ chụp Tour 360°</strong>
-                                <p>Muốn địa điểm nổi bật hơn? Đăng ký để đội ngũ hỗ trợ chụp và dựng không gian 360° cho địa điểm của bạn.</p>
-                            </div>
-                            <a href="{{ route('client.pano_service') }}" class="biz-pano-cta__btn" target="_blank" rel="noopener">
-                                Tìm hiểu <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                        </div>
+                        <p class="biz-pano-note">
+                            <i class="fa-solid fa-panorama"></i>
+                            Muốn địa điểm nổi bật hơn với không gian 360°?
+                            <a href="{{ route('client.pano_service') }}" target="_blank" rel="noopener">Tìm hiểu dịch vụ chụp Tour 360°</a>
+                        </p>
                     </div>
                 @endif
             </div>
