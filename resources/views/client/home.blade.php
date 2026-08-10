@@ -566,11 +566,11 @@
         }
 
         .dock-filter-btn.active {
-            color: #0284c7;
+            color: #1e3a5f;
         }
 
         .dock-filter-btn.active .material-symbols-rounded {
-            color: #0284c7;
+            color: #1e3a5f;
         }
 
         .dock-filter-btn.menu-open .arrow-icon {
@@ -596,14 +596,14 @@
         }
 
         .dock-random-btn:hover {
-            background: #0284c7;
+            background: #1e3a5f;
             color: #ffffff;
-            border-color: #0284c7;
+            border-color: #1e3a5f;
         }
 
         .dock-random-btn .material-symbols-rounded {
             font-size: 15px;
-            color: #0284c7;
+            color: #1e3a5f;
             transition: color 0.2s ease;
         }
 
@@ -649,9 +649,9 @@
         }
 
         .radius-btn.active {
-            background: #0284c7;
+            background: #1e3a5f;
             color: #ffffff;
-            border-color: #0284c7;
+            border-color: #1e3a5f;
         }
 
         .dock-filter-menu {
@@ -701,7 +701,7 @@
         .filter-reset-btn {
             background: transparent;
             border: none;
-            color: #0284c7;
+            color: #1e3a5f;
             font-size: 0.68rem;
             font-weight: 600;
             cursor: pointer;
@@ -744,13 +744,13 @@
         }
 
         .filter-item.active {
-            background: #f0f9ff;
-            color: #0284c7;
+            background: #f1f5f9;
+            color: #1e3a5f;
             font-weight: 700;
         }
 
         .filter-item.active .filter-count-badge {
-            background: #0284c7;
+            background: #1e3a5f;
             color: #ffffff;
         }
 
@@ -2302,7 +2302,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.45));
+            filter: drop-shadow(0 6px 16px rgba(15, 23, 42, 0.12));
             transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -2318,7 +2318,7 @@
 
         .vr-floating-hex-menu .vr-hex-polygon {
             fill: url(#vrHexGrad);
-            stroke: rgba(147, 203, 255, 0.55);
+            stroke: #cbdbe8;
             stroke-width: 1.8;
             transition: all 0.25s ease;
         }
@@ -2329,22 +2329,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
-            transition: transform 0.25s ease;
+            color: #1e3a5f;
+            transition: all 0.25s ease;
         }
 
         .vr-floating-hex-menu .vr-hex-btn:hover {
-            transform: translateY(-6px) scale(1.12);
+            transform: translateY(-6px) scale(1.1);
+            filter: drop-shadow(0 10px 24px rgba(30, 58, 95, 0.25));
         }
 
         .vr-floating-hex-menu .vr-hex-btn:hover .vr-hex-polygon {
             fill: url(#vrHexHoverGrad);
-            stroke: rgba(255, 255, 255, 0.95);
+            stroke: #ffffff;
             stroke-width: 2.2;
-            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.8));
         }
 
         .vr-floating-hex-menu .vr-hex-btn:hover .vr-hex-icon-content {
+            color: #ffffff;
             transform: scale(1.06);
         }
 
@@ -2427,7 +2428,7 @@
         .vr-hex-menu-bottom .vr-hex-btn-inner {
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, #2b5288 0%, #152a45 100%);
+            background: linear-gradient(180deg, #1e3a5f 0%, #12243e 100%);
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: flex;
             align-items: center;
@@ -2446,8 +2447,8 @@
         }
 
         .vr-hex-menu-bottom .vr-hex-btn:hover .vr-hex-btn-inner {
-            background: linear-gradient(180deg, #3b82f6 0%, #1e3a5f 100%);
-            box-shadow: 0 0 16px rgba(59, 130, 246, 0.7);
+            background: linear-gradient(180deg, #2d5282 0%, #1e3a5f 100%);
+            box-shadow: 0 0 16px rgba(30, 58, 95, 0.6);
         }
 
         .vr-hex-menu-bottom .vr-hex-btn:active {
@@ -3047,7 +3048,7 @@
                             </div>
                         </div>
                         <p style="font-size: 0.72rem; color: #64748b; margin-bottom: 10px; font-weight: 500; line-height: 1.35;">Đăng nhập để làm nhiệm vụ & nhận xu thưởng!</p>
-                        <a href="{{ route('login') }}" style="display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 6px 18px; background: #0284c7; color: #ffffff; border-radius: 8px; text-decoration: none; box-shadow: none; transition: all 0.2s;">Đăng nhập ngay</a>
+                        <a href="{{ route('login') }}" style="display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 6px 18px; background: #1e3a5f; color: #ffffff; border-radius: 8px; text-decoration: none; box-shadow: none; transition: all 0.2s;">Đăng nhập ngay</a>
                     </div>
                 @endauth
             </div><!-- /.mission-list-container -->
@@ -3059,13 +3060,13 @@
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
         <defs>
             <linearGradient id="vrHexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#233884" />
-                <stop offset="50%" stop-color="#1b5a9e" />
-                <stop offset="100%" stop-color="#177ab7" />
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96" />
+                <stop offset="100%" stop-color="#f1f5f9" stop-opacity="0.92" />
             </linearGradient>
             <linearGradient id="vrHexHoverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#3b82f6" />
-                <stop offset="100%" stop-color="#1d4ed8" />
+                <stop offset="0%" stop-color="#1e3a5f" />
+                <stop offset="50%" stop-color="#183050" />
+                <stop offset="100%" stop-color="#12243e" />
             </linearGradient>
         </defs>
     </svg>
@@ -3080,7 +3081,7 @@
                     <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
                 </svg>
                 <div class="vr-hex-icon-content">
-                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20V10.5z"/>
                         <path d="M9 21v-6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 15v6"/>
                     </svg>
@@ -3094,7 +3095,7 @@
                     <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
                 </svg>
                 <div class="vr-hex-icon-content">
-                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round">
                         <line x1="4" y1="7" x2="20" y2="7"/>
                         <line x1="4" y1="12" x2="20" y2="12"/>
                         <line x1="4" y1="17" x2="20" y2="17"/>
@@ -3109,17 +3110,17 @@
                     <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
                 </svg>
                 <div class="vr-hex-icon-content">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <!-- Plus D-Pad on Left -->
-                        <line x1="6" y1="11" x2="10" y2="11" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="8" y1="9" x2="8" y2="13" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="6" y1="11" x2="10" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="8" y1="9" x2="8" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         <!-- 4 Dots in Diamond Pattern on Right -->
-                        <circle cx="16" cy="9.8" r="0.8" fill="#ffffff" stroke="none"/>
-                        <circle cx="17.7" cy="11.5" r="0.8" fill="#ffffff" stroke="none"/>
-                        <circle cx="16" cy="13.2" r="0.8" fill="#ffffff" stroke="none"/>
-                        <circle cx="14.3" cy="11.5" r="0.8" fill="#ffffff" stroke="none"/>
+                        <circle cx="16" cy="9.8" r="0.8" fill="currentColor" stroke="none"/>
+                        <circle cx="17.7" cy="11.5" r="0.8" fill="currentColor" stroke="none"/>
+                        <circle cx="16" cy="13.2" r="0.8" fill="currentColor" stroke="none"/>
+                        <circle cx="14.3" cy="11.5" r="0.8" fill="currentColor" stroke="none"/>
                         <!-- Professional Gamepad Silhouette -->
-                        <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15.408A3.75 3.75 0 0 0 5.744 19.5c1.402 0 2.684-.79 3.32-2.036l.723-1.446a2 2 0 0 1 1.787-1.096h.852a2 2 0 0 1 1.787 1.096l.723 1.446A3.753 3.753 0 0 0 18.256 19.5 3.75 3.75 0 0 0 22 15.75l-.685-6.578A4 4 0 0 0 17.32 5z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15.408A3.75 3.75 0 0 0 5.744 19.5c1.402 0 2.684-.79 3.32-2.036l.723-1.446a2 2 0 0 1 1.787-1.096h.852a2 2 0 0 1 1.787 1.096l.723 1.446A3.753 3.753 0 0 0 18.256 19.5 3.75 3.75 0 0 0 22 15.75l-.685-6.578A4 4 0 0 0 17.32 5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
                 <span class="vr-hex-tooltip">Nhiệm vụ</span>
@@ -3133,15 +3134,15 @@
                 <div class="vr-hex-icon-content">
                     <svg width="38" height="38" viewBox="0 0 32 32" fill="none">
                         <!-- Outer Clapperboard Box -->
-                        <rect x="5" y="8" width="22" height="18" rx="3.5" stroke="#ffffff" stroke-width="2.5"/>
+                        <rect x="5" y="8" width="22" height="18" rx="3.5" stroke="currentColor" stroke-width="2.5"/>
                         <!-- Top Clapperboard Slanted Stripes -->
-                        <path d="M5 13H27" stroke="#ffffff" stroke-width="2.5"/>
-                        <path d="M9 8L13 13" stroke="#ffffff" stroke-width="2.2"/>
-                        <path d="M17 8L21 13" stroke="#ffffff" stroke-width="2.2"/>
+                        <path d="M5 13H27" stroke="currentColor" stroke-width="2.5"/>
+                        <path d="M9 8L13 13" stroke="currentColor" stroke-width="2.2"/>
+                        <path d="M17 8L21 13" stroke="currentColor" stroke-width="2.2"/>
                         <!-- Text "Trailer" -->
-                        <text x="16" y="19" font-size="5.5" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Trailer</text>
+                        <text x="16" y="19" font-size="5.5" font-weight="700" fill="currentColor" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Trailer</text>
                         <!-- Play Triangle below Trailer text -->
-                        <polygon points="14.5,21 18.5,23 14.5,25" fill="#ffffff"/>
+                        <polygon points="14.5,21 18.5,23 14.5,25" fill="currentColor"/>
                     </svg>
                 </div>
                 <span class="vr-hex-tooltip">Tour 360</span>
