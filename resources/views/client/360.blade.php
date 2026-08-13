@@ -2071,7 +2071,7 @@
 
 <body>
 
-    <a href="{{ url('/') }}" class="btn-back-map">
+    <a href="{{ route('home') }}" class="btn-back-map">
         <i class="fa-solid fa-arrow-left"></i> Quay lại Bản đồ
     </a>
 
