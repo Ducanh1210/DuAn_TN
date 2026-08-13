@@ -3076,7 +3076,7 @@
         <!-- Floating Hexagon Buttons centered on top edge of drawer -->
         <div class="vr-floating-hex-menu">
             <!-- Hex 1: Home -->
-            <button type="button" class="vr-hex-btn" id="vrBtnHome" title="Trang chủ" onclick="event.stopPropagation(); resetMapView();">
+            <a href="{{ route('client.landing') }}" class="vr-hex-btn" id="vrBtnHome" title="Trang chủ" onclick="event.stopPropagation();">
                 <svg class="vr-hex-svg" viewBox="0 0 62 70">
                     <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
                 </svg>
@@ -3087,7 +3087,7 @@
                     </svg>
                 </div>
                 <span class="vr-hex-tooltip">Trang chủ</span>
-            </button>
+            </a>
 
             <!-- Hex 2: Category / Menu -->
             <button type="button" class="vr-hex-btn" id="vrBtnCategory" title="Danh mục địa điểm" onclick="event.stopPropagation(); toggleCategoryDock();">
@@ -4494,6 +4494,111 @@
             L.DomEvent.disableClickPropagation(vrFloatingMenuEl);
             L.DomEvent.disableScrollPropagation(vrFloatingMenuEl);
         }
+    </script>
+    
+    @include('client.components.contribution-modals')
+
+    <!-- AI Chatbot & Trip Planner Floating Widgets -->
+    <x-chatbot-widget />
+    <x-trip-planner-widget />
+</body>
+            if (typeof map !== 'undefined' && map) {
+                map.setView([20.25, 105.97], 11);
+            } else {
+                window.location.href = "{{ url('/') }}";
+            }
+        }
+
+        // --- Monuments Modal JS Handlers (Matching Screenshot 2) ---
+        window.openMonumentsModal = function() {
+            const modal = document.getElementById('monumentsModal');
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.setProperty('display', 'flex', 'important');
+                document.body.style.overflow = 'hidden';
+                window.filterMonumentsModal();
+            }
+        };
+
+        window.closeMonumentsModal = function() {
+            const modal = document.getElementById('monumentsModal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.setProperty('display', 'none', 'important');
+                document.body.style.overflow = '';
+            }
+        };
+
+        window.filterMonumentsModal = function() {
+            const catSelect = document.getElementById('monumentsCatSelect');
+            const searchInput = document.getElementById('monumentsSearchInput');
+            const selectedCat = catSelect ? catSelect.value : 'all';
+            const keyword = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            
+            const cards = document.querySelectorAll('#monumentsGrid .monument-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const catId = card.getAttribute('data-cat');
+                const name = card.getAttribute('data-name') || '';
+                
+                const matchCat = (selectedCat === 'all' || catId === selectedCat);
+                const matchKeyword = (!keyword || name.includes(keyword));
+
+                if (matchCat && matchKeyword) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const countEl = document.getElementById('monumentsCurrentCount');
+            if (countEl) countEl.textContent = visibleCount;
+        };
+
+        window.selectMonumentFromModal = function(locId) {
+            window.closeMonumentsModal();
+            if (typeof locations !== 'undefined' && Array.isArray(locations)) {
+                const loc = locations.find(l => l.id === locId);
+                if (loc && loc.marker) {
+                    if (loc.lat && loc.lng && typeof map !== 'undefined' && map) {
+                        map.flyTo([loc.lat, loc.lng], 16, { animate: true, duration: 1.2 });
+                        setTimeout(() => {
+                            loc.marker.openPopup();
+                        }, 1200);
+                    }
+                }
+            }
+        };
+
+        // Gắn sự kiện trực tiếp bằng JS cho nút Hexagon 2
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnCategory = document.getElementById('vrBtnCategory');
+            if (btnCategory) {
+                btnCategory.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (window.openMonumentsModal) {
+                        window.openMonumentsModal();
+                    }
+                }, true);
+            }
+
+            @if(isset($autoOpenMonumentsModal) && $autoOpenMonumentsModal)
+                setTimeout(function() {
+                    if (window.openMonumentsModal) {
+                        window.openMonumentsModal();
+                    }
+                }, 300);
+            @endif
+        });
+
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                window.closeMonumentsModal();
+            }
+        });
     </script>
     
     @include('client.components.contribution-modals')

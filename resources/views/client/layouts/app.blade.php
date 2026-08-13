@@ -433,7 +433,7 @@
     <header class="site-header navbar navbar-expand-lg">
         <div class="container">
             <div class="site-header__inner">
-                <a class="site-brand" href="{{ url('/') }}">
+                <a class="site-brand" href="{{ route('client.landing') }}">
                     <span class="site-brand__main">Ninh Bình</span>
                     <span class="site-brand__sub">Travel Hub</span>
                 </a>
