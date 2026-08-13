@@ -1,186 +1,215 @@
 @extends('client.layouts.app')
 
-@section('title', 'Trang chủ — Ninh Bình Travel Hub')
+@php
+    $tamChucPath = public_path('images/tam_chuc.png');
+    $brainImgPath = 'C:/Users/admin/.gemini/antigravity-ide/brain/f933e8c2-b2d8-4fc9-a5ac-e95113e6f2a8/tam_chuc_background_1786629761917.png';
+    if (!file_exists($tamChucPath) && file_exists($brainImgPath)) {
+        @copy($brainImgPath, $tamChucPath);
+    }
+@endphp
+
+@section('title', 'Trang chủ — Cổng Thông Tin Du Lịch Ninh Bình 360°')
 
 @section('content')
-<div class="page-shell">
-    {{-- Hero --}}
-    <section class="landing-hero border-bottom" style="border-color: #e5e7eb !important;">
-        <div class="container py-5">
-            <div class="row align-items-center g-4">
-                <div class="col-lg-7">
-                    <p class="landing-eyebrow mb-2">Cổng thông tin du lịch Ninh Bình</p>
-                    <h1 class="landing-hero__title mb-3">Khám phá Ninh Bình theo cách của bạn</h1>
-                    <p class="landing-hero__lead mb-4">
-                        Bản đồ điểm đến, tour 360°, tin tức và sự kiện — tất cả trên một nền tảng gọn gàng, dễ tra cứu.
-                    </p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('home') }}" class="btn btn-primary px-4">Mở bản đồ du lịch</a>
-                        <a href="{{ route('client.news.index') }}" class="btn btn-outline-secondary px-4" style="border-color: #cbdbe8; color: #1e3a5f;">Đọc tin tức</a>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="landing-stats">
-                        <div class="landing-stat">
-                            <div class="landing-stat__num">{{ number_format($stats['locations']) }}</div>
-                            <div class="landing-stat__label">Địa điểm</div>
-                        </div>
-                        <div class="landing-stat">
-                            <div class="landing-stat__num">{{ number_format($stats['news']) }}</div>
-                            <div class="landing-stat__label">Bài viết</div>
-                        </div>
-                        <div class="landing-stat">
-                            <div class="landing-stat__num">{{ number_format($stats['events']) }}</div>
-                            <div class="landing-stat__label">Sự kiện</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<div class="landing-vr360-container">
+    {{-- Full-screen Background Panorama Image (Tam Chúc Pagoda) --}}
+    <img src="{{ asset('images/tam_chuc.png') }}" 
+         alt="Ninh Bình VR360 - Cảnh đẹp Chùa Tam Chúc" 
+         class="landing-bg-img"
+         onerror="this.src='{{ asset('images/trag.png') }}'">
 
-    {{-- Featured locations --}}
-    @if($featuredLocations->isNotEmpty())
-    <section class="container py-4">
-        <div class="d-flex justify-content-between align-items-end mb-3 pb-2 border-bottom" style="border-color: #e5e7eb !important;">
-            <div>
-                <span class="section-label d-block mb-1">Điểm đến nổi bật</span>
-                <h2 class="h5 mb-0 fw-semibold" style="color: #27272a;">Khám phá ngay</h2>
-            </div>
-            <a href="{{ route('home') }}" class="meta-text" style="color: #6482a6;">Xem trên bản đồ</a>
-        </div>
-        <div class="row g-3">
-            @foreach($featuredLocations as $loc)
-                <div class="col-md-6 col-lg-4">
-                    <a href="{{ route('client.locations.360', $loc->slug) }}" class="text-decoration-none editorial-link d-block h-100">
-                        <article class="event-card h-100">
-                            @include('client.partials.cover-image', [
-                                'src' => $loc->display_thumbnail,
-                                'alt' => $loc->name,
-                                'class' => 'rounded-0',
-                                'ratio' => '16/10',
-                            ])
-                            <div class="event-card__body">
-                                <h3 class="event-card__title editorial-link__title mb-1">{{ $loc->name }}</h3>
-                                @if($loc->category)
-                                    <p class="meta-text mb-2">{{ $loc->category->name }}</p>
-                                @endif
-                                <p class="event-card__excerpt mb-0">{{ Str::limit(strip_tags($loc->short_description ?? $loc->description ?? ''), 90) }}</p>
-                                <span class="d-inline-block mt-2 meta-text" style="color: #1e3a5f; font-weight: 500;">
-                                    Khám phá ngay →
-                                </span>
-                            </div>
-                        </article>
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </section>
-    @endif
+    {{-- Ambient Overlay Mask for Contrast --}}
+    <div class="landing-overlay-mask"></div>
 
-    <div class="container pb-4">
-        <div class="row g-4">
-            {{-- News --}}
-            <div class="col-lg-7">
-                <div class="mb-3 pb-2 border-bottom" style="border-color: #e5e7eb !important;">
-                    <span class="section-label">Tin tức & Cẩm nang</span>
-                </div>
-                <div class="d-flex flex-column gap-3">
-                    @forelse($latestNews as $item)
-                        <article class="pb-3 border-bottom" style="border-color: #f4f4f5 !important;">
-                            <a href="{{ route('client.news.show', $item->slug) }}" class="text-decoration-none editorial-link d-flex gap-3">
-                                <div style="width: 110px; flex-shrink: 0;">
-                                    @include('client.partials.cover-image', [
-                                        'src' => $item->featured_image_url,
-                                        'alt' => $item->title,
-                                        'ratio' => '4/3',
-                                    ])
-                                </div>
-                                <div class="flex-grow-1" style="min-width: 0;">
-                                    <h3 class="editorial-link__title fw-semibold mb-1" style="color: #27272a; font-size: 0.9rem; line-height: 1.4;">
-                                        {{ $item->title }}
-                                    </h3>
-                                    <div class="meta-text">{{ $item->published_at?->format('d/m/Y') }}</div>
-                                </div>
-                            </a>
-                        </article>
-                    @empty
-                        <p class="meta-text">Chưa có bài viết.</p>
-                    @endforelse
-                </div>
-                <a href="{{ route('client.news.index') }}" class="d-inline-block mt-3 meta-text" style="color: #1e3a5f; font-weight: 500;">Xem tất cả tin tức →</a>
-            </div>
+    {{-- Center Hero Content Box --}}
+    <div class="landing-hero-center">
+        <h1 class="landing-title">
+            <span class="title-white">MỘT CHẠM ĐẾN</span>
+            <span class="title-highlight">NINH BÌNH</span>
+        </h1>
 
-            {{-- Events --}}
-            <div class="col-lg-5">
-                <div class="mb-3 pb-2 border-bottom" style="border-color: #e5e7eb !important;">
-                    <span class="section-label">Sự kiện sắp tới</span>
-                </div>
-                <div class="d-flex flex-column gap-3">
-                    @forelse($upcomingEvents as $event)
-                        <article>
-                            <a href="{{ route('client.events.show', $event->slug) }}" class="text-decoration-none editorial-link">
-                                <h3 class="editorial-link__title fw-semibold mb-1" style="color: #27272a; font-size: 0.875rem;">{{ $event->name }}</h3>
-                                <div class="event-card__date">{{ $event->start_time?->format('d/m/Y H:i') }}</div>
-                                @if($event->location_text)
-                                    <p class="meta-text mb-0">{{ $event->location_text }}</p>
-                                @endif
-                            </a>
-                        </article>
-                    @empty
-                        <p class="meta-text">Chưa có sự kiện sắp tới.</p>
-                    @endforelse
-                </div>
-                <a href="{{ route('client.events.index') }}" class="d-inline-block mt-3 meta-text" style="color: #1e3a5f; font-weight: 500;">Xem tất cả sự kiện →</a>
-            </div>
-        </div>
+        <a href="{{ route('home') }}" class="btn-start-tour" title="Bắt đầu tham quan bản đồ 360°">
+            <span class="btn-text">BẮT ĐẦU THAM QUAN</span>
+            <span class="btn-icon"><i class="fa-solid fa-compass"></i></span>
+        </a>
     </div>
 </div>
 
 @push('styles')
 <style>
-    .landing-hero { background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%); }
-    .landing-eyebrow {
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: 0.06em;
+    /* Reset & Fullscreen Enforcements */
+    .site-header, footer {
+        display: none !important;
+    }
+    html, body {
+        overflow: hidden !important;
+        height: 100vh !important;
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #0f172a !important;
+        font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    .landing-vr360-container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* High Quality Panoramic Image Coverage */
+    .landing-bg-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        object-position: center center;
+        z-index: 1;
+        transform: scale(1.02);
+        transition: transform 10s ease-out;
+    }
+
+    /* Ambient Vignette & Gradient Mask */
+    .landing-overlay-mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: radial-gradient(circle at center, rgba(15, 23, 42, 0.12) 0%, rgba(15, 23, 42, 0.4) 70%, rgba(15, 23, 42, 0.65) 100%);
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    /* Center Hero Text and Button Section */
+    .landing-hero-center {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 20px;
+        max-width: 1000px;
+        margin-top: -2vh;
+    }
+
+    /* Title Styling: "MỘT CHẠM ĐẾN NINH BÌNH" (Tăng kích thước chữ to hơn) */
+    .landing-title {
+        margin: 0 0 1.8rem 0;
+        font-size: clamp(3rem, 7.5vw, 6.2rem);
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: 1px;
         text-transform: uppercase;
-        color: #6482a6;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3em;
+        user-select: none;
     }
-    .landing-hero__title {
-        color: #1e3a5f;
-        font-size: clamp(1.5rem, 3vw, 2rem);
-        font-weight: 600;
-        line-height: 1.25;
-        letter-spacing: -0.02em;
+
+    .title-white {
+        color: #ffffff;
+        text-shadow: 
+            0 4px 20px rgba(0, 0, 0, 0.9),
+            0 2px 6px rgba(0, 0, 0, 0.95);
     }
-    .landing-hero__lead {
-        color: #52525b;
-        font-size: 0.95rem;
-        line-height: 1.65;
-        max-width: 540px;
+
+    .title-highlight {
+        color: #facc15; /* Golden Yellow matching reference */
+        text-shadow: 
+            0 4px 20px rgba(0, 0, 0, 0.9),
+            0 0 35px rgba(250, 204, 21, 0.5);
     }
-    .landing-stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        padding: 20px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+
+    /* Cyan Gradient Action Button ("BẮT ĐẦU THAM QUAN" - Thu nhỏ gọn gàng) */
+    .btn-start-tour {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 32px;
+        background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #0284c7 100%);
+        color: #ffffff !important;
+        font-size: clamp(0.875rem, 1.25vw, 1.05rem);
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        text-decoration: none !important;
+        border-radius: 9999px;
+        box-shadow: 
+            0 6px 20px rgba(6, 182, 212, 0.45),
+            0 0 0 0 rgba(34, 211, 238, 0.4);
+        border: 1.5px solid rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: pulse-glow 2.5s infinite;
+        position: relative;
     }
-    .landing-stat { text-align: center; }
-    .landing-stat__num {
-        color: #1e3a5f;
-        font-size: 1.35rem;
-        font-weight: 600;
-        line-height: 1.2;
+
+    .btn-start-tour .btn-icon {
+        font-size: 1.2em;
+        transition: transform 0.3s ease;
     }
-    .landing-stat__label {
-        color: #6482a6;
-        font-size: 0.75rem;
-        margin-top: 4px;
+
+    .btn-start-tour:hover {
+        transform: translateY(-3px) scale(1.05);
+        background: linear-gradient(135deg, #38bdf8 0%, #06b6d4 50%, #0369a1 100%);
+        box-shadow: 
+            0 14px 40px rgba(6, 182, 212, 0.7),
+            0 0 30px rgba(56, 189, 248, 0.6);
+        border-color: #ffffff;
+    }
+
+    .btn-start-tour:hover .btn-icon {
+        transform: rotate(45deg) scale(1.15);
+    }
+
+    .btn-start-tour:active {
+        transform: translateY(1px) scale(0.98);
+        box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+    }
+
+    /* Pulse Glow Keyframes */
+    @keyframes pulse-glow {
+        0% {
+            box-shadow: 
+                0 8px 30px rgba(6, 182, 212, 0.5),
+                0 0 0 0 rgba(34, 211, 238, 0.6);
+        }
+        70% {
+            box-shadow: 
+                0 8px 30px rgba(6, 182, 212, 0.5),
+                0 0 0 18px rgba(34, 211, 238, 0);
+        }
+        100% {
+            box-shadow: 
+                0 8px 30px rgba(6, 182, 212, 0.5),
+                0 0 0 0 rgba(34, 211, 238, 0);
+        }
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .btn-start-tour {
+            padding: 14px 32px;
+        }
+        .landing-title {
+            gap: 0.2em;
+        }
     }
 </style>
 @endpush
 @endsection
+

@@ -2122,7 +2122,7 @@
 
 <!-- Top Navigation Bar -->
 <div class="top-navbar">
-    <a href="{{ url('/') }}" class="btn-back">
+    <a href="{{ route('home') }}" class="btn-back">
         <span class="back-chevron">&lsaquo;</span> Quay lại
     </a>
     <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
@@ -2240,7 +2240,7 @@
             </div>
             <div class="workspace-actions">
                 <span id="workspaceHint" class="text-secondary" style="font-size:0.72rem;margin-right:4px;">Workspace</span>
-                <a href="{{ url('/') }}" class="btn-action" style="text-decoration:none; padding:6px 12px; font-size:0.72rem;">Về bản đồ</a>
+                <a href="{{ route('home') }}" class="btn-action" style="text-decoration:none; padding:6px 12px; font-size:0.72rem;">Về bản đồ</a>
             </div>
         </div>
 
@@ -2419,7 +2419,7 @@
                                     <span>Đăng ký doanh nghiệp</span>
                                     <span class="qo-meta">Mở rộng</span>
                                 </button>
-                                <a href="{{ url('/') }}">
+                                <a href="{{ route('home') }}">
                                     <span>Mở bản đồ / AI lịch trình</span>
                                     <span class="qo-meta">Map</span>
                                 </a>
@@ -2616,7 +2616,7 @@
                             <span class="filter-chip on">Tất cả</span>
                             <span class="dt-meta">Danh sách yêu thích trên bản đồ</span>
                         </div>
-                        <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;">+ Thêm từ bản đồ</a>
+                        <a href="{{ route('home') }}" class="btn-solid" style="text-decoration:none;">+ Thêm từ bản đồ</a>
                     </div>
                     <div class="data-list" id="favoritesGrid">
                         @forelse($favorites as $location)
@@ -2635,7 +2635,7 @@
                         @empty
                             <div id="noFavoritesMsg" class="empty-state" style="border:0;border-radius:0;">
                                 <p>Bạn chưa lưu địa điểm nào.</p>
-                                <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;display:inline-block;">Tìm địa điểm trên bản đồ</a>
+                                <a href="{{ route('home') }}" class="btn-solid" style="text-decoration:none;display:inline-block;">Tìm địa điểm trên bản đồ</a>
                             </div>
                         @endforelse
                     </div>
@@ -2654,7 +2654,7 @@
                             <span class="filter-chip on">AI itineraries</span>
                             <span class="dt-meta">Lưu từ tính năng Lên lịch trình</span>
                         </div>
-                        <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;" onclick="if(window.openTripPlanner){event.preventDefault(); window.openTripPlanner(true);}">+ Tạo lịch trình</a>
+                        <a href="{{ route('home') }}" class="btn-solid" style="text-decoration:none;" onclick="if(window.openTripPlanner){event.preventDefault(); window.openTripPlanner(true);}">+ Tạo lịch trình</a>
                     </div>
                     <div class="data-list" id="itinerariesGrid">
                         @forelse(($itineraries ?? collect()) as $it)
@@ -2678,7 +2678,7 @@
                         @empty
                             <div id="noItinerariesMsg" class="empty-state" style="border:0;border-radius:0;">
                                 <p>Bạn chưa lưu lịch trình nào.</p>
-                                <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;display:inline-block;" onclick="if(window.openTripPlanner){event.preventDefault(); window.openTripPlanner(true);}">Lên lịch trình AI</a>
+                                <a href="{{ route('home') }}" class="btn-solid" style="text-decoration:none;display:inline-block;" onclick="if(window.openTripPlanner){event.preventDefault(); window.openTripPlanner(true);}">Lên lịch trình AI</a>
                             </div>
                         @endforelse
                     </div>
@@ -3520,7 +3520,7 @@
                                     favoritesGrid.innerHTML = `
                                         <div id="noFavoritesMsg" class="empty-state" style="border:0;border-radius:0;">
                                             <p>Bạn chưa lưu địa điểm nào.</p>
-                                            <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;display:inline-block;">Tìm địa điểm trên bản đồ</a>
+                                            <a href="{{ route('home') }}" class="btn-solid" style="text-decoration:none;display:inline-block;">Tìm địa điểm trên bản đồ</a>
                                         </div>
                                     `;
                                 }
@@ -3663,7 +3663,7 @@
                             itinerariesGrid.innerHTML = `
                                 <div id="noItinerariesMsg" class="empty-state" style="border:0;border-radius:0;">
                                     <p>Bạn chưa lưu lịch trình nào.</p>
-                                    <a href="{{ url('/') }}" class="btn-solid" style="text-decoration:none;display:inline-block;" onclick="if(window.openTripPlanner){event.preventDefault();window.openTripPlanner(true);}">Lên lịch trình AI</a>
+                                    <a href="{{ route('home') }}" class="btn-solid" style="text-decoration:none;display:inline-block;" onclick="if(window.openTripPlanner){event.preventDefault();window.openTripPlanner(true);}">Lên lịch trình AI</a>
                                 </div>`;
                         }
                         showToast('Đã xóa lịch trình.', true);

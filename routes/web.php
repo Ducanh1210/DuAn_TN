@@ -35,11 +35,12 @@ if (app()->environment('local') || php_sapi_name() == 'cli-server') {
     })->where('path', '.*');
 }
 
-Route::get('/trang-chu', [LandingController::class, 'index'])->name('client.landing');
+Route::get('/', [LandingController::class, 'index'])->name('client.landing');
+Route::get('/trang-chu', [LandingController::class, 'index']);
 Route::get('/dich-vu-tour-360', [LandingController::class, 'panoService'])->name('client.pano_service');
 Route::post('/dich-vu-tour-360', [LandingController::class, 'submitPanoService'])->name('client.pano_service.submit');
 
-Route::get('/', function () {
+Route::get('/ban-do', function () {
     $locations = \App\Models\Location::with(['category', 'images'])->withCount('panoramas')->where('status', 'published')->get();
     if ($locations->isEmpty()) {
         $locations = \App\Models\Location::with(['category', 'images'])->withCount('panoramas')->get();
