@@ -2536,6 +2536,220 @@
                 display: none;
             }
         }
+
+        /* ========== Monuments Modal ========== */
+        .monuments-modal-backdrop {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(15, 23, 42, 0.6) !important;
+            backdrop-filter: blur(6px) !important;
+            -webkit-backdrop-filter: blur(6px) !important;
+            z-index: 999999999 !important;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .monuments-modal-backdrop.show {
+            display: flex !important;
+        }
+        .monuments-modal-dialog {
+            width: 100%;
+            max-width: 960px;
+            max-height: 85vh;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: mmFadeIn .2s ease-out;
+        }
+        @keyframes mmFadeIn {
+            from { opacity: 0; transform: translateY(12px) scale(.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .monuments-modal-header {
+            padding: 16px 22px 12px;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .monuments-modal-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .monuments-modal-title {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #1e3a5f;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            text-align: center;
+            flex: 1;
+        }
+        .monuments-close-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 26px;
+            font-weight: 900;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 2px;
+            transition: transform .15s;
+        }
+        .monuments-close-btn:hover {
+            color: #dc2626;
+            transform: scale(1.15);
+        }
+        .monuments-controls-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .monuments-controls-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .monuments-cat-select {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: .84rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            outline: none;
+            background: #f8fafc;
+            cursor: pointer;
+            max-width: 170px;
+        }
+        .monuments-cat-select:focus { border-color: #1e3a5f; background: #fff; }
+        .monuments-search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 160px;
+        }
+        .monuments-search-wrapper .search-icon {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 18px;
+        }
+        .monuments-search-input {
+            width: 100%;
+            padding: 6px 10px 6px 32px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: .84rem;
+            color: #0f172a;
+            outline: none;
+            background: #f8fafc;
+            box-sizing: border-box;
+        }
+        .monuments-search-input:focus { border-color: #1e3a5f; background: #fff; }
+        .monuments-count-info {
+            font-size: .82rem;
+            font-weight: 600;
+            color: #64748b;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .monuments-pagination {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .page-num-btn {
+            border: none;
+            background: transparent;
+            color: #475569;
+            font-size: .8rem;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .page-num-btn.active { background: #0284c7; color: #fff; }
+        .count-divider { margin: 0 5px; color: #94a3b8; }
+        .monuments-modal-body {
+            padding: 16px 20px;
+            overflow-y: auto;
+            flex: 1;
+            background: #f8fafc;
+        }
+        .monuments-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 860px) { .monuments-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 540px) {
+            .monuments-grid { grid-template-columns: 1fr; }
+            .monuments-controls-left { flex-direction: column; align-items: stretch; }
+            .monuments-cat-select { max-width: 100%; }
+        }
+        .monument-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+        .monument-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(30,58,95,0.14);
+            border-color: #1e3a5f;
+        }
+        .monument-card-img-box {
+            position: relative;
+            width: 100%;
+            height: 155px;
+            overflow: hidden;
+            background: #cbd5e1;
+        }
+        .monument-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .35s ease;
+        }
+        .monument-card:hover .monument-card-img { transform: scale(1.06); }
+        .monument-card-title-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.48);
+            color: #fff;
+            padding: 7px 10px;
+            font-size: .78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: .3px;
+            text-shadow: 0 1px 3px rgba(0,0,0,.8);
+        }
     </style>
 </head>
 
@@ -3089,8 +3303,8 @@
                 <span class="vr-hex-tooltip">Trang chủ</span>
             </a>
 
-            <!-- Hex 2: Category / Menu -->
-            <button type="button" class="vr-hex-btn" id="vrBtnCategory" title="Danh mục địa điểm" onclick="event.stopPropagation(); toggleCategoryDock();">
+            <!-- Hex 2: Danh sách di tích -->
+            <button type="button" class="vr-hex-btn" id="vrBtnCategory" title="Danh sách di tích" onclick="event.stopPropagation(); openMonumentsModal();">
                 <svg class="vr-hex-svg" viewBox="0 0 62 70">
                     <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
                 </svg>
@@ -3193,6 +3407,56 @@
     </div>
 
 
+
+    <!-- ========== Monuments Modal ========== -->
+    <div class="monuments-modal-backdrop" id="monumentsModal" onclick="if(event.target===this) closeMonumentsModal();">
+        <div class="monuments-modal-dialog">
+            <div class="monuments-modal-header">
+                <div class="monuments-modal-title-row">
+                    <h3 class="monuments-modal-title">DANH SÁCH DI TÍCH</h3>
+                    <button type="button" class="monuments-close-btn" onclick="closeMonumentsModal()" title="Đóng">✕</button>
+                </div>
+                <div class="monuments-controls-bar">
+                    <div class="monuments-controls-left">
+                        <select id="monumentsCatSelect" class="monuments-cat-select" onchange="filterMonumentsModal()">
+                            <option value="all">Tất cả</option>
+                            @foreach($locations->pluck('category')->filter()->unique('id') as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="monuments-count-info" id="monumentsCountInfo">
+                        <span class="monuments-pagination">
+                            <button type="button" class="page-num-btn active">1</button>
+                            <button type="button" class="page-num-btn">2</button>
+                            <button type="button" class="page-num-btn">3</button>
+                            <span>...</span>
+                        </span>
+                        <span class="count-divider">|</span>
+                        <span><strong id="monumentsCurrentCount">{{ $locations->count() }}</strong> địa điểm</span>
+                    </div>
+                </div>
+            </div>
+            <div class="monuments-modal-body">
+                <div class="monuments-grid" id="monumentsGrid">
+                    @foreach($locations as $loc)
+                        <div class="monument-card"
+                             data-cat="{{ $loc->category ? $loc->category->id : '' }}"
+                             data-name="{{ mb_strtolower($loc->name, 'UTF-8') }}"
+                             onclick="selectMonumentFromModal({{ $loc->id }})">
+                            <div class="monument-card-img-box">
+                                <img src="{{ $loc->thumbnail_url ?: 'https://placehold.co/400x250/1e293b/ffffff?text=Ninh+Binh' }}"
+                                     alt="{{ $loc->name }}"
+                                     class="monument-card-img"
+                                     loading="lazy">
+                                <div class="monument-card-title-overlay">{{ mb_strtoupper($loc->name, 'UTF-8') }}</div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
@@ -4494,110 +4758,68 @@
             L.DomEvent.disableClickPropagation(vrFloatingMenuEl);
             L.DomEvent.disableScrollPropagation(vrFloatingMenuEl);
         }
-    </script>
-    
-    @include('client.components.contribution-modals')
 
-    <!-- AI Chatbot & Trip Planner Floating Widgets -->
-    <x-chatbot-widget />
-    <x-trip-planner-widget />
-</body>
-            if (typeof map !== 'undefined' && map) {
-                map.setView([20.25, 105.97], 11);
-            } else {
-                window.location.href = "{{ url('/') }}";
-            }
-        }
-
-        // --- Monuments Modal JS Handlers (Matching Screenshot 2) ---
-        window.openMonumentsModal = function() {
-            const modal = document.getElementById('monumentsModal');
+        // ========== Monuments Modal JS ==========
+        function openMonumentsModal() {
+            var modal = document.getElementById('monumentsModal');
             if (modal) {
                 modal.classList.add('show');
-                modal.style.setProperty('display', 'flex', 'important');
                 document.body.style.overflow = 'hidden';
-                window.filterMonumentsModal();
+                filterMonumentsModal();
             }
-        };
-
-        window.closeMonumentsModal = function() {
-            const modal = document.getElementById('monumentsModal');
+        }
+        function closeMonumentsModal() {
+            var modal = document.getElementById('monumentsModal');
             if (modal) {
                 modal.classList.remove('show');
-                modal.style.setProperty('display', 'none', 'important');
                 document.body.style.overflow = '';
             }
-        };
-
-        window.filterMonumentsModal = function() {
-            const catSelect = document.getElementById('monumentsCatSelect');
-            const searchInput = document.getElementById('monumentsSearchInput');
-            const selectedCat = catSelect ? catSelect.value : 'all';
-            const keyword = searchInput ? searchInput.value.trim().toLowerCase() : '';
-            
-            const cards = document.querySelectorAll('#monumentsGrid .monument-card');
-            let visibleCount = 0;
-
-            cards.forEach(card => {
-                const catId = card.getAttribute('data-cat');
-                const name = card.getAttribute('data-name') || '';
-                
-                const matchCat = (selectedCat === 'all' || catId === selectedCat);
-                const matchKeyword = (!keyword || name.includes(keyword));
-
-                if (matchCat && matchKeyword) {
-                    card.style.display = 'flex';
+        }
+        function filterMonumentsModal() {
+            var catSelect = document.getElementById('monumentsCatSelect');
+            var selectedCat = catSelect ? catSelect.value : 'all';
+            var cards = document.querySelectorAll('#monumentsGrid .monument-card');
+            var visibleCount = 0;
+            cards.forEach(function(card) {
+                var catId = card.getAttribute('data-cat');
+                var matchCat = (selectedCat === 'all' || catId === selectedCat);
+                if (matchCat) {
+                    card.style.display = '';
                     visibleCount++;
                 } else {
                     card.style.display = 'none';
                 }
             });
-
-            const countEl = document.getElementById('monumentsCurrentCount');
+            var countEl = document.getElementById('monumentsCurrentCount');
             if (countEl) countEl.textContent = visibleCount;
-        };
-
-        window.selectMonumentFromModal = function(locId) {
-            window.closeMonumentsModal();
+        }
+        function selectMonumentFromModal(locId) {
+            closeMonumentsModal();
             if (typeof locations !== 'undefined' && Array.isArray(locations)) {
-                const loc = locations.find(l => l.id === locId);
-                if (loc && loc.marker) {
-                    if (loc.lat && loc.lng && typeof map !== 'undefined' && map) {
-                        map.flyTo([loc.lat, loc.lng], 16, { animate: true, duration: 1.2 });
-                        setTimeout(() => {
-                            loc.marker.openPopup();
-                        }, 1200);
-                    }
+                var loc = locations.find(function(l) { return l.id === locId; });
+                if (loc && loc.lat && loc.lng && typeof map !== 'undefined' && map) {
+                    map.flyTo([loc.lat, loc.lng], 16, { animate: true, duration: 1.2 });
+                    setTimeout(function() {
+                        if (loc.marker) loc.marker.openPopup();
+                    }, 1200);
                 }
             }
-        };
+        }
 
-        // Gắn sự kiện trực tiếp bằng JS cho nút Hexagon 2
-        document.addEventListener('DOMContentLoaded', function () {
-            const btnCategory = document.getElementById('vrBtnCategory');
-            if (btnCategory) {
-                btnCategory.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    if (window.openMonumentsModal) {
-                        window.openMonumentsModal();
-                    }
-                }, true);
+        // Bắt sự kiện Leaflet cho nút Hex 2
+        (function() {
+            var btn = document.getElementById('vrBtnCategory');
+            if (btn && typeof L !== 'undefined' && L.DomEvent) {
+                L.DomEvent.on(btn, 'click', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    openMonumentsModal();
+                });
             }
+        })();
 
-            @if(isset($autoOpenMonumentsModal) && $autoOpenMonumentsModal)
-                setTimeout(function() {
-                    if (window.openMonumentsModal) {
-                        window.openMonumentsModal();
-                    }
-                }, 300);
-            @endif
-        });
-
-        // Close on ESC key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                window.closeMonumentsModal();
-            }
+        // Đóng modal bằng ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeMonumentsModal();
         });
     </script>
     
