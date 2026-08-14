@@ -1909,26 +1909,36 @@
 
             // Restore base64 camera photos (+ GPS metadata) from IndexedDB after reload
             async function restoreVerificationPhotosFromIDB() {
-                const data = await idbGetPhotos();
+                let data = null;
+                try {
+                    data = await idbGetPhotos();
+                } catch (e) {
+                    console.warn('Không đọc được ảnh thực địa đã lưu:', e);
+                }
                 if (!data) return;
-                if (Array.isArray(data.verificationPhotos) && data.verificationPhotos.length) {
-                    verificationPhotos.length = 0;
-                    data.verificationPhotos.forEach(p => verificationPhotos.push(p));
-                    verificationPhotoData = verificationPhotos[0] || null;
-                    renderVerificationGallery();
-                    if (verificationPhotoData && capturedImagePreview && capturedPreviewContainer) {
-                        capturedImagePreview.src = verificationPhotoData;
-                        capturedPreviewContainer.classList.remove('d-none');
+
+                try {
+                    if (Array.isArray(data.verificationPhotos) && data.verificationPhotos.length) {
+                        verificationPhotos.length = 0;
+                        data.verificationPhotos.forEach(p => verificationPhotos.push(p));
+                        verificationPhotoData = verificationPhotos[0] || null;
+                        renderVerificationGallery();
+                        if (verificationPhotoData && capturedImagePreview && capturedPreviewContainer) {
+                            capturedImagePreview.src = verificationPhotoData;
+                            capturedPreviewContainer.classList.remove('d-none');
+                        }
                     }
-                }
-                if (data.verificationLat) verificationLat = data.verificationLat;
-                if (data.verificationLng) verificationLng = data.verificationLng;
-                if (data.verificationTime) verificationTime = data.verificationTime;
-                if (verificationLat && verificationLng && watermarkLocation) {
-                    watermarkLocation.innerText = 'Tọa độ GPS: ' + Number(verificationLat).toFixed(6) + ', ' + Number(verificationLng).toFixed(6);
-                }
-                if (verificationTime && watermarkTime) {
-                    watermarkTime.innerText = 'Thời gian: ' + new Date(verificationTime).toLocaleString('vi-VN');
+                    if (data.verificationLat) verificationLat = data.verificationLat;
+                    if (data.verificationLng) verificationLng = data.verificationLng;
+                    if (data.verificationTime) verificationTime = data.verificationTime;
+                    if (verificationLat && verificationLng && watermarkLocation) {
+                        watermarkLocation.innerText = 'Tọa độ GPS: ' + Number(verificationLat).toFixed(6) + ', ' + Number(verificationLng).toFixed(6);
+                    }
+                    if (verificationTime && watermarkTime) {
+                        watermarkTime.innerText = 'Thời gian: ' + new Date(verificationTime).toLocaleString('vi-VN');
+                    }
+                } catch (e) {
+                    console.warn('Không khôi phục được ảnh thực địa:', e);
                 }
             }
 
@@ -1936,19 +1946,38 @@
                 const raw = localStorage.getItem('biz_wizard_state');
                 if (!raw) return;
 
+                let state;
                 try {
-                    const state = JSON.parse(raw);
+                    state = JSON.parse(raw);
+                } catch (e) {
+                    console.error('Error parsing wizard state:', e);
+                    return;
+                }
 
+                // Mỗi phần khôi phục chạy độc lập: một phần lỗi không làm mất các phần còn lại
+                const restore = (label, fn) => {
+                    try {
+                        fn();
+                    } catch (e) {
+                        console.warn('Không khôi phục được "' + label + '":', e);
+                    }
+                };
+
+                restore('bước hiện tại', () => {
                     if (state.bizStep && !isNaN(state.bizStep)) {
                         bizStep = parseInt(state.bizStep);
                     }
+                });
 
+                restore('tên doanh nghiệp', () => {
                     if (state.businessName) {
-                        inputBizName.value = state.businessName;
+                        if (inputBizName) inputBizName.value = state.businessName;
                         if (mockBizName) mockBizName.innerText = state.businessName;
                         if (mockSearchText) mockSearchText.innerText = state.businessName;
                     }
+                });
 
+                restore('loại hình kinh doanh', () => {
                     if (state.businessTypes && Array.isArray(state.businessTypes)) {
                         document.querySelectorAll('.biz-type-card').forEach(card => {
                             const val = card.getAttribute('data-val');
@@ -1961,9 +1990,11 @@
                         const inputTypes = document.getElementById('input_business_types');
                         if (inputTypes) inputTypes.value = JSON.stringify(state.businessTypes);
                     }
+                });
 
+                restore('danh mục', () => {
                     if (state.categoryId) {
-                        inputCategoryId.value = state.categoryId;
+                        if (inputCategoryId) inputCategoryId.value = state.categoryId;
                         const catName = state.categoryName || state.categorySearchName;
                         if (catName && catName !== '-- Chọn danh mục kinh doanh --') {
                             if (inputCategorySearch) inputCategorySearch.value = catName;
@@ -1996,43 +2027,59 @@
                             }
                         }
                     }
+                });
 
-                    if (state.addressStreet) inputStreet.value = state.addressStreet;
-                    if (state.addressCity) inputCity.value = state.addressCity;
-                    if (state.addressProvince) inputProvince.value = state.addressProvince;
-                    if (state.addressPostalCode && document.getElementById('input_address_postal_code')) {
-                        document.getElementById('input_address_postal_code').value = state.addressPostalCode;
+                restore('địa chỉ', () => {
+                    if (state.addressStreet && inputStreet) inputStreet.value = state.addressStreet;
+                    if (state.addressCity && inputCity) inputCity.value = state.addressCity;
+                    if (state.addressProvince && inputProvince) inputProvince.value = state.addressProvince;
+                    const postalEl = document.getElementById('input_address_postal_code');
+                    if (state.addressPostalCode && postalEl) {
+                        postalEl.value = state.addressPostalCode;
                     }
                     updateMockAddress();
+                });
 
+                restore('số điện thoại', () => {
                     if (state.phone) {
                         if (inputPhone) inputPhone.value = state.phone;
                         if (mockBizPhone) mockBizPhone.innerText = state.phone;
                     }
+                });
+
+                restore('website', () => {
                     if (state.website) {
                         if (inputWebsite) inputWebsite.value = state.website;
                         if (mockBizWebsite) mockBizWebsite.innerText = state.website;
                         if (mockBizWebsiteRow) mockBizWebsiteRow.classList.remove('d-none');
                     }
+                });
 
+                restore('vị trí bản đồ', () => {
+                    const latEl = document.getElementById('input_lat');
+                    const lngEl = document.getElementById('input_lng');
                     if (state.lat && state.lng) {
-                        if (document.getElementById('input_lat')) document.getElementById('input_lat').value = state.lat;
-                        if (document.getElementById('input_lng')) document.getElementById('input_lng').value = state.lng;
+                        if (latEl) latEl.value = state.lat;
+                        if (lngEl) lngEl.value = state.lng;
                     }
+                });
 
-                    if (state.hasOwnProperty('receiveTips') && document.getElementById('receive_tips')) {
-                        document.getElementById('receive_tips').checked = state.receiveTips;
-                    }
-                    if (state.hasOwnProperty('receiveSurveys') && document.getElementById('receive_surveys')) {
-                        document.getElementById('receive_surveys').checked = state.receiveSurveys;
-                    }
+                restore('tùy chọn nhận thông tin', () => {
+                    const tipsEl = document.getElementById('receive_tips');
+                    const surveysEl = document.getElementById('receive_surveys');
+                    if (state.hasOwnProperty('receiveTips') && tipsEl) tipsEl.checked = state.receiveTips;
+                    if (state.hasOwnProperty('receiveSurveys') && surveysEl) surveysEl.checked = state.receiveSurveys;
+                });
 
+                restore('mô tả', () => {
                     if (state.description) {
                         if (inputDesc) inputDesc.value = state.description;
                         if (mockBizDesc) mockBizDesc.innerText = state.description;
                         if (descCharCount) descCharCount.innerText = state.description.length + ' / 750';
                     }
+                });
 
+                restore('ảnh địa điểm', () => {
                     if (state.menuPhotos && Array.isArray(state.menuPhotos)) {
                         menuPhotos.length = 0;
                         state.menuPhotos.forEach(p => menuPhotos.push(p));
@@ -2042,15 +2089,24 @@
                         storefrontPhotos.length = 0;
                         state.storefrontPhotos.forEach(p => storefrontPhotos.push(p));
                     }
+                });
+
+                restore('ảnh đại diện', () => {
                     if (state.avatarPhoto) {
                         avatarPhoto = state.avatarPhoto;
                         restoreAvatarPreview();
                     }
+                });
+
+                restore('giấy tờ doanh nghiệp', () => {
                     if (state.businessDocs && Array.isArray(state.businessDocs)) {
                         businessDocs.length = 0;
                         state.businessDocs.forEach(p => businessDocs.push(p));
                         restorePhotoPreviews('docPreviews', businessDocs);
                     }
+                });
+
+                restore('ảnh bằng chứng', () => {
                     if (state.verificationPhotos && Array.isArray(state.verificationPhotos)) {
                         verificationPhotos.length = 0;
                         state.verificationPhotos.forEach(p => verificationPhotos.push(p));
@@ -2059,11 +2115,11 @@
                     if (state.verificationLat) verificationLat = state.verificationLat;
                     if (state.verificationLng) verificationLng = state.verificationLng;
                     if (state.verificationTime) verificationTime = state.verificationTime;
-                    updateMockPhotosGrid();
+                });
 
-                } catch (e) {
-                    console.error('Error loading wizard state:', e);
-                }
+                restore('ảnh xem trước', () => {
+                    updateMockPhotosGrid();
+                });
             }
 
             function clearWizardState() {
@@ -2268,9 +2324,10 @@
                     if (!bizMap) {
                         let savedLat = parseFloat(document.getElementById('input_lat').value);
                         let savedLng = parseFloat(document.getElementById('input_lng').value);
+                        const hasSavedPosition = !isNaN(savedLat) && !isNaN(savedLng);
 
-                        const defaultLat = !isNaN(savedLat) ? savedLat : 20.545;
-                        const defaultLng = !isNaN(savedLng) ? savedLng : 105.912; // Phủ Lý, Hà Nam
+                        const defaultLat = hasSavedPosition ? savedLat : 20.545;
+                        const defaultLng = hasSavedPosition ? savedLng : 105.912; // Phủ Lý, Hà Nam
 
                         document.getElementById('input_lat').value = defaultLat.toFixed(6);
                         document.getElementById('input_lng').value = defaultLng.toFixed(6);
@@ -2280,7 +2337,7 @@
                             zoomControl: true,
                             attributionControl: false,
                             minZoom: 10
-                        }).setView([defaultLat, defaultLng], 12);
+                        }).setView([defaultLat, defaultLng], hasSavedPosition ? 16 : 12);
 
                         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                             subdomains: 'abcd',
@@ -2352,8 +2409,25 @@
             if (inputBizName) {
                 inputBizName.addEventListener('input', function() {
                     const val = this.value.trim() || 'Tên doanh nghiệp';
-                    mockBizName.innerText = val;
-                    mockSearchText.innerText = val;
+                    if (mockBizName) mockBizName.innerText = val;
+                    if (mockSearchText) mockSearchText.innerText = val;
+                    saveWizardState();
+                });
+            }
+
+            // Lưới an toàn: mọi ô trong form đều được lưu tạm, kể cả ô chưa gắn listener riêng
+            const bizFormEl = document.getElementById('bizRegisterForm');
+            if (bizFormEl) {
+                let autoSaveTimer = null;
+                const queueAutoSave = () => {
+                    clearTimeout(autoSaveTimer);
+                    autoSaveTimer = setTimeout(saveWizardState, 250);
+                };
+                bizFormEl.addEventListener('input', queueAutoSave);
+                bizFormEl.addEventListener('change', queueAutoSave);
+                window.addEventListener('beforeunload', function() {
+                    clearTimeout(autoSaveTimer);
+                    saveWizardState();
                 });
             }
 
@@ -2514,16 +2588,16 @@
 
             // Address updates
             function updateMockAddress() {
-                const street = inputStreet.value.trim();
-                const city = inputCity.value.trim();
-                const province = inputProvince.value.trim();
-                
+                const street = inputStreet ? inputStreet.value.trim() : '';
+                const city = inputCity ? inputCity.value.trim() : '';
+                const province = inputProvince ? inputProvince.value.trim() : '';
+
                 let addr = '';
                 if (street) addr += street;
                 if (city) addr += (addr ? ', ' : '') + city;
                 if (province) addr += (addr ? ', ' : '') + province;
 
-                mockBizAddress.innerText = addr || 'Địa chỉ đường phố, thành phố';
+                if (mockBizAddress) mockBizAddress.innerText = addr || 'Địa chỉ đường phố, thành phố';
                 saveWizardState();
             }
             if (inputStreet) inputStreet.addEventListener('input', updateMockAddress);
@@ -2570,8 +2644,8 @@
             if (inputDesc) {
                 inputDesc.addEventListener('input', function() {
                     const len = this.value.length;
-                    descCharCount.innerText = len + ' / 750';
-                    mockBizDesc.innerText = this.value.trim() || 'Chưa có mô tả nào được thêm...';
+                    if (descCharCount) descCharCount.innerText = len + ' / 750';
+                    if (mockBizDesc) mockBizDesc.innerText = this.value.trim() || 'Chưa có mô tả nào được thêm...';
                     saveWizardState();
                 });
             }
