@@ -67,6 +67,8 @@ class Location extends Model
         'lng',
         'opening_hours',
         'phone',
+        'zalo',
+        'facebook',
         'website_url',
         'thumbnail_url',
         'audio_url',
@@ -89,6 +91,31 @@ class Location extends Model
         'lng' => 'decimal:7',
         'average_rating' => 'decimal:2',
     ];
+
+    public function zaloUrl(): ?string
+    {
+        $zalo = trim((string) $this->zalo);
+        if ($zalo === '') {
+            return null;
+        }
+        if (preg_match('#^https?://#i', $zalo)) {
+            return preg_match('#^https?://(www\.)?zalo\.me/#i', $zalo) ? $zalo : null;
+        }
+        $digits = preg_replace('/\D+/', '', $zalo);
+        return $digits !== '' ? 'https://zalo.me/' . $digits : null;
+    }
+
+    public function facebookUrl(): ?string
+    {
+        $fb = trim((string) $this->facebook);
+        if ($fb === '') {
+            return null;
+        }
+        if (preg_match('#^https?://#i', $fb)) {
+            return preg_match('#^https?://([a-z0-9-]+\.)?(facebook\.com|fb\.com)/#i', $fb) ? $fb : null;
+        }
+        return 'https://facebook.com/' . ltrim($fb, '@/');
+    }
 
     /** Danh mục của địa điểm. */
     public function category()
@@ -114,10 +141,13 @@ class Location extends Model
         return $this->hasMany(FavoriteLocation::class);
     }
 
-    /** Bình luận đang hiển thị của địa điểm, mới nhất trước. */
+    /** Bình luận gốc đang hiển thị của địa điểm, mới nhất trước (không gồm trả lời). */
     public function comments()
     {
-        return $this->hasMany(Comment::class)->where('status', 'visible')->orderBy('created_at', 'desc');
+        return $this->hasMany(Comment::class)
+            ->where('status', 'visible')
+            ->whereNull('parent_id')
+            ->orderBy('created_at', 'desc');
     }
 
     /**

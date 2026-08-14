@@ -629,6 +629,27 @@
             margin-bottom: 10px;
             font-weight: 400;
         }
+        .gmaps-owner-reply {
+            margin: 0 0 12px;
+            padding: 8px 10px;
+            background: #f8fafc;
+            border-left: 2px solid #cbd5e1;
+            border-radius: 0 6px 6px 0;
+            opacity: 0.72;
+        }
+        .gmaps-owner-reply__label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+        .gmaps-owner-reply__text {
+            margin: 0;
+            font-size: 12.5px;
+            color: #64748b;
+            line-height: 1.45;
+            white-space: pre-wrap;
+        }
         .gmaps-btn-see-more {
             background: none;
             border: none;
@@ -1450,11 +1471,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 28px;
-            padding: 20px 16px 14px;
+            gap: 4px;
+            padding: 20px 12px 14px;
+            flex-wrap: nowrap;
             background: none;
             pointer-events: none;
             transition: padding 0.22s ease;
+        }
+        .viewer-dock__tools {
+            display: contents;
         }
         .viewer-dock__btn {
             pointer-events: auto;
@@ -1470,8 +1495,11 @@
             color: #fff;
             cursor: pointer;
             padding: 0;
-            width: 64px;
-            min-width: 64px;
+            box-sizing: border-box;
+            width: 72px;
+            min-width: 72px;
+            max-width: 72px;
+            flex: 0 0 72px;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
             filter: none !important;
             transform: none !important;
@@ -1508,9 +1536,10 @@
             font-size: 11px;
             font-weight: 500;
             letter-spacing: 0;
-            line-height: 1.2;
+            line-height: 1.15;
             text-align: center;
-            white-space: nowrap;
+            white-space: normal;
+            overflow: hidden;
             opacity: 1;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
             filter: none !important;
@@ -1541,8 +1570,244 @@
         .viewer-dock__btn.is-active {
             opacity: 1;
         }
+        #viewerContactWrap {
+            pointer-events: auto;
+            position: fixed;
+            left: 16px;
+            bottom: 16px;
+            z-index: 10051;
+            width: auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            overflow: visible;
+        }
+        .viewer-contact-fab {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: none;
+            padding: 0;
+            color: #fff;
+            cursor: pointer;
+            outline: none;
+            overflow: visible;
+        }
+        .viewer-contact-fab__icon {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: rgba(18, 16, 14, 0.48);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow:
+                0 10px 28px rgba(0, 0, 0, 0.32),
+                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+            transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+                        background 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+                        border-color 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .viewer-contact-fab__icon i {
+            position: absolute;
+            font-size: 17px;
+            line-height: 1;
+            transition: opacity 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+                        transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .viewer-contact-fab__close {
+            opacity: 0;
+            transform: rotate(-75deg) scale(0.6);
+        }
+        .viewer-contact.is-open .viewer-contact-fab__open {
+            opacity: 0;
+            transform: rotate(75deg) scale(0.6);
+        }
+        .viewer-contact.is-open .viewer-contact-fab__close {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+        .viewer-contact.is-open .viewer-contact-fab__icon {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.38);
+        }
+        .viewer-contact-fab:hover .viewer-contact-fab__icon,
+        .viewer-contact-fab:focus-visible .viewer-contact-fab__icon {
+            transform: scale(1.04);
+        }
+        .viewer-contact-fab:active .viewer-contact-fab__icon {
+            transform: scale(0.96);
+        }
+        .viewer-contact-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            overflow: visible;
+        }
+        .viewer-contact-tip {
+            position: absolute;
+            top: -42px;
+            left: 4px;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #1f2937;
+            font-size: 12.5px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            line-height: 1;
+            border: 1px solid rgba(15, 23, 42, 0.06);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(4px) scale(0.96);
+            animation: viewerContactTipPulse 14s ease-in-out infinite;
+        }
+        .viewer-contact-tip::after {
+            content: '';
+            position: absolute;
+            left: 12px;
+            bottom: -6px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 7px solid #ffffff;
+            filter: drop-shadow(0 2px 1px rgba(15, 23, 42, 0.08));
+        }
+        .viewer-contact.is-open .viewer-contact-tip {
+            animation: none;
+            opacity: 0;
+        }
+        /* Hiện nhanh ~2s rồi ẩn lâu ~12s */
+        @keyframes viewerContactTipPulse {
+            0%, 1% {
+                opacity: 0;
+                transform: translateY(6px) scale(0.96);
+            }
+            3%, 14% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            16%, 100% {
+                opacity: 0;
+                transform: translateY(4px) scale(0.96);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .viewer-contact-tip {
+                animation: viewerContactTipPulse 20s ease-in-out infinite;
+            }
+        }
+        .viewer-contact-sheet {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 188px;
+            padding: 6px;
+            border-radius: 22px;
+            background: rgba(16, 14, 12, 0.62);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow:
+                0 18px 40px rgba(0, 0, 0, 0.38),
+                inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            transform-origin: bottom left;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(10px) scale(0.96);
+            transition: opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+                        transform 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+                        visibility 0.28s;
+        }
+        .viewer-contact.is-open .viewer-contact-sheet,
+        .viewer-contact-sheet:not([hidden]) {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+        .viewer-contact-sheet[hidden] {
+            display: flex !important;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .viewer-contact-sheet__item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 7px 12px 7px 7px;
+            border-radius: 16px;
+            color: #fff !important;
+            text-decoration: none !important;
+            transition: background 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .viewer-contact-sheet__item:hover,
+        .viewer-contact-sheet__item:focus-visible {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff !important;
+        }
+        .viewer-contact-sheet__icon {
+            flex: 0 0 36px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+        .viewer-contact-sheet__item--call .viewer-contact-sheet__icon {
+            background: linear-gradient(180deg, #4ade80, #16a34a);
+        }
+        .viewer-contact-sheet__item--zalo .viewer-contact-sheet__icon {
+            background: linear-gradient(180deg, #3b8aff, #0057d9);
+        }
+        .viewer-contact-sheet__item--fb .viewer-contact-sheet__icon {
+            background: linear-gradient(180deg, #4b92f7, #166fe5);
+        }
+        .viewer-contact-sheet__copy {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
+        }
+        .viewer-contact-sheet__name {
+            font-size: 13px;
+            font-weight: 650;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            color: #fff !important;
+        }
+        .viewer-contact-sheet__hint {
+            font-size: 10px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.62) !important;
+            line-height: 1.2;
+        }
         /* Khi dải ảnh mở: ẩn hẳn thanh thao tác */
-        body.viewer-photo-strip-open .viewer-dock {
+        body.viewer-photo-strip-open .viewer-dock,
+        body.viewer-photo-strip-open #viewerContactWrap {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
@@ -1551,6 +1816,7 @@
             bottom: 16px;
         }
         body.reviews-drawer-open .viewer-dock,
+        body.reviews-drawer-open #viewerContactWrap,
         body.reviews-drawer-open .viewer-photo-strip {
             opacity: 0;
             visibility: hidden;
@@ -1560,11 +1826,14 @@
         /* Góc dưới trái: Toàn màn hình / Hướng dẫn / Ngừng quay */
         .viewer-tools {
             position: absolute;
-            left: 16px;
-            bottom: 18px;
+            left: 50%;
+            right: auto;
+            bottom: 78px;
+            transform: translateX(-50%);
             z-index: 10051;
             display: flex;
             align-items: flex-end;
+            justify-content: center;
             gap: 14px;
             pointer-events: none;
         }
@@ -1613,6 +1882,7 @@
         body.reviews-drawer-open .viewer-tools,
         body.viewer-guide-open .viewer-tools,
         body.viewer-guide-open .viewer-dock,
+        body.viewer-guide-open #viewerContactWrap,
         body.viewer-guide-open .audio-player {
             opacity: 0;
             visibility: hidden;
@@ -1639,7 +1909,7 @@
         }
         .viewer-guide__inner {
             position: relative;
-            width: min(920px, 100%);
+            width: min(520px, 100%);
             max-height: 100%;
             overflow: auto;
             cursor: default;
@@ -1666,23 +1936,8 @@
         .viewer-guide__grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 28px 36px;
-            padding: 28px 12px 8px;
-        }
-        .viewer-guide__cell {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 12px;
-        }
-        .viewer-guide__title {
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            opacity: 0.95;
-            margin: 0 0 4px;
+            gap: 28px 24px;
+            padding: 36px 8px 4px;
         }
         .viewer-guide__row {
             display: flex;
@@ -1722,10 +1977,9 @@
             z-index: 1;
         }
         .viewer-guide__text {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            line-height: 1.35;
-            max-width: 220px;
+            line-height: 1.2;
             opacity: 0.92;
         }
         .viewer-guide__hint {
@@ -1956,17 +2210,30 @@
 
         @media (max-width: 640px) {
             .viewer-dock {
-                gap: 20px;
+                gap: 2px;
                 padding: 18px 8px 10px;
             }
             .viewer-dock__btn {
                 width: 56px;
                 min-width: 56px;
+                max-width: 56px;
+                flex-basis: 56px;
             }
             .viewer-dock__label { font-size: 10px; }
+            #viewerContactWrap {
+                left: 12px;
+                bottom: 12px;
+            }
+            .viewer-contact-fab__icon {
+                width: 44px;
+                height: 44px;
+            }
+            .viewer-contact-sheet {
+                min-width: 176px;
+            }
             .viewer-tools {
-                left: 10px;
-                bottom: 14px;
+                left: 50%;
+                bottom: 72px;
                 gap: 10px;
             }
             .viewer-tools__btn { min-width: 48px; }
@@ -2095,65 +2362,29 @@
     ])
 
     @if(!$photoMode)
-    {{-- Góc dưới trái: toàn màn hình / hướng dẫn / ngừng quay --}}
-    <div class="viewer-tools" id="viewerTools">
-        <button type="button" class="viewer-tools__btn" id="btnViewerFullscreen" title="Toàn màn hình">
-            <i class="fa-solid fa-expand" id="iconViewerFullscreen"></i>
-            <span class="viewer-tools__label" id="labelViewerFullscreen">Toàn màn hình</span>
-        </button>
-        <button type="button" class="viewer-tools__btn" id="btnViewerGuide" title="Hướng dẫn sử dụng">
-            <i class="fa-regular fa-circle-question"></i>
-            <span class="viewer-tools__label">Hướng dẫn</span>
-        </button>
-        <button type="button" class="viewer-tools__btn is-active" id="btnViewerAutorotate" title="Ngừng quay">
-            <i class="fa-solid fa-pause" id="iconViewerAutorotate"></i>
-            <span class="viewer-tools__label" id="labelViewerAutorotate">Ngừng quay</span>
-        </button>
-    </div>
-
     <div class="viewer-guide" id="viewerGuideOverlay" role="dialog" aria-modal="true" aria-label="Hướng dẫn sử dụng" hidden>
         <div class="viewer-guide__crosshair" aria-hidden="true"></div>
         <div class="viewer-guide__inner" id="viewerGuideInner">
             <button type="button" class="viewer-guide__close" id="btnCloseViewerGuide" aria-label="Đóng hướng dẫn">×</button>
             <div class="viewer-guide__grid">
-                <div class="viewer-guide__cell">
-                    <h3 class="viewer-guide__title">Trên màn hình cảm ứng</h3>
-                    <div class="viewer-guide__row">
-                        <div class="viewer-guide__icon"><i class="fa-solid fa-hand-pointer"></i></div>
-                        <div class="viewer-guide__text">Phóng to / thu nhỏ</div>
-                    </div>
-                    <div class="viewer-guide__row">
-                        <div class="viewer-guide__icon"><i class="fa-solid fa-up-down-left-right"></i></div>
-                        <div class="viewer-guide__text">Di chuyển</div>
-                    </div>
+                <div class="viewer-guide__row">
+                    <div class="viewer-guide__icon"><i class="fa-solid fa-hand-pointer"></i></div>
+                    <div class="viewer-guide__text">Thu phóng</div>
                 </div>
-                <div class="viewer-guide__cell">
-                    <h3 class="viewer-guide__title">Thao tác trên chuột</h3>
-                    <div class="viewer-guide__row">
-                        <div class="viewer-guide__icon"><i class="fa-solid fa-computer-mouse"></i></div>
-                        <div class="viewer-guide__text">Nhấn và kéo chuột để di chuyển</div>
-                    </div>
-                    <div class="viewer-guide__row">
-                        <div class="viewer-guide__icon"><i class="fa-solid fa-scroll"></i></div>
-                        <div class="viewer-guide__text">Cuộn chuột để phóng to, thu nhỏ</div>
-                    </div>
+                <div class="viewer-guide__row">
+                    <div class="viewer-guide__icon"><i class="fa-solid fa-up-down-left-right"></i></div>
+                    <div class="viewer-guide__text">Kéo xem</div>
                 </div>
-                <div class="viewer-guide__cell">
-                    <h3 class="viewer-guide__title">Thao tác trên bàn phím</h3>
-                    <div class="viewer-guide__row">
-                        <div class="viewer-guide__icon"><i class="fa-solid fa-keyboard"></i></div>
-                        <div class="viewer-guide__text">Dùng phím mũi tên để di chuyển</div>
-                    </div>
+                <div class="viewer-guide__row">
+                    <div class="viewer-guide__icon"><i class="fa-solid fa-computer-mouse"></i></div>
+                    <div class="viewer-guide__text">Cuộn chuột</div>
                 </div>
-                <div class="viewer-guide__cell">
-                    <h3 class="viewer-guide__title">Xem các vị trí khác</h3>
-                    <div class="viewer-guide__row">
-                        <div class="viewer-guide__icon viewer-guide__icon--hotspot" aria-hidden="true"></div>
-                        <div class="viewer-guide__text">Bấm để chuyển qua vị trí khác</div>
-                    </div>
+                <div class="viewer-guide__row">
+                    <div class="viewer-guide__icon viewer-guide__icon--hotspot" aria-hidden="true"></div>
+                    <div class="viewer-guide__text">Đổi chỗ</div>
                 </div>
             </div>
-            <p class="viewer-guide__hint">Chạm bất kỳ đâu để đóng</p>
+            <p class="viewer-guide__hint">Chạm để đóng</p>
         </div>
     </div>
     @endif
@@ -2286,6 +2517,18 @@
                                 <span>{{ $content }}</span>
                             @endif
                         </div>
+
+                        @php
+                            $ownerReply = $comment->replies->first(function ($reply) use ($location) {
+                                return (int) $reply->user_id === (int) $location->created_by;
+                            }) ?? $comment->replies->first();
+                        @endphp
+                        @if($ownerReply)
+                            <div class="gmaps-owner-reply">
+                                <div class="gmaps-owner-reply__label">Phản hồi từ chủ địa điểm</div>
+                                <p class="gmaps-owner-reply__text">{{ $ownerReply->content }}</p>
+                            </div>
+                        @endif
 
                         <!-- Footer Actions -->
                         <div class="gmaps-review-footer">
@@ -2572,10 +2815,10 @@
                 iconFs.className = on ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
             }
             if (labelFs) {
-                labelFs.textContent = on ? 'Thu nhỏ' : 'Toàn màn hình';
+                labelFs.textContent = on ? 'Thu nhỏ' : 'Toàn màn';
             }
             if (btnFs) {
-                btnFs.title = on ? 'Thu nhỏ' : 'Toàn màn hình';
+                btnFs.title = on ? 'Thu nhỏ' : 'Toàn màn';
                 btnFs.classList.toggle('is-active', on);
             }
         }
@@ -3769,6 +4012,11 @@
     let currentFeedbackLocationId = null;
 
     function openFeedbackModal(locationId) {
+        const checkAuth = {{ Auth::check() ? 'true' : 'false' }};
+        if (!checkAuth) {
+            window.location.href = "{{ route('login') }}";
+            return;
+        }
         currentFeedbackLocationId = locationId;
         document.getElementById('feedbackType').value = 'wrong_info';
         document.getElementById('feedbackContent').value = '';

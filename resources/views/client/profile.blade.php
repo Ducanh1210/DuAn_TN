@@ -879,6 +879,22 @@
             color: var(--text-sub);
             line-height: 1.4;
         }
+        .biz-pano-note {
+            margin: 12px 0 0;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+        .biz-pano-note i {
+            color: #94a3b8;
+            margin-right: 5px;
+        }
+        .biz-pano-note a {
+            color: #1e3a5f;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .biz-pano-note a:hover { text-decoration: underline; }
         .map-style-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2885,6 +2901,12 @@
                                 </div>
                             </div>
                         </div>
+
+                        <p class="biz-pano-note">
+                            <i class="fa-solid fa-panorama"></i>
+                            Muốn địa điểm nổi bật hơn với không gian 360°?
+                            <a href="{{ route('client.pano_service') }}" target="_blank" rel="noopener">Tìm hiểu dịch vụ chụp Tour 360°</a>
+                        </p>
                     </div>
                 @endif
             </div>

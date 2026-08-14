@@ -50,9 +50,11 @@ class Comment extends Model
         return $this->belongsTo(Comment::class, 'parent_id');
     }
 
-    /** Các câu trả lời cho bình luận này. */
+    /** Các câu trả lời đang hiển thị cho bình luận này. */
     public function replies()
     {
-        return $this->hasMany(Comment::class, 'parent_id');
+        return $this->hasMany(Comment::class, 'parent_id')
+            ->where('status', 'visible')
+            ->orderBy('created_at', 'asc');
     }
 }

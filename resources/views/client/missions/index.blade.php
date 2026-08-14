@@ -890,11 +890,11 @@
         left: 50%;
         transform: translateX(-50%) translateY(4px);
         background: #ffffff;
-        border: 1px solid #cbd5e1;
-        box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.2), 0 3px 8px rgba(0, 0, 0, 0.06);
-        border-radius: 10px;
-        padding: 4px;
-        white-space: nowrap;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 24px -6px rgba(15, 23, 42, 0.18), 0 2px 6px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        padding: 8px;
+        white-space: normal;
         text-align: center;
         z-index: 100;
         opacity: 0;
@@ -906,15 +906,38 @@
     .tooltip-mini-card {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        width: 44px;
-        height: 44px;
+        border-radius: 10px;
+        min-width: 100px;
+        max-width: 128px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 2px;
-        box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9);
+        gap: 4px;
+        padding: 8px 10px;
+    }
+
+    .tooltip-mini-card img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+    }
+
+    .tooltip-frame-caption {
+        font-size: 0.55rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #94a3b8;
+    }
+
+    .tooltip-frame-name {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.25;
+        white-space: normal;
+        word-break: break-word;
     }
 
     .milestone-node .milestone-tooltip::after {
@@ -1142,20 +1165,8 @@
         <!-- TAB 2: NHIỆM VỤ (QUESTS PANE - REFERENCED QUEST LAYOUT) -->
         <div class="tab-pane fade show active" id="quests-pane" role="tabpanel">
             <div class="row g-3">
-                <!-- LEFT COLUMN: Menu Sidebar -->
-                <div class="col-lg-3 col-xl-2">
-                    <!-- Referral Widget -->
-                    <div class="reward-sidebar-compact text-center" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px 10px;">
-                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.82rem;">Mời bạn bè</h6>
-                        <p class="text-muted mb-2" style="font-size: 0.72rem;">Nhận ngay <strong>2.000 xu</strong> cho mỗi lượt mời!</p>
-                        <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="copyReferralLink()" style="font-size: 0.78rem; padding: 7px 10px;">
-                            Mời ngay
-                        </button>
-                    </div>
-                </div>
-
                 <!-- CENTER COLUMN: Quest List -->
-                <div class="col-lg-5 col-xl-6">
+                <div class="col-lg-8 col-xl-8">
                     @php
                         $totalPointsEarned = \App\Models\PointTransaction::where('user_id', Auth::id())
                             ->where('amount', '>', 0)
@@ -1223,12 +1234,14 @@
                                     <div class="d-flex align-items-center gap-1">
                                         @if($frame100)
                                             <div class="tooltip-mini-card">
-                                                <img src="{{ asset($frame100->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame100->name }}">
-                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 48px;">Khung {{ $frame100->name }}</div>
+                                                <span class="tooltip-frame-caption">Phần thưởng</span>
+                                                <img src="{{ asset($frame100->image_url) }}" alt="{{ $frame100->name }}">
+                                                <div class="tooltip-frame-name">Khung {{ $frame100->name }}</div>
                                             </div>
                                         @else
                                             <div class="tooltip-mini-card">
-                                                <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">Mở khung</div>
+                                                <span class="tooltip-frame-caption">Phần thưởng</span>
+                                                <div class="tooltip-frame-name">Mở khung avatar</div>
                                             </div>
                                         @endif
                                     </div>
@@ -1263,12 +1276,14 @@
                                     <div class="d-flex align-items-center gap-1">
                                         @if($frame200)
                                             <div class="tooltip-mini-card">
-                                                <img src="{{ asset($frame200->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame200->name }}">
-                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 48px;">Khung {{ $frame200->name }}</div>
+                                                <span class="tooltip-frame-caption">Phần thưởng</span>
+                                                <img src="{{ asset($frame200->image_url) }}" alt="{{ $frame200->name }}">
+                                                <div class="tooltip-frame-name">Khung {{ $frame200->name }}</div>
                                             </div>
                                         @else
                                             <div class="tooltip-mini-card">
-                                                <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">Mở khung</div>
+                                                <span class="tooltip-frame-caption">Phần thưởng</span>
+                                                <div class="tooltip-frame-name">Mở khung avatar</div>
                                             </div>
                                         @endif
                                     </div>
@@ -1303,12 +1318,14 @@
                                     <div class="d-flex align-items-center gap-1">
                                         @if($frame500)
                                             <div class="tooltip-mini-card">
-                                                <img src="{{ asset($frame500->image_url) }}" style="width: 20px; height: 20px; object-fit: contain;" class="mb-0.5" alt="{{ $frame500->name }}">
-                                                <div class="fw-bold text-dark text-truncate" style="font-size: 0.55rem; max-width: 48px;">Khung {{ $frame500->name }}</div>
+                                                <span class="tooltip-frame-caption">Phần thưởng</span>
+                                                <img src="{{ asset($frame500->image_url) }}" alt="{{ $frame500->name }}">
+                                                <div class="tooltip-frame-name">Khung {{ $frame500->name }}</div>
                                             </div>
                                         @else
                                             <div class="tooltip-mini-card">
-                                                <div class="fw-extrabold text-dark" style="font-size: 0.58rem;">Mở khung</div>
+                                                <span class="tooltip-frame-caption">Phần thưởng</span>
+                                                <div class="tooltip-frame-name">Mở khung avatar</div>
                                             </div>
                                         @endif
                                     </div>
@@ -1652,14 +1669,6 @@
                         </div>
                     </div>
 
-                    <!-- Widget 4: Săn nhiệm vụ đặc biệt Promo -->
-                    <div class="promo-banner-card">
-                        <h6 class="fw-extrabold text-dark mb-1" style="font-size: 0.86rem;">Săn nhiệm vụ đặc biệt</h6>
-                        <p class="text-muted mb-2" style="font-size: 0.74rem;">Nhiệm vụ đặc biệt với phần thưởng siêu hấp dẫn đang chờ bạn!</p>
-                        <button class="btn btn-dark btn-sm rounded-pill fw-bold" style="font-size: 0.75rem; padding: 5px 14px;" onclick="switchNavTab('shop-pane')">
-                            Khám phá ngay
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
