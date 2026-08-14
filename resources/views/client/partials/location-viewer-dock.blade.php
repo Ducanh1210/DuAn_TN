@@ -33,7 +33,55 @@
 </div>
 @endif
 
-{{-- Bottom action dock --}}
+@php
+    $callPhone = preg_replace('/[^\d+]/', '', (string) $location->phone);
+    $callPhoneDisplay = trim((string) $location->phone) ?: $callPhone;
+    $zaloUrl = $location->zaloUrl();
+    $fbUrl = $location->facebookUrl();
+@endphp
+@if($callPhone || $zaloUrl || $fbUrl)
+<div class="viewer-contact" id="viewerContactWrap">
+    <div class="viewer-contact-sheet" id="viewerContactMenu" hidden>
+        @if($callPhone)
+            <a href="tel:{{ $callPhone }}" class="viewer-contact-sheet__item viewer-contact-sheet__item--call">
+                <span class="viewer-contact-sheet__icon"><i class="fa-solid fa-phone"></i></span>
+                <span class="viewer-contact-sheet__copy">
+                    <span class="viewer-contact-sheet__name">Gọi điện</span>
+                    <span class="viewer-contact-sheet__hint">{{ $callPhoneDisplay }}</span>
+                </span>
+            </a>
+        @endif
+        @if($zaloUrl)
+            <a href="{{ $zaloUrl }}" class="viewer-contact-sheet__item viewer-contact-sheet__item--zalo" target="_blank" rel="noopener">
+                <span class="viewer-contact-sheet__icon"><i class="fa-regular fa-comment-dots"></i></span>
+                <span class="viewer-contact-sheet__copy">
+                    <span class="viewer-contact-sheet__name">Zalo</span>
+                    <span class="viewer-contact-sheet__hint">Nhắn tin ngay</span>
+                </span>
+            </a>
+        @endif
+        @if($fbUrl)
+            <a href="{{ $fbUrl }}" class="viewer-contact-sheet__item viewer-contact-sheet__item--fb" target="_blank" rel="noopener">
+                <span class="viewer-contact-sheet__icon"><i class="fa-brands fa-facebook-f"></i></span>
+                <span class="viewer-contact-sheet__copy">
+                    <span class="viewer-contact-sheet__name">Facebook</span>
+                    <span class="viewer-contact-sheet__hint">Trang chính thức</span>
+                </span>
+            </a>
+        @endif
+    </div>
+    <div class="viewer-contact-bar">
+        <button type="button" class="viewer-contact-fab" id="btnToggleContact" title="Liên hệ" aria-label="Liên hệ" aria-expanded="false">
+            <span class="viewer-contact-fab__icon">
+                <i class="fa-solid fa-headset viewer-contact-fab__open"></i>
+                <i class="fa-solid fa-xmark viewer-contact-fab__close"></i>
+            </span>
+            <span class="viewer-contact-tip" aria-hidden="true">Liên hệ ngay</span>
+        </button>
+    </div>
+</div>
+@endif
+
 <div class="viewer-dock" id="viewerDock">
     <button type="button" class="viewer-dock__btn {{ $isFavorited ? 'is-active' : '' }}" id="btnToggleFavorite" title="Lưu">
         <i class="{{ $isFavorited ? 'fa-solid' : 'fa-regular' }} fa-heart"></i>
@@ -51,8 +99,25 @@
     @if($hasPhotos)
     <button type="button" class="viewer-dock__btn" id="btnTogglePhotos" title="Ảnh">
         <i class="fa-regular fa-image"></i>
-        <span class="viewer-dock__label">Ảnh</span>
-    </button>
+            <span class="viewer-dock__label">Ảnh</span>
+        </button>
+    @endif
+
+    @if(empty($photoMode))
+    <div class="viewer-dock__tools">
+        <button type="button" class="viewer-dock__btn" id="btnViewerFullscreen" title="Toàn màn hình">
+            <i class="fa-solid fa-expand" id="iconViewerFullscreen"></i>
+            <span class="viewer-dock__label" id="labelViewerFullscreen">Toàn màn hình</span>
+        </button>
+        <button type="button" class="viewer-dock__btn" id="btnViewerGuide" title="Hướng dẫn sử dụng">
+            <i class="fa-regular fa-circle-question"></i>
+            <span class="viewer-dock__label">Hướng dẫn</span>
+        </button>
+        <button type="button" class="viewer-dock__btn is-active" id="btnViewerAutorotate" title="Ngừng quay">
+            <i class="fa-solid fa-pause" id="iconViewerAutorotate"></i>
+            <span class="viewer-dock__label" id="labelViewerAutorotate">Ngừng quay</span>
+        </button>
+    </div>
     @endif
 </div>
 
@@ -314,3 +379,37 @@
 })();
 </script>
 @endif
+
+<script>
+(function () {
+    const btn = document.getElementById('btnToggleContact');
+    const menu = document.getElementById('viewerContactMenu');
+    const wrap = document.getElementById('viewerContactWrap');
+    if (!btn || !menu || !wrap) return;
+
+    function closeContact() {
+        menu.hidden = true;
+        wrap.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.classList.remove('is-active');
+    }
+
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const open = menu.hidden;
+        menu.hidden = !open;
+        wrap.classList.toggle('is-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.classList.toggle('is-active', open);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!wrap.contains(e.target)) closeContact();
+    });
+
+    ['btnToggleComments', 'btnTogglePhotos', 'btnToggleFavorite', 'btnViewerFullscreen', 'btnViewerGuide', 'btnViewerAutorotate'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', closeContact);
+    });
+})();
+</script>

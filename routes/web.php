@@ -84,11 +84,13 @@ Route::get('locations/{location:slug}/360', function (\App\Models\Location $loca
         'images',
         'panoramas.hotspots',
         'comments.user.equippedFrame',
+        'comments.replies.user',
     ]);
 
     $userIds = $location->comments->pluck('user_id')->filter()->unique()->values();
     $commentCounts = \App\Models\Comment::whereIn('user_id', $userIds)
         ->where('status', 'visible')
+        ->whereNull('parent_id')
         ->selectRaw('user_id, COUNT(*) as aggregate')
         ->groupBy('user_id')
         ->pluck('aggregate', 'user_id');
@@ -177,6 +179,9 @@ Route::middleware('auth')->group(function () {
     // Dedicated Business Dashboard Portal (Portal Dành Cho Chủ Doanh Nghiệp)
     Route::get('/doanh-nghiep/dashboard', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'index'])->name('business.dashboard');
     Route::post('/doanh-nghiep/update-info', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'updateInfo'])->name('business.update_info');
+    Route::post('/doanh-nghiep/update-contact', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'updateContact'])->name('business.update_contact');
+    Route::post('/doanh-nghiep/comments/{comment}/reply', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'replyComment'])->name('business.reply_comment');
+    Route::delete('/doanh-nghiep/comments/{comment}/reply', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'deleteReply'])->name('business.delete_reply');
     Route::post('/doanh-nghiep/upload-photo', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'uploadPhoto'])->name('business.upload_photo');
     Route::delete('/doanh-nghiep/photos', [\App\Http\Controllers\Client\BusinessDashboardController::class, 'deletePhoto'])->name('business.delete_photo');
 });

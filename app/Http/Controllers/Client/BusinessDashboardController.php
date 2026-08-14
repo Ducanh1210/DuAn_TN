@@ -13,6 +13,7 @@ use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Controller bảng điều khiển doanh nghiệp: dành cho chủ doanh nghiệp đã được duyệt,
@@ -50,9 +51,10 @@ class BusinessDashboardController extends Controller
                 ->with('error', 'Địa điểm doanh nghiệp đã bị gỡ khỏi hệ thống. Vui lòng đăng ký lại hoặc liên hệ quản trị viên.');
         }
 
-        // Thống kê: bình luận, lượt thích, lượt xem, điểm đánh giá
+        // Thống kê: bình luận gốc, lượt thích, lượt xem, điểm đánh giá
         $comments = Comment::where('location_id', $location->id)
-            ->with('user')
+            ->whereNull('parent_id')
+            ->with(['user', 'replies.user'])
             ->latest()
             ->get();
 
@@ -78,7 +80,7 @@ class BusinessDashboardController extends Controller
         ));
     }
 
-    /** Cập nhật thông tin doanh nghiệp từ dashboard và đồng bộ sang bản ghi địa điểm. */
+    /** Chỉ cập nhật mô tả doanh nghiệp (đồng bộ sang địa điểm). */
     public function updateInfo(Request $request)
     {
         $user = Auth::user();
@@ -88,44 +90,96 @@ class BusinessDashboardController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
-            'business_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:30',
-            'website' => 'nullable|url|max:255',
             'description' => 'nullable|string|max:1000',
-            'address_street' => 'required|string|max:255',
-            'address_city' => 'required|string|max:255',
-        ], [
-            'business_name.required' => 'Vui lòng nhập tên doanh nghiệp.',
-            'phone.required' => 'Vui lòng nhập số điện thoại liên hệ.',
-            'address_street.required' => 'Vui lòng nhập địa chỉ đường phố.',
-            'address_city.required' => 'Vui lòng nhập thành phố/huyện.',
         ]);
+
+        $description = $validated['description'] ?? null;
 
         $businessProfile->update([
-            'business_name' => $validated['business_name'],
-            'phone' => $validated['phone'],
-            'website' => $validated['website'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'address_street' => $validated['address_street'],
-            'address_city' => $validated['address_city'],
+            'description' => $description,
         ]);
 
-        // Đồng bộ luôn sang bản ghi địa điểm tương ứng (nếu có)
         $location = Location::where('created_by', $user->id)->first();
         if ($location) {
-            $fullAddress = trim($validated['address_street'] . ', ' . $validated['address_city'] . ', ' . $businessProfile->address_province);
             $location->update([
-                'name' => $validated['business_name'],
-                'phone' => $validated['phone'],
-                'website_url' => $validated['website'] ?? null,
-                'description' => $validated['description'] ?? null,
-                'address' => $fullAddress,
-                'district' => $validated['address_city'],
+                'description' => $description,
             ]);
         }
 
         return redirect()->route('business.dashboard')
-            ->with('success', 'Đã cập nhật thông tin doanh nghiệp thành công!');
+            ->with('success', 'Đã cập nhật mô tả thành công!');
+    }
+
+    /** Lưu kênh liên hệ công khai (khác SĐT đăng ký lúc duyệt). */
+    public function updateContact(Request $request)
+    {
+        $user = Auth::user();
+
+        $businessProfile = BusinessProfile::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->firstOrFail();
+
+        try {
+            $validated = $request->validate([
+            'public_phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+\s().-]{8,20}$/'],
+            'zalo' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
+                $value = trim((string) $value);
+                if ($value === '') {
+                    return;
+                }
+                if (preg_match('/^https?:\/\//i', $value)) {
+                    if (!preg_match('/^https?:\/\/(www\.)?zalo\.me\//i', $value)) {
+                        $fail('Zalo phải là số điện thoại hoặc link zalo.me.');
+                    }
+                    return;
+                }
+                if (!preg_match('/^[0-9+\s().-]{8,20}$/', $value)) {
+                    $fail('Zalo phải là số điện thoại hoặc link zalo.me.');
+                }
+            }],
+            'facebook' => ['nullable', 'string', 'max:255', function ($attribute, $value, $fail) {
+                $value = trim((string) $value);
+                if ($value === '') {
+                    return;
+                }
+                if (preg_match('/youtube\.com|youtu\.be|tiktok\.com|instagram\.com/i', $value)) {
+                    $fail('Facebook phải là link facebook.com hoặc fb.com');
+                    return;
+                }
+                if (preg_match('/^https?:\/\//i', $value)) {
+                    if (!preg_match('/^https?:\/\/([a-z0-9-]+\.)?(facebook\.com|fb\.com)\//i', $value)) {
+                        $fail('Facebook phải là link facebook.com hoặc fb.com.');
+                    }
+                    return;
+                }
+                if (!preg_match('/^[A-Za-z0-9._]{3,50}$/', $value)) {
+                    $fail('Facebook phải là link facebook.com hoặc tên trang.');
+                }
+            }],
+        ], [
+            'public_phone.regex' => 'Số điện thoại khách liên hệ không hợp lệ.',
+        ]);
+        } catch (ValidationException $e) {
+            throw $e->redirectTo(route('business.dashboard') . '#tab-contact');
+        }
+
+        $businessProfile->update([
+            'public_phone' => $validated['public_phone'] ?: null,
+            'zalo' => $validated['zalo'] ?: null,
+            'facebook' => $validated['facebook'] ?: null,
+        ]);
+
+        $location = Location::where('created_by', $user->id)->first();
+        if ($location) {
+            $location->update([
+                'phone' => $businessProfile->public_phone,
+                'zalo' => $businessProfile->zalo,
+                'facebook' => $businessProfile->facebook,
+            ]);
+        }
+
+        return redirect()->to(route('business.dashboard') . '#tab-contact')
+            ->with('success', 'Đã lưu thông tin liên hệ cho khách.');
     }
 
     /** Tải ảnh lên thư viện doanh nghiệp (mặt tiền hoặc thực đơn) và thêm vào ảnh địa điểm. */
@@ -206,5 +260,80 @@ class BusinessDashboardController extends Controller
 
         return redirect()->route('business.dashboard')
             ->with('success', 'Đã xóa ảnh thành công.');
+    }
+
+    /** Chủ DN trả lời / cập nhật trả lời cho một bình luận trên địa điểm của họ. */
+    public function replyComment(Request $request, Comment $comment)
+    {
+        $user = Auth::user();
+
+        BusinessProfile::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->firstOrFail();
+
+        $location = Location::where('created_by', $user->id)->firstOrFail();
+
+        if ($comment->location_id !== $location->id || $comment->parent_id) {
+            abort(403, 'Không thể trả lời bình luận này.');
+        }
+
+        $validated = $request->validate([
+            'content' => 'required|string|max:1000',
+        ], [
+            'content.required' => 'Vui lòng nhập nội dung trả lời.',
+        ]);
+
+        $existing = Comment::where('parent_id', $comment->id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if ($existing) {
+            $existing->update([
+                'content' => $validated['content'],
+                'status' => 'visible',
+            ]);
+            $message = 'Đã cập nhật câu trả lời.';
+        } else {
+            Comment::create([
+                'user_id' => $user->id,
+                'location_id' => $location->id,
+                'parent_id' => $comment->id,
+                'content' => $validated['content'],
+                'rating' => null,
+                'status' => 'visible',
+            ]);
+            $message = 'Đã gửi trả lời.';
+        }
+
+        return redirect()->to(route('business.dashboard') . '#tab-reviews')
+            ->with('success', $message);
+    }
+
+    /** Thu hồi (xóa) câu trả lời của chủ DN. */
+    public function deleteReply(Comment $comment)
+    {
+        $user = Auth::user();
+
+        BusinessProfile::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->firstOrFail();
+
+        $location = Location::where('created_by', $user->id)->firstOrFail();
+
+        if ($comment->location_id !== $location->id || $comment->parent_id) {
+            abort(403, 'Không thể thu hồi phản hồi này.');
+        }
+
+        $deleted = Comment::where('parent_id', $comment->id)
+            ->where('user_id', $user->id)
+            ->delete();
+
+        if (!$deleted) {
+            return redirect()->to(route('business.dashboard') . '#tab-reviews')
+                ->with('error', 'Không tìm thấy câu trả lời để thu hồi.');
+        }
+
+        return redirect()->to(route('business.dashboard') . '#tab-reviews')
+            ->with('success', 'Đã thu hồi câu trả lời.');
     }
 }

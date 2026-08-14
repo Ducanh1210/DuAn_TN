@@ -40,6 +40,28 @@
             border-right: 1px solid var(--border-light);
             padding: 1.5rem 1rem;
             transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.35rem 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: color 0.15s ease, background-color 0.15s ease;
+        }
+        .sidebar-back:hover {
+            color: var(--text-heading);
+            background-color: #f1f5f9;
+        }
+        .sidebar-back i {
+            font-size: 0.7rem;
         }
         .sidebar-brand {
             font-size: 0.95rem;
@@ -62,7 +84,7 @@
         }
         .sidebar-biz {
             padding: 0 0.75rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
         .sidebar-biz__name {
             font-size: 0.85rem;
@@ -76,6 +98,10 @@
             color: var(--text-muted);
             line-height: 1.35;
         }
+        .sidebar-nav-main {
+            flex: 1 1 auto;
+            min-height: 0;
+        }
         .sidebar-group-title {
             font-size: 0.65rem;
             text-transform: uppercase;
@@ -83,8 +109,19 @@
             color: #94a3b8;
             font-weight: 500;
             padding: 0 0.75rem;
-            margin-top: 1.25rem;
+            margin-top: 1.15rem;
             margin-bottom: 0.4rem;
+        }
+        .sidebar-nav-main > .sidebar-group-title:first-child {
+            margin-top: 0;
+        }
+        .sidebar-footer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+        .sidebar-footer .sidebar-group-title {
+            margin-top: 0;
         }
         .sidebar nav a {
             display: block;
@@ -115,6 +152,13 @@
         }
         .sidebar nav a .badge-count {
             float: right;
+            margin-top: 1px;
+        }
+        .sidebar nav a.is-external::after {
+            content: '↗';
+            float: right;
+            font-size: 0.7rem;
+            opacity: 0.45;
             margin-top: 1px;
         }
 
@@ -312,6 +356,39 @@
             padding: 0.9rem 1.15rem;
         }
         .review-card:last-child { border-bottom: none; }
+        .review-reply {
+            margin-top: 0.65rem;
+            margin-left: 0.25rem;
+            padding: 0.65rem 0.75rem;
+            background: #f8fafc;
+            border-left: 3px solid var(--accent-primary);
+            border-radius: 0 6px 6px 0;
+        }
+        .review-reply__label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 0.2rem;
+        }
+        .review-reply__text {
+            font-size: 0.8rem;
+            color: var(--text-body);
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .review-reply-form {
+            margin-top: 0.65rem;
+        }
+        .review-reply-form textarea {
+            min-height: 64px;
+            resize: vertical;
+        }
+        .review-reply-form .btn-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.4rem;
+            margin-top: 0.45rem;
+        }
 
         .form-control, .form-select {
             font-size: 0.825rem;
@@ -359,10 +436,10 @@
 
 <div class="d-flex">
     <aside class="sidebar flex-shrink-0" id="sidebar">
-        <div class="sidebar-brand">
-            <span class="sidebar-brand-dot"></span>
-            <span>Portal Doanh Nghiệp</span>
-        </div>
+        <a href="{{ route('client.profile') }}" class="sidebar-back">
+            <i class="fas fa-arrow-left"></i>
+            <span>Trang cá nhân</span>
+        </a>
 
         <div class="sidebar-biz">
             <div class="sidebar-biz__name">{{ $businessProfile->business_name }}</div>
@@ -372,29 +449,33 @@
             </div>
         </div>
 
-        <div class="sidebar-group-title">Quản lý</div>
-        <nav>
-            <a href="#tab-overview" class="biz-nav-link active" data-tab="tab-overview">Tổng quan & Bản đồ</a>
-            <a href="#tab-gallery" class="biz-nav-link" data-tab="tab-gallery">Hình ảnh & Thực đơn</a>
-            <a href="#tab-reviews" class="biz-nav-link d-flex justify-content-between align-items-center" data-tab="tab-reviews">
-                <span>Đánh giá khách hàng</span>
-                @if($commentCount > 0)
-                    <span class="badge-count">{{ $commentCount }}</span>
-                @endif
-            </a>
-            <a href="{{ route('client.pano_service') }}" class="biz-nav-link d-flex justify-content-between align-items-center" target="_blank" rel="noopener">
-                <span>Dịch vụ tour 360</span>
-            </a>
-        </nav>
+        <div class="sidebar-nav-main">
+            <div class="sidebar-group-title">Địa điểm</div>
+            <nav>
+                <a href="#tab-overview" class="biz-nav-link active" data-tab="tab-overview">Tổng quan</a>
+                <a href="#tab-gallery" class="biz-nav-link" data-tab="tab-gallery">Hình ảnh & Thực đơn</a>
+                <a href="#tab-reviews" class="biz-nav-link d-flex justify-content-between align-items-center" data-tab="tab-reviews">
+                    <span>Đánh giá khách hàng</span>
+                    @if($commentCount > 0)
+                        <span class="badge-count">{{ $commentCount }}</span>
+                    @endif
+                </a>
+            </nav>
 
-        <div class="sidebar-group-title">Liên kết</div>
-        <nav>
-            @if($location)
-                <a href="{{ route('client.locations.360', $location->slug) }}" target="_blank">Xem trên bản đồ</a>
-            @endif
-            <a href="{{ route('client.profile') }}">Trang cá nhân</a>
-            <a href="{{ url('/') }}">Về bản đồ chính</a>
-        </nav>
+            <div class="sidebar-group-title">Người dùng liên hệ</div>
+            <nav>
+                <a href="#tab-contact" class="biz-nav-link" data-tab="tab-contact">Thông tin liên hệ</a>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-group-title">Dịch vụ thêm</div>
+            <nav>
+                <a href="{{ route('client.pano_service') }}" class="biz-nav-link is-external" target="_blank" rel="noopener">
+                    Tour 360
+                </a>
+            </nav>
+        </div>
     </aside>
 
     <div class="flex-grow-1 main-wrapper">
@@ -410,7 +491,7 @@
                     <x-user-avatar :user="Auth::user()" size="28" />
                     <span>{{ Auth::user()->display_name ?? Auth::user()->username }}</span>
                 </div>
-                <a href="{{ route('client.profile') }}" class="btn-minimal">Thoát portal</a>
+                <a href="{{ route('client.profile') }}" class="btn-minimal">Trang cá nhân</a>
             </div>
         </div>
 
@@ -449,7 +530,7 @@
                         </a>
                     @endif
                     <button type="button" class="btn-minimal btn-minimal-primary" data-bs-toggle="modal" data-bs-target="#editInfoModal">
-                        Chỉnh sửa thông tin
+                        Sửa mô tả
                     </button>
                 </div>
             </div>
@@ -486,7 +567,7 @@
                             </div>
                             <div class="px-3 py-2">
                                 <div class="info-row">
-                                    <span class="info-row__label">Điện thoại</span>
+                                    <span class="info-row__label">SĐT hồ sơ</span>
                                     <span class="info-row__value">{{ $businessProfile->phone }}</span>
                                 </div>
                                 <div class="info-row">
@@ -579,11 +660,50 @@
                 </div>
             </div>
 
+            {{-- Contact --}}
+            <div class="tab-pane" id="tab-contact">
+                <div class="card-minimal">
+                    <div class="card-header-minimal">Liên hệ cho khách</div>
+                    <form action="{{ route('business.update_contact') }}" method="POST" class="px-3 py-3">
+                        @csrf
+                        <p class="text-muted mb-3" style="font-size: 0.8rem; line-height: 1.45;">
+                            Ba kênh này hiện khi khách mở trang khám phá. Khác với số điện thoại dùng lúc đăng ký duyệt. Facebook chỉ nhận link facebook.com.
+                        </p>
+                        <div class="mb-3">
+                            <label class="form-label">Số điện thoại khách liên hệ</label>
+                            <input type="text" class="form-control @error('public_phone') is-invalid @enderror" name="public_phone" value="{{ old('public_phone', $businessProfile->public_phone) }}" placeholder="VD: 0912345678" maxlength="30">
+                            @error('public_phone')
+                                <div class="text-danger mt-1" style="font-size:0.75rem;">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Zalo</label>
+                            <input type="text" class="form-control @error('zalo') is-invalid @enderror" name="zalo" value="{{ old('zalo', $businessProfile->zalo) }}" placeholder="Số Zalo hoặc https://zalo.me/..." maxlength="255">
+                            @error('zalo')
+                                <div class="text-danger mt-1" style="font-size:0.75rem;">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Facebook</label>
+                            <input type="text" class="form-control @error('facebook') is-invalid @enderror" name="facebook" value="{{ old('facebook', $businessProfile->facebook) }}" placeholder="https://facebook.com/ten-trang" maxlength="255">
+                            @error('facebook')
+                                <div class="text-danger mt-1" style="font-size:0.75rem;">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <button type="submit" class="btn-minimal btn-minimal-primary">Lưu liên hệ</button>
+                    </form>
+                </div>
+            </div>
+
             {{-- Reviews --}}
             <div class="tab-pane" id="tab-reviews">
                 <div class="card-minimal">
                     <div class="card-header-minimal">Nhận xét từ khách hàng</div>
                     @forelse($comments as $comment)
+                        @php
+                            $bizReply = $comment->replies->firstWhere('user_id', Auth::id())
+                                ?? $comment->replies->first();
+                        @endphp
                         <div class="review-card">
                             <div class="d-flex justify-content-between align-items-start mb-1">
                                 <div class="d-flex align-items-center gap-2">
@@ -602,10 +722,43 @@
                                 </div>
                             </div>
                             <p class="mb-0 mt-1" style="color: var(--text-body); font-size: 0.825rem;">{{ $comment->content }}</p>
+
+                            @if($bizReply)
+                                <div class="review-reply">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <div class="review-reply__label">Phản hồi của bạn</div>
+                                            <p class="review-reply__text">{{ $bizReply->content }}</p>
+                                        </div>
+                                        <form action="{{ route('business.delete_reply', $comment) }}" method="POST" onsubmit="return confirm('Thu hồi câu trả lời này?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-minimal" style="color:#b91c1c;border-color:#fecaca;">Thu hồi</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('business.reply_comment', $comment) }}" method="POST" class="review-reply-form">
+                                @csrf
+                                <textarea
+                                    class="form-control"
+                                    name="content"
+                                    rows="2"
+                                    maxlength="1000"
+                                    placeholder="{{ $bizReply ? 'Sửa câu trả lời...' : 'Viết trả lời cho khách...' }}"
+                                    required
+                                >{{ $bizReply?->content }}</textarea>
+                                <div class="btn-row">
+                                    <button type="submit" class="btn-minimal btn-minimal-primary">
+                                        {{ $bizReply ? 'Cập nhật trả lời' : 'Trả lời' }}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     @empty
                         <div class="empty-photo-box">Chưa có nhận xét nào từ khách hàng.</div>
-                    @endif
+                    @endforelse
                 </div>
             </div>
 
@@ -613,49 +766,26 @@
     </div>
 </div>
 
-{{-- Modal Edit Info --}}
+{{-- Modal Edit Description --}}
 <div class="modal fade" id="editInfoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
         <form action="{{ route('business.update_info') }}" method="POST">
             @csrf
             <div class="modal-content border-0" style="border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light);">
                 <div class="modal-header px-3 py-2" style="background: #fff; border-bottom: 1px solid var(--border-light);">
-                    <h5 class="modal-title" style="color: var(--text-heading); font-size: 0.95rem; font-weight: 600;">Cập nhật thông tin doanh nghiệp</h5>
+                    <h5 class="modal-title" style="color: var(--text-heading); font-size: 0.95rem; font-weight: 600;">Sửa mô tả</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-3">
-                    <div class="mb-3">
-                        <label class="form-label">Tên doanh nghiệp *</label>
-                        <input type="text" class="form-control" name="business_name" value="{{ $businessProfile->business_name }}" required>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Số điện thoại liên hệ *</label>
-                            <input type="text" class="form-control" name="phone" value="{{ $businessProfile->phone }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Trang web (Website)</label>
-                            <input type="url" class="form-control" name="website" value="{{ $businessProfile->website }}" placeholder="https://">
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Đường / Số nhà *</label>
-                            <input type="text" class="form-control" name="address_street" value="{{ $businessProfile->address_street }}" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Thành phố / Huyện *</label>
-                            <input type="text" class="form-control" name="address_city" value="{{ $businessProfile->address_city }}" required>
-                        </div>
-                    </div>
                     <div class="mb-0">
                         <label class="form-label">Mô tả doanh nghiệp</label>
-                        <textarea class="form-control" name="description" rows="4">{{ $businessProfile->description }}</textarea>
+                        <textarea class="form-control" name="description" rows="5" maxlength="1000" placeholder="Giới thiệu ngắn về cửa hàng của bạn...">{{ $businessProfile->description }}</textarea>
+                        <div class="form-text" style="font-size:0.75rem;color:var(--text-muted);">Tối đa 1000 ký tự. Tên, địa chỉ và SĐT hồ sơ không đổi tại đây.</div>
                     </div>
                 </div>
                 <div class="modal-footer px-3 py-2" style="background: #fff; border-top: 1px solid var(--border-light);">
                     <button type="button" class="btn-minimal" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn-minimal btn-minimal-primary">Lưu thay đổi</button>
+                    <button type="submit" class="btn-minimal btn-minimal-primary">Lưu mô tả</button>
                 </div>
             </div>
         </form>
@@ -702,6 +832,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const titles = {
         'tab-overview': 'Tổng quan',
         'tab-gallery': 'Hình ảnh & Thực đơn',
+        'tab-contact': 'Thông tin liên hệ',
         'tab-reviews': 'Đánh giá khách hàng'
     };
     const titleEl = document.getElementById('pageSectionTitle');
@@ -737,6 +868,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const initialHash = (window.location.hash || '').replace(/^#/, '');
     if (initialHash && titles[initialHash]) {
         showTab(initialHash);
+    } else if (document.querySelector('.content-area .alert ul')) {
+        showTab('tab-contact');
     }
 
     const toggleBtn = document.getElementById('toggleSidebar');
