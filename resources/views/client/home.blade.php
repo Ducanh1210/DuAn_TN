@@ -977,6 +977,8 @@
 
         /* Bottom Featured Drawer */
         .bottom-drawer-wrapper {
+            /* Chiều cao dải tab trên cùng — tab "Khám phá" và tab icon dùng chung mốc này */
+            --drawer-rail-h: 32px;
             position: absolute;
             bottom: 0;
             left: 66px;
@@ -1004,7 +1006,8 @@
             gap: 10px;
             width: fit-content;
             max-width: calc(100% - 24px);
-            padding: 6px 14px;
+            height: var(--drawer-rail-h);
+            padding: 0 14px;
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-bottom-color: #ffffff;
@@ -2274,27 +2277,37 @@
             /* 260px + 24px */
         }
 
-        /* ======================================================== */
-        /* PREMIUM SVG HEXAGON MENU (MATCHING REFERENCE IMAGE 2)   */
-        /* ======================================================== */
+        /* ============================================================= */
+        /* ICON TAB BAR — cùng ngôn ngữ với tab "Khám phá" của drawer    */
+        /* ============================================================= */
+        /* Đáy tab tụt thêm 1px để đè lên viền trên của drawer, tạo cảm giác liền khối */
         .vr-floating-hex-menu {
             position: absolute;
             left: 50%;
-            top: -34px;
-            transform: translateX(-50%);
+            top: 0;
+            transform: translate(-50%, calc(-100% + var(--drawer-rail-h) + 1px));
             display: flex;
-            align-items: center;
-            gap: 14px;
+            align-items: stretch;
+            height: 40px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-bottom-color: #ffffff;
+            border-radius: 7px 7px 0 0;
+            box-shadow: none;
             z-index: 2500;
             pointer-events: auto;
         }
 
+        .bottom-drawer-wrapper:not(.open) .vr-floating-hex-menu {
+            border-bottom-color: #e2e8f0;
+        }
+
         .vr-floating-hex-menu .vr-hex-btn {
             position: relative;
-            width: 62px;
-            height: 70px;
+            width: 46px;
             background: transparent;
             border: none;
+            border-left: 1px solid #e2e8f0;
             padding: 0;
             cursor: pointer;
             outline: none;
@@ -2302,76 +2315,51 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 6px 16px rgba(15, 23, 42, 0.12));
-            transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: #475569;
+            transition: background 0.15s ease, color 0.15s ease;
         }
 
-        .vr-floating-hex-menu .vr-hex-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: visible;
+        .vr-floating-hex-menu .vr-hex-btn:first-child {
+            border-left: none;
+            border-radius: 6px 0 0 0;
         }
 
-        .vr-floating-hex-menu .vr-hex-polygon {
-            fill: url(#vrHexGrad);
-            stroke: #cbdbe8;
-            stroke-width: 1.8;
-            transition: all 0.25s ease;
+        .vr-floating-hex-menu .vr-hex-btn:last-child {
+            border-radius: 0 6px 0 0;
         }
 
-        .vr-floating-hex-menu .vr-hex-icon-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #1e3a5f;
-            transition: all 0.25s ease;
+        .vr-floating-hex-menu .vr-hex-btn .material-symbols-rounded {
+            font-size: 21px;
+            line-height: 1;
         }
 
         .vr-floating-hex-menu .vr-hex-btn:hover {
-            transform: translateY(-6px) scale(1.1);
-            filter: drop-shadow(0 10px 24px rgba(30, 58, 95, 0.25));
-        }
-
-        .vr-floating-hex-menu .vr-hex-btn:hover .vr-hex-polygon {
-            fill: url(#vrHexHoverGrad);
-            stroke: #ffffff;
-            stroke-width: 2.2;
-        }
-
-        .vr-floating-hex-menu .vr-hex-btn:hover .vr-hex-icon-content {
-            color: #ffffff;
-            transform: scale(1.06);
+            background: #f1f5f9;
+            color: #1e3a5f;
         }
 
         .vr-floating-hex-menu .vr-hex-btn:active {
-            transform: translateY(-2px) scale(0.98);
+            background: #e2e8f0;
         }
 
         /* Tooltip */
         .vr-floating-hex-menu .vr-hex-tooltip {
             position: absolute;
-            top: -36px;
+            bottom: calc(100% + 6px);
             left: 50%;
-            transform: translateX(-50%) translateY(-4px);
-            background: rgba(15, 23, 42, 0.95);
-            color: #f1f5f9;
-            padding: 4px 10px;
+            transform: translateX(-50%) translateY(3px);
+            background: #1e3a5f;
+            color: #f8fafc;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 0.66rem;
             font-weight: 600;
+            letter-spacing: -0.15px;
             white-space: nowrap;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.2s ease;
+            transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
             pointer-events: none;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .vr-floating-hex-menu .vr-hex-btn:hover .vr-hex-tooltip {
@@ -3270,95 +3258,27 @@
         </div><!-- /.mission-widget-wrapper -->
     </div>
 
-    <!-- SVG Definitions for Hexagon Gradients -->
-    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
-        <defs>
-            <linearGradient id="vrHexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96" />
-                <stop offset="100%" stop-color="#f1f5f9" stop-opacity="0.92" />
-            </linearGradient>
-            <linearGradient id="vrHexHoverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#1e3a5f" />
-                <stop offset="50%" stop-color="#183050" />
-                <stop offset="100%" stop-color="#12243e" />
-            </linearGradient>
-        </defs>
-    </svg>
-
     <!-- Bottom Featured Drawer (Full Width Sheet) -->
     <div class="bottom-drawer-wrapper open" id="featured-drawer">
-        <!-- Floating Hexagon Buttons centered on top edge of drawer -->
+        <!-- Icon tab bar seated on the top edge of the drawer, same style as the "Khám phá" tab -->
         <div class="vr-floating-hex-menu">
-            <!-- Hex 1: Home -->
             <a href="{{ route('client.landing') }}" class="vr-hex-btn" id="vrBtnHome" title="Trang chủ" onclick="event.stopPropagation();">
-                <svg class="vr-hex-svg" viewBox="0 0 62 70">
-                    <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
-                </svg>
-                <div class="vr-hex-icon-content">
-                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20V10.5z"/>
-                        <path d="M9 21v-6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 15v6"/>
-                    </svg>
-                </div>
+                <span class="material-symbols-rounded">home</span>
                 <span class="vr-hex-tooltip">Trang chủ</span>
             </a>
 
-            <!-- Hex 2: Danh sách di tích -->
             <button type="button" class="vr-hex-btn" id="vrBtnCategory" title="Danh sách di tích" onclick="event.stopPropagation(); openMonumentsModal();">
-                <svg class="vr-hex-svg" viewBox="0 0 62 70">
-                    <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
-                </svg>
-                <div class="vr-hex-icon-content">
-                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round">
-                        <line x1="4" y1="7" x2="20" y2="7"/>
-                        <line x1="4" y1="12" x2="20" y2="12"/>
-                        <line x1="4" y1="17" x2="20" y2="17"/>
-                    </svg>
-                </div>
+                <span class="material-symbols-rounded">format_list_bulleted</span>
                 <span class="vr-hex-tooltip">Danh mục</span>
             </button>
 
-            <!-- Hex 3: Gamepad / Missions -->
             <a href="{{ route('client.missions') }}" class="vr-hex-btn" id="vrBtnGame" title="Trò chơi & Nhiệm vụ" onclick="event.stopPropagation();">
-                <svg class="vr-hex-svg" viewBox="0 0 62 70">
-                    <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
-                </svg>
-                <div class="vr-hex-icon-content">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Plus D-Pad on Left -->
-                        <line x1="6" y1="11" x2="10" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="8" y1="9" x2="8" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <!-- 4 Dots in Diamond Pattern on Right -->
-                        <circle cx="16" cy="9.8" r="0.8" fill="currentColor" stroke="none"/>
-                        <circle cx="17.7" cy="11.5" r="0.8" fill="currentColor" stroke="none"/>
-                        <circle cx="16" cy="13.2" r="0.8" fill="currentColor" stroke="none"/>
-                        <circle cx="14.3" cy="11.5" r="0.8" fill="currentColor" stroke="none"/>
-                        <!-- Professional Gamepad Silhouette -->
-                        <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15.408A3.75 3.75 0 0 0 5.744 19.5c1.402 0 2.684-.79 3.32-2.036l.723-1.446a2 2 0 0 1 1.787-1.096h.852a2 2 0 0 1 1.787 1.096l.723 1.446A3.753 3.753 0 0 0 18.256 19.5 3.75 3.75 0 0 0 22 15.75l-.685-6.578A4 4 0 0 0 17.32 5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+                <span class="material-symbols-rounded">sports_esports</span>
                 <span class="vr-hex-tooltip">Nhiệm vụ</span>
             </a>
 
-            <!-- Hex 4: Trailer / Movie 360 -->
             <a href="{{ route('client.pano_service') }}" class="vr-hex-btn" id="vrBtn360" title="Tour VR 360" onclick="event.stopPropagation();">
-                <svg class="vr-hex-svg" viewBox="0 0 62 70">
-                    <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
-                </svg>
-                <div class="vr-hex-icon-content">
-                    <svg width="38" height="38" viewBox="0 0 32 32" fill="none">
-                        <!-- Outer Clapperboard Box -->
-                        <rect x="5" y="8" width="22" height="18" rx="3.5" stroke="currentColor" stroke-width="2.5"/>
-                        <!-- Top Clapperboard Slanted Stripes -->
-                        <path d="M5 13H27" stroke="currentColor" stroke-width="2.5"/>
-                        <path d="M9 8L13 13" stroke="currentColor" stroke-width="2.2"/>
-                        <path d="M17 8L21 13" stroke="currentColor" stroke-width="2.2"/>
-                        <!-- Text "Trailer" -->
-                        <text x="16" y="19" font-size="5.5" font-weight="700" fill="currentColor" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Trailer</text>
-                        <!-- Play Triangle below Trailer text -->
-                        <polygon points="14.5,21 18.5,23 14.5,25" fill="currentColor"/>
-                    </svg>
-                </div>
+                <span class="material-symbols-rounded">vrpano</span>
                 <span class="vr-hex-tooltip">Tour 360</span>
             </a>
         </div>
