@@ -59,7 +59,24 @@ class LandingController extends Controller
     }
 
     /**
-     * Trang giới thiệu + form gửi yêu cầu (công khai, không cần đăng nhập).
+     * Trang "Giới thiệu": nội dung biên tập về vùng đất, kèm vài địa điểm tiêu biểu
+     * lấy từ CSDL để minh họa cho chương "Kiệt tác thiên nhiên".
+     */
+    public function about()
+    {
+        $showcase = Location::query()
+            ->where('status', 'published')
+            ->with('category')
+            ->orderByDesc('view_count')
+            ->take(3)
+            ->get()
+            ->each(fn ($loc) => $loc->setAttribute('display_thumbnail', $loc->resolveThumbnailUrl()));
+
+        return view('client.about', compact('showcase'));
+    }
+
+    /**
+     * Trang dịch vụ tour 360 + form gửi yêu cầu (công khai, không cần đăng nhập).
      */
     public function panoService()
     {

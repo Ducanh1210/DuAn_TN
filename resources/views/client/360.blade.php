@@ -1331,24 +1331,23 @@
         /* Floating Toast Notification 360 */
         .toast-notification-360 {
             position: fixed;
-            top: 24px;
+            top: 20px;
             left: 50%;
-            transform: translateX(-50%) translateY(-30px);
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
-            color: #ffffff;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-size: 0.875rem;
+            transform: translateX(-50%) translateY(-12px);
+            background: #ffffff;
+            border: 1px solid #e0e3e5;
+            color: #191c1e;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.82rem;
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             opacity: 0;
             pointer-events: none;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.25s ease;
             z-index: 10000;
             font-family: 'Be Vietnam Pro', sans-serif;
         }
@@ -3286,13 +3285,13 @@
 
             toastText.innerText = message;
             if (status === 'added') {
-                toastIcon.innerHTML = '<i class="fa-solid fa-heart" style="color: #ef4444; font-size: 1.2rem;"></i>';
+                toastIcon.innerHTML = '<i class="fa-solid fa-heart" style="color: #ef4444; font-size: 1rem;"></i>';
             } else if (status === 'removed') {
-                toastIcon.innerHTML = '<i class="fa-regular fa-heart" style="color: #94a3b8; font-size: 1.2rem;"></i>';
+                toastIcon.innerHTML = '<i class="fa-regular fa-heart" style="color: #76777d; font-size: 1rem;"></i>';
             } else if (status === 'comment') {
-                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 1.2rem;"></i>';
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #166534; font-size: 1rem;"></i>';
             } else {
-                toastIcon.innerHTML = '<i class="fa-solid fa-circle-info" style="color: #38bdf8; font-size: 1.2rem;"></i>';
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-info" style="color: #45464d; font-size: 1rem;"></i>';
             }
 
             toast.classList.add('show');
@@ -3334,7 +3333,6 @@
                             icon.className = 'fa-solid fa-heart';
                             icon.style.color = '#ef4444';
                         }
-                        showToast360(data.message || 'Đã thêm vào danh sách yêu thích (+2 điểm)', 'added');
                     } else {
                         btnToggleFavorite.classList.remove('is-active', 'active');
                         const icon = btnToggleFavorite.querySelector('i');
@@ -3342,7 +3340,6 @@
                             icon.className = 'fa-regular fa-heart';
                             icon.style.color = '';
                         }
-                        showToast360(data.message || 'Đã xóa khỏi danh sách yêu thích', 'removed');
                     }
                 })
                 .catch(err => {

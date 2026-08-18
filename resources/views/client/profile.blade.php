@@ -2138,9 +2138,7 @@
 
 <!-- Top Navigation Bar -->
 <div class="top-navbar">
-    <a href="{{ route('home') }}" class="btn-back">
-        <span class="back-chevron">&lsaquo;</span> Quay lại
-    </a>
+    <div></div>
     <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
         Ninh Bình Travel Hub
     </div>
@@ -2254,10 +2252,7 @@
                 <span class="sep">/</span>
                 <strong id="workspaceTabTitle">Thông tin cá nhân</strong>
             </div>
-            <div class="workspace-actions">
-                <span id="workspaceHint" class="text-secondary" style="font-size:0.72rem;margin-right:4px;">Workspace</span>
-                <a href="{{ route('home') }}" class="btn-action" style="text-decoration:none; padding:6px 12px; font-size:0.72rem;">Về bản đồ</a>
-            </div>
+            <div class="workspace-actions"></div>
         </div>
 
         <div class="workspace-body">
@@ -2300,8 +2295,19 @@
             <div class="tab-pane fade show active" id="tab-profile" role="tabpanel">
                 <div class="content-panel" style="margin-bottom:12px;">
                     <div class="panel-head">
-                        <div class="section-title">Chỉnh sửa nhanh</div>
-                        <button type="button" class="btn-action" id="btnEditDisplayNameTop" style="padding:5px 12px;font-size:0.72rem;">Sửa tên hiển thị</button>
+                        <div class="section-title">Thông tin nhanh</div>
+                        @if($user->provider !== 'google')
+                            <button
+                                type="button"
+                                class="btn-action"
+                                style="padding:5px 12px;font-size:0.72rem;"
+                                data-bs-toggle="pill"
+                                data-bs-target="#tab-security"
+                                onclick="document.getElementById('tab-security-btn')?.click()"
+                            >
+                                Đổi mật khẩu
+                            </button>
+                        @endif
                     </div>
                     <div class="panel-body" style="padding-top:12px;padding-bottom:12px;">
                         <div class="info-list mb-0">
@@ -2309,7 +2315,7 @@
                                 <div class="info-label">Tên hiển thị</div>
                                 <div class="info-value" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                                     <span id="profileTopDisplayName">{{ $user->display_name ?? $user->username }}</span>
-                                    <span class="text-secondary" style="font-size:0.72rem;">Nhấp biểu tượng bút bên sidebar hoặc nút Sửa ở trên để đổi tên</span>
+                                    <span class="text-secondary" style="font-size:0.72rem;">Nhấp biểu tượng bút bên sidebar để đổi tên</span>
                                 </div>
                             </div>
                             <div class="info-item">
@@ -2379,10 +2385,6 @@
                         <div class="panel-body">
                             <div class="info-list mb-0">
                                 <div class="info-item">
-                                    <div class="info-label">Tên tài khoản</div>
-                                    <div class="info-value"><code style="font-size:0.8rem;">{{ $user->username }}</code></div>
-                                </div>
-                                <div class="info-item">
                                     <div class="info-label">Tên hiển thị</div>
                                     <div class="info-value" id="profileFormDisplayNameVal">{{ $user->display_name ?? $user->username }}</div>
                                 </div>
@@ -2402,47 +2404,6 @@
                                         <span class="status-dot active"></span> {{ $user->status === 'active' ? 'Đang hoạt động' : 'Bị khóa' }}
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="content-panel">
-                        <div class="panel-head">
-                            <div class="section-title">Thao tác nhanh</div>
-                        </div>
-                        <div class="panel-body">
-                            <div class="quick-ops">
-                                @if($user->provider !== 'google')
-                                <button type="button" data-bs-toggle="pill" data-bs-target="#tab-security" onclick="document.getElementById('tab-security-btn')?.click()">
-                                    <span>Đổi mật khẩu</span>
-                                    <span class="qo-meta">Bảo mật</span>
-                                </button>
-                                @else
-                                <div class="ops-form-card" style="border-color:#cbdbe8;background:#f1f5f9;margin:0;padding:10px 12px;">
-                                    <div style="font-size:0.72rem;font-weight:600;color:#1e3a5f;margin-bottom:4px;">Đăng nhập Google</div>
-                                    <div style="font-size:0.75rem;color:#64748b;">Tài khoản dùng Google OAuth — không cần / không đổi mật khẩu trên hệ thống.</div>
-                                </div>
-                                @endif
-                                <button type="button" data-bs-toggle="pill" data-bs-target="#tab-itineraries" onclick="document.getElementById('tab-itineraries-btn').click()">
-                                    <span>Xem lịch trình đã lưu</span>
-                                    <span class="qo-meta">{{ isset($itineraries) ? $itineraries->count() : 0 }} mục</span>
-                                </button>
-                                <button type="button" data-bs-toggle="pill" data-bs-target="#tab-favorites" onclick="document.getElementById('tab-favorites-btn').click()">
-                                    <span>Địa điểm yêu thích</span>
-                                    <span class="qo-meta">{{ $favorites->count() }} mục</span>
-                                </button>
-                                <button type="button" data-bs-toggle="pill" data-bs-target="#tab-business" onclick="document.getElementById('tab-business-btn').click()">
-                                    <span>Đăng ký doanh nghiệp</span>
-                                    <span class="qo-meta">Mở rộng</span>
-                                </button>
-                                <a href="{{ route('home') }}">
-                                    <span>Mở bản đồ / AI lịch trình</span>
-                                    <span class="qo-meta">Map</span>
-                                </a>
-                                <button type="button" class="btn-danger-ghost" style="justify-content:space-between;width:100%;display:flex;" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">
-                                    <span>Hủy kích hoạt tài khoản</span>
-                                    <span class="qo-meta" style="color:#b91c1c;">Nguy hiểm</span>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -2572,11 +2533,6 @@
                                     <button type="submit" class="btn-action">Lưu mật khẩu</button>
                                 </div>
                             </form>
-                        </div>
-                        <div class="ops-form-card" style="border-color:#fecaca;background:#fffafa;margin-bottom:0;">
-                            <div class="ops-form-title" style="color:#b91c1c;">Vùng nguy hiểm</div>
-                            <p class="text-secondary small mb-3">Hủy kích hoạt sẽ tạm dừng tài khoản và ẩn bình luận của bạn.</p>
-                            <button type="button" class="btn-danger-ghost" data-bs-toggle="modal" data-bs-target="#deactivateAccountModal">Yêu cầu hủy kích hoạt</button>
                         </div>
                     </div>
                     <div class="content-panel">
@@ -2915,41 +2871,6 @@
         </div><!-- /.workspace-body -->
     </div><!-- /.dashboard-content -->
 </div><!-- /.main-layout -->
-
-<!-- Deactivation Confirmation Modal -->
-<div class="modal fade" id="deactivateAccountModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-3">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-danger">Xác nhận hủy kích hoạt</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body py-3">
-                <p class="text-secondary small">Vui lòng điền thông tin để xác thực trước khi tiếp tục:</p>
-                
-                @if($user->provider)
-                    <div class="mb-3">
-                        <label class="form-label-clean">Xác nhận email của bạn (<strong>{{ $user->email }}</strong>):</label>
-                        <input type="text" class="form-control-clean" id="confirm_username" placeholder="Nhập email">
-                    </div>
-                @else
-                    <div class="mb-3">
-                        <label class="form-label-clean">Nhập mật khẩu hiện tại của bạn:</label>
-                        <input type="password" class="form-control-clean" id="confirm_password" placeholder="Nhập mật khẩu">
-                    </div>
-                @endif
-                <div class="text-danger small d-none" id="deactivateErrorMsg">Thông tin xác minh chưa khớp.</div>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-light rounded-2 btn-sm px-3" data-bs-dismiss="modal">Hủy bỏ</button>
-                <button type="button" class="btn btn-danger rounded-2 btn-sm px-3" id="confirmDeactivationBtn">
-                    <span class="spinner-border spinner-border-sm d-none me-1" id="deactivateSpinner" role="status"></span>
-                    Hủy kích hoạt ngay
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Cancel Business Registration Modal -->
 <div class="modal fade" id="cancelBusinessModal" tabindex="-1" aria-hidden="true">
@@ -3398,7 +3319,6 @@
         const displayNameInput = document.getElementById('sidebarDisplayNameInput');
         const formDisplayNameVal = document.getElementById('profileFormDisplayNameVal');
         const profileTopDisplayName = document.getElementById('profileTopDisplayName');
-        const btnEditDisplayNameTop = document.getElementById('btnEditDisplayNameTop');
 
         function startDisplayNameEdit() {
             if (!displayNameText || !displayNameInput) return;
@@ -3406,10 +3326,6 @@
             displayNameInput.classList.remove('d-none');
             displayNameInput.focus();
             displayNameInput.select();
-        }
-
-        if (btnEditDisplayNameTop) {
-            btnEditDisplayNameTop.addEventListener('click', startDisplayNameEdit);
         }
 
         if (displayNameText && displayNameInput && displayNameVal) {
@@ -3828,67 +3744,6 @@
             document.getElementById('profile-app-container')?.classList.remove('dark-mode-active');
             document.body.style.backgroundColor = '';
         } catch (e) {}
-
-        // --- Account Deactivation ---
-        const confirmDeactivationBtn = document.getElementById('confirmDeactivationBtn');
-        const deactivateSpinner = document.getElementById('deactivateSpinner');
-        const deactivateErrorMsg = document.getElementById('deactivateErrorMsg');
-
-        if (confirmDeactivationBtn) {
-            confirmDeactivationBtn.addEventListener('click', function() {
-                const currentPasswordInput = document.getElementById('confirm_password');
-                const emailInput = document.getElementById('confirm_username');
-
-                const bodyData = {};
-                if (currentPasswordInput) bodyData.confirm_password = currentPasswordInput.value;
-                if (emailInput) bodyData.confirm_username = emailInput.value;
-
-                deactivateSpinner.classList.remove('d-none');
-                deactivateErrorMsg.classList.add('d-none');
-                confirmDeactivationBtn.disabled = true;
-
-                fetch("{{ route('client.profile.delete') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify(bodyData)
-                })
-                .then(res => {
-                    if (res.status === 419) {
-                        showToast('Phiên làm việc đã hết hạn. Đang tự động tải lại trang...', false);
-                        setTimeout(() => window.location.reload(), 2000);
-                        throw new Error('CSRF token mismatch (419)');
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    deactivateSpinner.classList.add('d-none');
-                    confirmDeactivationBtn.disabled = false;
-
-                    if (data.success) {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('deactivateAccountModal'));
-                        if (modal) modal.hide();
-                        showToast(data.message, true);
-                        setTimeout(() => {
-                            window.location.href = data.redirect_url;
-                        }, 1200);
-                    } else {
-                        deactivateErrorMsg.innerText = data.message || 'Xác thực thất bại.';
-                        deactivateErrorMsg.classList.remove('d-none');
-                    }
-                })
-                .catch(err => {
-                    deactivateSpinner.classList.add('d-none');
-                    confirmDeactivationBtn.disabled = false;
-                    deactivateErrorMsg.innerText = 'Xác thực thông tin không chính xác.';
-                    deactivateErrorMsg.classList.remove('d-none');
-                    console.error(err);
-                });
-            });
-        }
 
         // Cancel pending request logic
         const cancelRequestBtn = document.getElementById('cancelBusinessRequestBtn');

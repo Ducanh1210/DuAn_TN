@@ -810,7 +810,12 @@ class ProfileController extends Controller
         // Bảng xếp hạng (Top 5 người dùng nhiều điểm nhất)
         $leaderboard = User::orderBy('points', 'desc')->take(5)->get();
 
-        $shopRewards = Reward::active()->orderBy('cost_points')->get();
+        $milestoneFrameCodes = ['frame-bronze', 'frame-silver', 'frame-diamond', 'frame-streak'];
+        $shopFrames = AvatarFrame::where('status', 'active')
+            ->whereNotIn('code', $milestoneFrameCodes)
+            ->whereNotIn('id', $unlockedFrameIds)
+            ->orderBy('required_points')
+            ->get();
         $userRedemptions = $user
             ? UserRedemption::where('user_id', $user->id)->with('reward')->latest()->get()
             : collect();
@@ -825,7 +830,7 @@ class ProfileController extends Controller
             'allFrames',
             'unlockedFrameIds',
             'leaderboard',
-            'shopRewards',
+            'shopFrames',
             'userRedemptions',
             'redeemedRewardIds'
         ));

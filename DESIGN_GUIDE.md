@@ -6,17 +6,42 @@ Tài liệu này lưu trữ toàn bộ quy chuẩn giao diện, bảng màu, ph�
 
 ## 1. Tông Màu Chủ Đạo (Color Palette)
 
-Dự án áp dụng phong cách **Misty Ice-Blue & Slate Ink (Xanh sương mờ & Mực xám lam)** thanh lịch, dịu mắt,màu sắc đơn giản, hạn chế dùng icon trang trí rườm rà, hòa hợp với hình ảnh sông núi du lịch Ninh Bình:
+Dự án áp dụng bảng màu của mẫu **"Trang chủ Khám phá Ninh Bình Premium"** (`stitch_kh_m_ph_du_l_ch_ninh_b_nh/trang_ch_kh_m_ph_ninh_b_nh_premium`): nền xám lạnh trung tính, mực gần đen, và **đúng một màu nhấn là vàng đồng**.
+
+Đây là bảng màu **cố ý đơn sắc**. Vẻ cao cấp không đến từ việc nhiều màu mà đến từ ba thứ: một điểm vàng ấm duy nhất đặt trên nền xám lạnh, khoảng trắng rộng, và nhãn chữ hoa nhỏ có giãn ký tự lớn.
+
+### 1.1. Màu nền tảng
 
 | Thành phần | Mã màu CSS | Mô tả |
 | :--- | :--- | :--- |
-| **Nền trang Auth / Form** | `#f1f5f9` | Màu xanh sương mờ dịu mắt, trùng mã nền tệp `nen02.png` |
-| **Nền trang chính Client** | `#ffffff` / `#f8fafc` | Trắng / Xám nhạt sạch sẽ, tương phản tốt với bài viết |
-| **Tiêu đề chính (Headings)** | `#1e3a5f` / `#27272a` | Xanh lam xám sẫm mềm mại, **không** dùng màu đen tuyền `#000000` |
-| **Văn bản nội dung (Body text)**| `#3b5980` / `#52525b` | Xám xanh dịu mắt, giãn dòng 1.5 - 1.75 |
-| **Thông tin phụ / Ngày tháng**| `#6482a6` / `#a1a1aa` | Xám nhạt tinh tế |
-| **Viền ô nhập / Phân cách** | `#cbdbe8` / `#e5e7eb` | Viền mảnh nhạt, không dùng viền đậm gắt |
-| **Nút bấm chính (Primary Button)**| `#1e3a5f` *(Hover: `#2b4c7e`)*| Nút màu lam xám sang trọng, bo góc 8px |
+| **Nền trang Auth / Form** | `#f1f5f9` | Giữ nguyên, trùng mã nền tệp `nen02.png` |
+| **Nền trang chính Client** | `#ffffff` / `#f7f9fb` / `#f2f4f6` | Ba bậc xám lạnh; `#f2f4f6` là dải section xen kẽ |
+| **Nền ô ảnh chờ tải** | `#e0e3e5` | Xám đặc hơn, dùng làm nền placeholder |
+| **Tiêu đề chính (Headings)** | `#000000` | Đen tuyền. Đây là điểm đặc trưng của mẫu |
+| **Chữ nền / mặc định** | `#191c1e` | Gần đen, dùng cho `body` |
+| **Văn bản nội dung (Body text)**| `#45464d` | Xám đậm trung tính, giãn dòng 1.5 - 1.75. Tương phản 8.9:1 |
+| **Thông tin phụ / Nhãn nhỏ**| `#76777d` | Xám vừa |
+| **Viền ô nhập / Phân cách** | `#c6c6cd` / `#e0e3e5` | Viền mảnh nhạt, không dùng viền đậm gắt |
+| **Nút bấm chính (Primary Button)**| `#000000` *(Hover: `#565e74`)*| Nút đen, chữ trắng |
+
+> **Quy tắc một họ xám**: bảng này dùng xám **trung tính lạnh**. Không trộn xám ám xanh (`#1e3a5f`, `#47607d`, `#5f7594`) của bản cũ vào cùng trang.
+
+### 1.2. Màu nhấn (Accent) — vàng đồng, dùng duy nhất
+
+| Vai trò | Mã màu CSS | Dùng ở đâu |
+| :--- | :--- | :--- |
+| **Accent chính** | `#735c00` | Nhãn eyebrow, link hover, gạch chân mục active, ngày tháng, viền thẻ khi hover, tiêu đề cột footer. Tương phản 6.44:1 trên nền trắng nên dùng được cho cả chữ nhỏ |
+| **Accent sáng** | `#cba72f` | Chỉ dùng trên nền tối, ví dụ vạch mảnh trên dải CTA đen |
+
+### 1.3. Nguyên tắc dùng màu
+
+- **Vàng đồng không bao giờ tô nền.** Nó chỉ là màu chữ, màu icon và màu viền. Mọi mảng nền trong trang đều giữ xám trung tính. Đây là quy tắc quan trọng nhất tạo nên vẻ tiết chế của mẫu — tô nền vàng sẽ hỏng ngay.
+- **Đen cho cấu trúc, vàng cho tương tác.** Tiêu đề, nút chính, số trang đang xem dùng đen. Nhãn, link hover, mục menu đang chọn dùng vàng.
+- **Lớp phủ trên ảnh dùng đen, không dùng màu.** Mẫu dùng `rgba(0,0,0,0.3)` cho hero và `rgba(0,0,0,0.6→0.8)` cho lớp phủ thẻ ảnh. Bóng đổ chữ trên ảnh: `0 4px 12px rgba(0,0,0,0.5)`.
+- **Chỉ một dải nền xen kẽ.** Mẫu chỉ có `nb-section--mist` (`#f2f4f6`) phẳng, không viền, không chuyển sắc. Các section còn lại để trắng và dựa vào khoảng trắng lớn để tách nhau.
+- Các mã trên khai báo sẵn thành biến CSS: `--primary`, `--text-dark`, `--text-body`, `--text-muted`, `--accent`, `--accent-bright`, `--line`, `--line-soft`, `--surface-mist` trong `client/layouts/app.blade.php`, và bản `--nb-*` tương ứng trong `public/css/heritage.css`.
+
+> **Cảnh báo font**: mẫu gốc dùng `Libre Caslon Text` cho tiêu đề, nhưng font này **không có bộ ký tự tiếng Việt** (chỉ `latin`, `latin-ext`), chữ có dấu sẽ rơi sang font dự phòng trông lỗi. Nếu sau này muốn dùng serif, hãy chọn `Playfair Display` hoặc `Lora` — cả hai đều có subset `vietnamese`.
 
 ---
 
@@ -64,8 +89,9 @@ Dự án áp dụng phong cách **Misty Ice-Blue & Slate Ink (Xanh sương mờ 
 
 ## 4. Quy Chuẩn Thanh Điều Hướng (Navbar Header)
 
-- **Logo**: Chữ thuần `Ninh Bình POI` màu `#0f172a` (`font-weight: 700`), bỏ icon bản đồ & gradient lòe loẹt.
-- **Mục active**: Dùng khối nền xám nhạt `#f1f5f9` nhẹ nhàng với màu chữ `#0f172a`, không dùng màu xanh dương rực.
+- **Logo**: Ảnh `public/images/logo.png` (44px ở header, 52px ở footer) đặt cạnh chữ `Ninh Bình Travel Hub`.
+- **Mục active**: Chữ đen `#000000` kèm gạch chân vàng đồng `#735c00` dày 2px; hover đổi chữ sang `#735c00`.
+- **Footer**: Nền sáng `#f7f9fb` tách bằng viền trên `#c6c6cd` (mẫu dùng footer sáng, **không** dùng footer nền tối). Tiêu đề cột màu vàng đồng, chữ hoa, giãn ký tự `0.1em`.
 - **Nút User Profile**: Dùng pill màu xám `#f8fafc` viền `#e2e8f0` kèm avatar tròn `<x-user-avatar>`.
 
 ---

@@ -37,6 +37,7 @@ if (app()->environment('local') || php_sapi_name() == 'cli-server') {
 
 Route::get('/', [LandingController::class, 'index'])->name('client.landing');
 Route::get('/trang-chu', [LandingController::class, 'index']);
+Route::get('/gioi-thieu', [LandingController::class, 'about'])->name('client.about');
 Route::get('/dich-vu-tour-360', [LandingController::class, 'panoService'])->name('client.pano_service');
 Route::post('/dich-vu-tour-360', [LandingController::class, 'submitPanoService'])->name('client.pano_service.submit');
 

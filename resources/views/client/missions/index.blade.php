@@ -2,24 +2,23 @@
 
 @section('title', 'Trung Tâm Nhiệm Vụ & Đổi Thưởng - Ninh Bình Travel Hub')
 
+@section('body_class', 'missions-shell')
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
 <style>
     :root {
-        --q-bg: #f8fafc;
+        --q-bg: #f7f9fb;
         --q-card-bg: #ffffff;
-        --q-primary: #1e3a5f;
-        --q-primary-hover: #2b4c7e;
-        --q-primary-light: #f1f5f9;
-        --q-accent-orange: #f59e0b;
-        --q-text-main: #0f2442;
-        --q-text-sub: #64748b;
-        --q-border: #e2e8f0;
+        --q-primary: #000000;
+        --q-primary-hover: #565e74;
+        --q-primary-light: #f2f4f6;
+        --q-accent-orange: #735c00;
+        --q-text-main: #191c1e;
+        --q-text-sub: #76777d;
+        --q-border: #e0e3e5;
     }
 
-    footer {
-        display: none !important;
-    }
 
     /* Tab Panes Visibility Control */
     .tab-content > .tab-pane {
@@ -54,9 +53,9 @@
 
     .reward-modal-card {
         background: #ffffff;
-        border-radius: 24px;
+        border-radius: 2px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e0e3e5;
         padding: 24px;
         text-align: center;
     }
@@ -64,7 +63,7 @@
     .reward-modal-header-title {
         font-size: 1.15rem;
         font-weight: 800;
-        color: #0f172a;
+        color: #000000;
         margin-bottom: 20px;
     }
 
@@ -77,9 +76,9 @@
 
     .reward-item-card {
         position: relative;
-        background: #f8fafc;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 18px;
+        background: #f7f9fb;
+        border: 1.5px solid #e0e3e5;
+        border-radius: 2px;
         padding: 14px;
         width: 130px;
         height: 130px;
@@ -98,7 +97,7 @@
         width: 16px;
         height: 16px;
         cursor: pointer;
-        accent-color: #6366f1;
+        accent-color: #000000;
         z-index: 2;
         margin: 0;
     }
@@ -142,7 +141,7 @@
     .coin-card-icon-box {
         width: 58px;
         height: 58px;
-        background: #fef9c3;
+        background: #f2f4f6;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -154,7 +153,7 @@
     .reward-card-label {
         font-size: 0.82rem;
         font-weight: 700;
-        color: #334155;
+        color: #45464d;
         text-align: center;
         white-space: nowrap;
         max-width: 120px;
@@ -170,153 +169,334 @@
 
     .btn-reward-equip {
         flex: 1;
-        background: #6366f1;
-        color: #ffffff !important;
+        background: #ffffff;
+        color: #191c1e !important;
         font-weight: 700;
         font-size: 0.9rem;
         padding: 11px 20px;
-        border-radius: 14px;
-        border: none;
-        transition: all 0.2s;
+        border-radius: 2px;
+        border: 1px solid #7d8791;
+        box-shadow: 0 2px 0 #c6cbd1;
+        transition: all 0.18s ease;
     }
 
     .btn-reward-equip:hover {
-        background: #4f46e5;
+        background: #f7f9fb;
+        border-color: #5f6973;
+        box-shadow: 0 3px 0 #bcc3ca;
+        transform: translateY(-1px);
     }
 
     .btn-reward-close {
         flex: 1;
-        background: #f1f5f9;
-        color: #475569 !important;
+        background: #f2f4f6;
+        color: #45464d !important;
         font-weight: 700;
         font-size: 0.9rem;
         padding: 11px 20px;
-        border-radius: 14px;
-        border: 1px solid #e2e8f0;
+        border-radius: 2px;
+        border: 1px solid #e0e3e5;
         transition: all 0.2s;
     }
 
     .btn-reward-close:hover {
-        background: #e2e8f0;
-        color: #0f172a !important;
+        background: #e0e3e5;
+        color: #000000 !important;
     }
-
-    /* Chỉ giữ 1 header của module nhiệm vụ — ẩn header/footer layout chung */
-    .site-header,
-    header.site-header,
-    body > footer,
-    footer {
+    /* Ẩn header/footer site — trang nhiệm vụ là shell riêng */
+    body.missions-shell > header.site-header,
+    body.missions-shell > footer,
+    body.missions-shell > .container.mt-3 {
         display: none !important;
     }
 
-    body {
-        background-color: var(--q-bg);
-        font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-        color: var(--q-text-main);
-        margin: 0;
-        padding: 0;
+    body.missions-shell {
+        background: var(--q-bg);
+        min-height: 100vh;
     }
 
-    /* Full Width Top Header Bar */
-    .reward-top-bar-full {
+    .ms-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ms-top {
         background: #ffffff;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 10px 32px;
-        box-shadow: none;
+        color: #191c1e;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
         position: sticky;
         top: 0;
-        z-index: 100;
+        z-index: 110;
+        border-bottom: 1px solid var(--q-border);
     }
 
-    .reward-brand {
+    .ms-top__left,
+    .ms-top__center,
+    .ms-top__right {
         display: flex;
         align-items: center;
-        gap: 11px;
-        text-decoration: none;
+        gap: 14px;
+        min-width: 0;
     }
 
-    .reward-brand-icon {
-        font-size: 1.8rem;
-        color: #1e3a5f;
-        display: flex;
-        align-items: center;
+    .ms-top__center {
+        flex: 1;
         justify-content: center;
     }
 
-    .reward-brand-text {
-        font-size: 1.02rem;
-        font-weight: 800;
-        color: #0f172a;
-        letter-spacing: -0.01em;
-        line-height: 1.25;
+    .ms-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #45464d;
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        white-space: nowrap;
         transition: color 0.2s ease;
     }
 
-    .reward-brand-sub {
-        font-size: 0.72rem;
-        color: #64748b;
-        font-weight: 500;
-        line-height: 1.2;
+    .ms-back:hover {
+        color: #000000;
     }
 
-    .reward-top-menu {
-        display: flex;
+    .ms-brand {
+        display: inline-flex;
         align-items: center;
         gap: 8px;
-        list-style: none;
-        margin: 0;
-        padding: 0;
+        text-decoration: none;
+        color: #000000;
     }
 
-    .reward-top-menu .nav-link {
-        font-weight: 600;
+    .ms-brand__logo {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+    }
+
+    .ms-brand__name {
         font-size: 0.88rem;
-        color: #475569 !important;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    .ms-xu-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        background: #f7f9fb;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
+        font-weight: 700;
+        font-size: 0.82rem;
+        color: #191c1e;
+    }
+
+    .ms-nav__track {
+        display: inline-flex;
+        gap: 4px;
+        background: #f2f4f6;
+        padding: 4px;
+        border-radius: 2px;
+        list-style: none;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .ms-nav__track .nav-link {
         padding: 8px 18px !important;
-        border-radius: 0 !important;
-        transition: all 0.2s ease;
+        font-size: 0.84rem !important;
+        font-weight: 600 !important;
+        color: #45464d !important;
+        border-radius: 2px !important;
         border: none !important;
+        border-bottom: 2px solid transparent !important;
         background: transparent !important;
         box-shadow: none !important;
         cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
     }
 
-    .reward-top-menu .nav-link:hover {
-        color: #1e3a5f !important;
+    .ms-nav__track .nav-link:hover:not(.active) {
+        color: #735c00 !important;
     }
 
-    .reward-top-menu .nav-link.active {
-        color: #1e3a5f !important;
-        font-weight: 700 !important;
-        border-bottom: 3px solid #1e3a5f !important;
+    .ms-nav__track .nav-link.active {
+        background: transparent !important;
+        color: #191c1e !important;
+        box-shadow: none !important;
+        border-bottom: 2px solid #735c00 !important;
     }
 
-    .user-point-capsule {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        box-shadow: none;
-        padding: 5px 14px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 700;
-        color: #0f172a;
-        font-size: 0.85rem;
+    .ms-nav__hint {
+        font-size: 0.76rem;
+        color: #76777d;
+        margin: 0;
     }
 
-    /* Main Container */
     .reward-full-container {
         width: 100%;
-        padding: 20px 32px 40px;
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 24px 20px 48px;
+        flex: 1;
+    }
+
+    .ms-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+        gap: 24px;
+        align-items: start;
+        background: #f2f4f6;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
+        padding: 22px 24px;
+        margin-bottom: 20px;
+    }
+
+    .ms-hero__eyebrow {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #735c00;
+        margin-bottom: 8px;
+    }
+
+    .ms-hero__title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #000000;
+        margin: 0 0 6px;
+        line-height: 1.3;
+    }
+
+    .ms-hero__sub {
+        font-size: 0.8rem;
+        color: #76777d;
+        margin: 0 0 14px;
+    }
+
+    .ms-hero__points {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #000000;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+    }
+
+    .ms-hero__checkin-title {
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #000000;
+        margin-bottom: 4px;
+    }
+
+    .ms-hero__checkin-sub {
+        font-size: 0.74rem;
+        color: #76777d;
+        margin-bottom: 12px;
+    }
+
+    .ms-cat-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .ms-cat-chip {
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border: 1px solid #e0e3e5;
+        background: #ffffff;
+        color: #45464d;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .ms-cat-chip:hover {
+        border-color: #000000;
+        color: #000000;
+    }
+
+    .ms-cat-chip.active {
+        background: #dfe4e8;
+        color: #191c1e;
+        border-color: #aeb4ba;
+    }
+
+    .ms-section-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .ms-section-head h2 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #000000;
+        margin: 0;
+    }
+
+    .ms-section-head p {
+        font-size: 0.78rem;
+        color: #76777d;
+        margin: 4px 0 0;
+    }
+
+    @media (max-width: 991px) {
+        .ms-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .ms-top {
+            flex-wrap: wrap;
+        }
+
+        .ms-top__center {
+            order: 3;
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .ms-nav__hint {
+            display: none;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .ms-back span {
+            display: none;
+        }
+
+        .ms-brand__name {
+            display: none;
+        }
+
+        .ms-nav__track .nav-link {
+            padding: 8px 12px !important;
+            font-size: 0.78rem !important;
+        }
     }
 
     /* Left Sidebar Cards */
     .reward-sidebar-compact {
         background: #ffffff;
-        border-radius: 12px;
+        border-radius: 2px;
         padding: 12px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e0e3e5;
         box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
 
@@ -324,11 +504,11 @@
         font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
-        color: #94a3b8;
+        color: #76777d;
         letter-spacing: 0.5px;
         padding: 4px 10px 10px;
         margin-bottom: 4px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid #f2f4f6;
     }
 
     .reward-cat-btn {
@@ -337,10 +517,10 @@
         gap: 10px;
         width: 100%;
         padding: 9px 12px;
-        border-radius: 8px;
+        border-radius: 2px;
         font-weight: 600;
         font-size: 0.84rem;
-        color: #475569 !important;
+        color: #45464d !important;
         background: transparent !important;
         border: none !important;
         text-align: left;
@@ -351,27 +531,27 @@
     }
 
     .reward-cat-btn:hover {
-        background: #f1f5f9 !important;
-        color: #1e3a5f !important;
+        background: #f2f4f6 !important;
+        color: #000000 !important;
     }
 
     .reward-cat-btn.active {
-        background: #f1f5f9 !important;
-        color: #1e3a5f !important;
+        background: #f2f4f6 !important;
+        color: #000000 !important;
         font-weight: 700 !important;
         box-shadow: none !important;
     }
 
     .reward-cat-btn.active i,
     .reward-cat-btn.active span {
-        color: #1e3a5f !important;
+        color: #000000 !important;
     }
 
     /* Hero Banner (Shop Tab) */
     .reward-hero-compact {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
+        background: #f7f9fb;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
         padding: 22px 28px;
         position: relative;
         overflow: hidden;
@@ -381,39 +561,39 @@
     .hero-title-compact {
         font-size: 1.3rem;
         font-weight: 800;
-        color: #0f172a;
+        color: #000000;
         line-height: 1.3;
         margin-bottom: 6px;
     }
 
     .hero-sub-compact {
         font-size: 0.84rem;
-        color: #64748b;
+        color: #76777d;
         margin-bottom: 16px;
     }
 
     .btn-hero-compact {
-        background: #0284c7;
-        color: #ffffff;
+        background: #d9dee3;
+        color: #191c1e;
         font-weight: 700;
         font-size: 0.82rem;
         padding: 8px 20px;
-        border-radius: 8px;
-        border: none;
+        border-radius: 2px;
+        border: 1px solid #aeb4ba;
         box-shadow: none;
         transition: all 0.2s ease;
     }
 
     .btn-hero-compact:hover {
-        background: #0369a1;
-        color: #ffffff;
+        background: #c9d0d7;
+        color: #191c1e;
     }
 
     /* Top Assurance Bar */
     .top-assurance-compact {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
         padding: 12px 18px;
         margin-bottom: 20px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.01);
@@ -429,32 +609,32 @@
         width: 32px;
         height: 32px;
         border-radius: 50%;
-        background: #f0f9ff;
-        color: #0284c7;
+        background: #f2f4f6;
+        color: #000000;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 0.9rem;
         flex-shrink: 0;
-        border: 1px solid #bae6fd;
+        border: 1px solid #e0e3e5;
     }
 
     .assurance-title-compact {
         font-weight: 700;
         font-size: 0.82rem;
-        color: #0f172a;
+        color: #000000;
     }
 
     .assurance-sub-compact {
         font-size: 0.72rem;
-        color: #64748b;
+        color: #76777d;
     }
 
     /* Gift / Frame Card Grid */
     .item-card-compact {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
         padding: 14px;
         transition: all 0.2s ease;
         height: 100%;
@@ -466,38 +646,38 @@
     .item-card-compact:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        border-color: #cbd5e1;
+        border-color: #c6c6cd;
     }
 
     .item-img-compact {
         height: 90px;
-        background: #f8fafc;
-        border-radius: 10px;
+        background: #f7f9fb;
+        border-radius: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 10px;
         padding: 8px;
-        border: 1px solid #f1f5f9;
+        border: 1px solid #f2f4f6;
     }
 
     .item-name-compact {
         font-size: 0.85rem;
         font-weight: 700;
-        color: #0f172a;
+        color: #000000;
         margin-bottom: 2px;
     }
 
     .item-desc-compact {
         font-size: 0.75rem;
-        color: #64748b;
+        color: #76777d;
         margin-bottom: 8px;
     }
 
     .item-price-compact {
         font-size: 0.82rem;
         font-weight: 800;
-        color: #0284c7;
+        color: #000000;
         display: flex;
         align-items: center;
         gap: 5px;
@@ -505,104 +685,126 @@
     }
 
     .btn-action-compact {
-        background: #1e3a5f;
-        color: #ffffff;
+        background: #ffffff;
+        color: #191c1e;
         font-weight: 700;
         font-size: 0.78rem;
-        border-radius: 8px;
-        padding: 7px;
-        border: none;
+        border-radius: 2px;
+        padding: 8px 12px;
+        border: 1px solid #7d8791;
         width: 100%;
-        transition: all 0.2s;
-        box-shadow: none;
+        transition: all 0.18s ease;
+        box-shadow: 0 2px 0 #c6cbd1;
+        min-height: 36px;
     }
 
     .btn-action-compact:hover {
-        background: #2b4c7e;
-        color: #ffffff;
+        background: #f7f9fb;
+        border-color: #5f6973;
+        box-shadow: 0 3px 0 #bcc3ca;
+        transform: translateY(-1px);
+        color: #191c1e;
     }
 
     .btn-indigo {
-        background: #1e3a5f !important;
-        border: none !important;
-        color: #ffffff !important;
+        background: #ffffff !important;
+        border: 1px solid #7d8791 !important;
+        color: #191c1e !important;
         font-weight: 700 !important;
-        border-radius: 8px !important;
-        box-shadow: none !important;
-        transition: all 0.2s ease !important;
+        border-radius: 2px !important;
+        box-shadow: 0 2px 0 #c6cbd1 !important;
+        transition: all 0.18s ease !important;
+        min-height: 38px;
     }
 
     .btn-indigo:hover {
-        background: #2b4c7e !important;
-        box-shadow: none !important;
-        color: #ffffff !important;
+        background: #f7f9fb !important;
+        border-color: #5f6973 !important;
+        box-shadow: 0 3px 0 #bcc3ca !important;
+        transform: translateY(-1px);
+        color: #191c1e !important;
     }
 
     .text-indigo {
-        color: #1e3a5f !important;
+        color: #000000 !important;
     }
 
     .btn-outline-compact {
-        border: 1px solid #1e3a5f;
-        color: #1e3a5f;
+        border: 1px solid #7d8791;
+        color: #191c1e;
         background: #ffffff;
         font-weight: 700;
         font-size: 0.8rem;
-        border-radius: 8px;
+        border-radius: 2px;
         padding: 7px;
         width: 100%;
-        transition: all 0.2s;
+        transition: all 0.18s ease;
+        box-shadow: 0 2px 0 #c6cbd1;
     }
 
     .btn-outline-compact:hover {
-        background: #1e3a5f;
-        color: #ffffff;
+        background: #f7f9fb;
+        border-color: #5f6973;
+        box-shadow: 0 3px 0 #bcc3ca;
+        transform: translateY(-1px);
+        color: #191c1e;
     }
 
     /* Quests Tab Layout Specific Styles */
     .main-section-card {
         background: #ffffff;
-        border-radius: 14px;
+        border-radius: 2px;
         padding: 20px 24px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e0e3e5;
         box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
 
     .quest-filter-pill {
-        border-radius: 8px;
+        border-radius: 2px;
         padding: 5px 14px;
         font-size: 0.8rem;
         font-weight: 600;
-        color: #64748b;
+        color: #76777d;
         background: #ffffff;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e0e3e5;
         transition: all 0.2s ease;
         cursor: pointer;
     }
 
     .quest-filter-pill.active {
-        background: #1e3a5f;
-        color: #ffffff;
+        background: transparent;
+        color: #191c1e;
         font-weight: 700;
-        border-color: #1e3a5f;
+        border-color: #aeb4ba;
+        border-bottom: 2px solid #735c00;
         box-shadow: none;
     }
 
     .quest-item-card {
         position: relative;
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 14px 16px;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
+        padding: 16px 18px;
         margin-bottom: 10px;
         transition: all 0.2s ease;
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 16px;
         align-items: center;
-        justify-content: space-between;
+        border-left: 3px solid transparent;
+    }
+
+    .quest-item-card:has(.btn-claim-mission) {
+        border-left-color: #735c00;
+    }
+
+    .quest-item-card:has(.btn-claim-milestone-box) {
+        border-left-color: #735c00;
     }
 
     .quest-item-card:hover {
-        border-color: #cbd5e1;
+        border-color: #c6c6cd;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
     }
 
@@ -622,68 +824,76 @@
     .bg-icon-green,
     .bg-icon-blue,
     .bg-icon-orange {
-        background: #f8fafc;
-        color: #1e3a5f;
-        border: 1px solid #e2e8f0;
+        background: #f7f9fb;
+        color: #000000;
+        border: 1px solid #e0e3e5;
     }
 
     .quest-reward-tag {
-        position: absolute;
-        top: 10px;
-        right: 14px;
-        font-size: 0.78rem;
+        position: static;
+        font-size: 0.82rem;
         font-weight: 700;
-        color: #1e3a5f;
-        background: transparent;
-        border: none;
-        padding: 0;
+        color: #000000;
+        background: #f2f4f6;
+        border: 1px solid #e0e3e5;
+        padding: 4px 10px;
+        border-radius: 2px;
+        white-space: nowrap;
+        align-self: center;
     }
 
     .btn-quest-action {
         background: #ffffff;
-        color: #1e3a5f;
+        color: #191c1e;
         font-weight: 700;
         font-size: 0.78rem;
-        border-radius: 8px;
-        padding: 5px 14px;
-        border: 1px solid #1e3a5f;
-        transition: all 0.2s ease;
+        border-radius: 2px;
+        padding: 7px 14px;
+        border: 1px solid #7d8791;
+        transition: all 0.18s ease;
+        box-shadow: 0 2px 0 #c6cbd1;
     }
 
     .btn-quest-action:hover {
-        background: #1e3a5f;
-        color: #ffffff;
+        background: #f7f9fb;
+        border-color: #5f6973;
+        box-shadow: 0 3px 0 #bcc3ca;
+        transform: translateY(-1px);
+        color: #191c1e;
     }
 
     .btn-quest-claim {
-        background: #1e3a5f;
-        color: #ffffff;
+        background: #ffffff;
+        color: #191c1e;
         font-weight: 700;
         font-size: 0.8rem;
-        border-radius: 8px;
-        padding: 6px 16px;
-        border: none;
-        box-shadow: none;
+        border-radius: 2px;
+        padding: 7px 16px;
+        border: 1px solid #7d8791;
+        box-shadow: 0 2px 0 #c6cbd1;
     }
 
     .btn-quest-claim:hover {
-        background: #2b4c7e;
-        color: #ffffff;
+        background: #f7f9fb;
+        border-color: #5f6973;
+        box-shadow: 0 3px 0 #bcc3ca;
+        transform: translateY(-1px);
+        color: #191c1e;
     }
 
     .widget-card {
         background: #ffffff;
-        border-radius: 12px;
+        border-radius: 2px;
         padding: 16px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e0e3e5;
         margin-bottom: 14px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
 
     .streak-day-box {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
         padding: 6px 2px;
         text-align: center;
         flex: 1;
@@ -691,26 +901,26 @@
     }
 
     .streak-day-box.completed {
-        background: #f8fafc !important;
-        border-color: #e2e8f0 !important;
-        color: #94a3b8 !important;
+        background: #f7f9fb !important;
+        border-color: #e0e3e5 !important;
+        color: #76777d !important;
         opacity: 0.7 !important;
     }
 
     .streak-day-box.current {
-        border: 1.5px solid #1e3a5f !important;
+        border: 1.5px solid #000000 !important;
         background: #ffffff !important;
         box-shadow: none !important;
     }
 
     .streak-day-box.special-day {
-        background: #f1f5f9 !important;
-        border: 1px solid #cbdbe8 !important;
-        color: #1e3a5f !important;
+        background: #f2f4f6 !important;
+        border: 1px solid #c6c6cd !important;
+        color: #000000 !important;
     }
 
     .streak-day-box.special-day .special-day-title {
-        color: #1e3a5f !important;
+        color: #000000 !important;
         font-weight: 700 !important;
     }
 
@@ -718,9 +928,9 @@
     #btnDailyCheckinSide:disabled,
     #btnDailyCheckinShop:disabled,
     .btn-indigo:disabled {
-        background: #f1f5f9 !important;
-        border-color: #e2e8f0 !important;
-        color: #94a3b8 !important;
+        background: #f2f4f6 !important;
+        border-color: #e0e3e5 !important;
+        color: #76777d !important;
         box-shadow: none !important;
         cursor: not-allowed !important;
         opacity: 0.85;
@@ -730,15 +940,15 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        border: 3px solid #1e3a5f;
+        border: 3px solid #000000;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 0.9rem;
         font-weight: 700;
-        color: #1e3a5f;
+        color: #000000;
         flex-shrink: 0;
-        background: #f1f5f9;
+        background: #f2f4f6;
     }
 
     .leaderboard-row {
@@ -746,12 +956,12 @@
         align-items: center;
         justify-content: space-between;
         padding: 8px 10px;
-        border-radius: 8px;
+        border-radius: 2px;
         transition: all 0.2s ease;
     }
 
     .leaderboard-row.highlight {
-        background: #f0f9ff;
+        background: #f2f4f6;
         font-weight: 700;
     }
 
@@ -767,23 +977,23 @@
         color: #fff;
     }
 
-    .rank-1 { background: #0f172a; }
-    .rank-2 { background: #475569; }
-    .rank-3 { background: #64748b; }
-    .rank-other { background: #f1f5f9; color: #64748b; }
+    .rank-1 { background: #000000; }
+    .rank-2 { background: #45464d; }
+    .rank-3 { background: #76777d; }
+    .rank-other { background: #f2f4f6; color: #76777d; }
 
     .promo-banner-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        background: #f7f9fb;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
         padding: 16px;
     }
 
     /* TIẾN ĐỘ NHIỆM VỤ Widget (Minimalist & Clean Theme) */
     .quest-progress-card-cream {
         background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
         padding: 20px 24px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         margin-bottom: 20px;
@@ -804,7 +1014,7 @@
         left: 45px;
         right: 40px;
         height: 4px;
-        background: #e2e8f0;
+        background: #e0e3e5;
         border-radius: 4px;
         transform: translateY(-50%);
         z-index: 1;
@@ -812,7 +1022,7 @@
 
     .quest-milestone-line-fill {
         height: 100%;
-        background: #0284c7;
+        background: #000000;
         border-radius: 4px;
         transition: width 0.4s ease;
     }
@@ -820,7 +1030,7 @@
     .quest-coin-badge {
         width: 40px;
         height: 40px;
-        background: #0284c7;
+        background: #000000;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -846,7 +1056,7 @@
     .node-top-label {
         font-size: 0.72rem;
         font-weight: 700;
-        color: #94a3b8;
+        color: #76777d;
         margin-bottom: 3px;
     }
 
@@ -854,8 +1064,8 @@
         width: 22px;
         height: 22px;
         border-radius: 50%;
-        background: #e2e8f0;
-        color: #64748b;
+        background: #e0e3e5;
+        color: #76777d;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -865,12 +1075,12 @@
 
     .node-icon-gift {
         font-size: 18px;
-        color: #94a3b8;
+        color: #76777d;
     }
 
     .node-icon-gift-big {
         font-size: 24px;
-        color: #0284c7;
+        color: #000000;
         filter: none;
     }
 
@@ -880,7 +1090,7 @@
         margin-top: 4px;
         font-size: 0.75rem;
         font-weight: 700;
-        color: #475569;
+        color: #45464d;
         white-space: nowrap;
     }
 
@@ -890,9 +1100,9 @@
         left: 50%;
         transform: translateX(-50%) translateY(4px);
         background: #ffffff;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e0e3e5;
         box-shadow: 0 10px 24px -6px rgba(15, 23, 42, 0.18), 0 2px 6px rgba(0, 0, 0, 0.05);
-        border-radius: 12px;
+        border-radius: 2px;
         padding: 8px;
         white-space: normal;
         text-align: center;
@@ -904,9 +1114,9 @@
     }
 
     .tooltip-mini-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
+        background: #f7f9fb;
+        border: 1px solid #e0e3e5;
+        border-radius: 2px;
         min-width: 100px;
         max-width: 128px;
         display: flex;
@@ -928,13 +1138,13 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.04em;
-        color: #94a3b8;
+        color: #76777d;
     }
 
     .tooltip-frame-name {
         font-size: 0.68rem;
         font-weight: 700;
-        color: #1e293b;
+        color: #191c1e;
         line-height: 1.25;
         white-space: normal;
         word-break: break-word;
@@ -960,10 +1170,10 @@
 
     .quest-sub-item-card {
         background: #ffffff;
-        border-radius: 16px;
+        border-radius: 2px;
         padding: 14px 16px;
         margin-bottom: 10px;
-        border: 1px solid #f1f5f9;
+        border: 1px solid #f2f4f6;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         display: flex;
         align-items: center;
@@ -973,177 +1183,156 @@
 
     .quest-sub-item-card:hover {
         box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
-        border-color: #bfdbfe;
+        border-color: #c6c6cd;
     }
 
     .btn-outline-purple {
-        border: 1.5px solid #3b82f6;
-        color: #2563eb;
+        border: 1.5px solid #735c00;
+        color: #735c00;
         background: transparent;
-        border-radius: 20px;
+        border-radius: 2px;
         padding: 4px 16px;
         font-weight: 700;
         font-size: 0.78rem;
         transition: all 0.2s ease;
     }
 
+    .progress {
+        border-radius: 2px !important;
+        background: #e0e3e5 !important;
+    }
+    .progress-bar,
+    .progress-bar.bg-primary {
+        background: #000000 !important;
+        border-radius: 2px !important;
+    }
+
+    @media (max-width: 767px) {
+        .quest-item-card {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .quest-reward-tag {
+            justify-self: start;
+        }
+    }
+
     .btn-outline-purple:hover {
-        background: #2563eb;
+        background: #735c00;
         color: #ffffff;
     }
 </style>
 @endpush
 
 @section('content')
-<!-- Full Width Header Navigation Bar -->
-<div class="reward-top-bar-full">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <a href="{{ route('home') }}" class="reward-brand" title="Quay về bản đồ">
-            <i class="fa-solid fa-gift reward-brand-icon"></i>
-            <div>
-                <div class="reward-brand-text" id="headerBrandText">Nhiệm Vụ & Tích Xu</div>
-                <div class="reward-brand-sub" id="headerBrandSub">Hoàn thành nhiệm vụ nhận xu hàng ngày</div>
-            </div>
-        </a>
-
-        <!-- Menu Tabs -->
-        <ul class="reward-top-menu nav" id="rewardTopNav" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" id="nav-quests-tab" data-bs-toggle="pill" data-bs-target="#quests-pane" type="button" role="tab" onclick="switchNavTab('quests-pane')">
-                    Nhiệm vụ
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="nav-shop-tab" data-bs-toggle="pill" data-bs-target="#shop-pane" type="button" role="tab" onclick="switchNavTab('shop-pane')">
-                    Đổi thưởng
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="nav-inventory-tab" data-bs-toggle="pill" data-bs-target="#inventory-pane" type="button" role="tab" onclick="switchNavTab('inventory-pane')">
-                    Tủ quà của tôi
-                </button>
-            </li>
-        </ul>
-
-        <!-- Points Capsule & Avatar -->
-        <div class="d-flex align-items-center gap-3">
+<div class="ms-shell">
+    <header class="ms-top">
+        <div class="ms-top__left">
+            <a href="{{ route('home') }}" class="ms-back">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                <span>Bản đồ</span>
+            </a>
+            <a href="{{ route('client.missions') }}" class="ms-brand">
+                <img class="ms-brand__logo" src="{{ asset('images/logo.png') }}" alt="">
+                <span class="ms-brand__name">Ninh Bình Travel Hub</span>
+            </a>
+        </div>
+        <div class="ms-top__center">
+            <ul class="ms-nav__track nav" id="rewardTopNav" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="nav-quests-tab" data-bs-toggle="pill" data-bs-target="#quests-pane" type="button" role="tab" onclick="switchNavTab('quests-pane')">
+                        Nhiệm vụ
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="nav-shop-tab" data-bs-toggle="pill" data-bs-target="#shop-pane" type="button" role="tab" onclick="switchNavTab('shop-pane')">
+                        Đổi thưởng
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="nav-inventory-tab" data-bs-toggle="pill" data-bs-target="#inventory-pane" type="button" role="tab" onclick="switchNavTab('inventory-pane')">
+                        Tủ quà
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="ms-top__right">
+            <p class="ms-nav__hint mb-0" id="headerBrandSub">Hoàn thành nhiệm vụ để nhận xu mỗi ngày</p>
             @if($user)
-                <div class="user-point-capsule">
-                    <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 20px; height: 20px; object-fit: contain; vertical-align: -3px;" class="me-1">
+                <div class="ms-xu-pill">
+                    <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 18px; height: 18px; object-fit: contain;">
                     <span id="headerUserPoints">{{ number_format($user->points) }}</span>
                 </div>
-
-                <div class="position-relative">
-                    <i class="fa-solid fa-bell text-muted fs-5 cursor-pointer"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary" style="font-size: 0.6rem;">3</span>
-                </div>
-
-                <x-user-avatar :user="$user" size="34" />
+                <x-user-avatar :user="$user" size="32" />
             @else
-                <a href="{{ route('login') }}" class="btn btn-primary btn-sm fw-bold px-3" style="border-radius: 8px;">
-                    <i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
-                </a>
+                <a href="{{ route('login') }}" class="btn btn-sm btn-light" style="border-radius: 2px; font-weight: 600;">Đăng nhập</a>
             @endif
         </div>
-    </div>
-</div>
+    </header>
 
 <!-- Main Container -->
 <div class="reward-full-container">
     <div class="tab-content" id="mainTabContent">
         
-        <!-- TAB 1: ĐỔI THƯỞNG (SHOP PANE - MATCHED INDIGO COLOR SCHEME) -->
+        <!-- TAB 1: ĐỔI THƯỞNG -->
         <div class="tab-pane fade" id="shop-pane" role="tabpanel">
-            <div class="row g-3">
-                <!-- LEFT COLUMN: Danh Mục Phần Thưởng Sidebar -->
-                <div class="col-lg-3 col-xl-2">
-                    <div class="reward-sidebar-compact">
-                        <div class="sidebar-title">Danh mục phần thưởng</div>
-                        <div class="d-flex flex-column" id="rewardCatList">
-                            <button class="reward-cat-btn active" onclick="filterCategory('all', this)" type="button">
-                                <span>Tất cả quà</span>
-                            </button>
-                            <button class="reward-cat-btn" onclick="filterCategory('voucher', this)" type="button">
-                                <span>Voucher &amp; Thẻ nạp</span>
-                            </button>
-                            <button class="reward-cat-btn" onclick="filterCategory('badge', this)" type="button">
-                                <span>Huy hiệu &amp; Vật phẩm</span>
-                            </button>
-                            <button class="reward-cat-btn" onclick="filterCategory('exclusive', this)" type="button">
-                                <span>Quà độc quyền</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Referral Card -->
-                    <div class="reward-sidebar-compact mt-2 text-center" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px 10px;">
-                        <h6 class="fw-bold text-dark mb-1" style="font-size: 0.82rem;">Giới thiệu bạn bè</h6>
-                        <p class="text-muted mb-2" style="font-size: 0.72rem;">Nhận ngay <strong>2.000 xu</strong> cho mỗi lượt mời!</p>
-                        <button class="btn btn-indigo btn-sm w-100 fw-bold" onclick="copyReferralLink()" style="font-size: 0.78rem; padding: 7px 10px;">
-                            Giới thiệu ngay
-                        </button>
-                    </div>
+            <div class="ms-section-head">
+                <div>
+                    <h2 id="shopSectionTitle">Đổi thưởng</h2>
+                    <p>Dùng xu tích lũy để đổi khung avatar</p>
                 </div>
+                <button class="btn btn-outline-compact" type="button" onclick="copyReferralLink()" style="width: auto; padding: 7px 16px;">
+                    Giới thiệu bạn bè
+                </button>
+            </div>
 
-                <!-- RIGHT COLUMN: Shop Banner, Assurance & Gift Grid -->
-                <div class="col-lg-9 col-xl-10">
+            <div class="ms-cat-chips" id="rewardCatList">
+                <button class="ms-cat-chip active" onclick="filterCategory('all', this)" type="button">Tất cả khung</button>
+                <button class="ms-cat-chip" onclick="filterCategory('exclusive', this)" type="button">Khung avatar</button>
+            </div>
 
+            <div id="emptyCatMessage" class="text-center py-5 bg-white border d-none" style="border-radius: 2px;">
+                <i class="fa-solid fa-box-open text-muted fs-1 mb-2"></i>
+                <h6 class="fw-bold text-dark mb-1">Chưa có phần thưởng trong mục này</h6>
+                <p class="text-muted small mb-0">Các phần quà mới sẽ sớm được cập nhật.</p>
+            </div>
 
-
-
-                    <!-- Section Header -->
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="fw-bold text-dark fs-5" id="shopSectionTitle">Gợi ý cho bạn</div>
-                        <a href="#" class="text-muted small fw-semibold text-decoration-none" onclick="return false;">Xem tất cả <i class="fa-solid fa-chevron-right ms-1" style="font-size: 0.7rem;"></i></a>
-                    </div>
-
-                    <!-- Empty Category Message -->
-                    <div id="emptyCatMessage" class="col-12 text-center py-5 bg-white rounded-3 border d-none">
-                        <i class="fa-solid fa-box-open text-muted fs-1 mb-2"></i>
-                        <h6 class="fw-bold text-dark mb-1">Chưa có phần thưởng trong mục này</h6>
-                        <p class="text-muted small mb-0">Các phần quà mới sẽ sớm được cập nhật!</p>
-                    </div>
-
-                    <!-- Gift Cards Grid -->
                     <div class="row g-3" id="shopItemGrid">
-                        @forelse($shopRewards as $reward)
+                        @forelse($shopFrames as $frame)
                             @php
-                                $alreadyRedeemed = in_array($reward->id, $redeemedRewardIds ?? [], true);
-                                $canAfford = auth()->check() && auth()->user()->points >= $reward->cost_points;
-                                $isAvailable = $reward->isAvailable();
+                                $canAfford = auth()->check() && auth()->user()->points >= (int) $frame->required_points;
+                                $avatarPreview = $user?->avatar_formatted_url ?? 'https://ui-avatars.com/api/?name=Guest&background=eceff1&color=111827';
                             @endphp
-                            <div class="col-6 col-md-4 col-lg-3 reward-item-wrapper" data-category="{{ $reward->category }}">
+                            <div class="col-6 col-md-4 col-lg-3 reward-item-wrapper" data-category="exclusive">
                                 <div class="item-card-compact">
                                     <div>
                                         <div class="item-img-compact bg-light d-flex align-items-center justify-content-center">
-                                            @if($reward->category === 'voucher')
-                                                <i class="fa-solid fa-ticket text-secondary fs-1"></i>
-                                            @elseif($reward->category === 'badge')
-                                                <i class="fa-solid fa-medal text-secondary fs-1"></i>
+                                            @if($frame->image_url)
+                                                <div class="avatar-frame-wrapper has-png-frame" style="width: 58px; height: 58px;">
+                                                    <img src="{{ $avatarPreview }}" alt="Avatar preview" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                                    <img src="{{ asset($frame->image_url) }}" class="avatar-frame-png-overlay" alt="{{ $frame->name }}">
+                                                </div>
                                             @else
-                                                <i class="fa-solid fa-gift text-secondary fs-1"></i>
+                                                <div class="avatar-frame-wrapper {{ $frame->css_style }}" style="width: 58px; height: 58px;">
+                                                    <img src="{{ $avatarPreview }}" alt="Avatar preview" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                                </div>
                                             @endif
                                         </div>
-                                        <h6 class="item-name-compact text-truncate">{{ $reward->title }}</h6>
-                                        <div class="item-desc-compact text-truncate">{{ $reward->description }}</div>
+                                        <h6 class="item-name-compact text-truncate">{{ $frame->name }}</h6>
+                                        <div class="item-desc-compact text-truncate">{{ $frame->description ?: 'Khung avatar có thể đổi bằng xu.' }}</div>
                                     </div>
                                     <div>
                                         <div class="item-price-compact">
                                             <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain; vertical-align: -2px;" class="me-0.5">
-                                            <span>{{ number_format($reward->cost_points) }} xu</span>
+                                            <span>{{ number_format((int) $frame->required_points) }} xu</span>
                                         </div>
                                         @guest
                                             <a href="{{ route('login') }}" class="btn btn-action-compact text-decoration-none text-center d-block">Đăng nhập để đổi</a>
                                         @else
-                                            @if($alreadyRedeemed)
-                                                <button class="btn btn-action-compact" type="button" disabled>Đã đổi</button>
-                                            @elseif(!$isAvailable)
-                                                <button class="btn btn-action-compact" type="button" disabled>Hết hàng</button>
-                                            @else
-                                                <button class="btn btn-action-compact" type="button" onclick="redeemReward({{ $reward->id }}, this)" {{ $canAfford ? '' : 'disabled' }}>
-                                                    {{ $canAfford ? 'Đổi ngay' : 'Không đủ xu' }}
-                                                </button>
-                                            @endif
+                                            <button class="btn btn-action-compact btn-buy-frame" type="button" data-id="{{ $frame->id }}" data-points="{{ (int) $frame->required_points }}" {{ $canAfford ? '' : 'disabled' }}>
+                                                {{ $canAfford ? 'Đổi khung' : 'Không đủ xu' }}
+                                            </button>
                                         @endguest
                                     </div>
                                 </div>
@@ -1155,49 +1344,127 @@
                                 </div>
                             </div>
                         @endforelse
-                    </div>
-
-
-                </div>
             </div>
         </div>
 
-        <!-- TAB 2: NHIỆM VỤ (QUESTS PANE - REFERENCED QUEST LAYOUT) -->
+        <!-- TAB 2: NHIỆM VỤ -->
         <div class="tab-pane fade show active" id="quests-pane" role="tabpanel">
-            <div class="row g-3">
-                <!-- CENTER COLUMN: Quest List -->
-                <div class="col-lg-8 col-xl-8">
-                    @php
-                        $totalPointsEarned = \App\Models\PointTransaction::where('user_id', Auth::id())
-                            ->where('amount', '>', 0)
-                            ->where('action', 'not like', 'daily_milestone_%')
-                            ->sum('amount');
+            @php
+                $totalPointsEarned = \App\Models\PointTransaction::where('user_id', Auth::id())
+                    ->where('amount', '>', 0)
+                    ->where('action', 'not like', 'daily_milestone_%')
+                    ->sum('amount');
 
-                        $claimedMilestones = \App\Models\PointTransaction::where('user_id', Auth::id())
-                            ->where('action', 'like', 'daily_milestone_%')
-                            ->pluck('action')
-                            ->toArray();
+                $claimedMilestones = \App\Models\PointTransaction::where('user_id', Auth::id())
+                    ->where('action', 'like', 'daily_milestone_%')
+                    ->pluck('action')
+                    ->toArray();
 
-                        // Progress percentage for 3 nodes (100, 200, 500)
-                        if ($totalPointsEarned <= 100) {
-                            $milestonePercent = ($totalPointsEarned / 100) * 33.33;
-                        } elseif ($totalPointsEarned <= 200) {
-                            $milestonePercent = 33.33 + (($totalPointsEarned - 100) / 100) * 33.33;
+                if ($totalPointsEarned <= 100) {
+                    $milestonePercent = ($totalPointsEarned / 100) * 33.33;
+                } elseif ($totalPointsEarned <= 200) {
+                    $milestonePercent = 33.33 + (($totalPointsEarned - 100) / 100) * 33.33;
+                } else {
+                    $milestonePercent = 66.66 + (min(300, $totalPointsEarned - 200) / 300) * 33.34;
+                }
+                $milestonePercent = min(100, max(0, round($milestonePercent)));
+
+                $claimed100 = in_array('daily_milestone_100', $claimedMilestones);
+                $claimed200 = in_array('daily_milestone_200', $claimedMilestones);
+                $claimed500 = in_array('daily_milestone_500', $claimedMilestones);
+                $allClaimed = $claimed100 && $claimed200 && $claimed500;
+
+                $frame100 = \App\Models\AvatarFrame::where('code', 'frame-bronze')->first();
+                $frame200 = \App\Models\AvatarFrame::where('code', 'frame-silver')->first();
+                $frame500 = \App\Models\AvatarFrame::where('code', 'frame-diamond')->first();
+
+                $hasClaimedToday = false;
+                $effectiveStreak = 0;
+                if ($user) {
+                    $hasClaimedToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
+                    $lastStreakAt = $user->last_streak_at ? \Carbon\Carbon::parse($user->last_streak_at) : null;
+
+                    if ($hasClaimedToday) {
+                        $rawStreak = (int)($user->streak_count ?? 1);
+                        $effectiveStreak = (($rawStreak - 1) % 7) + 1;
+                    } else {
+                        if ($lastStreakAt && $lastStreakAt->isYesterday()) {
+                            $prevStreak = (int)($user->streak_count ?? 0);
+                            $effectiveStreak = (($prevStreak - 1) % 7) + 1;
                         } else {
-                            $milestonePercent = 66.66 + (min(300, $totalPointsEarned - 200) / 300) * 33.34;
+                            $effectiveStreak = 0;
                         }
-                        $milestonePercent = min(100, max(0, round($milestonePercent)));
+                    }
+                }
 
-                        $claimed100 = in_array('daily_milestone_100', $claimedMilestones);
-                        $claimed200 = in_array('daily_milestone_200', $claimedMilestones);
-                        $claimed500 = in_array('daily_milestone_500', $claimedMilestones);
-                        $allClaimed = $claimed100 && $claimed200 && $claimed500;
+                $day7Frame = \App\Models\AvatarFrame::where('code', 'frame-streak')->first()
+                    ?? \App\Models\AvatarFrame::where('name', 'like', '%Duy Trì%')->first()
+                    ?? \App\Models\AvatarFrame::first();
+            @endphp
 
-                        $frame100 = \App\Models\AvatarFrame::where('code', 'frame-bronze')->first();
-                        $frame200 = \App\Models\AvatarFrame::where('code', 'frame-silver')->first();
-                        $frame500 = \App\Models\AvatarFrame::where('code', 'frame-diamond')->first();
-                    @endphp
+            <div class="ms-hero">
+                <div>
+                    <div class="ms-hero__eyebrow">Trung tâm tích xu</div>
+                    <h1 class="ms-hero__title">
+                        @auth
+                            Xin chào, {{ $user->display_name ?? $user->username }}
+                        @else
+                            Bắt đầu tích xu ngay
+                        @endauth
+                    </h1>
+                    <p class="ms-hero__sub">Hoàn thành nhiệm vụ, điểm danh mỗi ngày và đổi quà hấp dẫn.</p>
+                    <div class="ms-hero__points">
+                        {{ $user ? number_format($user->points) : '0' }}
+                        <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 26px; height: 26px; object-fit: contain; margin-left: 4px;">
+                    </div>
+                </div>
+                <div>
+                    <div class="ms-hero__checkin-title">Điểm danh 7 ngày</div>
+                    <div class="ms-hero__checkin-sub">Điểm danh liên tục để nhận thưởng lớn vào ngày thứ 7.</div>
+                    <div class="d-flex align-items-center gap-1 mb-3">
+                        @for($day = 1; $day <= 7; $day++)
+                            @php
+                                $isDone = ($hasClaimedToday && $day <= $effectiveStreak) || (!$hasClaimedToday && $day <= $effectiveStreak);
+                                $isCurrent = (!$hasClaimedToday && $day == ($effectiveStreak + 1));
+                                $isFrameDay = ($day == 7);
+                            @endphp
+                            <div class="streak-day-box {{ $isDone ? 'completed' : ($isCurrent ? 'current' : '') }} {{ $isFrameDay && !$isDone && !$isCurrent ? 'special-day' : '' }}">
+                                <div style="font-size: 0.64rem; font-weight: 600;">Ngày {{ $day }}</div>
+                                <div class="my-1 d-flex align-items-center justify-content-center" style="height: 28px;">
+                                    @if($isDone)
+                                        <i class="fa-solid fa-check text-muted" style="font-size: 0.8rem;"></i>
+                                    @elseif($isFrameDay)
+                                        @if($day7Frame && $day7Frame->image_url)
+                                            <img src="{{ asset($day7Frame->image_url) }}" alt="{{ $day7Frame->name }}" style="width: 24px; height: 24px; object-fit: contain;" title="Phần thưởng: Khung {{ $day7Frame->name }}">
+                                        @else
+                                            <span class="text-dark fw-bold" style="font-size: 0.68rem;">Khung</span>
+                                        @endif
+                                    @else
+                                        <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain;">
+                                    @endif
+                                </div>
+                                <div class="fw-bold text-truncate" style="font-size: 0.65rem;">
+                                    @if($isFrameDay)
+                                        <span class="{{ $isDone ? 'text-muted' : 'special-day-title' }}">{{ $day7Frame->name ?? 'Khung' }}</span>
+                                    @else
+                                        +{{ $day * 10 }}
+                                    @endif
+                                </div>
+                            </div>
+                        @endfor
+                    </div>
+                    <button id="btnDailyCheckinSide" class="btn btn-indigo w-100 fw-bold" style="padding: 9px; font-size: 0.84rem;" @if($user && $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday()) disabled @endif>
+                        @if($user && $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday())
+                            Đã điểm danh hôm nay
+                        @else
+                            Điểm danh ngay
+                        @endif
+                    </button>
+                </div>
+            </div>
 
+            <div class="row g-3">
+                <div class="col-lg-8 col-xl-8">
                     <!-- TIẾN ĐỘ NHIỆM VỤ Widget (3 Mốc 100, 200, 500 Xu) -->
                     <div class="quest-progress-card-cream">
                         <div class="d-flex align-items-center justify-content-between mb-2">
@@ -1331,7 +1598,7 @@
                                     </div>
                                 </div>
                                 @if($claimed500)
-                                    <div style="width: 22px; height: 22px; border-radius: 50%; background: #0284c7; display: flex; align-items: center; justify-content: center;" title="Đã nhận quà mốc 500 xu">
+                                    <div style="width: 22px; height: 22px; border-radius: 2px; background: #000000; display: flex; align-items: center; justify-content: center;" title="Đã nhận quà mốc 500 xu">
                                         <svg width="14" height="14" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M6 10.2L8.8 13L14 7.5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
@@ -1339,16 +1606,16 @@
                                 @elseif($totalPointsEarned >= 500)
                                     <button type="button" class="btn p-0 border-0 bg-transparent btn-claim-milestone-box" data-milestone="500" title="Nhấn để nhận Hộp Quà Mốc 500 Xu Tối Đa!" style="cursor: pointer; animation: pulse 1.2s infinite;">
                                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect x="3" y="10" width="18" height="11" rx="2" fill="#0284c7" stroke="#0284c7" stroke-width="1.6"/>
-                                            <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#38bdf8" stroke="#0284c7" stroke-width="1.6"/>
+                                            <rect x="3" y="10" width="18" height="11" rx="2" fill="#000000" stroke="#000000" stroke-width="1.6"/>
+                                            <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#565e74" stroke="#000000" stroke-width="1.6"/>
                                             <path d="M12 6V21" stroke="#ffffff" stroke-width="1.8"/>
                                         </svg>
                                     </button>
                                 @else
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" title="Đạt 500 xu để mở quà lớn!">
-                                        <rect x="3" y="10" width="18" height="11" rx="2" fill="#E0F2FE" stroke="#0284c7" stroke-width="1.6"/>
-                                        <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#BAE6FD" stroke="#0284c7" stroke-width="1.6"/>
-                                        <path d="M12 6V21" stroke="#0284c7" stroke-width="1.6"/>
+                                        <rect x="3" y="10" width="18" height="11" rx="2" fill="#f2f4f6" stroke="#000000" stroke-width="1.6"/>
+                                        <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#e0e3e5" stroke="#000000" stroke-width="1.6"/>
+                                        <path d="M12 6V21" stroke="#000000" stroke-width="1.6"/>
                                     </svg>
                                 @endif
                                 <div class="node-bottom-val {{ $totalPointsEarned >= 500 ? 'text-indigo fw-extrabold' : 'text-muted' }}">500</div>
@@ -1393,7 +1660,7 @@
                             <div class="quest-item-card quest-unit" data-type="daily">
                                 <div>
                                     <h6 class="fw-bold text-dark mb-1" style="font-size: 0.86rem;">{{ $sessionMission->title }}</h6>
-                                    <div class="text-muted mb-1" style="font-size: 0.74rem;">{{ $sessionMission->description ?: 'Online đủ thời gian rồi nhận thưởng nhiệm vụ (không cộng xu từng phút).' }}</div>
+                                    <div class="text-muted mb-1" style="font-size: 0.74rem;">{{ $sessionMission->description ?: 'Online đủ thời gian rồi nhận thưởng nhiệm vụ.' }}</div>
                                     <div class="d-flex align-items-center gap-2" style="width: 140px;">
                                         <div class="progress flex-grow-1 rounded-pill" style="height: 4px; background: #e2e8f0;">
                                             <div class="progress-bar bg-primary" id="missionSessionProgressBar" style="width: {{ $sessionPercent }}%;" aria-valuenow="{{ $sessionMinutes }}"></div>
@@ -1408,9 +1675,9 @@
                                         <span class="text-muted" style="font-size:0.72rem;">Theo dõi</span>
                                     @endif
                                 </div>
-                                <div class="text-end pt-3">
-                                    @if($sessionClaimed)
-                                        <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Đã nhận</button>
+                                    <div>
+                                        @if($sessionClaimed)
+                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 2px; padding: 5px 14px;">Đã nhận</button>
                                     @elseif($sessionCompleted)
                                         <button class="btn-quest-claim btn-claim-mission" data-id="{{ $sessionMission->id }}">Nhận thưởng</button>
                                     @else
@@ -1449,9 +1716,9 @@
                                             <span class="text-muted" style="font-size:0.72rem;">Xu tức thì</span>
                                         @endif
                                     </div>
-                                    <div class="text-end pt-3">
+                                    <div>
                                         @if($isClaimed)
-                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Hoàn thành</button>
+                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 2px; padding: 5px 14px;">Hoàn thành</button>
                                         @elseif($isCompleted)
                                             <button class="btn-quest-claim btn-claim-mission" data-id="{{ $mission->id }}">Nhận thưởng</button>
                                         @else
@@ -1489,9 +1756,9 @@
                                             <span class="text-muted" style="font-size:0.72rem;">Thành tích</span>
                                         @endif
                                     </div>
-                                    <div class="text-end pt-3">
+                                    <div>
                                         @if($isClaimed)
-                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 8px; padding: 5px 14px;">Đã nhận</button>
+                                            <button class="btn btn-light text-muted fw-bold border" disabled style="font-size: 0.78rem; border-radius: 2px; padding: 5px 14px;">Đã nhận</button>
                                         @elseif($isCompleted)
                                             <button class="btn-quest-claim btn-claim-mission" data-id="{{ $mission->id }}">Nhận thưởng</button>
                                         @else
@@ -1504,82 +1771,9 @@
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN: Multi-Widgets -->
+                <!-- RIGHT COLUMN -->
                 <div class="col-lg-4 col-xl-4">
-                    <!-- Widget 1: Điểm danh mỗi ngày -->
-                    <div class="widget-card">
-                        <div class="d-flex align-items-center justify-content-between mb-1">
-                            <h6 class="fw-bold text-dark mb-0" style="font-size: 0.9rem;">Điểm danh mỗi ngày</h6>
-                        </div>
-                        <div class="text-muted mb-3" style="font-size: 0.74rem;">Điểm danh liên tục để nhận thưởng lớn!</div>
-
-                        <div class="d-flex align-items-center gap-1 mb-3">
-                            @php
-                                $hasClaimedToday = false;
-                                $effectiveStreak = 0;
-                                if ($user) {
-                                    $hasClaimedToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
-                                    $lastStreakAt = $user->last_streak_at ? \Carbon\Carbon::parse($user->last_streak_at) : null;
-                                    
-                                    if ($hasClaimedToday) {
-                                        $rawStreak = (int)($user->streak_count ?? 1);
-                                        $effectiveStreak = (($rawStreak - 1) % 7) + 1;
-                                    } else {
-                                        if ($lastStreakAt && $lastStreakAt->isYesterday()) {
-                                            $prevStreak = (int)($user->streak_count ?? 0);
-                                            $effectiveStreak = (($prevStreak - 1) % 7) + 1;
-                                        } else {
-                                            $effectiveStreak = 0;
-                                        }
-                                    }
-                                }
-                                
-                                $day7Frame = \App\Models\AvatarFrame::where('code', 'frame-streak')->first()
-                                    ?? \App\Models\AvatarFrame::where('name', 'like', '%Duy Trì%')->first()
-                                    ?? \App\Models\AvatarFrame::first();
-                            @endphp
-                            @for($day = 1; $day <= 7; $day++)
-                                @php
-                                    $isDone = ($hasClaimedToday && $day <= $effectiveStreak) || (!$hasClaimedToday && $day <= $effectiveStreak);
-                                    $isCurrent = (!$hasClaimedToday && $day == ($effectiveStreak + 1));
-                                    $isFrameDay = ($day == 7);
-                                @endphp
-                                <div class="streak-day-box {{ $isDone ? 'completed' : ($isCurrent ? 'current' : '') }} {{ $isFrameDay && !$isDone && !$isCurrent ? 'special-day' : '' }}">
-                                    <div style="font-size: 0.64rem; font-weight: 600;">Ngày {{ $day }}</div>
-                                    <div class="my-1 d-flex align-items-center justify-content-center" style="height: 28px;">
-                                        @if($isDone)
-                                            <i class="fa-solid fa-check text-muted" style="font-size: 0.8rem;"></i>
-                                        @elseif($isFrameDay)
-                                            @if($day7Frame && $day7Frame->image_url)
-                                                <img src="{{ asset($day7Frame->image_url) }}" alt="{{ $day7Frame->name }}" style="width: 24px; height: 24px; object-fit: contain;" title="Phần thưởng: Khung {{ $day7Frame->name }}">
-                                            @else
-                                                <span class="text-dark fw-bold" style="font-size: 0.68rem;">Khung</span>
-                                            @endif
-                                        @else
-                                            <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 16px; height: 16px; object-fit: contain;">
-                                        @endif
-                                    </div>
-                                    <div class="fw-bold text-truncate" style="font-size: 0.65rem;">
-                                        @if($isFrameDay)
-                                            <span class="{{ $isDone ? 'text-muted' : 'special-day-title' }}">{{ $day7Frame->name ?? 'Khung' }}</span>
-                                        @else
-                                            +{{ $day * 10 }}
-                                        @endif
-                                    </div>
-                                </div>
-                            @endfor
-                        </div>
-
-                        <button id="btnDailyCheckinSide" class="btn btn-indigo w-100 fw-bold" style="padding: 9px; font-size: 0.84rem;" @if($user && $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday()) disabled @endif>
-                            @if($user && $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday())
-                                Đã điểm danh hôm nay
-                            @else
-                                Điểm danh ngay
-                            @endif
-                        </button>
-                    </div>
-
-                    <!-- Widget 2: Nhiệm vụ hàng ngày (tiến độ thật + đếm ngược reset) -->
+                    <!-- Widget: Nhiệm vụ hàng ngày -->
                     @php
                         $dailyTrack = $dailyMissions ?? collect();
                         $dailyTotal = $dailyTrack->count();
@@ -1636,7 +1830,7 @@
                                     </div>
                                 @endif
                                 <div class="progress rounded-pill" style="height: 5px; width: 100%; max-width: 160px; background: #e2e8f0;">
-                                    <div class="progress-bar" id="dailySummaryBar" style="width: {{ $dailyPercent }}%; background: {{ $dailyPercent >= 100 ? '#166534' : '#1e3a5f' }};"></div>
+                                    <div class="progress-bar" id="dailySummaryBar" style="width: {{ $dailyPercent }}%; background: {{ $dailyPercent >= 100 ? '#000000' : '#000000' }};"></div>
                                 </div>
                             </div>
                         </div>
@@ -1673,42 +1867,27 @@
             </div>
         </div>
 
-        <!-- TAB 3: TỦ KHUNG CÁ NHÂN (INVENTORY PANE) -->
+        <!-- TAB 3: TỦ QUÀ -->
         <div class="tab-pane fade" id="inventory-pane" role="tabpanel">
-            <div class="row g-3">
-                <div class="col-lg-3 col-xl-2">
-                    <div class="reward-sidebar-compact">
-                        <div class="sidebar-title">Bộ sưu tập</div>
-                        <div class="d-flex flex-column">
-                            <button class="reward-cat-btn active" type="button">
-                                <i class="fa-solid fa-box-archive text-indigo"></i>
-                                <span>Tủ khung cá nhân</span>
-                            </button>
-                            <button class="reward-cat-btn" onclick="switchNavTab('shop-pane')" type="button">
-                                <i class="fa-solid fa-gift text-indigo"></i>
-                                <span>Đổi thưởng</span>
-                            </button>
-                        </div>
-                    </div>
+            <div class="ms-section-head">
+                <div>
+                    <h2>Tủ khung cá nhân</h2>
+                    <p>Khung avatar và vật phẩm bạn đã sở hữu</p>
                 </div>
+                @if($user && $user->equipped_frame_id)
+                    <button class="btn btn-outline-compact btn-unequip-frame" type="button" style="width: auto; padding: 7px 16px;">
+                        Tháo khung
+                    </button>
+                @endif
+            </div>
 
-                <div class="col-lg-9 col-xl-10">
-                    <div class="main-section-card">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h4 class="fw-extrabold text-dark mb-0" style="font-size: 1.2rem;">Tủ khung cá nhân</h4>
-                            @if($user && $user->equipped_frame_id)
-                                <button class="btn btn-outline-danger btn-sm rounded-pill fw-bold btn-unequip-frame" style="font-size: 0.75rem;">
-                                    <i class="fa-solid fa-xmark me-1"></i> Tháo khung
-                                </button>
-                            @endif
-                        </div>
-
-                        <div class="row g-3">
+            <div class="main-section-card">
+                <div class="row g-3">
                             @php $myFrames = $allFrames->whereIn('id', $unlockedFrameIds); @endphp
                             @forelse($myFrames as $frame)
                                 @php $isEquipped = ($user && $user->equipped_frame_id == $frame->id); @endphp
                                 <div class="col-6 col-md-4 col-lg-3">
-                                    <div class="p-3 border rounded-3 text-center bg-white">
+                                    <div class="p-3 border text-center bg-white" style="border-radius: 2px;">
                                         <div class="avatar-frame-wrapper {{ $frame->image_url ? 'has-png-frame' : $frame->css_style }} mx-auto mb-2" style="width: 56px; height: 56px;">
                                             <img src="{{ $user ? $user->avatar_formatted_url : 'https://ui-avatars.com/api/?name=Guest&background=6366f1&color=fff' }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Guest&background=6366f1&color=fff';" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                                             @if($frame->image_url)
@@ -1720,7 +1899,7 @@
                                         @if($isEquipped)
                                             <button class="btn btn-secondary btn-sm w-100 fw-bold rounded-pill" disabled style="font-size: 0.78rem;">Đang đeo</button>
                                         @else
-                                            <button class="btn btn-indigo btn-sm w-100 fw-bold rounded-pill text-white btn-equip-frame" data-id="{{ $frame->id }}" style="background: #6366f1; font-size: 0.78rem;">Trang bị</button>
+                                            <button class="btn btn-indigo btn-sm w-100 btn-equip-frame" data-id="{{ $frame->id }}" style="font-size: 0.78rem;">Trang bị</button>
                                         @endif
                                     </div>
                                 </div>
@@ -1730,11 +1909,12 @@
                                     <p class="mb-0">Bạn chưa sở hữu khung avatar nào.</p>
                                 </div>
                             @endforelse
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
+
+    </div>
+</div>
 
 <!-- Custom Reward Item Cards Modal -->
 <div id="rewardCustomModal" class="reward-modal-backdrop d-none">
@@ -1776,6 +1956,7 @@
         </div>
     </div>
 </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -1801,8 +1982,7 @@ window.switchNavTab = function(tabId) {
 };
 
 window.filterCategory = function(cat, btn) {
-    // Highlight sidebar category button
-    document.querySelectorAll('.reward-cat-btn').forEach(b => {
+    document.querySelectorAll('.ms-cat-chip').forEach(b => {
         b.classList.remove('active');
     });
     if (btn) {
@@ -1816,11 +1996,9 @@ window.filterCategory = function(cat, btn) {
     const shopSectionTitle = document.getElementById('shopSectionTitle');
     if (shopSectionTitle) {
         const textMap = {
-            'all': 'Gợi ý cho bạn',
+            'all': 'Tất cả khung',
             'avatar_frame': 'Khung Avatar độc quyền',
-            'voucher': 'Voucher & Thẻ nạp',
-            'badge': 'Huy hiệu & Vật phẩm',
-            'exclusive': 'Quà tặng độc quyền'
+            'exclusive': 'Khung avatar'
         };
         shopSectionTitle.textContent = textMap[cat] || 'Danh sách phần thưởng';
     }
@@ -1857,7 +2035,7 @@ window.filterQuestList = function(type, btn) {
     quests.forEach(q => {
         const qType = q.getAttribute('data-type');
         if (type === 'all' || qType === type) {
-            q.style.setProperty('display', 'flex', 'important');
+            q.style.setProperty('display', 'grid', 'important');
         } else {
             q.style.setProperty('display', 'none', 'important');
         }
@@ -2207,27 +2385,15 @@ window.switchNavTab = function(paneId) {
     }
 
     // Dynamically update Brand Header Title & Subtitle
-    const brandMap = {
-        'quests-pane': {
-            title: 'Nhiệm Vụ & Tích Xu',
-            sub: 'Hoàn thành nhiệm vụ nhận xu hàng ngày'
-        },
-        'shop-pane': {
-            title: 'Cửa Hàng Đổi Thưởng',
-            sub: 'Dùng xu đổi quà & khung avatar độc quyền'
-        },
-        'inventory-pane': {
-            title: 'Tủ Khung Cá Nhân',
-            sub: 'Bộ sưu tập khung & vật phẩm đã sở hữu'
-        }
+    const hintMap = {
+        'quests-pane': 'Hoàn thành nhiệm vụ để nhận xu mỗi ngày',
+        'shop-pane': 'Dùng xu đổi quà và khung avatar',
+        'inventory-pane': 'Khung avatar và vật phẩm đã sở hữu'
     };
 
-    if (brandMap[paneId]) {
-        const textEl = document.getElementById('headerBrandText');
+    if (hintMap[paneId]) {
         const subEl = document.getElementById('headerBrandSub');
-
-        if (textEl) textEl.textContent = brandMap[paneId].title;
-        if (subEl) subEl.textContent = brandMap[paneId].sub;
+        if (subEl) subEl.textContent = hintMap[paneId];
     }
 
     document.querySelectorAll('#mainTabContent > .tab-pane').forEach(pane => {
@@ -2298,20 +2464,14 @@ window.showShopNotice = function(title, message, iconType = 'info') {
     if (messageEl) messageEl.innerText = message;
 
     if (iconEl) {
+        iconEl.style.backgroundColor = '#f2f4f6';
+        iconEl.style.borderColor = '#e0e3e5';
+        iconEl.style.color = '#000000';
         if (iconType === 'voucher') {
-            iconEl.style.backgroundColor = '#fef9c3';
-            iconEl.style.borderColor = '#fef08a';
-            iconEl.style.color = '#d97706';
             iconEl.innerHTML = '<i class="fa-solid fa-ticket"></i>';
         } else if (iconType === 'badge') {
-            iconEl.style.backgroundColor = '#fee2e2';
-            iconEl.style.borderColor = '#fecdd3';
-            iconEl.style.color = '#dc2626';
             iconEl.innerHTML = '<i class="fa-solid fa-medal"></i>';
         } else {
-            iconEl.style.backgroundColor = '#eff6ff';
-            iconEl.style.borderColor = '#dbeafe';
-            iconEl.style.color = '#3b82f6';
             iconEl.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
         }
     }
@@ -2352,13 +2512,13 @@ window.copyReferralLink = function() {
                 <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" id="shopNoticeIcon" style="width: 60px; height: 60px; background-color: #eff6ff; color: #3b82f6; border-radius: 50%; font-size: 1.5rem; border: 1px solid #dbeafe;">
                     <i class="fa-solid fa-circle-info"></i>
                 </div>
-                <h5 class="fw-bold mb-2" id="shopNoticeTitle" style="color: #1e3a5f; font-size: 1.1rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+                <h5 class="fw-bold mb-2" id="shopNoticeTitle" style="color: #000000; font-size: 1.1rem;">
                     Thông báo
                 </h5>
                 <p class="text-secondary small mb-4" id="shopNoticeMessage" style="color: #64748b; line-height: 1.5; font-size: 0.875rem;">
                     Nội dung thông báo...
                 </p>
-                <button type="button" class="btn px-4 py-2 w-100" data-bs-dismiss="modal" style="background: #1e3a5f; border-color: #1e3a5f; color: white; font-weight: 600; border-radius: 12px; font-size: 0.85rem;">
+                <button type="button" class="btn px-4 py-2 w-100" data-bs-dismiss="modal" style="background: #000000; border-color: #000000; color: white; font-weight: 600; border-radius: 2px; font-size: 0.85rem;">
                     Đã hiểu
                 </button>
             </div>
@@ -2367,8 +2527,8 @@ window.copyReferralLink = function() {
 </div>
 
 <!-- Shop Toast Container -->
-<div id="shopToastNotification" style="position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-30px); background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(16px); color: #ffffff; padding: 12px 24px; border-radius: 50px; font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 10px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3); opacity: 0; pointer-events: none; transition: all 0.35s ease; z-index: 10000; font-family: 'Be Vietnam Pro', sans-serif;">
-    <i class="fa-solid fa-circle-check text-success fs-5"></i>
+<div id="shopToastNotification" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-12px); background: #ffffff; border: 1px solid #e0e3e5; color: #191c1e; padding: 10px 18px; border-radius: 10px; font-size: 0.82rem; font-weight: 500; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 10000; font-family: 'Be Vietnam Pro', sans-serif;">
+    <i class="fa-solid fa-circle-check" style="color: #166534; font-size: 1rem;"></i>
     <span id="shopToastText">Nội dung thông báo</span>
 </div>
 @endpush

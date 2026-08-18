@@ -26,12 +26,10 @@ class InteractionController extends Controller
             return response()->json(['status' => 'removed', 'message' => 'Đã xóa khỏi danh sách yêu thích.']);
         } else {
             $user->favoriteLocations()->create(['location_id' => $location->id]);
-            PointService::awardPoints($user, PointService::POINTS_FAVORITE, 'favorite', 'Yêu thích địa điểm ' . $location->name);
             \App\Services\MissionService::trackProgress($user, 'favorite_location', 1, false, $location->id);
             return response()->json([
                 'status' => 'added',
-                'message' => 'Đã thêm vào danh sách yêu thích (+' . PointService::POINTS_FAVORITE . ' điểm).',
-                'points' => $user->fresh()->points,
+                'message' => 'Đã thêm vào danh sách yêu thích.',
             ]);
         }
     }
@@ -62,7 +60,6 @@ class InteractionController extends Controller
             'status' => 'visible',
         ]);
 
-        PointService::awardPoints(Auth::user(), PointService::POINTS_COMMENT, 'comment', 'Bình luận địa điểm ' . $location->name);
         \App\Services\MissionService::trackProgress(Auth::user(), 'write_comment', 1);
 
         $comment->load('user.equippedFrame');
