@@ -297,13 +297,49 @@ class MissionService
         return ['success' => true, 'message' => 'Đã trang bị khung avatar: ' . ($frame ? $frame->name : '')];
     }
 
-    /**
-     * (Đã vô hiệu hóa) Mua khung avatar bằng xu.
-     * Hiện khung avatar chỉ là phần thưởng thành tích nên luôn trả về thất bại.
-     */
     public static function purchaseFrame(User $user, int $frameId)
     {
-        return ['success' => false, 'message' => 'Khung Avatar là phần thưởng thành tích, không thể dùng xu để đổi.'];
+        $frame = AvatarFrame::where('status', 'active')->find($frameId);
+        if (!$frame) {
+            return ['success' => false, 'message' => 'Khung avatar không tồn tại.'];
+        }
+
+        if (in_array($frame->code, ['frame-bronze', 'frame-silver', 'frame-diamond', 'frame-streak'], true)) {
+            return ['success' => false, 'message' => 'Khung này là phần thưởng tiến độ/điểm danh, không thể đổi thêm.'];
+        }
+
+        $alreadyOwned = UserAvatarFrame::where('user_id', $user->id)
+            ->where('avatar_frame_id', $frame->id)
+            ->exists();
+
+        if ($alreadyOwned) {
+            return ['success' => false, 'message' => 'Bạn đã sở hữu khung avatar này rồi.'];
+        }
+
+        $cost = max(0, (int) $frame->required_points);
+
+        if ((int) $user->points < $cost) {
+            return ['success' => false, 'message' => 'Bạn không đủ xu để đổi khung này.'];
+        }
+
+        return DB::transaction(function () use ($user, $frame, $cost) {
+            if ($cost > 0) {
+                $user->decrement('points', $cost);
+            }
+            self::unlockFrame($user, $frame->id);
+
+            return [
+                'success' => true,
+                'message' => 'Đổi thành công khung avatar: ' . $frame->name . '.',
+                'points' => $user->fresh()->points,
+                'frame' => [
+                    'id' => $frame->id,
+                    'name' => $frame->name,
+                    'image_url' => $frame->image_url ? asset($frame->image_url) : '',
+                    'css_style' => $frame->css_style,
+                ],
+            ];
+        });
     }
 
     /**

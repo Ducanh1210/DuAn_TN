@@ -17,11 +17,22 @@
     @stack('styles')
     <style>
         :root {
-            --primary: #1e3a5f;
-            --primary-hover: #2b4c7e;
-            --bg-body: #f8fafc;
-            --text-dark: #0f2442;
-            --text-muted: #64748b;
+            /* Bảng màu lấy từ mẫu "Trang chủ Khám phá Ninh Bình Premium" */
+            --primary: #000000;
+            --primary-hover: #565e74;
+            --bg-body: #f7f9fb;
+            --text-dark: #191c1e;
+            --text-body: #45464d;
+            --text-muted: #76777d;
+
+            /* Vàng đồng là màu nhấn DUY NHẤT. Chỉ dùng cho chữ, icon và viền —
+               không bao giờ tô nền, mọi mảng nền đều giữ xám trung tính. */
+            --accent: #735c00;
+            --accent-bright: #cba72f;
+
+            --line: #c6c6cd;
+            --line-soft: #e0e3e5;
+            --surface-mist: #f2f4f6;
         }
         body { 
             font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
@@ -32,15 +43,15 @@
             -webkit-font-smoothing: antialiased;
         }
         .text-primary {
-            color: #1e3a5f !important;
+            color: var(--primary) !important;
         }
         .btn-primary {
-            background-color: #1e3a5f !important;
-            border-color: #1e3a5f !important;
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
         }
         .btn-primary:hover {
-            background-color: #2b4c7e !important;
-            border-color: #2b4c7e !important;
+            background-color: var(--primary-hover) !important;
+            border-color: var(--primary-hover) !important;
         }
 
         /* Proportional, compact typography matching homepage scale */
@@ -63,8 +74,8 @@
             top: 0;
             z-index: 1030;
             background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 1px 2px rgba(15, 36, 66, 0.04);
+            border-bottom: 1px solid var(--line);
+            box-shadow: 0 1px 2px rgba(25, 28, 30, 0.05);
         }
         .site-header__inner {
             display: flex;
@@ -74,22 +85,33 @@
         }
         .site-brand {
             display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            flex-shrink: 0;
+            color: var(--primary) !important;
+            text-decoration: none;
+        }
+        .site-brand__logo {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .site-brand__name {
+            display: inline-flex;
             align-items: baseline;
             gap: 6px;
-            flex-shrink: 0;
-            color: #0f172a !important;
-            text-decoration: none;
         }
         .site-brand__main {
             font-weight: 700;
             font-size: 1.05rem;
             letter-spacing: -0.02em;
-            color: #1e3a5f;
+            color: var(--primary);
         }
         .site-brand__sub {
             font-weight: 500;
             font-size: 0.9rem;
-            color: #64748b;
+            color: var(--text-muted);
             letter-spacing: -0.01em;
         }
         .site-nav {
@@ -106,25 +128,25 @@
             min-height: 56px;
             font-size: 0.825rem;
             font-weight: 500;
-            color: #64748b;
+            color: var(--text-body);
             transition: color 0.15s ease;
             position: relative;
             white-space: nowrap;
         }
         .site-nav__link:hover {
-            color: #1e3a5f;
+            color: var(--accent);
         }
         .site-nav__link.is-active {
-            color: #1e3a5f;
+            color: var(--primary);
             font-weight: 600;
-            box-shadow: inset 0 -2px 0 #1e3a5f;
+            box-shadow: inset 0 -2px 0 var(--accent);
         }
         .site-header .navbar-toggler {
-            border-color: #e2e8f0;
+            border-color: var(--line);
             padding: 4px 8px;
         }
         .site-header .navbar-toggler:focus {
-            box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.12);
+            box-shadow: 0 0 0 2px rgba(115, 92, 0, 0.25);
         }
         @media (min-width: 992px) {
             .site-header .navbar-collapse {
@@ -151,7 +173,7 @@
                 padding: 10px 14px;
             }
             .site-nav__link.is-active {
-                box-shadow: inset 0 -2px 0 #1e3a5f;
+                box-shadow: inset 0 -2px 0 var(--accent);
             }
         }
 
@@ -163,7 +185,7 @@
         /* Modern Card */
         .card-modern { 
             border: none; 
-            border-radius: 16px; 
+            border-radius: 2px; 
             background: #fff;
             box-shadow: 0 8px 30px rgba(0,0,0,0.04); 
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
@@ -174,7 +196,7 @@
         }
         .card-modern:hover { 
             transform: translateY(-4px); 
-            box-shadow: 0 14px 30px rgba(0,0,0,0.07); 
+            box-shadow: 0 14px 30px rgba(25, 28, 30, 0.12); 
         }
         .card-modern .img-wrapper {
             position: relative;
@@ -186,10 +208,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.6s ease;
-        }
-        .card-modern:hover .img-wrapper img {
-            transform: scale(1.04);
         }
         
         /* Badges */
@@ -200,7 +218,7 @@
             background: rgba(255,255,255,0.85); 
             color: var(--text-dark); 
             padding: 4px 10px; 
-            border-radius: 20px; 
+            border-radius: 2px; 
             font-size: 0.725rem; 
             font-weight: 700; 
             backdrop-filter: blur(8px); 
@@ -209,37 +227,46 @@
             text-transform: uppercase;
         }
 
-        /* Footer */
+        /* Footer — mẫu dùng footer nền sáng, tách khỏi nội dung bằng viền mảnh */
         footer {
-            background: #0f172a;
-            color: #94a3b8;
-            padding: 48px 0 24px;
-            margin-top: 64px;
+            background: var(--bg-body);
+            color: var(--text-body);
+            border-top: 1px solid var(--line);
+            padding: 64px 0 28px;
+            margin-top: 80px;
             font-size: 0.85rem;
         }
         footer a {
-            color: #cbd5e1;
+            color: var(--text-body);
             transition: color 0.15s ease;
         }
-        footer a:hover { color: #ffffff; }
+        footer a:hover { color: var(--accent); }
         .footer-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             font-weight: 600;
             font-size: 1rem;
-            color: #f8fafc;
+            color: var(--primary);
             letter-spacing: -0.02em;
         }
+        .footer-brand__logo {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+        }
         .footer-tagline {
-            color: #64748b;
+            color: var(--text-muted);
             font-size: 0.825rem;
             line-height: 1.55;
             max-width: 280px;
         }
         .footer-heading {
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #64748b;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
             margin-bottom: 12px;
         }
         .footer-links {
@@ -249,25 +276,25 @@
         }
         .footer-links li + li { margin-top: 8px; }
         .footer-bottom {
-            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            border-top: 1px solid var(--line-soft);
             margin-top: 32px;
             padding-top: 20px;
             font-size: 0.8rem;
-            color: #64748b;
+            color: var(--text-muted);
         }
 
         /* Cover image */
         .cover-image {
             position: relative;
             overflow: hidden;
-            border-radius: 8px;
-            background: #f1f5f9;
+            border-radius: 2px;
+            background: var(--line-soft);
         }
         .cover-image__img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: opacity 0.2s ease, transform 0.35s ease;
+            transition: opacity 0.2s ease;
         }
         .cover-image__placeholder {
             width: 100%;
@@ -275,8 +302,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #e8eef5 0%, #f1f5f9 100%);
-            color: #6482a6;
+            background: linear-gradient(135deg, #e0e3e5 0%, #f2f4f6 100%);
+            color: var(--text-muted);
             font-size: 0.8rem;
             font-weight: 500;
             letter-spacing: 0.04em;
@@ -289,81 +316,90 @@
             padding-bottom: 48px;
         }
         .page-header {
+            position: relative;
             padding-bottom: 16px;
             margin-bottom: 24px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--line-soft);
+        }
+        .page-header::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 56px;
+            height: 2px;
+            background: var(--accent);
         }
         .page-header__title {
-            color: #1e3a5f;
+            color: var(--primary);
             font-size: 1.4rem;
             font-weight: 600;
             letter-spacing: -0.01em;
             margin-bottom: 4px;
         }
         .page-header__subtitle {
-            color: #6482a6;
+            color: var(--text-muted);
             font-size: 0.875rem;
             font-weight: 400;
         }
         .section-label {
-            color: #3f3f46;
+            color: var(--accent);
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.1em;
         }
         .editorial-link:hover .editorial-link__title {
-            color: #1e3a5f;
+            color: var(--accent);
             text-decoration: underline;
         }
         .editorial-link:hover .cover-image__img {
             opacity: 0.92;
-            transform: scale(1.02);
         }
         .meta-text {
-            color: #a1a1aa;
+            color: var(--text-muted);
             font-size: 0.775rem;
         }
         .tab-filter {
             display: inline-flex;
             gap: 4px;
             padding: 4px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            background: var(--surface-mist);
+            border: 1px solid var(--line);
+            border-radius: 2px;
         }
         .tab-filter__item {
             padding: 6px 14px;
             font-size: 0.825rem;
             font-weight: 500;
-            color: #64748b;
-            border-radius: 6px;
+            color: var(--text-body);
+            border-radius: 2px;
             transition: all 0.15s ease;
         }
         .tab-filter__item:hover {
-            color: #1e3a5f;
+            color: var(--accent);
             background: #ffffff;
         }
         .tab-filter__item.is-active {
-            background: #ffffff;
-            color: #1e3a5f;
-            box-shadow: 0 1px 2px rgba(15, 36, 66, 0.06);
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(25, 28, 30, 0.24);
         }
         .event-card {
             background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
+            border: 1px solid var(--line);
+            border-radius: 2px;
             overflow: hidden;
             height: 100%;
             transition: box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .event-card:hover {
-            border-color: #cbdbe8;
-            box-shadow: 0 8px 24px rgba(15, 36, 66, 0.06);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(25, 28, 30, 0.10);
         }
         .event-card__body { padding: 16px; }
         .event-card__title {
-            color: #27272a;
+            color: var(--primary);
             font-size: 0.95rem;
             font-weight: 600;
             line-height: 1.4;
@@ -374,13 +410,15 @@
             margin-bottom: 8px;
         }
         .event-card__date {
-            color: #1e3a5f;
+            color: var(--text-muted);
             font-size: 0.775rem;
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             margin-bottom: 8px;
         }
         .event-card__excerpt {
-            color: #52525b;
+            color: var(--text-body);
             font-size: 0.825rem;
             line-height: 1.5;
             display: -webkit-box;
@@ -391,18 +429,18 @@
         .empty-state {
             text-align: center;
             padding: 64px 24px;
-            border: 1px dashed #e2e8f0;
-            border-radius: 12px;
-            background: #fafbfc;
+            border: 1px dashed var(--line);
+            border-radius: 2px;
+            background: var(--surface-mist);
         }
         .empty-state__title {
-            color: #1e3a5f;
+            color: var(--primary);
             font-size: 1.05rem;
             font-weight: 600;
             margin-bottom: 8px;
         }
         .empty-state__text {
-            color: #6482a6;
+            color: var(--text-muted);
             font-size: 0.875rem;
             max-width: 420px;
             margin: 0 auto 20px;
@@ -410,16 +448,21 @@
         }
         .custom-pagination .pagination { gap: 4px; }
         .custom-pagination .page-link {
-            color: #3f3f46;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
+            color: var(--text-body);
+            border: 1px solid var(--line);
+            border-radius: 2px;
             padding: 5px 11px;
             font-size: 0.825rem;
             background: #ffffff;
         }
+        .custom-pagination .page-link:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: var(--surface-mist);
+        }
         .custom-pagination .page-item.active .page-link {
-            background-color: #1e3a5f;
-            border-color: #1e3a5f;
+            background-color: var(--primary);
+            border-color: var(--primary);
             color: #ffffff;
         }
         
@@ -429,13 +472,16 @@
     </style>
 
 </head>
-<body>
-    <header class="site-header navbar navbar-expand-lg">
+<body class="@yield('body_class')">
+    <header class="site-header navbar navbar-expand-lg @yield('header_variant')">
         <div class="container">
             <div class="site-header__inner">
                 <a class="site-brand" href="{{ route('client.landing') }}">
-                    <span class="site-brand__main">Ninh Bình</span>
-                    <span class="site-brand__sub">Travel Hub</span>
+                    <img class="site-brand__logo" src="{{ asset('images/logo.png') }}" alt="Logo Du lịch Ninh Bình">
+                    <span class="site-brand__name">
+                        <span class="site-brand__main">Ninh Bình</span>
+                        <span class="site-brand__sub">Travel Hub</span>
+                    </span>
                 </a>
 
                 <button class="navbar-toggler ms-auto d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#siteNavCollapse" aria-controls="siteNavCollapse" aria-expanded="false" aria-label="Menu">
@@ -445,9 +491,9 @@
                 <div class="collapse navbar-collapse flex-grow-1" id="siteNavCollapse">
                     <nav class="site-nav" aria-label="Điều hướng chính">
                         <a class="site-nav__link {{ request()->routeIs('client.landing') ? 'is-active' : '' }}" href="{{ route('client.landing') }}">Trang chủ</a>
+                        <a class="site-nav__link {{ request()->routeIs('client.about') ? 'is-active' : '' }}" href="{{ route('client.about') }}">Giới thiệu</a>
+                        <a class="site-nav__link {{ request()->routeIs('client.events.*') || request()->routeIs('client.news.*') ? 'is-active' : '' }}" href="{{ route('client.events.index') }}">Tin tức</a>
                         <a class="site-nav__link {{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ route('home') }}">Bản đồ</a>
-                        <a class="site-nav__link {{ request()->routeIs('client.news.*') ? 'is-active' : '' }}" href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a>
-                        <a class="site-nav__link {{ request()->routeIs('client.events.*') ? 'is-active' : '' }}" href="{{ route('client.events.index') }}">Sự kiện nổi bật</a>
                     </nav>
                 </div>
             </div>
@@ -470,7 +516,10 @@
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-5">
-                    <div class="footer-brand mb-2">Ninh Bình Travel Hub</div>
+                    <a class="footer-brand mb-2" href="{{ route('client.landing') }}">
+                        <img class="footer-brand__logo" src="{{ asset('images/logo.png') }}" alt="" aria-hidden="true">
+                        <span>Ninh Bình Travel Hub</span>
+                    </a>
                     <p class="footer-tagline mb-0">Cổng thông tin du lịch — khám phá điểm đến, tin tức và sự kiện tại Ninh Bình.</p>
                 </div>
                 <div class="col-6 col-md-3">
@@ -478,8 +527,8 @@
                     <ul class="footer-links">
                         <li><a href="{{ route('client.landing') }}">Trang chủ</a></li>
                         <li><a href="{{ route('home') }}">Bản đồ du lịch</a></li>
-                        <li><a href="{{ route('client.news.index') }}">Tin tức & Cẩm nang</a></li>
-                        <li><a href="{{ route('client.events.index') }}">Sự kiện nổi bật</a></li>
+                        <li><a href="{{ route('client.about') }}">Giới thiệu</a></li>
+                        <li><a href="{{ route('client.events.index') }}">Tin tức</a></li>
                         <li><a href="{{ route('client.pano_service') }}">Dịch vụ tour 360</a></li>
                     </ul>
                 </div>

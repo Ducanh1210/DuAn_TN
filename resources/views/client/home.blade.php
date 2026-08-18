@@ -504,6 +504,31 @@
             width: 195px;
         }
 
+        .dock-category-select {
+            height: 30px;
+            border: 1px solid #d7dde5;
+            background: #ffffff;
+            color: #334155;
+            font-family: inherit;
+            font-size: 0.76rem;
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 0 30px 0 10px;
+            outline: none;
+            min-width: 140px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: linear-gradient(45deg, transparent 50%, #64748b 50%), linear-gradient(135deg, #64748b 50%, transparent 50%);
+            background-position: calc(100% - 16px) calc(50% - 2px), calc(100% - 11px) calc(50% - 2px);
+            background-size: 5px 5px, 5px 5px;
+            background-repeat: no-repeat;
+        }
+
+        .dock-category-select:focus,
+        .dock-category-select:hover {
+            border-color: #475569;
+        }
+
         .dock-search-box .search-icon {
             font-size: 18px;
             color: #64748b;
@@ -977,6 +1002,8 @@
 
         /* Bottom Featured Drawer */
         .bottom-drawer-wrapper {
+            /* Chiều cao dải tab trên cùng — tab "Khám phá" và tab icon dùng chung mốc này */
+            --drawer-rail-h: 32px;
             position: absolute;
             bottom: 0;
             left: 66px;
@@ -1004,7 +1031,8 @@
             gap: 10px;
             width: fit-content;
             max-width: calc(100% - 24px);
-            padding: 6px 14px;
+            height: var(--drawer-rail-h);
+            padding: 0 14px;
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-bottom-color: #ffffff;
@@ -1040,107 +1068,6 @@
             height: 12px;
             background: #e2e8f0;
             flex-shrink: 0;
-        }
-
-        .drawer-filter-dropdown-wrapper {
-            position: relative;
-        }
-
-        .drawer-filter-trigger {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: transparent;
-            border: none;
-            padding: 1px 2px;
-            font-family: inherit;
-            font-size: 0.72rem;
-            font-weight: 500;
-            color: #475569;
-            cursor: pointer;
-            transition: color 0.15s ease;
-            white-space: nowrap;
-        }
-
-        .drawer-filter-trigger:hover {
-            color: #1e3a5f;
-        }
-
-        .drawer-filter-trigger .material-symbols-rounded {
-            font-size: 14px;
-            color: #64748b;
-            transition: color 0.15s ease;
-        }
-
-        .drawer-filter-trigger:hover .material-symbols-rounded {
-            color: #1e3a5f;
-        }
-
-        .drawer-filter-trigger .arrow-icon {
-            font-size: 14px;
-            color: #94a3b8;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .drawer-filter-trigger.menu-open .arrow-icon {
-            transform: rotate(180deg);
-        }
-
-        .drawer-filter-menu {
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 0;
-            width: 180px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: none;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            z-index: 99999;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(4px);
-            transform-origin: bottom left;
-            transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
-            pointer-events: none;
-        }
-
-        .drawer-filter-menu.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        .drawer-filter-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 5px 8px;
-            border-radius: 5px;
-            font-size: 0.72rem;
-            font-weight: 500;
-            color: #334155;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            width: 100%;
-            text-align: left;
-            transition: background 0.15s ease, color 0.15s ease;
-        }
-
-        .drawer-filter-item:hover {
-            background: #f8fafc;
-            color: #0f172a;
-        }
-
-        .drawer-filter-item.active {
-            background: #f1f5f9;
-            color: #1e3a5f;
-            font-weight: 600;
         }
 
         .drawer-title {
@@ -1690,10 +1617,8 @@
         }
 
         .suggestion-item {
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 10px 14px;
+            display: block;
             cursor: pointer;
             transition: background 0.15s ease;
             border-bottom: 1px solid #f1f5f9;
@@ -1707,31 +1632,15 @@
             background: #f8fafc;
         }
 
-        .suggestion-icon {
-            width: 26px;
-            height: 26px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .suggestion-icon span {
-            font-size: 15px;
-        }
-
         .suggestion-info {
-            display: flex;
-            flex-direction: column;
+            display: block;
             overflow: hidden;
         }
 
         .suggestion-name {
             font-size: 0.82rem;
-            font-weight: 500;
-            color: #1e3a5f;
+            font-weight: 600;
+            color: #1e293b;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1740,7 +1649,7 @@
         .suggestion-cat {
             font-size: 0.7rem;
             color: #64748b;
-            margin-top: 1px;
+            margin-top: 2px;
         }
 
         .no-results {
@@ -2274,27 +2183,37 @@
             /* 260px + 24px */
         }
 
-        /* ======================================================== */
-        /* PREMIUM SVG HEXAGON MENU (MATCHING REFERENCE IMAGE 2)   */
-        /* ======================================================== */
+        /* ============================================================= */
+        /* ICON TAB BAR — cùng ngôn ngữ với tab "Khám phá" của drawer    */
+        /* ============================================================= */
+        /* Đáy tab tụt thêm 1px để đè lên viền trên của drawer, tạo cảm giác liền khối */
         .vr-floating-hex-menu {
             position: absolute;
             left: 50%;
-            top: -34px;
-            transform: translateX(-50%);
+            top: 0;
+            transform: translate(-50%, calc(-100% + var(--drawer-rail-h) + 1px));
             display: flex;
-            align-items: center;
-            gap: 14px;
+            align-items: stretch;
+            height: 40px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-bottom-color: #ffffff;
+            border-radius: 7px 7px 0 0;
+            box-shadow: none;
             z-index: 2500;
             pointer-events: auto;
         }
 
+        .bottom-drawer-wrapper:not(.open) .vr-floating-hex-menu {
+            border-bottom-color: #e2e8f0;
+        }
+
         .vr-floating-hex-menu .vr-hex-btn {
             position: relative;
-            width: 62px;
-            height: 70px;
+            width: 46px;
             background: transparent;
             border: none;
+            border-left: 1px solid #e2e8f0;
             padding: 0;
             cursor: pointer;
             outline: none;
@@ -2302,76 +2221,51 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 6px 16px rgba(15, 23, 42, 0.12));
-            transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: #475569;
+            transition: background 0.15s ease, color 0.15s ease;
         }
 
-        .vr-floating-hex-menu .vr-hex-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: visible;
+        .vr-floating-hex-menu .vr-hex-btn:first-child {
+            border-left: none;
+            border-radius: 6px 0 0 0;
         }
 
-        .vr-floating-hex-menu .vr-hex-polygon {
-            fill: url(#vrHexGrad);
-            stroke: #cbdbe8;
-            stroke-width: 1.8;
-            transition: all 0.25s ease;
+        .vr-floating-hex-menu .vr-hex-btn:last-child {
+            border-radius: 0 6px 0 0;
         }
 
-        .vr-floating-hex-menu .vr-hex-icon-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #1e3a5f;
-            transition: all 0.25s ease;
+        .vr-floating-hex-menu .vr-hex-btn .material-symbols-rounded {
+            font-size: 21px;
+            line-height: 1;
         }
 
         .vr-floating-hex-menu .vr-hex-btn:hover {
-            transform: translateY(-6px) scale(1.1);
-            filter: drop-shadow(0 10px 24px rgba(30, 58, 95, 0.25));
-        }
-
-        .vr-floating-hex-menu .vr-hex-btn:hover .vr-hex-polygon {
-            fill: url(#vrHexHoverGrad);
-            stroke: #ffffff;
-            stroke-width: 2.2;
-        }
-
-        .vr-floating-hex-menu .vr-hex-btn:hover .vr-hex-icon-content {
-            color: #ffffff;
-            transform: scale(1.06);
+            background: #f1f5f9;
+            color: #1e3a5f;
         }
 
         .vr-floating-hex-menu .vr-hex-btn:active {
-            transform: translateY(-2px) scale(0.98);
+            background: #e2e8f0;
         }
 
         /* Tooltip */
         .vr-floating-hex-menu .vr-hex-tooltip {
             position: absolute;
-            top: -36px;
+            bottom: calc(100% + 6px);
             left: 50%;
-            transform: translateX(-50%) translateY(-4px);
-            background: rgba(15, 23, 42, 0.95);
-            color: #f1f5f9;
-            padding: 4px 10px;
+            transform: translateX(-50%) translateY(3px);
+            background: #1e3a5f;
+            color: #f8fafc;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 0.66rem;
             font-weight: 600;
+            letter-spacing: -0.15px;
             white-space: nowrap;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.2s ease;
+            transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
             pointer-events: none;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .vr-floating-hex-menu .vr-hex-btn:hover .vr-hex-tooltip {
@@ -2673,23 +2567,6 @@
             align-items: center;
             gap: 4px;
         }
-        .monuments-pagination {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
-        .page-num-btn {
-            border: none;
-            background: transparent;
-            color: #475569;
-            font-size: .8rem;
-            font-weight: 600;
-            padding: 1px 5px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .page-num-btn.active { background: #0284c7; color: #fff; }
-        .count-divider { margin: 0 5px; color: #94a3b8; }
         .monuments-modal-body {
             padding: 16px 20px;
             overflow-y: auto;
@@ -2879,38 +2756,13 @@
             <!-- Divider -->
             <div class="dock-divider"></div>
 
-            <!-- Category Filter Dropdown -->
-            <div class="dock-filter-wrapper">
-                <button type="button" class="dock-filter-btn" id="categoryFilterBtn">
-                    <span class="material-symbols-rounded">tune</span>
-                    <span id="selectedCategoryLabel">Tất cả chủ đề</span>
-                    <span class="material-symbols-rounded arrow-icon">expand_more</span>
-                </button>
+            <select id="mapCategoryFilter" class="dock-category-select" aria-label="Lọc theo danh mục">
+                <option value="all">Tất cả chủ đề</option>
+                @foreach($locations->pluck('category')->filter()->unique('id') as $cat)
+                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                @endforeach
+            </select>
 
-                <!-- Floating Filter Menu -->
-                <div class="dock-filter-menu" id="dockFilterMenu">
-                    <!-- Radius Filter Section -->
-                    <div class="radius-section">
-                        <div class="radius-title">BÁN KÍNH GẦN BẠN</div>
-                        <div class="radius-btn-group" id="radiusBtnGroup">
-                            <button type="button" class="radius-btn active" data-radius="all">Tất cả</button>
-                            <button type="button" class="radius-btn" data-radius="5">5km</button>
-                            <button type="button" class="radius-btn" data-radius="10">10km</button>
-                            <button type="button" class="radius-btn" data-radius="20">20km</button>
-                        </div>
-                    </div>
-
-                    <div class="filter-menu-header">
-                        <span>LỌC THEO CHỦ ĐỀ</span>
-                        <button type="button" class="filter-reset-btn" id="resetCategoryBtn" style="display: none;">Đặt lại</button>
-                    </div>
-                    <div class="filter-menu-list" id="map-categories">
-                        <!-- Content rendered by JS -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Divider -->
             <div class="dock-divider"></div>
 
             <!-- Trip Planner Recommendation Button -->
@@ -3014,351 +2866,29 @@
             </div>
         @endif
 
-        <!-- Nhiệm vụ: nút tròn → bấm mở panel -->
-        @php
-            $missionFabNeedsAction = false;
-            $missionFabSignalCount = 0;
-            $missionFabTitle = 'Nhiệm vụ';
-            if (Auth::check()) {
-                $fabUser = Auth::user();
-                $fabHasCheckin = $fabUser->last_daily_bonus_at && \Carbon\Carbon::parse($fabUser->last_daily_bonus_at)->isToday();
-                if (!$fabHasCheckin) {
-                    $missionFabNeedsAction = true;
-                    $missionFabSignalCount++;
-                    $missionFabTitle = 'Còn điểm danh hôm nay — mở nhiệm vụ';
-                }
-                $fabClaimable = \App\Models\UserMission::where('user_id', $fabUser->id)
-                    ->where('status', 'completed')
-                    ->count();
-                if ($fabClaimable > 0) {
-                    $missionFabNeedsAction = true;
-                    $missionFabSignalCount += $fabClaimable;
-                    $missionFabTitle = 'Có thưởng chờ nhận — mở nhiệm vụ';
-                }
-            } else {
-                $missionFabNeedsAction = true;
-                $missionFabTitle = 'Đăng nhập để làm nhiệm vụ & nhận xu';
-            }
-        @endphp
-        <div class="mission-widget-wrapper collapsed" id="mission-widget-wrapper">
-            <button type="button"
-                class="mission-fab-btn {{ $missionFabNeedsAction ? 'has-signal' : '' }}"
-                id="mission-fab-btn"
-                title="{{ $missionFabTitle }}"
-                aria-label="{{ $missionFabTitle }}"
-                aria-expanded="false">
-                <span class="material-symbols-outlined" aria-hidden="true">emoji_events</span>
-                @if($missionFabNeedsAction)
-                    @if($missionFabSignalCount > 1)
-                        <span class="mission-fab-signal">{{ min(9, $missionFabSignalCount) }}{{ $missionFabSignalCount > 9 ? '+' : '' }}</span>
-                    @else
-                        <span class="mission-fab-signal is-dot" aria-hidden="true"></span>
-                    @endif
-                @endif
-            </button>
-
-            <div class="mission-panel" id="mission-panel">
-                <div class="mission-header" id="mission-widget-header" title="Thu gọn" role="button" tabindex="0" aria-label="Thu gọn bảng nhiệm vụ">
-                    <span class="mission-header-label">
-                        <span class="material-symbols-outlined mission-fab-icon">emoji_events</span>
-                        <span class="mission-header-text">Nhiệm vụ</span>
-                    </span>
-                    <div class="mission-header-meta">
-                        @auth
-                            <div style="display: flex; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: 600; color: #1e3a5f;">
-                                <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 14px; height: 14px; object-fit: contain;">
-                                <span id="widgetPoints">{{ number_format(Auth::user()->points) }}</span>
-                            </div>
-                        @endauth
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="mission-toggle-arrow">
-                            <polyline points="18 15 12 9 6 15"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="mission-list-container" id="mission-list-container">
-                @auth
-                    <!-- Horizontal Milestone Progress Tracker -->
-                    @php
-                        $userPts = Auth::check() ? \App\Models\PointTransaction::where('user_id', Auth::id())
-                            ->where('amount', '>', 0)
-                            ->where('action', 'not like', 'daily_milestone_%')
-                            ->sum('amount') : 0;
-                        if ($userPts <= 100) {
-                            $fillPercent = ($userPts / 100) * 33.33;
-                        } elseif ($userPts <= 200) {
-                            $fillPercent = 33.33 + (($userPts - 100) / 100) * 33.33;
-                        } else {
-                            $fillPercent = 66.66 + (min(300, $userPts - 200) / 300) * 33.34;
-                        }
-                    @endphp
-                    <div style="position: relative; display: flex; align-items: flex-start; justify-content: space-between; padding: 4px 6px 8px 6px; margin-bottom: 8px;">
-                        <!-- Line BG & Fill -->
-                        <div style="position: absolute; top: 13px; left: 20px; right: 20px; height: 3px; background: #e2e8f0; border-radius: 4px; transform: translateY(-50%); z-index: 1;">
-                            <div style="height: 100%; background: #475569; border-radius: 4px; width: {{ $fillPercent }}%; transition: width 0.4s ease;"></div>
-                        </div>
-
-                        <!-- Start Flag (Standalone SVG Flag) -->
-                        <div style="position: relative; z-index: 2; width: 18px; height: 18px; display: flex; align-items: flex-end; justify-content: center; transform: translateY(-1px);">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 21V3" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
-                                <path d="M5 4H19L14.5 9L19 14H5" fill="#475569" stroke="#475569" stroke-width="1.2" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-
-                        <!-- Node 1: 100 -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 22px;">
-                            @if($userPts >= 100)
-                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="18" height="18" rx="4" fill="#475569"/>
-                                    <path d="M5 9.2L7.8 12L13 6.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            @else
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#F8FAFC" stroke="#64748b" stroke-width="1.6"/>
-                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#E2E8F0" stroke="#64748b" stroke-width="1.6"/>
-                                    <path d="M12 6V21" stroke="#64748b" stroke-width="1.6"/>
-                                </svg>
-                            @endif
-                            <div style="font-size: 0.6rem; font-weight: 700; color: #64748b; margin-top: 2px;">100</div>
-                        </div>
-
-                        <!-- Node 2: 200 -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 22px;">
-                            @if($userPts >= 200)
-                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="18" height="18" rx="4" fill="#475569"/>
-                                    <path d="M5 9.2L7.8 12L13 6.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            @else
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#F8FAFC" stroke="#64748b" stroke-width="1.6"/>
-                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#E2E8F0" stroke="#64748b" stroke-width="1.6"/>
-                                    <path d="M12 6V21" stroke="#64748b" stroke-width="1.6"/>
-                                </svg>
-                            @endif
-                            <div style="font-size: 0.6rem; font-weight: 700; color: #64748b; margin-top: 2px;">200</div>
-                        </div>
-
-                        <!-- Node 3: 500 -->
-                        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 22px;">
-                            @if($userPts >= 500)
-                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="18" height="18" rx="4" fill="#475569"/>
-                                    <path d="M5 9.2L7.8 12L13 6.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            @else
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="3" y="10" width="18" height="11" rx="2" fill="#F8FAFC" stroke="#64748b" stroke-width="1.6"/>
-                                    <rect x="2" y="6" width="20" height="4" rx="1.5" fill="#E2E8F0" stroke="#64748b" stroke-width="1.6"/>
-                                    <path d="M12 6V21" stroke="#64748b" stroke-width="1.6"/>
-                                </svg>
-                            @endif
-                            <div style="font-size: 0.6rem; font-weight: 700; color: #64748b; margin-top: 2px;">500</div>
-                        </div>
-                    </div>
-
-                    <!-- Sub Cards Container -->
-                    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;">
-                        <!-- Group Card (Row 1 + Row 2) -->
-                        <div style="background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; overflow: hidden;">
-                            <!-- Row 1: Điểm danh -->
-                            @php
-                                $user = Auth::user();
-                                $hasCheckinToday = $user->last_daily_bonus_at && \Carbon\Carbon::parse($user->last_daily_bonus_at)->isToday();
-                                if ($hasCheckinToday) {
-                                    $todayBonus = ((($user->streak_count - 1) % 7) + 1) * 10;
-                                } else {
-                                    $lastStreakAt = $user->last_streak_at ? \Carbon\Carbon::parse($user->last_streak_at) : null;
-                                    if ($lastStreakAt && $lastStreakAt->isYesterday()) {
-                                        $nextStreak = $user->streak_count + 1;
-                                    } else {
-                                        $nextStreak = 1;
-                                    }
-                                    $todayBonus = ((($nextStreak - 1) % 7) + 1) * 10;
-                                }
-                            @endphp
-                            <div style="padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #f1f5f9;">
-                                <div style="display: flex; align-items: center; min-width: 0; flex: 1;">
-                                    <span style="font-weight: 700; color: #334155; font-size: 0.68rem; line-height: 1.25;">Điểm danh</span>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; flex-shrink: 0;">
-                                    <div style="display: flex; align-items: center; gap: 2px; font-weight: 700; color: #334155; font-size: 0.6rem;">
-                                        +<span id="widgetDailyBonusVal">{{ $todayBonus }}</span> <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;">
-                                    </div>
-                                    @if($hasCheckinToday)
-                                        <span style="font-weight: 600; color: #475569; font-size: 0.56rem; white-space: nowrap;">Đã điểm danh</span>
-                                    @else
-                                        <button type="button" id="widgetClaimDailyBtn" style="font-size: 0.56rem; font-weight: 700; padding: 2px 8px; border: 1px solid #1e3a5f; color: #ffffff; background: #1e3a5f; border-radius: 4px; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Nhận</button>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <!-- Row 2: Khám phá 3 địa điểm -->
-                            @php
-                                $exploredCount = 0;
-                                if (Auth::check()) {
-                                    $exploredCount = \App\Models\PointTransaction::where('user_id', Auth::id())
-                                        ->whereIn('action', ['explore_poi', 'explore_location', 'view_poi'])
-                                        ->whereDate('created_at', \Carbon\Carbon::today())
-                                        ->count();
-                                        
-                                    $userExploreMission = \App\Models\UserMission::where('user_id', Auth::id())
-                                        ->whereHas('mission', function($q) {
-                                            $q->where('action_key', 'explore_locations')->orWhere('action_key', 'explore_poi');
-                                        })->first();
-                                        
-                                    if ($userExploreMission) {
-                                        $exploredCount = max($exploredCount, $userExploreMission->current_count);
-                                    }
-                                }
-                            @endphp
-                            <div style="padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                                <div style="display: flex; align-items: center; flex: 1; min-width: 0;">
-                                    <div style="display: flex; flex-direction: column; width: 100%; min-width: 0;">
-                                        <span style="font-weight: 700; color: #334155; font-size: 0.68rem; line-height: 1.25;">Khám phá</span>
-                                        <div style="height: 3px; background: #e2e8f0; border-radius: 2px; overflow: hidden; width: 100%; margin-top: 4px;">
-                                            <div id="widgetExploreBar" style="width: {{ min(100, (min(3, $exploredCount) / 3) * 100) }}%; background: #475569; height: 100%; border-radius: 2px; transition: width 0.3s ease;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; flex-shrink: 0; gap: 2px;">
-                                    <div style="display: flex; align-items: center; gap: 2px; font-weight: 700; color: #334155; font-size: 0.6rem;">
-                                        +20 <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 11px; height: 11px; object-fit: contain;">
-                                    </div>
-                                    <div style="font-weight: 500; color: #64748b; font-size: 0.54rem; display: flex; align-items: center; gap: 2px; white-space: nowrap;">
-                                        <span>{{ min(3, $exploredCount) }}/3 địa điểm</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card 3: Đổi quà ngay -->
-                        <div style="background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                            <div style="display: flex; align-items: center; min-width: 0; flex: 1;">
-                                <span style="font-weight: 700; color: #334155; font-size: 0.68rem; line-height: 1.25;">Đổi quà ngay</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-                                <a href="{{ route('client.missions') }}" style="font-size: 0.58rem; font-weight: 700; padding: 2.5px 9px; border: 1px solid #475569; color: #475569; background: #ffffff; border-radius: 4px; cursor: pointer; white-space: nowrap; text-decoration: none; transition: all 0.2s;">Đổi quà</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer Link -->
-                    <div style="text-align: center; margin-top: 4px; padding-top: 2px;">
-                        <a href="{{ route('client.missions') }}" style="color: #475569; font-weight: 700; font-size: 0.72rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-                            <span>Xem tất cả nhiệm vụ</span>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="5" y1="12" x2="19" y2="12"/>
-                                <polyline points="12 5 19 12 12 19"/>
-                            </svg>
-                        </a>
-                    </div>
-                @else
-                    <div style="text-align: center; padding: 10px 4px 6px 4px;">
-                        <div style="margin-bottom: 8px; display: flex; justify-content: center;">
-                            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(2, 132, 199, 0.08); display: flex; align-items: center; justify-content: center;">
-                                <img src="{{ asset('images/xu.png') }}" alt="xu" style="width: 20px; height: 20px; object-fit: contain;">
-                            </div>
-                        </div>
-                        <p style="font-size: 0.72rem; color: #64748b; margin-bottom: 10px; font-weight: 500; line-height: 1.35;">Đăng nhập để làm nhiệm vụ & nhận xu thưởng!</p>
-                        <a href="{{ route('login') }}" style="display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 6px 18px; background: #1e3a5f; color: #ffffff; border-radius: 8px; text-decoration: none; box-shadow: none; transition: all 0.2s;">Đăng nhập ngay</a>
-                    </div>
-                @endauth
-            </div><!-- /.mission-list-container -->
-            </div><!-- /.mission-panel -->
-        </div><!-- /.mission-widget-wrapper -->
     </div>
-
-    <!-- SVG Definitions for Hexagon Gradients -->
-    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
-        <defs>
-            <linearGradient id="vrHexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96" />
-                <stop offset="100%" stop-color="#f1f5f9" stop-opacity="0.92" />
-            </linearGradient>
-            <linearGradient id="vrHexHoverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#1e3a5f" />
-                <stop offset="50%" stop-color="#183050" />
-                <stop offset="100%" stop-color="#12243e" />
-            </linearGradient>
-        </defs>
-    </svg>
 
     <!-- Bottom Featured Drawer (Full Width Sheet) -->
     <div class="bottom-drawer-wrapper open" id="featured-drawer">
-        <!-- Floating Hexagon Buttons centered on top edge of drawer -->
+        <!-- Icon tab bar seated on the top edge of the drawer, same style as the "Khám phá" tab -->
         <div class="vr-floating-hex-menu">
-            <!-- Hex 1: Home -->
             <a href="{{ route('client.landing') }}" class="vr-hex-btn" id="vrBtnHome" title="Trang chủ" onclick="event.stopPropagation();">
-                <svg class="vr-hex-svg" viewBox="0 0 62 70">
-                    <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
-                </svg>
-                <div class="vr-hex-icon-content">
-                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20V10.5z"/>
-                        <path d="M9 21v-6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 15v6"/>
-                    </svg>
-                </div>
+                <span class="material-symbols-rounded">home</span>
                 <span class="vr-hex-tooltip">Trang chủ</span>
             </a>
 
-            <!-- Hex 2: Danh sách di tích -->
             <button type="button" class="vr-hex-btn" id="vrBtnCategory" title="Danh sách di tích" onclick="event.stopPropagation(); openMonumentsModal();">
-                <svg class="vr-hex-svg" viewBox="0 0 62 70">
-                    <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
-                </svg>
-                <div class="vr-hex-icon-content">
-                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round">
-                        <line x1="4" y1="7" x2="20" y2="7"/>
-                        <line x1="4" y1="12" x2="20" y2="12"/>
-                        <line x1="4" y1="17" x2="20" y2="17"/>
-                    </svg>
-                </div>
+                <span class="material-symbols-rounded">format_list_bulleted</span>
                 <span class="vr-hex-tooltip">Danh mục</span>
             </button>
 
-            <!-- Hex 3: Gamepad / Missions -->
             <a href="{{ route('client.missions') }}" class="vr-hex-btn" id="vrBtnGame" title="Trò chơi & Nhiệm vụ" onclick="event.stopPropagation();">
-                <svg class="vr-hex-svg" viewBox="0 0 62 70">
-                    <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
-                </svg>
-                <div class="vr-hex-icon-content">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Plus D-Pad on Left -->
-                        <line x1="6" y1="11" x2="10" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="8" y1="9" x2="8" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <!-- 4 Dots in Diamond Pattern on Right -->
-                        <circle cx="16" cy="9.8" r="0.8" fill="currentColor" stroke="none"/>
-                        <circle cx="17.7" cy="11.5" r="0.8" fill="currentColor" stroke="none"/>
-                        <circle cx="16" cy="13.2" r="0.8" fill="currentColor" stroke="none"/>
-                        <circle cx="14.3" cy="11.5" r="0.8" fill="currentColor" stroke="none"/>
-                        <!-- Professional Gamepad Silhouette -->
-                        <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.106-.017.158L2 15.408A3.75 3.75 0 0 0 5.744 19.5c1.402 0 2.684-.79 3.32-2.036l.723-1.446a2 2 0 0 1 1.787-1.096h.852a2 2 0 0 1 1.787 1.096l.723 1.446A3.753 3.753 0 0 0 18.256 19.5 3.75 3.75 0 0 0 22 15.75l-.685-6.578A4 4 0 0 0 17.32 5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+                <span class="material-symbols-rounded">sports_esports</span>
                 <span class="vr-hex-tooltip">Nhiệm vụ</span>
             </a>
 
-            <!-- Hex 4: Trailer / Movie 360 -->
             <a href="{{ route('client.pano_service') }}" class="vr-hex-btn" id="vrBtn360" title="Tour VR 360" onclick="event.stopPropagation();">
-                <svg class="vr-hex-svg" viewBox="0 0 62 70">
-                    <polygon class="vr-hex-polygon" points="31,2 60,18 60,52 31,68 2,52 2,18" />
-                </svg>
-                <div class="vr-hex-icon-content">
-                    <svg width="38" height="38" viewBox="0 0 32 32" fill="none">
-                        <!-- Outer Clapperboard Box -->
-                        <rect x="5" y="8" width="22" height="18" rx="3.5" stroke="currentColor" stroke-width="2.5"/>
-                        <!-- Top Clapperboard Slanted Stripes -->
-                        <path d="M5 13H27" stroke="currentColor" stroke-width="2.5"/>
-                        <path d="M9 8L13 13" stroke="currentColor" stroke-width="2.2"/>
-                        <path d="M17 8L21 13" stroke="currentColor" stroke-width="2.2"/>
-                        <!-- Text "Trailer" -->
-                        <text x="16" y="19" font-size="5.5" font-weight="700" fill="currentColor" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif">Trailer</text>
-                        <!-- Play Triangle below Trailer text -->
-                        <polygon points="14.5,21 18.5,23 14.5,25" fill="currentColor"/>
-                    </svg>
-                </div>
+                <span class="material-symbols-rounded">vrpano</span>
                 <span class="vr-hex-tooltip">Tour 360</span>
             </a>
         </div>
@@ -3366,19 +2896,6 @@
         <div class="drawer-header" id="drawer-toggle-btn" title="Nhấn để thu gọn/mở rộng">
             <div class="drawer-header-left">
                 <span class="drawer-title">Khám phá</span>
-            </div>
-
-            <div class="drawer-header-divider"></div>
-
-            <!-- Single Combined Category Dropdown Filter (Seamless Style) -->
-            <div class="drawer-filter-dropdown-wrapper">
-                <button type="button" class="drawer-filter-trigger" id="drawerFilterTrigger">
-                    <span class="material-symbols-rounded">tune</span>
-                    <span id="drawerFilterLabel">Tất cả chủ đề</span>
-                </button>
-                <div class="drawer-filter-menu" id="drawerFilterMenu">
-                    <!-- Items rendered dynamically by JS -->
-                </div>
             </div>
 
             <div class="drawer-header-divider"></div>
@@ -3426,13 +2943,6 @@
                         </select>
                     </div>
                     <div class="monuments-count-info" id="monumentsCountInfo">
-                        <span class="monuments-pagination">
-                            <button type="button" class="page-num-btn active">1</button>
-                            <button type="button" class="page-num-btn">2</button>
-                            <button type="button" class="page-num-btn">3</button>
-                            <span>...</span>
-                        </span>
-                        <span class="count-divider">|</span>
                         <span><strong id="monumentsCurrentCount">{{ $locations->count() }}</strong> địa điểm</span>
                     </div>
                 </div>
@@ -3772,27 +3282,6 @@
         // --- Logic Tìm kiếm và Danh mục ---
         const searchInput = document.getElementById('map-search-input');
         const suggestionsBox = document.getElementById('search-suggestions');
-        const categoriesContainer = document.getElementById('map-categories');
-        const categoryFilterBtn = document.getElementById('categoryFilterBtn');
-        const dockFilterMenu = document.getElementById('dockFilterMenu');
-        const selectedCategoryLabel = document.getElementById('selectedCategoryLabel');
-        const resetCategoryBtn = document.getElementById('resetCategoryBtn');
-
-        // Toggle popover menu
-        if (categoryFilterBtn && dockFilterMenu) {
-            categoryFilterBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                dockFilterMenu.classList.toggle('show');
-                categoryFilterBtn.classList.toggle('menu-open');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('#topSearchPanel')) {
-                    dockFilterMenu.classList.remove('show');
-                    categoryFilterBtn.classList.remove('menu-open');
-                }
-            });
-        }
 
         // Calculate location counts per category
         const catMap = {};
@@ -3807,30 +3296,6 @@
                 }
             }
         });
-
-        let currentActiveCatId = null;
-
-        function resetCategoryFilter() {
-            currentActiveCatId = null;
-            selectedCategoryLabel.textContent = 'Tất cả chủ đề';
-            categoryFilterBtn.classList.remove('active');
-            if (resetCategoryBtn) resetCategoryBtn.style.display = 'none';
-            document.querySelectorAll('.filter-item').forEach(el => el.classList.remove('active'));
-
-            markers.clearLayers();
-            locations.forEach(loc => {
-                if (loc.marker) markers.addLayer(loc.marker);
-            });
-        }
-
-        if (resetCategoryBtn) {
-            resetCategoryBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                resetCategoryFilter();
-                dockFilterMenu.classList.remove('show');
-                categoryFilterBtn.classList.remove('menu-open');
-            });
-        }
 
         // Helper function to render matching category icon
         function getCategoryIconHtml(cat) {
@@ -3860,133 +3325,34 @@
             return `<span class="material-symbols-rounded" style="color: ${cat.icon_color || 'var(--primary)'}">location_on</span>`;
         }
 
-        // Render category items inside popover
-        if (categoriesContainer) {
-            categoriesContainer.innerHTML = '';
-            uniqueCategories.forEach(cat => {
-                const count = catCounts[cat.id] || 0;
-                const iconHtml = getCategoryIconHtml(cat);
-                const item = document.createElement('button');
-                item.type = 'button';
-                item.className = 'filter-item';
-                item.innerHTML = `
-                    <div class="filter-item-left">
-                        ${iconHtml}
-                        <span>${cat.name}</span>
-                    </div>
-                    <span class="filter-count-badge">${count}</span>
-                `;
-
-                item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (currentActiveCatId === cat.id) {
-                        resetCategoryFilter();
-                    } else {
-                        currentActiveCatId = cat.id;
-                        selectedCategoryLabel.textContent = cat.name;
-                        categoryFilterBtn.classList.add('active');
-                        resetCategoryBtn.style.display = 'inline-block';
-
-                        document.querySelectorAll('.filter-item').forEach(el => el.classList.remove('active'));
-                        item.classList.add('active');
-
-                        markers.clearLayers();
-                        locations.forEach(loc => {
-                            if (loc.category && loc.category.id === cat.id && loc.marker) {
-                                markers.addLayer(loc.marker);
-                            }
-                        });
-                    }
-                    dockFilterMenu.classList.remove('show');
-                    categoryFilterBtn.classList.remove('menu-open');
-                });
-
-                categoriesContainer.appendChild(item);
-            });
-        }
-
-        // --- Independent Category Filter for Bottom Featured Drawer Cards ONLY ---
-        const drawerFilterTrigger = document.getElementById('drawerFilterTrigger');
-        const drawerFilterMenu = document.getElementById('drawerFilterMenu');
-        const drawerFilterLabel = document.getElementById('drawerFilterLabel');
+        // --- Category filter placed in top search dock ---
+        const mapCategoryFilter = document.getElementById('mapCategoryFilter');
         const featuredCards = document.querySelectorAll('#featuredLocScroll .featured-loc-card');
         const featuredCountBadge = document.getElementById('featuredCountBadge');
+        let activeCategoryFilter = 'all';
 
-        if (drawerFilterTrigger && drawerFilterMenu) {
-            drawerFilterTrigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                drawerFilterMenu.classList.toggle('show');
-                drawerFilterTrigger.classList.toggle('menu-open');
-            });
+        function locationMatchesActiveCategory(loc) {
+            if (activeCategoryFilter === 'all') return true;
+            return String(loc.category?.id || '') === String(activeCategoryFilter);
+        }
 
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.drawer-filter-dropdown-wrapper')) {
-                    drawerFilterMenu.classList.remove('show');
-                    drawerFilterTrigger.classList.remove('menu-open');
+        function applyTopCategoryFilter() {
+            markers.clearLayers();
+
+            locations.forEach(loc => {
+                if (locationMatchesActiveCategory(loc)) {
+                    markers.addLayer(loc.marker);
                 }
             });
         }
 
-        if (drawerFilterMenu && uniqueCategories) {
-            drawerFilterMenu.innerHTML = '';
-            
-            // "Tất cả chủ đề" item
-            const allItem = document.createElement('button');
-            allItem.type = 'button';
-            allItem.className = 'drawer-filter-item active';
-            allItem.innerHTML = '<span>Tất cả chủ đề</span>';
-            allItem.addEventListener('click', (e) => {
-                e.stopPropagation();
-                drawerFilterMenu.querySelectorAll('.drawer-filter-item').forEach(i => i.classList.remove('active'));
-                allItem.classList.add('active');
-                if (drawerFilterLabel) drawerFilterLabel.textContent = 'Tất cả chủ đề';
-                if (drawerFilterTrigger) drawerFilterTrigger.classList.remove('active');
-
-                // Filter cards ONLY (Do NOT alter map markers)
-                let visibleCount = 0;
-                featuredCards.forEach(card => {
-                    card.style.display = 'flex';
-                    visibleCount++;
-                });
-                if (featuredCountBadge) featuredCountBadge.textContent = visibleCount;
-
-                drawerFilterMenu.classList.remove('show');
-            });
-            drawerFilterMenu.appendChild(allItem);
-
-            // Category Items
-            uniqueCategories.forEach(cat => {
-                const count = catCounts[cat.id] || 0;
-                const iconHtml = getCategoryIconHtml(cat);
-                const item = document.createElement('button');
-                item.type = 'button';
-                item.className = 'drawer-filter-item';
-                item.innerHTML = `<div class="d-flex align-items-center gap-2">${iconHtml}<span>${cat.name}</span></div> <span class="filter-count-badge">${count}</span>`;
-
-                item.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    drawerFilterMenu.querySelectorAll('.drawer-filter-item').forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    if (drawerFilterLabel) drawerFilterLabel.textContent = cat.name;
-                    if (drawerFilterTrigger) drawerFilterTrigger.classList.add('active');
-
-                    // Filter cards ONLY (Do NOT alter map markers)
-                    let visibleCount = 0;
-                    featuredCards.forEach(card => {
-                        const cardCatId = card.getAttribute('data-cat');
-                        if (cardCatId == cat.id) {
-                            card.style.display = 'flex';
-                            visibleCount++;
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                    if (featuredCountBadge) featuredCountBadge.textContent = visibleCount;
-
-                    drawerFilterMenu.classList.remove('show');
-                });
-
-                drawerFilterMenu.appendChild(item);
+        if (mapCategoryFilter) {
+            mapCategoryFilter.addEventListener('change', function () {
+                activeCategoryFilter = this.value || 'all';
+                applyTopCategoryFilter();
+                if (searchInput.value.trim()) {
+                    searchInput.dispatchEvent(new Event('input'));
+                }
             });
         }
 
@@ -4110,19 +3476,15 @@
 
             const results = locations.filter(loc => {
                 const nameNoAccent = removeAccents(loc.name.toLowerCase());
-                return nameNoAccent.includes(valNoAccent);
+                return nameNoAccent.includes(valNoAccent) && locationMatchesActiveCategory(loc);
             });
 
             if (results.length > 0) {
                 results.slice(0, 10).forEach(loc => {
                     const item = document.createElement('div');
                     item.className = 'suggestion-item';
-                    const color = loc.category?.icon_color || 'var(--primary)';
 
                     item.innerHTML = `
-                        <div class="suggestion-icon" style="background: ${color};">
-                            <span class="material-symbols-rounded">location_on</span>
-                        </div>
                         <div class="suggestion-info">
                             <div class="suggestion-name">${loc.name}</div>
                             <div class="suggestion-cat">${loc.category?.name || 'Chưa phân loại'}</div>
@@ -4731,13 +4093,6 @@
         }
 
         // VR Header Menu Actions
-        function toggleCategoryDock() {
-            const categoryBtn = document.getElementById('categoryFilterBtn');
-            if (categoryBtn) {
-                categoryBtn.click();
-            }
-        }
-
         function toggleFeaturedDrawer() {
             const drawer = document.getElementById('featured-drawer');
             if (drawer) {

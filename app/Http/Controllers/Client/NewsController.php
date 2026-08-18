@@ -15,24 +15,7 @@ class NewsController extends Controller
     /** Danh sách tin tức + bài phổ biến + vài sự kiện sắp diễn ra cho sidebar. */
     public function index()
     {
-        $newsList = News::where('status', 'published')
-                    ->where('type', '!=', 'event')
-                    ->orderBy('published_at', 'desc')
-                    ->paginate(10);
-                    
-        $popularNews = News::where('status', 'published')
-                    ->where('type', '!=', 'event')
-                    ->orderBy('view_count', 'desc')
-                    ->take(5)
-                    ->get();
-                    
-        $upcomingEvents = \App\Models\Event::where('status', 'active')
-                    ->where('start_time', '>=', now())
-                    ->orderBy('start_time')
-                    ->take(4)
-                    ->get();
-                    
-        return view('client.news.index', compact('newsList', 'popularNews', 'upcomingEvents'));
+        return redirect()->route('client.events.index');
     }
 
     /** Trang chi tiết một bài viết kèm các bài liên quan. */

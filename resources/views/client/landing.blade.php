@@ -1,215 +1,213 @@
 @extends('client.layouts.app')
 
-@php
-    $tamChucPath = public_path('images/tam_chuc.png');
-    $brainImgPath = 'C:/Users/admin/.gemini/antigravity-ide/brain/f933e8c2-b2d8-4fc9-a5ac-e95113e6f2a8/tam_chuc_background_1786629761917.png';
-    if (!file_exists($tamChucPath) && file_exists($brainImgPath)) {
-        @copy($brainImgPath, $tamChucPath);
-    }
-@endphp
+@section('title', 'Trang chủ — Cổng Thông Tin Du Lịch Ninh Bình')
 
-@section('title', 'Trang chủ — Cổng Thông Tin Du Lịch Ninh Bình 360°')
-
-@section('content')
-<div class="landing-vr360-container">
-    {{-- Full-screen Background Panorama Image (Tam Chúc Pagoda) --}}
-    <img src="{{ asset('images/tam_chuc.png') }}" 
-         alt="Ninh Bình VR360 - Cảnh đẹp Chùa Tam Chúc" 
-         class="landing-bg-img"
-         onerror="this.src='{{ asset('images/trag.png') }}'">
-
-    {{-- Ambient Overlay Mask for Contrast --}}
-    <div class="landing-overlay-mask"></div>
-
-    {{-- Center Hero Content Box --}}
-    <div class="landing-hero-center">
-        <h1 class="landing-title">
-            <span class="title-white">MỘT CHẠM ĐẾN</span>
-            <span class="title-highlight">NINH BÌNH</span>
-        </h1>
-
-        <a href="{{ route('home') }}" class="btn-start-tour" title="Bắt đầu tham quan bản đồ 360°">
-            <span class="btn-text">BẮT ĐẦU THAM QUAN</span>
-            <span class="btn-icon"><i class="fa-solid fa-compass"></i></span>
-        </a>
-    </div>
-</div>
+{{-- Header nổi trong suốt trên ảnh hero, chuyển trắng khi cuộn xuống --}}
+@section('header_variant', 'site-header--overlay')
 
 @push('styles')
-<style>
-    /* Reset & Fullscreen Enforcements */
-    .site-header, footer {
-        display: none !important;
-    }
-    html, body {
-        overflow: hidden !important;
-        height: 100vh !important;
-        width: 100vw !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background-color: #0f172a !important;
-        font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    }
-
-    .landing-vr360-container {
-        position: relative;
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* High Quality Panoramic Image Coverage */
-    .landing-bg-img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        object-fit: cover;
-        object-position: center center;
-        z-index: 1;
-        transform: scale(1.02);
-        transition: transform 10s ease-out;
-    }
-
-    /* Ambient Vignette & Gradient Mask */
-    .landing-overlay-mask {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: radial-gradient(circle at center, rgba(15, 23, 42, 0.12) 0%, rgba(15, 23, 42, 0.4) 70%, rgba(15, 23, 42, 0.65) 100%);
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    /* Center Hero Text and Button Section */
-    .landing-hero-center {
-        position: relative;
-        z-index: 10;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 0 20px;
-        max-width: 1000px;
-        margin-top: -2vh;
-    }
-
-    /* Title Styling: "MỘT CHẠM ĐẾN NINH BÌNH" (Tăng kích thước chữ to hơn) */
-    .landing-title {
-        margin: 0 0 1.8rem 0;
-        font-size: clamp(3rem, 7.5vw, 6.2rem);
-        font-weight: 900;
-        line-height: 1.1;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: 0.3em;
-        user-select: none;
-    }
-
-    .title-white {
-        color: #ffffff;
-        text-shadow: 
-            0 4px 20px rgba(0, 0, 0, 0.9),
-            0 2px 6px rgba(0, 0, 0, 0.95);
-    }
-
-    .title-highlight {
-        color: #facc15; /* Golden Yellow matching reference */
-        text-shadow: 
-            0 4px 20px rgba(0, 0, 0, 0.9),
-            0 0 35px rgba(250, 204, 21, 0.5);
-    }
-
-    /* Cyan Gradient Action Button ("BẮT ĐẦU THAM QUAN" - Thu nhỏ gọn gàng) */
-    .btn-start-tour {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 11px 32px;
-        background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #0284c7 100%);
-        color: #ffffff !important;
-        font-size: clamp(0.875rem, 1.25vw, 1.05rem);
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        text-decoration: none !important;
-        border-radius: 9999px;
-        box-shadow: 
-            0 6px 20px rgba(6, 182, 212, 0.45),
-            0 0 0 0 rgba(34, 211, 238, 0.4);
-        border: 1.5px solid rgba(255, 255, 255, 0.7);
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        animation: pulse-glow 2.5s infinite;
-        position: relative;
-    }
-
-    .btn-start-tour .btn-icon {
-        font-size: 1.2em;
-        transition: transform 0.3s ease;
-    }
-
-    .btn-start-tour:hover {
-        transform: translateY(-3px) scale(1.05);
-        background: linear-gradient(135deg, #38bdf8 0%, #06b6d4 50%, #0369a1 100%);
-        box-shadow: 
-            0 14px 40px rgba(6, 182, 212, 0.7),
-            0 0 30px rgba(56, 189, 248, 0.6);
-        border-color: #ffffff;
-    }
-
-    .btn-start-tour:hover .btn-icon {
-        transform: rotate(45deg) scale(1.15);
-    }
-
-    .btn-start-tour:active {
-        transform: translateY(1px) scale(0.98);
-        box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
-    }
-
-    /* Pulse Glow Keyframes */
-    @keyframes pulse-glow {
-        0% {
-            box-shadow: 
-                0 8px 30px rgba(6, 182, 212, 0.5),
-                0 0 0 0 rgba(34, 211, 238, 0.6);
-        }
-        70% {
-            box-shadow: 
-                0 8px 30px rgba(6, 182, 212, 0.5),
-                0 0 0 18px rgba(34, 211, 238, 0);
-        }
-        100% {
-            box-shadow: 
-                0 8px 30px rgba(6, 182, 212, 0.5),
-                0 0 0 0 rgba(34, 211, 238, 0);
-        }
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-        .btn-start-tour {
-            padding: 14px 32px;
-        }
-        .landing-title {
-            gap: 0.2em;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/heritage.css') }}?v={{ @filemtime(public_path('css/heritage.css')) }}">
 @endpush
+
+@php
+    $decorImages = [
+        asset('images/trangtri1.jpg'),
+        asset('images/trangtri2.jpg'),
+        asset('images/trangtri3.jpg'),
+        asset('images/trangtri4.jpg'),
+    ];
+
+    $fallbackImages = [
+        $decorImages[1],
+        $decorImages[0],
+        asset('images/tam_chuc.png'),
+        asset('images/trag.png'),
+    ];
+
+    $heroImage = asset('images/trangchu.png');
+    $narrativeImage = $decorImages[2];
+    $showcase = collect($featuredLocations)->take(3);
+    $pickImage = fn (int $i) => $decorImages[$i % count($decorImages)];
+@endphp
+
+@section('content')
+<div class="nb">
+
+    {{-- ============ Hero ============ --}}
+    <header class="nb-hero nb-hero--full">
+        <img src="{{ $heroImage }}"
+             alt="Thung lũng lúa và núi đá vôi Ninh Bình lúc hoàng hôn"
+             class="nb-hero__img"
+             onerror="this.onerror=null;this.src='{{ $fallbackImages[1] }}';">
+        <div class="nb-hero__scrim"></div>
+
+        <div class="nb-hero__inner">
+            <span class="nb-eyebrow">Cổng thông tin du lịch Ninh Bình</span>
+            <h1 class="nb-hero__title">Khám Phá Di Sản Thiên Niên Kỷ</h1>
+            <p class="nb-hero__sub">
+                Hành trình qua vẻ đẹp vượt thời gian của vùng đất cố đô — nơi lịch sử ngàn năm
+                gặp gỡ những dãy núi đá vôi và dòng sông êm đềm.
+            </p>
+            <a href="{{ route('home') }}" class="nb-btn nb-btn--ghost-light">
+                Khám phá ngay
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </header>
+
+    {{-- ============ Điểm đến tiêu biểu ============ --}}
+    <section class="nb-section">
+        <div class="nb-wrap">
+            <div class="nb-section__head">
+                <div>
+                    <span class="nb-eyebrow">Tuyển chọn</span>
+                    <h2 class="nb-h2">Điểm Đến Tiêu Biểu</h2>
+                </div>
+                <a href="{{ route('home') }}" class="nb-link">
+                    Xem tất cả trên bản đồ
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </a>
+            </div>
+
+            @if($showcase->isNotEmpty())
+                <div class="nb-dest-grid nb-dest-grid--stagger">
+                    @foreach($showcase as $index => $loc)
+                        <a href="{{ route('client.locations.360', $loc->slug) }}" class="nb-dest">
+                            <div class="nb-dest__media">
+                                <img src="{{ $loc->display_thumbnail ?: $pickImage($index) }}"
+                                     alt="{{ $loc->name }}"
+                                     class="nb-dest__img"
+                                     loading="lazy"
+                                     onerror="this.onerror=null;this.src='{{ $fallbackImages[1] }}';">
+                                <div class="nb-dest__veil"></div>
+                            </div>
+                            <span class="nb-dest__tag">{{ $loc->category->name ?? 'Điểm đến' }}</span>
+                            <h3 class="nb-dest__title">{{ $loc->name }}</h3>
+                            <p class="nb-dest__desc">
+                                {{ $loc->short_description ?: Str::limit(strip_tags((string) $loc->description), 120) }}
+                            </p>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <div class="nb-empty">
+                    <h3 class="nb-empty__title">Chưa có điểm đến nào được xuất bản</h3>
+                    <p class="nb-empty__text">
+                        Dữ liệu địa điểm sẽ hiển thị tại đây ngay khi được quản trị viên đăng tải.
+                    </p>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    {{-- ============ Hành trình khám phá ============ --}}
+    <section class="nb-section nb-section--mist">
+        <div class="nb-wrap">
+            <div class="nb-split">
+                <div>
+                    <span class="nb-eyebrow">Hoàng hôn</span>
+                    <h2 class="nb-h2">Thành Phố Bên Dòng Sông</h2>
+                    <p class="nb-lead" style="margin-top: 20px;">
+                        Khi mặt trời khuất bóng, Ninh Bình hiện ra một gương mặt khác — dòng sông soi
+                        ánh trời chiều, mái ngói đỏ của khu đền cũ nằm sát những con đường vừa lên đèn.
+                        Di sản và nhịp sống đô thị đứng cạnh nhau trong cùng một khung hình.
+                    </p>
+                    <p class="nb-text" style="margin-top: 16px;">
+                        Từ trên cao, thành phố trải dài theo khúc sông, đèn vàng lần lượt bật lên giữa
+                        tán cây và mái nhà. Đó là lúc vùng đất cố đô không chỉ là danh thắng, mà còn là
+                        nơi người ta đang sống, đi về và giữ lửa cho những ngày tiếp theo.
+                    </p>
+
+                    <a href="{{ route('client.about') }}" class="nb-link" style="margin-top: 28px;">
+                        Tìm hiểu về Ninh Bình
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+                <div class="nb-split__figure">
+                    <img src="{{ $narrativeImage }}"
+                         alt="Hoàng hôn trên sông và thành phố Ninh Bình"
+                         loading="lazy"
+                         onerror="this.onerror=null;this.src='{{ $fallbackImages[1] }}';">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ============ Lưu giữ khoảnh khắc ============ --}}
+    <section class="nb-section">
+        <div class="nb-wrap">
+            <div class="nb-section__head nb-section__head--center">
+                <span class="nb-eyebrow">Nhật ký hình ảnh</span>
+                <h2 class="nb-h2">Lưu Giữ Khoảnh Khắc</h2>
+                <p class="nb-text" style="margin-top: 16px;">
+                    Một lát cắt về đời sống văn hóa, về con người và những phút giây tĩnh lặng
+                    làm nên tinh thần của vùng đất này.
+                </p>
+            </div>
+
+            <div class="nb-bento">
+                <div class="nb-bento__cell nb-bento__cell--wide">
+                    <img src="{{ $decorImages[0] }}" alt="Đêm hội với đài phun nước và trống đồng Ninh Bình" class="nb-bento__img" loading="lazy">
+                    <div class="nb-bento__caption">
+                        <strong>Đêm hội</strong>
+                        <span>Ánh đèn, đài phun nước và nhịp trống đồng giữa quảng trường.</span>
+                    </div>
+                </div>
+                <div class="nb-bento__cell nb-bento__cell--narrow">
+                    <img src="{{ $decorImages[1] }}" alt="Thuyền nan đậu dưới chân đền đài lúc chạng vạng" class="nb-bento__img" loading="lazy">
+                    <div class="nb-bento__caption">
+                        <strong>Chạng vạng</strong>
+                        <span>Đoàn thuyền nan yên ắng dưới mái đền vàng ánh đèn.</span>
+                    </div>
+                </div>
+                <div class="nb-bento__cell nb-bento__cell--narrow-b">
+                    <img src="{{ $decorImages[2] }}" alt="Hoàng hôn trên sông và thành phố Ninh Bình" class="nb-bento__img" loading="lazy">
+                    <div class="nb-bento__caption">
+                        <strong>Hoàng hôn</strong>
+                        <span>Dòng sông soi bóng trời chiều trên thành phố.</span>
+                    </div>
+                </div>
+                <div class="nb-bento__cell nb-bento__cell--wide-b">
+                    <img src="{{ $decorImages[3] }}" alt="Khu vui chơi giải trí Ninh Bình" class="nb-bento__img" loading="lazy">
+                    <div class="nb-bento__caption">
+                        <strong>Giải trí</strong>
+                        <span>Nhịp sống hiện đại bên cạnh miền di sản.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; margin-top: 48px;">
+                <a href="{{ route('home') }}" class="nb-btn nb-btn--outline">
+                    Mở bản đồ khám phá
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
 @endsection
 
+@push('scripts')
+<script>
+    (function () {
+        const header = document.querySelector('.site-header--overlay');
+        if (!header) return;
+
+        const syncScrollState = () => {
+            header.classList.toggle('is-scrolled', window.scrollY > 40);
+        };
+
+        syncScrollState();
+        window.addEventListener('scroll', syncScrollState, { passive: true });
+
+        // Menu mobile mở ra trên nền ảnh sẽ khó đọc nên ép header về nền trắng.
+        const menu = document.getElementById('siteNavCollapse');
+        if (menu) {
+            menu.addEventListener('show.bs.collapse', () => header.classList.add('is-solid'));
+            menu.addEventListener('hidden.bs.collapse', () => header.classList.remove('is-solid'));
+        }
+    })();
+</script>
+@endpush
