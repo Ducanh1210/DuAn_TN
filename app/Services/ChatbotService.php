@@ -2,29 +2,24 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\Location;
 
 /**
  * Dịch vụ trợ lý ảo (chatbot) tư vấn du lịch Ninh Bình.
  * Nạp danh sách địa điểm thật trong DB làm ngữ cảnh cho AI (chống bịa địa điểm),
- * gọi OpenRouter để trả lời và làm sạch các link địa điểm [Tên](loc:ID) do AI sinh ra.
+ * gọi Gemini để trả lời và làm sạch các link địa điểm [Tên](loc:ID) do AI sinh ra.
  */
 class ChatbotService
 {
-    protected $openRouterApiKey;
-    protected $openRouterModel;
-    protected $openRouterBaseUrl;
+    protected GeminiClient $gemini;
 
     /** @var \Illuminate\Support\Collection<int, Location>|null */
     protected $locationIndex = null;
 
-    public function __construct()
+    public function __construct(?GeminiClient $gemini = null)
     {
-        $this->openRouterApiKey = env('OPENROUTER_API_KEY');
-        $this->openRouterModel = env('OPENROUTER_MODEL', 'google/gemini-2.5-flash');
-        $this->openRouterBaseUrl = env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1');
+        $this->gemini = $gemini ?? new GeminiClient();
     }
 
     /**
@@ -98,19 +93,6 @@ class ChatbotService
     }
 
     /**
-     * Lấy danh sách các API Key từ .env (hỗ trợ nhiều key phân cách bằng dấu phẩy)
-     */
-    protected function getApiKeys(): array
-    {
-        $rawKeys = env('OPENROUTER_API_KEYS') ?: env('OPENROUTER_API_KEY');
-        if (!$rawKeys) {
-            return [];
-        }
-        $keys = array_map('trim', explode(',', $rawKeys));
-        return array_values(array_filter($keys));
-    }
-
-    /**
      * Sửa / gỡ thẻ [Tên](loc:ID) sai: ID không tồn tại, tên bịa, gắn nhầm chỗ.
      */
     protected function sanitizeLocationLinks(string $content): string
@@ -177,7 +159,7 @@ class ChatbotService
     }
 
     /**
-     * Gửi tin nhắn tới AI (OpenRouter) và nhận câu trả lời đã làm sạch link.
+     * Gửi tin nhắn tới AI (Gemini) và nhận câu trả lời đã làm sạch link.
      *
      * @param string $message Tin nhắn của người dùng
      * @param array $history Lịch sử hội thoại trước đó
@@ -239,50 +221,14 @@ QUY TẮC BẮT BUỘC:
             'content' => $message
         ];
 
-        // Thứ tự mô hình thử: mô hình chính -> bản nhẹ -> tự động (dự phòng)
-        $apiKeys = $this->getApiKeys();
-        $modelsToTry = array_unique([
-            $this->openRouterModel,
-            'google/gemini-2.5-flash-lite',
-            'openrouter/auto'
-        ]);
-
-        if (empty($apiKeys)) {
-            Log::error('ChatbotService: No OpenRouter API Key configured.');
+        if (!$this->gemini->isConfigured()) {
+            Log::error('ChatbotService: Chưa cấu hình GEMINI_API_KEY.');
             return 'Xin lỗi, hệ thống chưa được cấu hình API Key AI.';
         }
 
-        foreach ($apiKeys as $keyIndex => $apiKey) {
-            foreach ($modelsToTry as $modelName) {
-                try {
-                    $response = Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $apiKey,
-                        'HTTP-Referer' => 'http://localhost',
-                        'X-Title' => 'Ninh Binh POI',
-                        'Content-Type' => 'application/json',
-                    ])
-                    ->timeout(45)
-                    ->post($this->openRouterBaseUrl . '/chat/completions', [
-                        'model' => $modelName,
-                        'messages' => $messages,
-                        'temperature' => 0.35,
-                        'max_tokens' => 1400,
-                    ]);
-
-                    if ($response->successful()) {
-                        $data = $response->json();
-                        if (!empty($data['choices'][0]['message']['content'])) {
-                            return $this->sanitizeLocationLinks(
-                                $data['choices'][0]['message']['content']
-                            );
-                        }
-                    }
-
-                    Log::warning("ChatbotService Key #" . ($keyIndex + 1) . " with model {$modelName} failed: " . $response->body());
-                } catch (\Exception $e) {
-                    Log::warning("ChatbotService Key #" . ($keyIndex + 1) . " with model {$modelName} exception: " . $e->getMessage());
-                }
-            }
+        $content = $this->gemini->generate($messages, 0.35, 1400, 70);
+        if ($content) {
+            return $this->sanitizeLocationLinks($content);
         }
 
         return 'Xin lỗi, hệ thống AI hiện chưa thể xử lý câu trả lời lúc này. Vui lòng thử lại!';

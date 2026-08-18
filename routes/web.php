@@ -251,6 +251,8 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Reports Management
     Route::resource('reports', \App\Http\Controllers\Admin\ReportController::class)->only(['index']);
     Route::patch('reports/{report}/status', [\App\Http\Controllers\Admin\ReportController::class, 'updateStatus'])->name('reports.update_status');
+    Route::delete('reports/feedbacks/{id}', [\App\Http\Controllers\Admin\ReportController::class, 'destroyFeedback'])->name('reports.feedbacks.destroy');
+    Route::delete('reports/{report}', [\App\Http\Controllers\Admin\ReportController::class, 'destroy'])->whereNumber('report')->name('reports.destroy');
     Route::get('reports/feedbacks/{id}', [\App\Http\Controllers\Admin\ReportController::class, 'showFeedback'])->name('reports.feedbacks.show');
     Route::put('reports/feedbacks/{id}', [\App\Http\Controllers\Admin\ReportController::class, 'updateFeedback'])->name('reports.feedbacks.update');
 

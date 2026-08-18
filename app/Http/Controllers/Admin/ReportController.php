@@ -22,9 +22,12 @@ class ReportController extends Controller
         $locationType = Location::class;
         $commentType = Comment::class;
 
+        $locationTypes = Report::morphTypes($locationType);
+        $commentTypes = Report::morphTypes($commentType);
+
         if ($tab === 'comments') {
             $reports = Report::with(['reporter', 'handler', 'reportable.location'])
-                ->where('reportable_type', $commentType)
+                ->whereIn('reportable_type', $commentTypes)
                 ->orderByDesc('created_at')
                 ->paginate(15)
                 ->withQueryString();
@@ -38,17 +41,17 @@ class ReportController extends Controller
         } else {
             $tab = 'locations';
             $reports = Report::with(['reporter', 'handler', 'reportable'])
-                ->where('reportable_type', $locationType)
+                ->whereIn('reportable_type', $locationTypes)
                 ->orderByDesc('created_at')
                 ->paginate(15)
                 ->withQueryString();
             $feedbacks = null;
         }
 
-        $pendingLocations = Report::where('reportable_type', $locationType)
+        $pendingLocations = Report::whereIn('reportable_type', $locationTypes)
             ->where('status', 'pending')
             ->count();
-        $pendingComments = Report::where('reportable_type', $commentType)
+        $pendingComments = Report::whereIn('reportable_type', $commentTypes)
             ->where('status', 'pending')
             ->count();
         $pendingFeedbacks = FeedbackReport::where('status', 'pending')->count();
@@ -76,6 +79,25 @@ class ReportController extends Controller
         ]);
 
         return back()->with('success', 'Cập nhật trạng thái báo cáo thành công.');
+    }
+
+    /** Xóa một báo cáo vi phạm (địa điểm / bình luận). */
+    public function destroy(Report $report)
+    {
+        $report->delete();
+
+        return back()->with('success', 'Đã xóa báo cáo.');
+    }
+
+    /** Xóa một góp ý / báo lỗi. */
+    public function destroyFeedback($id)
+    {
+        $feedback = FeedbackReport::findOrFail($id);
+        $feedback->delete();
+
+        return redirect()
+            ->route('admin.reports.index', ['tab' => 'feedbacks'])
+            ->with('success', 'Đã xóa góp ý / báo lỗi.');
     }
 
     /** Chi tiết một góp ý/báo lỗi kèm liên kết tới đối tượng liên quan (địa điểm/tin tức). */

@@ -2,45 +2,24 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-
 /**
- * Dịch vụ kiểm duyệt bình luận bằng AI (qua OpenRouter/Gemini).
+ * Dịch vụ kiểm duyệt bình luận bằng AI (Gemini).
  * Nhận danh sách bình luận, gọi mô hình AI để gắn cờ nội dung
  * vi phạm / nghi ngờ, trả về cờ + điểm rủi ro + lý do cho từng bình luận.
  */
 class ModerationService
 {
-    protected $apiKeys;   // Danh sách API key (hỗ trợ xoay vòng nhiều key)
-    protected $model;     // Mô hình AI mặc định
-    protected $baseUrl;   // Địa chỉ gốc API OpenRouter
+    protected GeminiClient $gemini;
 
-    public function __construct()
+    public function __construct(?GeminiClient $gemini = null)
     {
-        $this->model = env('OPENROUTER_MODEL', 'google/gemini-2.5-flash');
-        $this->baseUrl = env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1');
-        $this->apiKeys = $this->getApiKeys();
-    }
-
-    /**
-     * Đọc các API key từ .env. Cho phép khai báo nhiều key cách nhau bằng dấu phẩy
-     * để tự động xoay vòng khi một key bị lỗi/hết hạn mức.
-     */
-    protected function getApiKeys(): array
-    {
-        $rawKeys = env('OPENROUTER_API_KEYS') ?: env('OPENROUTER_API_KEY');
-        if (!$rawKeys) {
-            return [];
-        }
-        $keys = array_map('trim', explode(',', $rawKeys));
-        return array_values(array_filter($keys));
+        $this->gemini = $gemini ?? new GeminiClient();
     }
 
     /** Có sẵn sàng gọi AI không (đã cấu hình ít nhất 1 API key). */
     public function isConfigured(): bool
     {
-        return !empty($this->apiKeys);
+        return $this->gemini->isConfigured();
     }
 
     /**
@@ -112,44 +91,11 @@ PROMPT;
             ['role' => 'user', 'content' => "Đánh giá các bình luận sau:\n{$listText}"],
         ];
 
-        // Danh sách mô hình thử theo thứ tự ưu tiên (có mô hình dự phòng rẻ hơn)
-        $modelsToTry = array_unique([
-            $this->model,
-            'google/gemini-2.5-flash-lite',
-            'openrouter/auto',
-        ]);
-
-        // Thử từng key, với mỗi key lại thử từng mô hình; gặp lỗi thì chuyển tiếp
-        foreach ($this->apiKeys as $keyIndex => $apiKey) {
-            foreach ($modelsToTry as $modelName) {
-                try {
-                    $response = Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $apiKey,
-                        'HTTP-Referer' => 'http://localhost',
-                        'X-Title' => 'Ninh Binh POI Moderation',
-                        'Content-Type' => 'application/json',
-                    ])
-                    ->timeout(60)
-                    ->post($this->baseUrl . '/chat/completions', [
-                        'model' => $modelName,
-                        'messages' => $messages,
-                        'temperature' => 0.1,
-                        'max_tokens' => 1500,
-                    ]);
-
-                    if ($response->successful()) {
-                        $data = $response->json();
-                        $content = $data['choices'][0]['message']['content'] ?? '';
-                        $parsed = $this->parseJsonArray($content);
-                        if (!empty($parsed)) {
-                            return $parsed;
-                        }
-                    }
-
-                    Log::warning("ModerationService Key #" . ($keyIndex + 1) . " model {$modelName} failed: " . $response->body());
-                } catch (\Exception $e) {
-                    Log::warning("ModerationService Key #" . ($keyIndex + 1) . " model {$modelName} exception: " . $e->getMessage());
-                }
+        $content = $this->gemini->generate($messages, 0.1, 1500, 70);
+        if ($content) {
+            $parsed = $this->parseJsonArray($content);
+            if (!empty($parsed)) {
+                return $parsed;
             }
         }
 

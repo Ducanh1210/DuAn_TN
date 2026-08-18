@@ -75,7 +75,7 @@ class CommentController extends Controller
         if (!$moderation->isConfigured()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Chưa cấu hình API Key AI (OPENROUTER_API_KEY).',
+                'message' => 'Chưa cấu hình API Key AI (GEMINI_API_KEY).',
             ], 400);
         }
 

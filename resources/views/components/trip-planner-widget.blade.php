@@ -61,12 +61,56 @@
         transition: transform 0.5s cubic-bezier(0.45, 0.05, 0.55, 0.95), opacity 0.4s ease 0.08s, border-radius 0.45s ease;
     }
     /* Khi xem kết quả: ẩn cột hồ sơ trống, timeline full-width */
+    .tp-container.tp-mode-result {
+        width: min(98vw, 1480px);
+        height: min(96vh, 920px);
+        max-width: 1480px;
+        max-height: 920px;
+        border-radius: 6px;
+    }
     .tp-container.tp-mode-result .tp-right {
         display: none;
     }
     .tp-container.tp-mode-result .tp-progress,
     .tp-container.tp-mode-result .tp-footer {
         display: none !important;
+    }
+    .tp-container.tp-mode-result .tp-wizard-body,
+    .tp-container.tp-mode-result .tp-loading-panel {
+        display: none !important;
+    }
+    .tp-container.tp-mode-result .tp-left {
+        min-height: 0;
+        overflow: hidden;
+    }
+    .tp-container.tp-mode-result .tp-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 30;
+        padding: 14px 16px;
+        background: transparent;
+        border-bottom: 0;
+        pointer-events: none;
+    }
+    .tp-container.tp-mode-result .tp-header-left { display: none; }
+    .tp-container.tp-mode-result .tp-close-btn {
+        pointer-events: auto;
+        margin-left: auto;
+        width: 38px;
+        height: 38px;
+        border: 0;
+        border-radius: 50%;
+        color: #2a2118;
+        background: rgba(255, 251, 245, 0.94);
+        box-shadow: 0 10px 28px rgba(42, 33, 24, 0.18);
+    }
+    .tp-container.tp-mode-result .tp-close-btn:hover {
+        background: #fff;
+        color: #9a3412;
+        border-color: transparent;
+        transform: scale(1.04);
     }
     .tp-container.tp-mode-loading .tp-right {
         opacity: 0.55;
@@ -90,6 +134,8 @@
         display: flex;
         flex-direction: column;
         min-width: 0;
+        min-height: 0;
+        overflow: hidden;
     }
 
     /* ─── Header ─── */
@@ -563,215 +609,473 @@
     }
 
     /* ═══════════════════════════════════════════════════
-       RESULT TIMELINE
+       RESULT: split journey + route map
        ═══════════════════════════════════════════════════ */
     .tp-result-panel {
         display: none;
         flex-direction: column;
         flex: 1;
         overflow: hidden;
-        background: #fbfcfe;
+        background: #f3efe7;
+        min-height: 0;
     }
     .tp-result-panel.active { display: flex; }
-    .tp-result-header {
-        padding: 22px 32px 18px;
-        border-bottom: 1px solid #eef2f7;
-        flex-shrink: 0;
-        background: #fff;
-    }
-    .tp-result-title {
-        font-size: 1.15rem;
-        font-weight: 600;
-        color: #0f2744;
-        margin-bottom: 8px;
-        letter-spacing: -0.02em;
-        line-height: 1.35;
-    }
-    .tp-result-summary {
-        font-size: 0.88rem;
-        color: #64748b;
-        line-height: 1.55;
-        font-weight: 400;
-        max-width: 52rem;
-    }
-    .tp-result-body {
+    .tp-result-stage {
+        display: grid;
+        grid-template-columns: minmax(340px, 42%) 1fr;
         flex: 1;
-        overflow-y: auto;
-        padding: 22px 32px 28px;
+        min-height: 0;
+        overflow: hidden;
     }
-    .tp-result-body::-webkit-scrollbar { width: 6px; }
-    .tp-result-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
-
-    .tp-day-section { margin-bottom: 28px; }
-    .tp-day-section:last-child { margin-bottom: 8px; }
-    .tp-day-title {
-        font-size: 0.92rem;
-        font-weight: 600;
-        color: #1e3a5f;
-        margin-bottom: 14px;
+    .tp-result-stage:has(.tp-route-pane.hidden) {
+        grid-template-columns: 1fr;
+    }
+    .tp-journey {
         display: flex;
-        align-items: center;
-        gap: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #e8ecf2;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #f3efe7;
+        border-right: 1px solid #e4ddd2;
     }
-    .tp-day-badge {
-        background: #1e3a5f;
+    .tp-result-hero {
+        position: relative;
+        min-height: 210px;
+        flex-shrink: 0;
+        overflow: hidden;
+        background: #1b2433 center/cover no-repeat;
+    }
+    .tp-result-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(16,24,38,.18) 0%, rgba(16,24,38,.78) 100%);
+    }
+    .tp-result-hero-copy {
+        position: relative;
+        z-index: 1;
+        padding: 28px 24px 20px;
         color: #fff;
+        min-height: 210px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    .tp-result-kicker {
         font-size: 0.68rem;
         font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 6px;
-        letter-spacing: 0.4px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,.72);
+        margin-bottom: 8px;
     }
-    .tp-slot {
-        display: flex;
-        gap: 14px;
-        margin-bottom: 12px;
-        padding: 14px 16px;
-        border-radius: 8px;
-        background: #ffffff;
-        border: 1px solid #e8eef5;
-        box-shadow: 0 1px 2px rgba(15, 39, 68, 0.03);
-        transition: all 0.15s;
-        animation: tpFadeIn 0.3s ease forwards;
+    .tp-result-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 8px;
+        letter-spacing: -0.03em;
+        line-height: 1.25;
+        text-wrap: balance;
     }
-    .tp-slot:hover {
-        background: #f8fbff;
-        border-color: #c5d7ea;
-        box-shadow: 0 4px 12px rgba(15, 39, 68, 0.05);
-    }
-    .tp-slot-time {
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: #1e3a5f;
-        min-width: 7.2rem;
-        padding-top: 2px;
-        flex-shrink: 0;
-        letter-spacing: -0.01em;
-        line-height: 1.35;
-    }
-    .tp-slot-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        margin-top: 5px;
-        flex-shrink: 0;
-        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.06);
-    }
-    .tp-slot-dot.visit { background: #94a3b8; }
-    .tp-slot-dot.food { background: #f59e0b; }
-    .tp-slot-dot.transport { background: #22c55e; }
-    .tp-slot-dot.rest { background: #8b5cf6; }
-    .tp-slot-dot.photo { background: #ec4899; }
-    .tp-slot-content { flex: 1; min-width: 0; }
-    .tp-slot-activity {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #334155;
-        line-height: 1.55;
-    }
-    .tp-slot-location {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 0.8rem;
-        color: #0369a1;
-        margin-top: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        text-decoration: underline;
-        text-underline-offset: 2px;
-    }
-    .tp-slot-location:hover { color: #0284c7; }
-    .tp-slot-tip {
-        font-size: 0.78rem;
-        color: #94a3b8;
-        margin-top: 8px;
-        font-style: italic;
+    .tp-result-summary {
+        font-size: 0.82rem;
+        color: rgba(255,255,255,.82);
+        line-height: 1.5;
         font-weight: 400;
-        line-height: 1.45;
+        max-width: 40rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
-    .tp-slot-distance {
+    .tp-result-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 14px;
+    }
+    .tp-result-stats:empty { display: none; }
+    .tp-stat {
+        background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.16);
+        border-radius: 999px;
+        padding: 5px 10px;
+        color: #fff;
         font-size: 0.72rem;
-        color: #64748b;
-        margin-top: 6px;
-        font-weight: 500;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        font-variant-numeric: tabular-nums;
     }
+
+    .tp-result-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        padding: 8px 8px 18px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tp-result-body::-webkit-scrollbar { width: 5px; }
+    .tp-result-body::-webkit-scrollbar-thumb { background: #d4cbbd; border-radius: 6px; }
+
+    .tp-day-section { padding: 12px 18px 4px; }
+    .tp-day-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #5c4f3e;
+        margin: 4px 0 4px 70px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+    .tp-day-badge { display: none; }
+
+    .tp-rail {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .tp-rail::before {
+        content: '';
+        position: absolute;
+        left: 62px;
+        top: 18px;
+        bottom: 18px;
+        width: 1px;
+        background: #d7cfc3;
+    }
+    .tp-stop {
+        position: relative;
+        display: grid;
+        grid-template-columns: 62px 108px 1fr;
+        gap: 12px;
+        padding: 10px 18px 10px 8px;
+        cursor: pointer;
+        transition: background 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .tp-stop:hover { background: rgba(255,255,255,.45); }
+    .tp-stop.is-active { background: #fff; }
+    .tp-stop-index {
+        margin: 6px 0 0;
+        padding-right: 10px;
+        background: transparent;
+        color: #b45309;
+        font-size: 0.68rem;
+        font-weight: 700;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: flex-start;
+        gap: 2px;
+        position: relative;
+        z-index: 1;
+        box-shadow: none;
+        border-radius: 0;
+        width: auto;
+        height: auto;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.01em;
+        line-height: 1.2;
+        text-align: right;
+        white-space: nowrap;
+    }
+    .tp-stop-index-end {
+        color: #8a7d6e;
+        font-size: 0.62rem;
+        font-weight: 600;
+    }
+    .tp-stop.is-active .tp-stop-index { background: transparent; color: #9a3412; }
+    .tp-stop-photo {
+        width: 108px;
+        height: 86px;
+        border-radius: 4px;
+        object-fit: cover;
+        background: #d8cfc2;
+        display: block;
+    }
+    .tp-stop-photo.placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7a6a58;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    .tp-stop-copy { min-width: 0; padding-top: 4px; }
+    .tp-stop-time { display: none; }
+    .tp-stop-name {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1d1914;
+        letter-spacing: -0.02em;
+        line-height: 1.3;
+        margin: 2px 0 4px;
+    }
+    .tp-stop-activity {
+        font-size: 0.78rem;
+        color: #6b6258;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .tp-stop-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 6px;
+        font-size: 0.7rem;
+        color: #8a7d6e;
+        font-weight: 600;
+    }
+    .tp-stop-link {
+        color: #1e3a5f;
+        text-decoration: none;
+        font-weight: 700;
+    }
+    .tp-stop-link:hover { text-decoration: underline; }
 
     .tp-tips-section {
-        background: #fff;
-        border: 1px solid #e8eef5;
-        border-radius: 8px;
-        padding: 16px 18px;
-        margin-top: 8px;
+        margin: 8px 18px 0;
+        padding: 12px 0 0;
+        border-top: 1px solid #e4ddd2;
     }
-    .tp-tips-title { font-size: 0.82rem; font-weight: 600; color: #1e3a5f; margin-bottom: 10px; }
+    .tp-tips-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #5c4f3e;
+        margin-bottom: 8px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
     .tp-tips-list { list-style: none; padding: 0; margin: 0; }
     .tp-tips-list li {
-        font-size: 0.82rem;
-        color: #64748b;
-        padding: 6px 0 6px 14px;
+        font-size: 0.78rem;
+        color: #6b6258;
+        padding: 4px 0;
+        line-height: 1.45;
+    }
+
+    .tp-route-pane {
         position: relative;
-        font-weight: 400;
+        min-width: 0;
+        min-height: 0;
+        background: #d7e0ea;
+        overflow: hidden;
+    }
+    .tp-route-pane.hidden { display: none; }
+    #tp-route-map, #tp-mini-map {
+        width: 100%;
+        height: 100%;
+    }
+    .tp-route-tools {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        z-index: 400;
+        pointer-events: none;
+    }
+    .tp-mini-map-btn {
+        pointer-events: auto;
+        display: inline-flex;
+        align-items: center;
+        border: 0;
+        border-radius: 8px;
+        background: #fff;
+        color: #1a1a1a;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 9px 14px;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
+        transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .tp-mini-map-btn:hover { background: #f4f4f5; }
+    .tp-mini-map-btn:active { transform: scale(0.98); }
+
+    .tp-map-num { background: none !important; border: none !important; }
+    .tp-pin-num {
+        position: absolute;
+        top: -7px;
+        right: -9px;
+        z-index: 2;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 4px;
+        border-radius: 999px;
+        background: #101826;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 16px;
+        text-align: center;
+        border: 1.5px solid #fff;
+        box-sizing: border-box;
+    }
+    #tp-route-map .custom-map-pin {
+        position: relative;
+        width: 26px;
+        height: 35px;
+    }
+    #tp-route-map .custom-map-pin svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 26px;
+        height: 35px;
+    }
+    #tp-route-map .pin-icon-img {
+        position: absolute !important;
+        top: 3px !important;
+        left: 3px !important;
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
+        object-fit: cover !important;
+        border-radius: 50% !important;
+    }
+    #tp-route-map .custom-pin-tooltip {
+        position: absolute;
+        top: 16px;
+        left: calc(100% - 2px);
+        transform: translate(0, -50%);
+        background: linear-gradient(to right, color-mix(in srgb, var(--tip-color) 40%, black), var(--tip-color));
+        color: #fff;
+        padding: 4px 11px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 10001;
+    }
+    #tp-route-map .custom-map-pin:hover .custom-pin-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(6px, -50%);
+    }
+    #tp-route-map .tp-stop-pin.is-active .tp-pin-num { background: #b45309; }
+    #tp-route-map .leaflet-popup-content-wrapper {
+        border-radius: 4px;
+        box-shadow: none;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    #tp-route-map .leaflet-popup-content {
+        font-family: inherit;
+        margin: 0;
+        width: 260px !important;
+    }
+    #tp-route-map .leaflet-popup-tip-container { display: none; }
+    #tp-route-map .poi-popup-inner {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+    #tp-route-map .poi-thumbnail {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        background: #f1f5f9;
+        display: block;
+    }
+    #tp-route-map .poi-content { padding: 16px; }
+    #tp-route-map .poi-title {
+        font-weight: 700;
+        font-size: 17px;
+        color: #1a1a1a;
+        margin-bottom: 6px;
+    }
+    #tp-route-map .poi-desc {
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 16px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
         line-height: 1.5;
     }
-    .tp-tips-list li::before { content: '·'; position: absolute; left: 0; font-weight: 700; color: #94a3b8; }
-
-    .tp-cost-badge {
-        margin-top: 14px;
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
-        border-radius: 8px;
-        padding: 12px 16px;
-        display: flex;
+    #tp-route-map .poi-btn-360 {
+        display: inline-flex;
         align-items: center;
-        gap: 12px;
+        justify-content: center;
+        background: transparent;
+        color: var(--poi-color, #1e3a5f) !important;
+        padding: 6px 20px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none !important;
+        border: 2px solid var(--poi-color, #1e3a5f);
+        width: 100%;
+        box-sizing: border-box;
     }
-    .tp-cost-label { font-size: 0.8rem; color: #3b5980; font-weight: 500; }
-    .tp-cost-value { font-size: 0.9rem; color: #166534; font-weight: 600; margin-left: auto; }
 
     .tp-result-footer {
-        padding: 14px 32px 18px;
-        border-top: 1px solid #eef2f7;
+        padding: 12px 16px 16px;
+        border-top: 1px solid rgba(90, 72, 55, 0.1);
         display: flex;
-        gap: 12px;
+        align-items: center;
+        gap: 10px 16px;
         flex-shrink: 0;
         flex-wrap: wrap;
-        background: #fff;
+        background: #f6f1e8;
+    }
+    .tp-result-footer-side {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: auto;
     }
     .tp-btn-new {
-        flex: 1;
-        min-width: 110px;
-        padding: 11px 14px;
-        border-radius: 8px;
-        background: #f8fafc;
-        color: #475569;
-        font-size: 0.82rem;
-        font-weight: 500;
-        border: 1px solid #e2e8f0;
+        background: transparent;
+        color: #6b5d4f;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border: 0;
+        border-radius: 999px;
+        padding: 8px 12px;
         cursor: pointer;
-        transition: all 0.15s;
         font-family: inherit;
+        transition: color 0.2s ease, background 0.2s ease;
     }
-    .tp-btn-new:hover { background: #e2e8f0; color: #1e3a5f; }
+    .tp-btn-new:hover { background: rgba(42, 33, 24, 0.06); color: #2a2118; }
     .tp-btn-save {
-        flex: 1.5;
-        min-width: 140px;
-        padding: 11px 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 168px;
+        padding: 12px 18px;
         border-radius: 8px;
         background: #1e3a5f;
         color: #fff;
         font-size: 0.82rem;
-        font-weight: 600;
+        font-weight: 650;
+        letter-spacing: -0.01em;
         border: none;
         cursor: pointer;
-        transition: all 0.15s;
         font-family: inherit;
+        box-shadow: none;
+        transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), background 0.2s ease;
     }
     .tp-btn-save:hover { background: #2b4c7e; }
-    .tp-btn-save:disabled { opacity: 0.55; cursor: not-allowed; }
-    .tp-btn-save.saved { background: #166534; }
+    .tp-btn-save:active { transform: scale(0.98); }
+    .tp-btn-save:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+    .tp-btn-save.saved { background: #166534; box-shadow: none; }
 
     .tp-raw-result {
         white-space: pre-wrap;
@@ -791,9 +1095,16 @@
             height: min(92vh, 700px);
         }
         .tp-right { width: 240px; }
-        .tp-result-header,
-        .tp-result-body,
-        .tp-result-footer { padding-left: 22px; padding-right: 22px; }
+        .tp-container.tp-mode-result .tp-result-stage {
+            display: flex;
+            flex-direction: column;
+        }
+        .tp-container.tp-mode-result .tp-route-pane {
+            order: -1;
+            flex: 0 0 38vh;
+            min-height: 220px;
+        }
+        .tp-journey { border-right: 0; flex: 1; min-height: 0; }
     }
     @media (max-width: 768px) {
         .tp-container {
@@ -811,12 +1122,23 @@
         .tp-profile-item { padding: 4px 0; border-bottom: none; flex: 0 0 auto; gap: 5px; }
         .tp-generate-cta { padding: 10px 16px; }
         .tp-card-grid.cols-4, .tp-card-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
-        .tp-slot { flex-wrap: wrap; }
-        .tp-slot-time { min-width: 100%; margin-bottom: 2px; }
         .tp-header { padding: 14px 18px; }
-        .tp-result-header { padding: 16px 18px; }
-        .tp-result-body { padding: 16px 18px 22px; }
-        .tp-result-footer { padding: 12px 18px 16px; }
+        .tp-container.tp-mode-result {
+            width: 100vw;
+            height: 100dvh;
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 0;
+        }
+        .tp-stop { grid-template-columns: 52px 84px 1fr; padding-right: 10px; }
+        .tp-stop-index { margin-left: 0; padding-right: 8px; font-size: 0.62rem; }
+        .tp-rail::before { left: 52px; }
+        .tp-day-title { margin-left: 60px; }
+        .tp-result-title { font-size: 1.12rem; }
+        .tp-result-hero, .tp-result-hero-copy { min-height: 170px; }
+        .tp-result-footer { padding: 12px 14px 14px; }
+        .tp-result-footer-side { width: 100%; margin-left: 0; justify-content: space-between; }
+        .tp-btn-save { width: 100%; }
     }
     @media (max-width: 480px) {
         .tp-card-grid.cols-2 { grid-template-columns: 1fr; }
@@ -854,15 +1176,31 @@
             </div>
 
             <div class="tp-result-panel" id="tp-result-panel">
-                <div class="tp-result-header">
-                    <div class="tp-result-title" id="tp-result-title"></div>
-                    <div class="tp-result-summary" id="tp-result-summary"></div>
-                </div>
-                <div class="tp-result-body" id="tp-result-body"></div>
-                <div class="tp-result-footer">
-                    <button class="tp-btn-save" id="tp-btn-save" type="button">Lưu vào trang cá nhân</button>
-                    <button class="tp-btn-new" id="tp-btn-restart">Lên lịch mới</button>
-                    <button class="tp-btn-new" id="tp-btn-close-result">Đóng</button>
+                <div class="tp-result-stage">
+                    <div class="tp-journey">
+                        <div class="tp-result-hero" id="tp-result-hero">
+                            <div class="tp-result-hero-copy">
+                                <div class="tp-result-kicker" id="tp-result-kicker">Hành trình</div>
+                                <div class="tp-result-title" id="tp-result-title"></div>
+                                <div class="tp-result-summary" id="tp-result-summary"></div>
+                                <div class="tp-result-stats" id="tp-result-stats"></div>
+                            </div>
+                        </div>
+                        <div class="tp-result-body" id="tp-result-body"></div>
+                        <div class="tp-result-footer">
+                            <button class="tp-btn-save" id="tp-btn-save" type="button">Lưu hành trình</button>
+                            <div class="tp-result-footer-side">
+                                <button class="tp-btn-new" id="tp-btn-restart" type="button">Lên lịch mới</button>
+                                <button class="tp-btn-new" id="tp-btn-close-result" type="button">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tp-route-pane" id="tp-route-pane">
+                        <div id="tp-route-map"></div>
+                        <div class="tp-route-tools">
+                            <button type="button" class="tp-mini-map-btn" id="tp-btn-show-route">Google Maps</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -918,6 +1256,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let aiDone = false;
     let currentItinerary = null;
     let lastAnswersPayload = [];
+    let tpMiniMap = null;
+    let tpRouteMarkers = [];
     const IS_AUTHENTICATED = @json(auth()->check());
     const CURRENT_USER_ID = @json(auth()->id());
     const LOGIN_URL = @json(route('login'));
@@ -926,6 +1266,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bản nháp chỉ giữ trong tab hiện tại + theo user — không dùng chung localStorage mãi
     const TP_DRAFT_KEY = 'nb_trip_draft_' + (CURRENT_USER_ID ? ('u' + CURRENT_USER_ID) : 'guest');
     const TP_LEGACY_KEYS = ['nb_saved_itinerary', 'nb_trip_draft_guest'];
+    const TP_BOUNDARY_URL = @json(asset('geo/ha-nam-old.geojson'));
 
     function clearTripDraftStorage() {
         try {
@@ -1014,9 +1355,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingMsg = document.getElementById('tp-loading-msg');
     const loadingBarFill = document.getElementById('tp-loading-bar-fill');
     const resultPanel = document.getElementById('tp-result-panel');
+    const resultHero = document.getElementById('tp-result-hero');
+    const resultKicker = document.getElementById('tp-result-kicker');
     const resultTitle = document.getElementById('tp-result-title');
     const resultSummary = document.getElementById('tp-result-summary');
+    const resultStats = document.getElementById('tp-result-stats');
     const resultBody = document.getElementById('tp-result-body');
+    const routePane = document.getElementById('tp-route-pane');
+    const showRouteBtn = document.getElementById('tp-btn-show-route');
     const restartBtn = document.getElementById('tp-btn-restart');
     const closeResultBtn = document.getElementById('tp-btn-close-result');
     const saveBtn = document.getElementById('tp-btn-save');
@@ -1028,44 +1374,49 @@ document.addEventListener('DOMContentLoaded', function() {
         tpContainer.classList.add(mode === 'result' ? 'tp-mode-result' : (mode === 'loading' ? 'tp-mode-loading' : 'tp-mode-wizard'));
     }
 
-    window.openTripPlanner = function(forceNew = false) {
-        console.log('openTripPlanner triggered');
+    function showPlannerOverlay() {
+        clearTripRouteOnMainMap();
+        setMainMapPoisVisible(true);
         const el = document.getElementById('trip-planner-overlay');
         const container = el ? el.querySelector('.tp-container') : null;
         const btn = document.getElementById('randomFlyBtn');
 
-        if (el) {
-            el.style.display = 'flex';
-            el.classList.add('active');
-            el.classList.remove('minimizing');
+        if (!el) return;
 
-            // Mở bung ra từ nút dock (ngược hiệu ứng thu)
-            if (container && btn) {
-                const bRect = btn.getBoundingClientRect();
-                el.classList.add('visible');
-                void container.offsetWidth;
-                const cRect = container.getBoundingClientRect();
-                const dx = (bRect.left + bRect.width / 2) - (cRect.left + cRect.width / 2);
-                const dy = (bRect.top + bRect.height / 2) - (cRect.top + cRect.height / 2);
-                const scale = Math.max(0.04, Math.min(bRect.width / cRect.width, bRect.height / cRect.height) * 0.95);
+        el.style.display = 'flex';
+        el.classList.add('active');
+        el.classList.remove('minimizing');
 
-                container.style.transition = 'none';
-                container.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
-                container.style.opacity = '0.35';
-                container.style.borderRadius = '8px';
-                void container.offsetWidth;
+        if (container && btn) {
+            const bRect = btn.getBoundingClientRect();
+            el.classList.add('visible');
+            void container.offsetWidth;
+            const cRect = container.getBoundingClientRect();
+            const dx = (bRect.left + bRect.width / 2) - (cRect.left + cRect.width / 2);
+            const dy = (bRect.top + bRect.height / 2) - (cRect.top + cRect.height / 2);
+            const scale = Math.max(0.04, Math.min(bRect.width / cRect.width, bRect.height / cRect.height) * 0.95);
 
-                requestAnimationFrame(() => {
-                    container.style.transition = '';
-                    container.style.transform = 'translate(0px, 0px) scale(1)';
-                    container.style.opacity = '1';
-                    container.style.borderRadius = '';
-                    setTimeout(() => resetContainerStyles(container), 420);
-                });
-            } else {
-                setTimeout(() => el.classList.add('visible'), 20);
-            }
+            container.style.transition = 'none';
+            container.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+            container.style.opacity = '0.35';
+            container.style.borderRadius = '8px';
+            void container.offsetWidth;
+
+            requestAnimationFrame(() => {
+                container.style.transition = '';
+                container.style.transform = 'translate(0px, 0px) scale(1)';
+                container.style.opacity = '1';
+                container.style.borderRadius = '';
+                setTimeout(() => resetContainerStyles(container), 420);
+            });
+        } else {
+            setTimeout(() => el.classList.add('visible'), 20);
         }
+    }
+
+    window.openTripPlanner = function(forceNew = false) {
+        console.log('openTripPlanner triggered');
+        showPlannerOverlay();
 
         if (!forceNew) {
             const saved = loadTripDraft();
@@ -1082,6 +1433,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         resetState();
         renderTripTypeStep();
+    };
+
+    window.openTripPlannerItinerary = function(data) {
+        if (!data || !(data.days || data.title)) return;
+        showPlannerOverlay();
+        wizardBody.style.display = 'none';
+        if (footer) footer.style.display = 'none';
+        loadingPanel.classList.remove('active');
+        renderItinerary(data, false);
     };
 
     function resetContainerStyles(container) {
@@ -1206,6 +1566,9 @@ document.addEventListener('DOMContentLoaded', function() {
         aiDone = false;
         currentItinerary = null;
         lastAnswersPayload = [];
+        destroyTripMiniMap();
+        clearTripRouteOnMainMap();
+        setMainMapPoisVisible(true);
         activeSteps = [];
         wizardBody.style.display = '';
         footer.style.display = '';
@@ -1213,9 +1576,14 @@ document.addEventListener('DOMContentLoaded', function() {
         resultPanel.classList.remove('active');
         setPlannerMode('wizard');
         generateBtn.disabled = true;
+        const heading = document.querySelector('#trip-planner-overlay .tp-header-title');
+        const subtitle = document.querySelector('#trip-planner-overlay .tp-header-subtitle');
+        if (heading) heading.textContent = 'Lên lịch trình';
+        if (subtitle) subtitle.textContent = 'Chọn vài bước — AI sinh lịch trình';
+        if (resultHero) resultHero.style.backgroundImage = '';
         if (saveBtn) {
             saveBtn.disabled = false;
-            saveBtn.textContent = 'Lưu vào trang cá nhân';
+            saveBtn.textContent = 'Lưu hành trình';
             saveBtn.classList.remove('saved');
         }
         nextBtn.classList.remove('visible');
@@ -2349,11 +2717,420 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function tpEsc(str) {
+        return String(str ?? '').replace(/[&<>"']/g, s => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[s]));
+    }
+
+    function lookupMapPlace(id, name) {
+        if (typeof locations === 'undefined' || !Array.isArray(locations)) return null;
+        const nid = String(id || '');
+        const nname = String(name || '').trim().toLowerCase();
+        return locations.find(l => String(l.id) === nid)
+            || (nname ? locations.find(l => String(l.name || '').toLowerCase() === nname) : null)
+            || null;
+    }
+
+    function haversineKm(a, b) {
+        const R = 6371;
+        const dLat = (b.lat - a.lat) * Math.PI / 180;
+        const dLng = (b.lng - a.lng) * Math.PI / 180;
+        const x = Math.sin(dLat / 2) ** 2
+            + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+    }
+
+    function enrichItineraryPlaces(data) {
+        let prev = null;
+        let stops = 0;
+        let meals = 0;
+        let distance = 0;
+        const seen = {};
+        (data.days || []).forEach(day => {
+            (day.slots || []).forEach(slot => {
+                if ((slot.type || '') === 'food') meals += 1;
+                const hit = lookupMapPlace(slot.place?.id || slot.location_id, slot.place?.name || slot.location);
+                if (hit) {
+                    const lat = hit.lat ? parseFloat(hit.lat) : null;
+                    const lng = hit.lng ? parseFloat(hit.lng) : null;
+                    slot.location_id = hit.id;
+                    slot.location = hit.name;
+                    slot.place = Object.assign({}, slot.place || {}, {
+                        id: hit.id,
+                        name: hit.name,
+                        slug: hit.slug,
+                        lat,
+                        lng,
+                        address: hit.address || (slot.place && slot.place.address) || '',
+                        image: hit.thumbnail_url || (slot.place && slot.place.image) || null,
+                        rating: hit.average_rating || (slot.place && slot.place.rating) || null,
+                        url: hit.slug ? ('/locations/' + hit.slug + '/360') : (slot.place && slot.place.url) || null,
+                        category: (hit.category && hit.category.name) || (slot.place && slot.place.category) || null,
+                    });
+                    if (prev && prev.lat && prev.lng && lat && lng) {
+                        const km = haversineKm(prev, { lat, lng });
+                        if (km >= 0.1) {
+                            slot.distance_from_prev_km = Math.round(km * 10) / 10;
+                            distance += slot.distance_from_prev_km;
+                        }
+                    }
+                    if (lat && lng) prev = { lat, lng };
+                    if (hit.id && !seen[hit.id]) {
+                        seen[hit.id] = true;
+                        stops += 1;
+                    }
+                } else if (slot.distance_from_prev_km) {
+                    distance += Number(slot.distance_from_prev_km) || 0;
+                    if (slot.location_id && !seen[slot.location_id]) {
+                        seen[slot.location_id] = true;
+                        stops += 1;
+                    }
+                }
+            });
+        });
+        data.stats = Object.assign({}, data.stats || {}, {
+            days: data.stats?.days || (data.days || []).length,
+            stops: data.stats?.stops || stops,
+            meals: data.stats?.meals || meals,
+            distance_km: data.stats?.distance_km || Math.round(distance * 10) / 10,
+            budget: data.stats?.budget || data.estimated_cost || null,
+        });
+        if (!data.stats.stops) data.stats.stops = stops;
+        if (!data.stats.distance_km) data.stats.distance_km = Math.round(distance * 10) / 10;
+        return data;
+    }
+
+    function collectTripPoints(data) {
+        const pts = [];
+        (data.days || []).forEach(day => {
+            (day.slots || []).forEach(slot => {
+                const hit = lookupMapPlace(slot.place?.id || slot.location_id, slot.place?.name || slot.location);
+                const p = slot.place || {};
+                const lat = parseFloat(p.lat || hit?.lat);
+                const lng = parseFloat(p.lng || hit?.lng);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+                pts.push({
+                    lat,
+                    lng,
+                    name: (hit && hit.name) || p.name || slot.location || '',
+                    id: (hit && hit.id) || p.id || slot.location_id,
+                    loc: hit || null,
+                    place: p,
+                });
+            });
+        });
+        return pts;
+    }
+
+    function firstHeroImage(data) {
+        for (const day of (data.days || [])) {
+            for (const slot of (day.slots || [])) {
+                if (slot.place && slot.place.image) return slot.place.image;
+            }
+        }
+        return '';
+    }
+
+    function destroyTripMiniMap() {
+        if (tpMiniMap) {
+            try { tpMiniMap.remove(); } catch (e) {}
+            tpMiniMap = null;
+        }
+        tpRouteMarkers = [];
+    }
+
+    function setMainMapPoisVisible(visible) {
+        try {
+            if (typeof map === 'undefined') return;
+            const cluster = window.mapPoiCluster;
+            if (!cluster) return;
+            if (visible) {
+                if (!map.hasLayer(cluster)) map.addLayer(cluster);
+            } else if (map.hasLayer(cluster)) {
+                map.removeLayer(cluster);
+            }
+        } catch (e) {}
+    }
+
+    function clearTripRouteOnMainMap() {
+        try {
+            if (typeof map !== 'undefined' && window._tpRouteGroup) {
+                map.removeLayer(window._tpRouteGroup);
+                window._tpRouteGroup = null;
+            }
+        } catch (e) {}
+    }
+
+    function tripPopupHtml(p) {
+        const loc = (p && p.loc) || {};
+        const place = (p && p.place) || {};
+        const name = loc.name || (p && p.name) || place.name || '';
+        const color = (loc.category && loc.category.icon_color) || '#ef4444';
+        const thumb = loc.thumbnail_url || place.image || '';
+        const desc = loc.short_description || '';
+        const slug = loc.slug || place.slug || '';
+        const url = place.url || (slug ? ('/locations/' + slug + '/360') : '');
+        const thumbUrl = thumb || 'https://placehold.co/400x250/e2e8f0/475569?text=No+Image';
+        let html = '<div class="poi-popup-inner" style="--poi-color: ' + color + ';">'
+            + '<img src="' + tpEsc(thumbUrl) + '" class="poi-thumbnail" alt="' + tpEsc(name) + '">'
+            + '<div class="poi-content">'
+            + '<div class="poi-title">' + tpEsc(name) + '</div>';
+        if (desc) html += '<div class="poi-desc">' + tpEsc(desc) + '</div>';
+        if (url) {
+            html += '<a href="' + tpEsc(url) + '" class="poi-btn-360" target="_blank" rel="noopener">Khám phá ngay</a>';
+        }
+        html += '</div></div>';
+        return html;
+    }
+
+    function tripPinIcon(locLike, opts) {
+        opts = opts || {};
+        const loc = locLike && locLike.loc ? locLike.loc : locLike;
+        const color = (loc && loc.category && loc.category.icon_color) ? loc.category.icon_color : '#ef4444';
+        const iconUrl = (loc && loc.category && loc.category.icon_url) ? loc.category.icon_url : '';
+        const name = (loc && loc.name) || locLike.name || '';
+        const num = opts.number
+            ? '<span class="tp-pin-num">' + opts.number + '</span>'
+            : '';
+        const cls = 'custom-map-pin tp-stop-pin' + (opts.active ? ' is-active' : '');
+        const img = iconUrl ? ('<img class="pin-icon-img" src="' + tpEsc(iconUrl) + '" alt="">') : '';
+        const html = '<div class="' + cls + '">'
+            + '<svg class="pin-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="26" height="35">'
+            + '<path fill="' + color + '" d="M172.3 501.7C27 291 0 269.4 0 192 0 86 86 0 192 0s192 86 192 192c0 77.4-27 99-172.3 309.7-9.5 13.8-29.9 13.8-39.5 0z"/>'
+            + '</svg>'
+            + img
+            + num
+            + '<div class="custom-pin-tooltip" style="--tip-color: ' + color + ';">' + tpEsc(name) + '</div>'
+            + '</div>';
+        return L.divIcon({
+            className: 'my-custom-marker',
+            html: html,
+            iconSize: [26, 35],
+            iconAnchor: [13, 35],
+            popupAnchor: [0, -35],
+        });
+    }
+
+    function tripRouteLatLngs(pts) {
+        const out = [];
+        pts.forEach(p => {
+            const last = out[out.length - 1];
+            if (last && last[0] === p.lat && last[1] === p.lng) return;
+            out.push([p.lat, p.lng]);
+        });
+        return out;
+    }
+
+    function tripRouteLineStyle() {
+        return {
+            color: '#1e3a5f',
+            weight: 3,
+            opacity: 0.88,
+            dashArray: '8 7',
+            lineCap: 'round',
+            lineJoin: 'round',
+        };
+    }
+
+    function ringsFromHaNamGeo(geo) {
+        const holes = [];
+        const g = geo && geo.type === 'Feature' ? geo.geometry : geo;
+        if (!g) return holes;
+        if (g.type === 'MultiPolygon') {
+            g.coordinates.forEach((polygon) => {
+                holes.push(polygon[0].map(([lng, lat]) => [lat, lng]));
+            });
+        } else if (g.type === 'Polygon') {
+            holes.push(g.coordinates[0].map(([lng, lat]) => [lat, lng]));
+        }
+        return holes;
+    }
+
+    function loadHaNamGeo() {
+        if (typeof haNamGeo !== 'undefined' && haNamGeo) {
+            return Promise.resolve(haNamGeo);
+        }
+        if (window._tpHaNamGeo) {
+            return Promise.resolve(window._tpHaNamGeo);
+        }
+        return fetch(TP_BOUNDARY_URL)
+            .then(res => res.json())
+            .then(geo => {
+                window._tpHaNamGeo = geo;
+                return geo;
+            })
+            .catch(() => null);
+    }
+
+    function paintHaNamOnTripMap(geo) {
+        if (!tpMiniMap || !geo) return null;
+        try {
+            if (!tpMiniMap.getPane('tpDimPane')) {
+                const pane = tpMiniMap.createPane('tpDimPane');
+                pane.style.zIndex = 350;
+            }
+            const world = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
+            const holes = ringsFromHaNamGeo(geo);
+            if (holes.length) {
+                L.polygon([world, ...holes], {
+                    pane: 'tpDimPane',
+                    fillColor: '#94a3b8',
+                    fillOpacity: 0.22,
+                    stroke: false,
+                    interactive: false,
+                }).addTo(tpMiniMap);
+            }
+            const border = L.geoJSON(geo, {
+                style: {
+                    color: '#7ba7d4',
+                    weight: 2,
+                    opacity: 0.55,
+                    fillColor: '#f8fafc',
+                    fillOpacity: 0.04,
+                },
+                interactive: false,
+            }).addTo(tpMiniMap);
+            const provinceBounds = border.getBounds();
+            tpMiniMap.setMaxBounds(provinceBounds.pad(0.5));
+            return provinceBounds;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function lockTripMinZoom(routeBounds) {
+        if (!tpMiniMap || !routeBounds || !routeBounds.isValid()) return;
+        tpMiniMap.fitBounds(routeBounds.pad(0.32), { maxZoom: 15, animate: false });
+        const z = tpMiniMap.getZoom();
+        if (Number.isFinite(z)) {
+            tpMiniMap.setMinZoom(z);
+        }
+    }
+
+    function renderTripMiniMap(data) {
+        destroyTripMiniMap();
+        const el = document.getElementById('tp-route-map');
+        if (!routePane || !el || typeof L === 'undefined') {
+            if (routePane) routePane.classList.add('hidden');
+            return;
+        }
+
+        const pts = collectTripPoints(data);
+        if (!pts.length) {
+            routePane.classList.add('hidden');
+            return;
+        }
+
+        routePane.classList.remove('hidden');
+        tpMiniMap = L.map(el, {
+            zoomControl: false,
+            attributionControl: false,
+            scrollWheelZoom: true,
+            maxBoundsViscosity: 0.8,
+            maxZoom: 20,
+        });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20,
+        }).addTo(tpMiniMap);
+        L.control.zoom({ position: 'topleft' }).addTo(tpMiniMap);
+
+        const latlngs = tripRouteLatLngs(pts);
+        if (latlngs.length > 1) {
+            L.polyline(latlngs, tripRouteLineStyle()).addTo(tpMiniMap);
+        }
+
+        pts.forEach((p, i) => {
+            const marker = L.marker([p.lat, p.lng], {
+                icon: tripPinIcon(p, { number: i + 1, active: i === 0 }),
+                keyboard: false,
+                zIndexOffset: 600,
+            });
+            marker.bindPopup(tripPopupHtml(p), {
+                minWidth: 260,
+                maxWidth: 260,
+                closeButton: false,
+                autoPanPadding: [28, 28],
+            });
+            marker.on('click', () => focusTripStop(i, false));
+            marker.addTo(tpMiniMap);
+            tpRouteMarkers.push(marker);
+        });
+
+        const routeBounds = L.latLngBounds(pts.map(p => [p.lat, p.lng]));
+        tpMiniMap.fitBounds(routeBounds.pad(0.32), { maxZoom: 15, animate: false });
+        loadHaNamGeo().then(geo => {
+            if (!tpMiniMap) return;
+            if (geo) paintHaNamOnTripMap(geo);
+            else tpMiniMap.setMaxBounds(routeBounds.pad(1.5));
+            setTimeout(() => {
+                if (!tpMiniMap) return;
+                tpMiniMap.invalidateSize();
+                lockTripMinZoom(routeBounds);
+            }, 180);
+        });
+    }
+
+    function focusTripStop(index, fly) {
+        document.querySelectorAll('.tp-stop').forEach((el, i) => {
+            el.classList.toggle('is-active', i === index);
+        });
+        const pts = collectTripPoints(currentItinerary || {});
+        const pt = pts[index];
+        if (!pt || !tpMiniMap) return;
+        tpRouteMarkers.forEach((m, i) => {
+            try { m.setIcon(tripPinIcon(pts[i], { number: i + 1, active: i === index })); } catch (e) {}
+        });
+        if (fly !== false) {
+            tpMiniMap.flyTo([pt.lat, pt.lng], Math.max(tpMiniMap.getZoom(), 15), { duration: 0.55 });
+        }
+        const marker = tpRouteMarkers[index];
+        if (marker) {
+            setTimeout(() => {
+                try { marker.openPopup(); } catch (e) {}
+            }, fly !== false ? 320 : 40);
+        }
+    }
+
+    function googleMapsTripUrl(pts) {
+        const unique = [];
+        pts.forEach(p => {
+            const last = unique[unique.length - 1];
+            if (last && last.lat === p.lat && last.lng === p.lng) return;
+            unique.push(p);
+        });
+        if (!unique.length) return '';
+        const coord = p => Number(p.lat).toFixed(6) + ',' + Number(p.lng).toFixed(6);
+        if (unique.length === 1) {
+            const p = unique[0];
+            const q = p.name ? (p.name + ' ' + coord(p)) : coord(p);
+            return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+        }
+        const origin = coord(unique[0]);
+        const destination = coord(unique[unique.length - 1]);
+        const mids = unique.slice(1, -1).slice(0, 8).map(coord).join('|');
+        let url = 'https://www.google.com/maps/dir/?api=1'
+            + '&origin=' + encodeURIComponent(origin)
+            + '&destination=' + encodeURIComponent(destination)
+            + '&travelmode=driving';
+        if (mids) url += '&waypoints=' + encodeURIComponent(mids);
+        return url;
+    }
+
+    function openTripInGoogleMaps() {
+        if (!currentItinerary) return;
+        const pts = collectTripPoints(currentItinerary);
+        const url = googleMapsTripUrl(pts);
+        if (!url) return;
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
     function renderItinerary(data, saveToStorage = true) {
+        data = enrichItineraryPlaces(data || {});
         currentItinerary = data;
         if (saveBtn) {
             saveBtn.disabled = false;
-            saveBtn.textContent = 'Lưu vào trang cá nhân';
+            saveBtn.textContent = 'Lưu hành trình';
             saveBtn.classList.remove('saved');
         }
         if (saveToStorage) {
@@ -2361,42 +3138,101 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         resultPanel.classList.add('active');
         setPlannerMode('result');
+
+        const heroImg = firstHeroImage(data);
+        if (resultHero) {
+            resultHero.style.backgroundImage = heroImg ? ('url(' + JSON.stringify(heroImg) + ')') : '';
+        }
+        if (resultKicker) resultKicker.textContent = (data.days && data.days.length > 1) ? (data.days.length + ' ngày') : 'Trong ngày';
         resultTitle.textContent = data.title || 'Lịch trình du lịch';
         resultSummary.textContent = data.summary || '';
+
+        const stats = data.stats || {};
+        const dayCount = stats.days || (data.days || []).length || 0;
+        const dist = stats.distance_km;
+        if (resultStats) {
+            const chips = [];
+            chips.push(`<span class="tp-stat">${tpEsc(dayCount)} ngày</span>`);
+            if (stats.stops) chips.push(`<span class="tp-stat">${tpEsc(stats.stops)} điểm dừng</span>`);
+            if (dist) chips.push(`<span class="tp-stat">${tpEsc(dist)} km</span>`);
+            if (stats.budget || data.estimated_cost) chips.push(`<span class="tp-stat">${tpEsc(stats.budget || data.estimated_cost)}</span>`);
+            resultStats.innerHTML = chips.join('');
+        }
+
+        const typeLabel = {
+            visit: 'Tham quan',
+            food: 'Ăn uống',
+            transport: 'Di chuyển',
+            rest: 'Nghỉ ngơi',
+            photo: 'Check-in',
+        };
+
         let html = '';
+        let stopIndex = 0;
         if (data.days && data.days.length > 0) {
             data.days.forEach(day => {
                 let dayTitle = String(day.title || '').trim()
                     .replace(new RegExp('^\\s*Ngày\\s*' + day.day + '\\s*[:\\-–]?\\s*', 'i'), '')
                     .replace(/^Ngày\s*\d+\s*[:\-–]?\s*/i, '')
                     .trim();
-                html += `<div class="tp-day-section"><div class="tp-day-title"><span class="tp-day-badge">NGÀY ${day.day}</span>${dayTitle || ''}</div>`;
+                html += `<section class="tp-day-section"><div class="tp-day-title">Ngày ${tpEsc(day.day)}${dayTitle ? ' · ' + tpEsc(dayTitle) : ''}</div><div class="tp-rail">`;
                 (day.slots || []).forEach(slot => {
                     const cls = slot.type || 'visit';
-                    const dist = slot.distance_from_prev_km
-                        ? `<div class="tp-slot-distance">↔ ${slot.distance_from_prev_km} km từ điểm trước</div>`
+                    const place = slot.place || {};
+                    const locName = place.name || slot.location || typeLabel[cls] || 'Chặng';
+                    const idx = stopIndex++;
+                    const thumb = place.image
+                        ? `<img class="tp-stop-photo" src="${tpEsc(place.image)}" alt="${tpEsc(locName)}" loading="lazy">`
+                        : `<div class="tp-stop-photo placeholder">${tpEsc(typeLabel[cls] || '')}</div>`;
+                    const meta = [];
+                    meta.push(typeLabel[cls] || 'Hoạt động');
+                    if (slot.distance_from_prev_km) meta.push(slot.distance_from_prev_km + ' km');
+                    if (place.rating) meta.push(place.rating + '/5');
+                    const detail = place.url
+                        ? `<a class="tp-stop-link" href="${tpEsc(place.url)}" target="_blank" rel="noopener" data-stop-link="1">Xem 360</a>`
                         : '';
-                    html += `<div class="tp-slot">
-                        <div class="tp-slot-time">${slot.time || ''}</div>
-                        <div class="tp-slot-dot ${cls}"></div>
-                        <div class="tp-slot-content">
-                            <div class="tp-slot-activity">${slot.activity || ''}</div>
-                            ${slot.location ? `<div class="tp-slot-location" ${slot.location_id ? `onclick="window.zoomFromTripPlanner('${slot.location_id}')" title="Xem trên bản đồ"` : ''}>${slot.location}</div>` : ''}
-                            ${dist}
-                            ${slot.tip ? `<div class="tp-slot-tip">${slot.tip}</div>` : ''}
+                    const timeParts = String(slot.time || '').trim().split(/\s*[-–—]\s*/).filter(Boolean);
+                    const timeHtml = timeParts.length
+                        ? `<span class="tp-stop-index-start">${tpEsc(timeParts[0])}</span>${timeParts[1] ? `<span class="tp-stop-index-end">${tpEsc(timeParts[1])}</span>` : ''}`
+                        : '<span class="tp-stop-index-start">—</span>';
+                    html += `<article class="tp-stop" data-stop-index="${idx}">
+                        <div class="tp-stop-index">${timeHtml}</div>
+                        ${thumb}
+                        <div class="tp-stop-copy">
+                            <div class="tp-stop-name">${tpEsc(locName)}</div>
+                            <div class="tp-stop-activity">${tpEsc(slot.activity || slot.tip || '')}</div>
+                            <div class="tp-stop-meta"><span>${tpEsc(meta.join(' · '))}</span>${detail}</div>
                         </div>
-                    </div>`;
+                    </article>`;
                 });
-                html += '</div>';
+                html += '</div></section>';
             });
         }
         if (data.tips && data.tips.length > 0) {
-            html += `<div class="tp-tips-section"><div class="tp-tips-title">Lưu ý</div><ul class="tp-tips-list">${data.tips.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
-        }
-        if (data.estimated_cost) {
-            html += `<div class="tp-cost-badge"><span class="tp-cost-label">Chi phí ước tính</span><span class="tp-cost-value">${data.estimated_cost}</span></div>`;
+            html += `<div class="tp-tips-section"><div class="tp-tips-title">Lưu ý</div><ul class="tp-tips-list">${data.tips.map(t => `<li>${tpEsc(t)}</li>`).join('')}</ul></div>`;
         }
         resultBody.innerHTML = html;
+
+        resultBody.querySelectorAll('.tp-stop').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('[data-stop-link]')) return;
+                const idx = parseInt(el.getAttribute('data-stop-index'), 10);
+                if (Number.isFinite(idx)) focusTripStop(idx, true);
+            });
+        });
+
+        renderTripMiniMap(data);
+        clearTripRouteOnMainMap();
+        setMainMapPoisVisible(true);
+        if (collectTripPoints(data).length) focusTripStop(0, false);
+        const subtitle = document.querySelector('#trip-planner-overlay .tp-header-subtitle');
+        if (subtitle) subtitle.textContent = 'Hành trình gắn với bản đồ và dữ liệu địa điểm';
+        const heading = document.querySelector('#trip-planner-overlay .tp-header-title');
+        if (heading) heading.textContent = 'Lịch trình';
+    }
+
+    if (showRouteBtn) {
+        showRouteBtn.addEventListener('click', openTripInGoogleMaps);
     }
 
     if (saveBtn) {
@@ -2425,7 +3261,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await res.json().catch(() => ({}));
                 if (res.status === 401 || data.need_login) {
                     saveBtn.disabled = false;
-                    saveBtn.textContent = 'Lưu vào trang cá nhân';
+                    saveBtn.textContent = 'Lưu hành trình';
                     if (confirm('Bạn cần đăng nhập để lưu. Đến trang đăng nhập?')) {
                         window.location.href = LOGIN_URL;
                     }
@@ -2433,7 +3269,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (!data.success) {
                     saveBtn.disabled = false;
-                    saveBtn.textContent = 'Lưu vào trang cá nhân';
+                    saveBtn.textContent = 'Lưu hành trình';
                     alert(data.error || 'Không lưu được lịch trình.');
                     return;
                 }
@@ -2446,7 +3282,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(() => {
                 saveBtn.disabled = false;
-                saveBtn.textContent = 'Lưu vào trang cá nhân';
+                saveBtn.textContent = 'Lưu hành trình';
                 alert('Không thể kết nối máy chủ.');
             });
         });
@@ -2478,6 +3314,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setPlannerMode('result');
         resultTitle.textContent = 'Lịch trình du lịch';
         resultSummary.textContent = '';
+        if (resultStats) resultStats.innerHTML = '';
         let f = strContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
         resultBody.innerHTML = `<div class="tp-raw-result">${f}</div>`;
     }
@@ -2486,14 +3323,30 @@ document.addEventListener('DOMContentLoaded', function() {
         currentItinerary = null;
         if (saveBtn) {
             saveBtn.disabled = true;
-            saveBtn.textContent = 'Lưu vào trang cá nhân';
+            saveBtn.textContent = 'Lưu hành trình';
         }
         resultPanel.classList.add('active');
         setPlannerMode('result');
         resultTitle.textContent = 'Không thể tạo lịch trình';
         resultSummary.textContent = msg;
+        if (resultStats) resultStats.innerHTML = '';
         resultBody.innerHTML = `<div style="text-align:center; padding:32px 16px; color:#a1a1aa; font-size:0.75rem;">
             <p>${msg}</p><p style="margin-top:6px; font-size:0.68rem;">Bấm "Lên lịch mới" để thử lại</p></div>`;
     }
+
+    (function bootSavedItineraryFromUrl() {
+        const id = new URLSearchParams(window.location.search).get('itinerary');
+        if (!id) return;
+        fetch('{{ url("/trip-planner") }}/' + encodeURIComponent(id), {
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.itinerary) {
+                window.openTripPlannerItinerary(data.itinerary);
+            }
+        })
+        .catch(() => {});
+    })();
 });
 </script>

@@ -3278,6 +3278,7 @@
         });
 
         map.addLayer(markers);
+        window.mapPoiCluster = markers;
 
         // --- Logic Tìm kiếm và Danh mục ---
         const searchInput = document.getElementById('map-search-input');
@@ -3946,30 +3947,62 @@
             step();
         }
 
+        let flyToSeq = 0;
+
+        function openLocationPopup(loc) {
+            if (!loc || !loc.marker) return;
+
+            const tryOpen = () => {
+                if (typeof markers !== 'undefined' && markers.getVisibleParent) {
+                    const parent = markers.getVisibleParent(loc.marker);
+                    if (parent && parent.getChildCount) {
+                        parent.spiderfy();
+                        setTimeout(() => {
+                            try { loc.marker.openPopup(); } catch (e) {}
+                        }, 200);
+                        return;
+                    }
+                }
+                try { loc.marker.openPopup(); } catch (e) {}
+            };
+
+            setTimeout(tryOpen, 80);
+        }
+
         // Helper function to fly to a location from the featured drawer
         function flyToLocation(id) {
             const loc = locations.find(l => l.id === id);
             if (!loc || !loc.marker) return;
 
-            if (featuredDrawer) featuredDrawer.classList.remove('open');
-            document.body.classList.remove('drawer-open');
+            const seq = ++flyToSeq;
+
+            // Giữ thanh Khám phá mở — chỉ đổi địa điểm / popup
+            map.closePopup();
+
+            const openIfCurrent = () => {
+                if (seq !== flyToSeq) return;
+                openLocationPopup(loc);
+            };
 
             // Zoom từng lớp cụm một y hệt như tìm kiếm
             stepZoomToMarker(loc, () => {
-                // Đưa marker ra chính giữa màn hình nhưng KHÔNG BAO GIỜ thu nhỏ lại
+                if (seq !== flyToSeq) return;
+
                 let targetZoom = Math.max(18, map.getZoom());
                 let dist = map.getCenter().distanceTo([loc.lat, loc.lng]);
+                const zoomDiff = Math.abs(map.getZoom() - targetZoom);
 
-                if (dist > 500) {
-                    map.flyTo([loc.lat, loc.lng], targetZoom, { duration: 1.2 });
+                if (dist > 80 || zoomDiff > 0.2) {
+                    map.flyTo([loc.lat, loc.lng], targetZoom, { duration: 1.1 });
+                    map.once('moveend', openIfCurrent);
+                    setTimeout(() => {
+                        if (seq !== flyToSeq) return;
+                        if (loc.marker && !loc.marker.isPopupOpen()) openLocationPopup(loc);
+                    }, 1600);
                 } else {
-                    map.setView([loc.lat, loc.lng], targetZoom, { animate: true, duration: 1.2 });
+                    map.setView([loc.lat, loc.lng], targetZoom, { animate: true });
+                    openIfCurrent();
                 }
-
-                // Đợi bay đến giữa rồi mới mở popup để tránh giật hình
-                setTimeout(() => {
-                    loc.marker.openPopup();
-                }, 800);
             });
         }
         // Cho phép cuộn ngang bằng con lăn chuột (mouse wheel)

@@ -41,4 +41,11 @@ return [
         'url' => env('VIENEU_TTS_URL', 'http://127.0.0.1:8001'),
     ],
 
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'api_keys' => env('GEMINI_API_KEYS'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
+        'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
+    ],
+
 ];

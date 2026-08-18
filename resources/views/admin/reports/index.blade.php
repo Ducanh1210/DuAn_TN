@@ -50,7 +50,14 @@
                         @endif
                     </td>
                     <td class="text-end pe-4">
-                        <a href="{{ route('admin.reports.feedbacks.show', $item->id) }}" class="btn-minimal py-1 px-2" style="font-size:0.75rem;">Chi tiết</a>
+                        <div class="d-inline-flex gap-1 align-items-center justify-content-end">
+                            <a href="{{ route('admin.reports.feedbacks.show', $item->id) }}" class="btn-minimal py-1 px-2" style="font-size:0.75rem;">Chi tiết</a>
+                            <form action="{{ route('admin.reports.feedbacks.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xóa góp ý này?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size:0.75rem;">Xóa</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -137,17 +144,20 @@
                             </form>
                         </td>
                         <td class="text-end pe-4">
-                            @if(($tab ?? 'locations') === 'comments')
-                                @if($report->reportable?->location_id)
-                                    <a href="{{ route('admin.locations.edit', $report->reportable->location_id) }}" class="btn-minimal py-1 px-2" style="font-size:0.75rem;">Chi tiết</a>
-                                @else
-                                    <span class="text-muted" style="font-size:0.75rem;">—</span>
+                            <div class="d-inline-flex gap-1 align-items-center justify-content-end">
+                                @if(($tab ?? 'locations') === 'comments')
+                                    @if($report->reportable?->location_id)
+                                        <a href="{{ route('admin.locations.edit', $report->reportable->location_id) }}" class="btn-minimal py-1 px-2" style="font-size:0.75rem;">Chi tiết</a>
+                                    @endif
+                                @elseif($report->reportable)
+                                    <a href="{{ route('admin.locations.edit', $report->reportable_id) }}" class="btn-minimal py-1 px-2" style="font-size:0.75rem;">Chi tiết</a>
                                 @endif
-                            @elseif($report->reportable)
-                                <a href="{{ route('admin.locations.edit', $report->reportable_id) }}" class="btn-minimal py-1 px-2" style="font-size:0.75rem;">Chi tiết</a>
-                            @else
-                                <span class="text-muted" style="font-size:0.75rem;">—</span>
-                            @endif
+                                <form action="{{ route('admin.reports.destroy', $report->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xóa báo cáo này khỏi danh sách?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size:0.75rem;">Xóa</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
