@@ -40,4 +40,12 @@ class Report extends Model
     {
         return $this->morphTo();
     }
+
+    /** Các biến thể class name từng bị lưu (có/không dấu \ đầu). */
+    public static function morphTypes(string $class): array
+    {
+        $normalized = ltrim($class, '\\');
+
+        return array_values(array_unique([$normalized, '\\' . $normalized]));
+    }
 }

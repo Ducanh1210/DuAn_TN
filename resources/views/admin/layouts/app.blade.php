@@ -508,8 +508,8 @@
                 $pendingSuggestions = \App\Models\LocationSuggestion::where('status', 'pending')->count();
                 $reportsOpen = request()->routeIs('admin.reports.*');
                 $reportTab = request('tab', 'locations');
-                $pendingReportLocations = \App\Models\Report::where('reportable_type', \App\Models\Location::class)->where('status', 'pending')->count();
-                $pendingReportComments = \App\Models\Report::where('reportable_type', \App\Models\Comment::class)->where('status', 'pending')->count();
+                $pendingReportLocations = \App\Models\Report::whereIn('reportable_type', \App\Models\Report::morphTypes(\App\Models\Location::class))->where('status', 'pending')->count();
+                $pendingReportComments = \App\Models\Report::whereIn('reportable_type', \App\Models\Report::morphTypes(\App\Models\Comment::class))->where('status', 'pending')->count();
                 $pendingFeedbacks = \App\Models\FeedbackReport::where('status', 'pending')->count();
                 $pendingReportsTotal = $pendingReportLocations + $pendingReportComments + $pendingFeedbacks;
             @endphp

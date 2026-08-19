@@ -502,9 +502,9 @@ class ProfileController extends Controller
             'avatar_photo' => 'nullable|string',
             'business_documents' => 'nullable|array',
             'verification_photo' => 'nullable|string',
-            'verification_photos' => 'nullable|array',
-            'verification_lat' => 'nullable|numeric',
-            'verification_lng' => 'nullable|numeric',
+            'verification_photos' => 'required|array|min:1',
+            'verification_lat' => 'required|numeric',
+            'verification_lng' => 'required|numeric',
             'verification_time' => 'nullable|string',
         ], [
             'business_name.required' => 'Vui lòng nhập tên doanh nghiệp.',
@@ -517,6 +517,10 @@ class ProfileController extends Controller
             'phone.required' => 'Vui lòng nhập số điện thoại liên hệ.',
             'lat.required' => 'Vui lòng chọn tọa độ bản đồ.',
             'lng.required' => 'Vui lòng chọn tọa độ bản đồ.',
+            'verification_photos.required' => 'Vui lòng chụp ảnh xác thực thực địa.',
+            'verification_photos.min' => 'Vui lòng chụp ít nhất 1 ảnh xác thực thực địa.',
+            'verification_lat.required' => 'Chưa lấy được tọa độ GPS. Vui lòng bật Vị trí rồi nhấn Lấy lại GPS.',
+            'verification_lng.required' => 'Chưa lấy được tọa độ GPS. Vui lòng bật Vị trí rồi nhấn Lấy lại GPS.',
         ]);
 
         $savedVerificationPhotos = [];

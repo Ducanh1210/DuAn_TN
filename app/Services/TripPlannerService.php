@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\Location;
 use App\Models\Itinerary;
@@ -12,31 +11,19 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Dịch vụ lập lịch trình du lịch bằng AI.
- * Quy trình: đọc câu trả lời khảo sát -> lọc & gom cụm địa điểm gần nhau theo GPS
- * -> gọi AI sinh lịch trình JSON -> hậu xử lý (kiểm tra địa điểm hợp lệ, tối ưu tuyến
- * đường theo khoảng cách thật, chèn bữa ăn/nghỉ, sửa giờ) -> lưu vào DB.
+ * Quy trình: đọc khảo sát -> lọc & gom cụm GPS -> Gemini sinh JSON
+ * -> kiểm tra location_id / số ngày / ngân sách -> lưu DB.
  */
 class TripPlannerService
 {
-    protected $openRouterModel;    // Mô hình AI dùng để sinh lịch trình
-    protected $openRouterBaseUrl;  // Địa chỉ gốc API OpenRouter
+    protected GeminiClient $gemini;
 
     /** @var array<int, Location>|null */
     protected $locationsById = null;
 
-    public function __construct()
+    public function __construct(?GeminiClient $gemini = null)
     {
-        $this->openRouterModel = env('OPENROUTER_MODEL', 'google/gemini-2.5-flash-lite');
-        $this->openRouterBaseUrl = env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1');
-    }
-
-    /** Đọc danh sách API key từ .env (cho phép nhiều key, cách nhau dấu phẩy để xoay vòng). */
-    protected function getApiKeys(): array
-    {
-        $rawKeys = env('OPENROUTER_API_KEYS') ?: env('OPENROUTER_API_KEY');
-        if (!$rawKeys) return [];
-        $keys = array_map('trim', explode(',', $rawKeys));
-        return array_values(array_filter($keys));
+        $this->gemini = $gemini ?? new GeminiClient();
     }
 
     /**
@@ -124,7 +111,6 @@ class TripPlannerService
             if ($key === 'interests' || str_contains($blob, 'ưu tiên trải nghiệm')) {
                 $vals = array_filter(array_map('trim', explode(',', (string) ($value ?: ''))));
                 if (empty($vals) && $answer !== '') {
-                    // fallback từ label
                     $mapLabel = [
                         'tâm linh' => 'tam_linh',
                         'ẩm thực' => 'am_thuc',
@@ -225,11 +211,11 @@ class TripPlannerService
      */
     protected function getFilteredLocations(array $prefs)
     {
-        $query = Location::with('category')->where('status', 'published');
+        $query = Location::with(['category', 'images'])->where('status', 'published');
         $locations = $query->get();
-            if ($locations->isEmpty()) {
-                $locations = Location::with('category')->get();
-            }
+        if ($locations->isEmpty()) {
+            $locations = Location::with(['category', 'images'])->get();
+        }
 
         $prioritySlugs = $this->categorySlugsForTripType($prefs['trip_type'] ?? null);
         $interestSlugs = $this->categorySlugsForInterests($prefs['interests'] ?? []);
@@ -269,6 +255,13 @@ class TripPlannerService
             $sorted = $hotels->concat($food)->concat($rest)->unique('id')->values();
         }
 
+        if ($this->wantsVegetarian($prefs)) {
+            $sorted = $sorted->reject(function ($loc) {
+                $slug = $loc->category->slug ?? '';
+                return $slug === 'am-thuc' && $this->isMeatHeavyName((string) $loc->name);
+            })->values();
+        }
+
         $this->locationsById = $sorted->keyBy('id')->all();
 
         return $sorted;
@@ -304,7 +297,6 @@ class TripPlannerService
                 ) <= $radiusKm;
             });
 
-            // Điểm số: số lượng + độ nổi bật (rating / lượt xem) để không bỏ cụm điểm lớn
             $score = 0.0;
             foreach ($members as $m) {
                 $slug = $m->category->slug ?? '';
@@ -316,7 +308,6 @@ class TripPlannerService
                 $score += min(3.0, (float) ($m->average_rating ?? 0) / 2);
                 $score += min(4.0, log10(1 + (int) ($m->view_count ?? 0)));
             }
-            // Thưởng nhẹ nếu seed là điểm nổi tiếng
             $score += min(3.0, log10(1 + (int) ($seed->view_count ?? 0)));
 
             if ($score > $bestScore) {
@@ -330,7 +321,6 @@ class TripPlannerService
             return $priorityLocations;
         }
 
-        // Bổ sung quán ăn / khách sạn gần cụm (bán kính hơi rộng hơn)
         $foodHotelRadius = $radiusKm + 5;
         $extras = $allLocations->filter(function ($loc) use ($bestSeed, $foodHotelRadius, $alwaysIncludeSlugs) {
             $slug = $loc->category->slug ?? '';
@@ -358,77 +348,43 @@ class TripPlannerService
         }
 
         $context = "\n--- DANH SÁCH BẮT BUỘC 100% CÁC ĐỊA ĐIỂM ĐƯỢC PHÉP DÙNG (KÈM GPS) ---\n";
-            foreach ($locations as $loc) {
-                $catName = $loc->category->name ?? 'Địa điểm';
+        foreach ($locations as $loc) {
+            $catName = $loc->category->name ?? 'Địa điểm';
             $lat = $loc->lat ? round((float) $loc->lat, 4) : 'N/A';
             $lng = $loc->lng ? round((float) $loc->lng, 4) : 'N/A';
-                $context .= "- ID:{$loc->id} | \"{$loc->name}\" | Loại:{$catName} | GPS:({$lat},{$lng}) | Địa chỉ:" . ($loc->address ?? '') . "\n";
-            }
-            $context .= "---------------------------------------------------------\n";
-            return $context;
+            $context .= "- ID:{$loc->id} | \"{$loc->name}\" | Loại:{$catName} | GPS:({$lat},{$lng}) | Địa chỉ:" . ($loc->address ?? '') . "\n";
+        }
+        $context .= "---------------------------------------------------------\n";
+
+        return $context;
     }
 
     /**
-     * Gọi AI (OpenRouter): thử lần lượt từng API key và từng mô hình dự phòng cho tới
-     * khi có phản hồi hợp lệ. Trả về nội dung text (đã gỡ code fence) hoặc null nếu thất bại.
+     * Gọi Gemini: trả về nội dung text (đã gỡ code fence) hoặc null nếu thất bại.
      */
-    protected function callAI(string $systemPrompt, string $userPrompt, int $maxTokens = 800, float $temperature = 0.7): ?string
+    protected function callAI(string $systemPrompt, string $userPrompt, int $maxTokens = 800, float $temperature = 0.4): ?string
     {
-        $apiKeys = $this->getApiKeys();
-        if (empty($apiKeys)) {
-            Log::error('TripPlannerService: No API Key configured.');
+        if (!$this->gemini->isConfigured()) {
+            Log::error('TripPlannerService: Chưa cấu hình GEMINI_API_KEY.');
             return null;
         }
 
-        $modelsToTry = array_unique([
-            $this->openRouterModel,
-            'google/gemini-2.5-flash-lite',
-            'openrouter/auto'
-        ]);
+        $content = $this->gemini->generate([
+            ['role' => 'system', 'content' => $systemPrompt],
+            ['role' => 'user', 'content' => $userPrompt],
+        ], $temperature, $maxTokens, 90, ['json' => true]);
 
-        foreach ($apiKeys as $keyIndex => $apiKey) {
-            foreach ($modelsToTry as $modelName) {
-                try {
-                    $response = Http::withHeaders([
-                        'Authorization' => 'Bearer ' . $apiKey,
-                        'HTTP-Referer' => 'http://localhost',
-                        'X-Title' => 'POI Trip Planner',
-                        'Content-Type' => 'application/json',
-                    ])
-                    ->timeout(45)
-                    ->post($this->openRouterBaseUrl . '/chat/completions', [
-                        'model' => $modelName,
-                        'messages' => [
-                            ['role' => 'system', 'content' => $systemPrompt],
-                            ['role' => 'user', 'content' => $userPrompt],
-                        ],
-                        'temperature' => $temperature,
-                        'max_tokens' => $maxTokens,
-                    ]);
-
-                    if ($response->successful()) {
-                        $data = $response->json();
-                        $content = $data['choices'][0]['message']['content'] ?? '';
-                        if (!empty($content)) {
-                            $content = preg_replace('/^```(?:json)?\s*/i', '', trim($content));
-                            $content = preg_replace('/\s*```$/i', '', $content);
-                            return $content;
-                        }
-                    }
-
-                    Log::warning("TripPlanner Key #" . ($keyIndex + 1) . " model {$modelName} warning: " . $response->body());
-                } catch (\Exception $e) {
-                    Log::warning("TripPlanner Key #" . ($keyIndex + 1) . " model {$modelName} exception: " . $e->getMessage());
-                }
-            }
+        if ($content) {
+            $content = preg_replace('/^```(?:json)?\s*/i', '', trim($content));
+            $content = preg_replace('/\s*```$/i', '', $content);
+            return $content;
         }
 
         return null;
     }
 
     /**
-     * Làm sạch và giải mã JSON từ phản hồi AI: gỡ code fence, cắt phần thừa sau dấu }
-     * cuối cùng và thử vá các lỗi JSON thường gặp (dấu phẩy thừa, ký tự điều khiển).
+     * Giải mã JSON từ Gemini: gỡ fence rồi decode; cắt phần thừa sau } cuối nếu cần.
      */
     protected function cleanAndDecodeJson(string $rawContent): ?array
     {
@@ -448,15 +404,7 @@ class TripPlannerService
             if ($lastBrace !== false) {
                 $jsonCandidate = substr($jsonCandidate, 0, $lastBrace + 1);
             }
-
-            $jsonCandidate = preg_replace('/[\x00-\x1F\x7F]/', ' ', $jsonCandidate);
             $decoded = json_decode($jsonCandidate, true);
-            if (is_array($decoded)) {
-                return $decoded;
-            }
-
-            $sanitized = preg_replace('/,\s*([\]\}])/', '$1', $jsonCandidate);
-            $decoded = json_decode($sanitized, true);
             if (is_array($decoded)) {
                 return $decoded;
             }
@@ -479,949 +427,213 @@ class TripPlannerService
     }
 
     /**
-     * Hậu xử lý lịch trình AI trả về: kiểm tra location_id hợp lệ, ép đúng số ngày/ngân sách,
-     * tối ưu tuyến đường theo khoảng cách thật và bổ sung bữa ăn/nghỉ còn thiếu.
+     * Kiểm tra lịch trình Gemini trả về: location_id có trong DB, tên thật, đúng số ngày/ngân sách.
      */
     public function postProcessItinerary(array $itinerary, array $prefs): array
     {
-        // Validate theo toàn bộ DB (không chỉ tập đã filter vào prompt)
-        $allLocations = Location::with('category')->get()->keyBy('id');
-        $validIds = $allLocations->keys()->flip()->all();
+        $catalog = Location::with(['category', 'images'])->where('status', 'published')->get()->keyBy('id');
+        if ($catalog->isEmpty()) {
+            $catalog = Location::with(['category', 'images'])->get()->keyBy('id');
+        }
 
-        // Merge để resolve GPS / tên
-        foreach ($allLocations as $id => $loc) {
-            if (!isset($this->locationsById[$id])) {
-                $this->locationsById[$id] = $loc;
+        $allowedIds = $this->locationsById ? array_map('intval', array_keys($this->locationsById)) : $catalog->keys()->all();
+        $allowedSet = array_fill_keys($allowedIds, true);
+
+        $itinerary['estimated_cost'] = $prefs['budget_label'] ?? ($itinerary['estimated_cost'] ?? null);
+        $daysWanted = max(1, (int) ($prefs['days'] ?? 2));
+        $days = is_array($itinerary['days'] ?? null) ? $itinerary['days'] : [];
+
+        $cleanDays = [];
+        foreach ($days as $index => $day) {
+            if (!is_array($day)) {
+                continue;
             }
-        }
 
-        $days = $itinerary['days'] ?? [];
-        if (!is_array($days)) {
-            $days = [];
-        }
+            $slots = [];
+            $prevLoc = null;
+            foreach ($day['slots'] ?? [] as $slot) {
+                if (!is_array($slot)) {
+                    continue;
+                }
 
-        // Enforce số ngày khớp câu trả lời
-        $expectedDays = max(1, (int) ($prefs['days'] ?? 2));
-        if (count($days) > $expectedDays) {
-            $days = array_slice($days, 0, $expectedDays);
-        }
-        while (count($days) < $expectedDays) {
-            $n = count($days) + 1;
-            $days[] = [
-                'day' => $n,
-                'title' => "Ngày {$n}: Tiếp tục khám phá",
-                'slots' => [],
-            ];
-        }
+                $lid = isset($slot['location_id']) ? (int) $slot['location_id'] : 0;
+                $loc = ($lid > 0 && isset($catalog[$lid]) && isset($allowedSet[$lid])) ? $catalog[$lid] : null;
 
-        $longJumps = [];
-        $processedDays = [];
+                if (!$loc && !empty($slot['location'])) {
+                    $loc = $this->findLocationByName((string) $slot['location'], $catalog, $allowedSet);
+                }
 
-        foreach ($days as $di => $day) {
-            $dayNum = $di + 1;
-            $slots = is_array($day['slots'] ?? null) ? $day['slots'] : [];
-            $cleanSlots = [];
+                $type = (string) ($slot['type'] ?? 'visit');
+                $slot['type'] = in_array($type, ['visit', 'food', 'transport', 'rest', 'photo'], true)
+                    ? $type
+                    : 'visit';
 
-            foreach ($slots as $slot) {
-                if (!is_array($slot)) continue;
-                $lid = isset($slot['location_id']) ? (int) $slot['location_id'] : null;
-                $type = $slot['type'] ?? 'visit';
-
-                if ($lid && !isset($validIds[$lid])) {
-                    // Thử match theo tên
-                    $matched = $this->findLocationByName($slot['location'] ?? '');
-                    if ($matched) {
-                        $lid = $matched->id;
-                        $slot['location_id'] = $lid;
-                        $slot['location'] = $matched->name;
+                $isFood = $slot['type'] === 'food' || ($loc && ($loc->category->slug ?? '') === 'am-thuc');
+                if ($loc && $isFood && $this->wantsVegetarian($prefs) && $this->isMeatHeavyName((string) $loc->name)) {
+                    $anchor = ($prevLoc && $prevLoc->lat) ? $prevLoc : $loc;
+                    $alt = $this->findNearbyFood($anchor, $catalog, $allowedSet, true);
+                    if ($alt) {
+                        $loc = $alt;
                     } else {
-                        $lid = null;
-                        unset($slot['location_id']);
-                        if (in_array($type, ['visit', 'food', 'photo'], true)) {
-                            // Bỏ slot địa điểm không hợp lệ
-                            continue;
+                        $activity = (string) ($slot['activity'] ?? '');
+                        $loc = null;
+                        $slot['location'] = 'Quán chay / quán thanh đạm gần khu vực đang tham quan';
+                        if ($activity !== '' && $this->isMeatHeavyName($activity)) {
+                            $slot['activity'] = 'Ăn món chay / thanh đạm tại quán gần khu vực đang tham quan.';
                         }
                     }
                 }
 
-                if ($lid && isset($this->locationsById[$lid])) {
-                    $loc = $this->locationsById[$lid];
-                    $slot['location_id'] = $lid;
+                if ($loc) {
+                    $slot['location_id'] = (int) $loc->id;
                     $slot['location'] = $loc->name;
-                    $slot['_lat'] = $loc->lat ? (float) $loc->lat : null;
-                    $slot['_lng'] = $loc->lng ? (float) $loc->lng : null;
-                    $slot['_category_slug'] = $loc->category->slug ?? '';
-                }
-
-                $cleanSlots[] = $slot;
-            }
-
-            $cleanSlots = $this->optimizeDayRoute($cleanSlots);
-            $cleanSlots = $this->constrainFarJumps($cleanSlots, $prefs);
-            $cleanSlots = $this->ensureMealsAndRest($cleanSlots, $prefs);
-            $cleanSlots = $this->fixMealTimes($cleanSlots);
-            $cleanSlots = $this->mergeMealWithAdjacentRest($cleanSlots);
-            $cleanSlots = $this->softenFarFoodSlots($cleanSlots);
-            $cleanSlots = $this->resolveTimelineConflicts($cleanSlots);
-
-            // Đo khoảng cách thật giữa các điểm liên tiếp có GPS
-            $prev = null;
-            foreach ($cleanSlots as &$slot) {
-                if (!empty($slot['_lat']) && !empty($slot['_lng'])) {
-                    if ($prev) {
-                        $km = $this->distanceKm($prev['_lat'], $prev['_lng'], $slot['_lat'], $slot['_lng']);
-                        $slot['distance_from_prev_km'] = round($km, 1);
-                        if ($km > 12) {
-                            $longJumps[] = sprintf(
-                                'Ngày %d: %s → %s ~%.0f km',
-                                $dayNum,
-                                $prev['location'] ?? '?',
-                                $slot['location'] ?? '?',
-                                $km
-                            );
+                    $slot['place'] = $this->serializePlace($loc);
+                    if ($prevLoc && $prevLoc->lat && $prevLoc->lng && $loc->lat && $loc->lng) {
+                        $km = $this->distanceKm(
+                            (float) $prevLoc->lat,
+                            (float) $prevLoc->lng,
+                            (float) $loc->lat,
+                            (float) $loc->lng
+                        );
+                        if ($km >= 0.1) {
+                            $slot['distance_from_prev_km'] = round($km, 1);
                         }
                     }
-                    $prev = $slot;
+                    $prevLoc = $loc;
+                } else {
+                    unset($slot['location_id'], $slot['place']);
                 }
-                unset($slot['_lat'], $slot['_lng'], $slot['_category_slug']);
+
+                $slots[] = $slot;
             }
-            unset($slot);
 
-            $dayTitle = $day['title'] ?? "Ngày {$dayNum}";
-            $dayTitle = preg_replace('/^\s*Ngày\s*' . $dayNum . '\s*[:\-–]?\s*/iu', '', (string) $dayTitle);
-            $dayTitle = preg_replace('/^\s*Ngày\s*\d+\s*[:\-–]?\s*/iu', '', (string) $dayTitle);
-            $dayTitle = trim($dayTitle) !== '' ? trim($dayTitle) : "Hành trình ngày {$dayNum}";
-
-            $processedDays[] = [
-                'day' => $dayNum,
-                'title' => $dayTitle,
-                'slots' => $cleanSlots,
-            ];
+            $day['day'] = (int) ($day['day'] ?? ($index + 1));
+            $day['slots'] = $slots;
+            $cleanDays[] = $day;
         }
 
-        $itinerary['days'] = $processedDays;
-        $itinerary['estimated_cost'] = $prefs['budget_label'];
-
-        $tips = is_array($itinerary['tips'] ?? null) ? $itinerary['tips'] : [];
-        $tips[] = "Lịch trình {$expectedDays} ngày theo lựa chọn của bạn.";
-        $tips[] = 'Ngân sách ước tính: ' . $prefs['budget_label'] . '.';
-        if (!empty($longJumps)) {
-            $tips[] = 'Đã cố gắng gom cụm gần nhau; vẫn còn đoạn hơi xa: ' . implode('; ', array_slice($longJumps, 0, 2)) . '.';
-        } else {
-            $tips[] = 'Các điểm trong ngày được ưu tiên gom theo khu vực gần nhau để giảm di chuyển.';
+        if (count($cleanDays) > $daysWanted) {
+            $cleanDays = array_slice($cleanDays, 0, $daysWanted);
         }
-        $itinerary['tips'] = array_values(array_unique(array_filter($tips)));
 
-        if (empty($itinerary['title'])) {
-            $itinerary['title'] = "Lịch trình {$expectedDays} ngày";
+        foreach ($cleanDays as $i => $day) {
+            $cleanDays[$i]['day'] = $i + 1;
         }
+
+        $itinerary['days'] = $cleanDays;
+        $itinerary['stats'] = $this->buildItineraryStats($cleanDays, $prefs);
 
         return $itinerary;
     }
 
-    protected function findLocationByName(string $name): ?Location
+    protected function serializePlace(Location $loc): array
     {
-        $name = trim($name);
-        if ($name === '' || !$this->locationsById) {
-            return null;
+        return [
+            'id' => (int) $loc->id,
+            'name' => $loc->name,
+            'slug' => $loc->slug,
+            'lat' => $loc->lat !== null ? (float) $loc->lat : null,
+            'lng' => $loc->lng !== null ? (float) $loc->lng : null,
+            'address' => $loc->address,
+            'category' => $loc->category->name ?? null,
+            'category_slug' => $loc->category->slug ?? null,
+            'image' => $loc->resolveThumbnailUrl(),
+            'rating' => $loc->average_rating !== null ? round((float) $loc->average_rating, 1) : null,
+            'url' => $loc->slug ? route('client.locations.360', $loc->slug) : null,
+        ];
+    }
+
+    protected function buildItineraryStats(array $days, array $prefs): array
+    {
+        $stops = 0;
+        $meals = 0;
+        $distance = 0.0;
+        $seen = [];
+
+        foreach ($days as $day) {
+            foreach ($day['slots'] ?? [] as $slot) {
+                if (($slot['type'] ?? '') === 'food') {
+                    $meals++;
+                }
+                if (!empty($slot['distance_from_prev_km'])) {
+                    $distance += (float) $slot['distance_from_prev_km'];
+                }
+                $lid = (int) ($slot['location_id'] ?? 0);
+                if ($lid > 0 && !isset($seen[$lid])) {
+                    $seen[$lid] = true;
+                    $stops++;
+                }
+            }
         }
 
-        $lower = mb_strtolower($name);
-        foreach ($this->locationsById as $loc) {
-            if (mb_strtolower($loc->name) === $lower) {
-                return $loc;
+        return [
+            'days' => count($days),
+            'stops' => $stops,
+            'meals' => $meals,
+            'distance_km' => round($distance, 1),
+            'budget' => $prefs['budget_label'] ?? null,
+        ];
+    }
+
+    protected function wantsVegetarian(array $prefs): bool
+    {
+        $blob = mb_strtolower((string) ($prefs['food'] ?? '') . ' ' . implode(' ', $prefs['interests'] ?? []));
+
+        return str_contains($blob, 'chay')
+            || str_contains($blob, 'thanh đạm')
+            || str_contains($blob, 'thanh dam')
+            || str_contains($blob, 'healthy');
+    }
+
+    protected function isMeatHeavyName(string $name): bool
+    {
+        $n = mb_strtolower($name);
+        foreach (['thịt dê', 'thit de', 'lẩu dê', 'thịt lợn', 'thịt heo', 'thịt bò', 'nem chua', 'tiết canh'] as $bad) {
+            if (str_contains($n, $bad)) {
+                return true;
             }
         }
-        foreach ($this->locationsById as $loc) {
-            if (str_contains(mb_strtolower($loc->name), $lower) || str_contains($lower, mb_strtolower($loc->name))) {
-                return $loc;
-            }
-        }
-        return null;
+
+        return (bool) preg_match('/\bdê\b/u', $n);
     }
 
     /**
-     * Đảm bảo mỗi ngày có ăn trưa (+ nghỉ / ăn tối khi cần). AI hay bỏ sót.
+     * @param  \Illuminate\Support\Collection<int, Location>  $catalog
+     * @param  array<int, true>  $allowedSet
      */
-    protected function ensureMealsAndRest(array $slots, array $prefs): array
+    protected function findNearbyFood(?Location $near, $catalog, array $allowedSet, bool $vegetarian): ?Location
     {
-        if (empty($slots)) {
-            return $slots;
-        }
-
-        $hasLunch = false;
-        $hasDinner = false;
-        $dayStart = null;
-        $dayEnd = null;
-        $anchorAroundNoon = null;
-        $anchorEvening = null;
-        $homeTransportStart = null;
-
-        foreach ($slots as $slot) {
-            $start = $this->parseTimeStartMinutes($slot['time'] ?? '');
-            $end = $this->parseTimeEndMinutes($slot['time'] ?? '') ?? $start;
-            if ($start !== null) {
-                $dayStart = $dayStart === null ? $start : min($dayStart, $start);
-            }
-            if ($end !== null) {
-                $dayEnd = $dayEnd === null ? $end : max($dayEnd, $end);
-            }
-
-            $activity = mb_strtolower((string) ($slot['activity'] ?? ''));
-            $type = $slot['type'] ?? '';
-
-            $isFood = $type === 'food'
-                || str_contains($activity, 'ăn sáng')
-                || str_contains($activity, 'ăn trưa')
-                || str_contains($activity, 'ăn tối')
-                || str_contains($activity, 'bữa ');
-
-            if ($isFood) {
-                if ($start !== null && $start >= 11 * 60 && $start < 15 * 60) {
-                    $hasLunch = true;
-                }
-                if ($start !== null && $start >= 16 * 60) {
-                    $hasDinner = true;
-                }
-                if (str_contains($activity, 'ăn trưa') || str_contains($activity, 'bữa trưa')) {
-                    $hasLunch = true;
-                }
-                if (str_contains($activity, 'ăn tối') || str_contains($activity, 'bữa tối')) {
-                    $hasDinner = true;
-                }
-            }
-
-            if (
-                $type === 'transport'
-                && $start !== null
-                && (str_contains($activity, 'về') || str_contains($activity, 'xuất phát') || str_contains($activity, 'trở về'))
-            ) {
-                $homeTransportStart = $homeTransportStart === null ? $start : min($homeTransportStart, $start);
-            }
-
-            if ($start !== null && $start <= 12 * 60 + 30) {
-                $anchorAroundNoon = $slot;
-            }
-            if ($start !== null && ($type !== 'transport' || $start < 17 * 60)) {
-                $anchorEvening = $slot;
-            }
-        }
-
-        if (!$anchorAroundNoon) {
-            $anchorAroundNoon = $slots[0];
-        }
-        if (!$anchorEvening) {
-            $anchorEvening = $slots[count($slots) - 1];
-        }
-
-        $foodStyle = $prefs['food'] ?? '';
-        $foodNear = 'các quán ăn gần';
-        if (str_contains((string) $foodStyle, 'chay')) {
-            $foodNear = 'quán chay / món thanh đạm gần';
-        } elseif (str_contains((string) $foodStyle, 'dac_san') || str_contains((string) $foodStyle, 'đặc sản')) {
-            $foodNear = 'quán đặc sản gần';
-        } elseif (str_contains((string) $foodStyle, 'nha_hang') || str_contains((string) $foodStyle, 'nhà hàng')) {
-            $foodNear = 'nhà hàng / quán view gần';
-        } elseif (str_contains((string) $foodStyle, 'binh_dan') || str_contains((string) $foodStyle, 'bình dân')) {
-            $foodNear = 'quán ăn bình dân gần';
-        }
-
-        $coversLunchWindow = ($dayStart === null || $dayStart < 13 * 60)
-            && ($dayEnd === null || $dayEnd > 11 * 60 + 30);
-
-        if ($coversLunchWindow && !$hasLunch) {
-            $area = $this->cleanAreaLabel($anchorAroundNoon['location'] ?? 'điểm tham quan');
-            $gap = $this->findFreeGap($slots, 12 * 60, 60, 11 * 60 + 30, 13 * 60 + 30);
-            if ($gap) {
-                // Ăn + nghỉ gộp 1 slot (~75–90 phút), không tách rest riêng
-                $end = min($gap[1] + 20, 13 * 60 + 45);
-                $slots[] = [
-                    'time' => $this->formatTimeRange($gap[0], max($end, $gap[0] + 75)),
-                    'activity' => "Ăn trưa tại {$foodNear} {$area}, rồi nghỉ ngơi nhẹ trước khi đi tiếp.",
-                    'location' => $anchorAroundNoon['location'] ?? $area,
-                    'location_id' => $anchorAroundNoon['location_id'] ?? null,
-                    'type' => 'food',
-                    'tip' => 'Gộp ăn và nghỉ tại chỗ để lịch gọn, đỡ mất thời gian di chuyển.',
-                    '_lat' => $anchorAroundNoon['_lat'] ?? null,
-                    '_lng' => $anchorAroundNoon['_lng'] ?? null,
-                ];
-            }
-        }
-
-        $needsDinner = ($dayEnd !== null && $dayEnd >= 17 * 60)
-            || ($homeTransportStart !== null)
-            || (!empty($prefs['need_hotel']) && ($prefs['days'] ?? 1) >= 2);
-
-        if ($needsDinner && !$hasDinner) {
-            $area = $this->cleanAreaLabel($anchorEvening['location'] ?? 'điểm cuối ngày');
-            $dinnerEndLimit = $homeTransportStart ?? (19 * 60);
-            $preferredStart = max(16 * 60 + 30, $dinnerEndLimit - 60);
-            $gap = $this->findFreeGap($slots, $preferredStart, 60, 16 * 60, $dinnerEndLimit);
-            if (!$gap && $homeTransportStart !== null) {
-                $end = $homeTransportStart;
-                $start = max(16 * 60, $end - 60);
-                if ($end - $start >= 30) {
-                    $gap = [$start, $end];
-                }
-            }
-            if ($gap) {
-                $slots[] = [
-                    'time' => $this->formatTimeRange($gap[0], $gap[1]),
-                    'activity' => "Ăn tối tại {$foodNear} {$area} trước khi kết thúc ngày.",
-                    'location' => $anchorEvening['location'] ?? $area,
-                    'location_id' => $anchorEvening['location_id'] ?? null,
-                    'type' => 'food',
-                    'tip' => 'Ăn tối trước khi lên đường về để không chồng giờ với di chuyển.',
-                    '_lat' => $anchorEvening['_lat'] ?? null,
-                    '_lng' => $anchorEvening['_lng'] ?? null,
-                ];
-            }
-        }
-
-        usort($slots, function ($a, $b) {
-            $am = $this->parseTimeStartMinutes($a['time'] ?? '') ?? 0;
-            $bm = $this->parseTimeStartMinutes($b['time'] ?? '') ?? 0;
-            return $am <=> $bm;
-        });
-
-        return $slots;
-    }
-
-    /**
-     * Gộp slot ăn + nghỉ liền kề (cùng chỗ / nghỉ ngay sau bữa) thành 1 slot food.
-     */
-    protected function mergeMealWithAdjacentRest(array $slots): array
-    {
-        if (count($slots) < 2) {
-            return $slots;
-        }
-
-        usort($slots, function ($a, $b) {
-            $am = $this->parseTimeStartMinutes($a['time'] ?? '') ?? 0;
-            $bm = $this->parseTimeStartMinutes($b['time'] ?? '') ?? 0;
-            return $am <=> $bm;
-        });
-
-        $merged = [];
-        $n = count($slots);
-
-        for ($i = 0; $i < $n; $i++) {
-            $curr = $slots[$i];
-            $next = $slots[$i + 1] ?? null;
-
-            if ($next && $this->isMealSlot($curr) && $this->isPostMealRestSlot($next) && $this->samePlaceOrRest($curr, $next)) {
-                $start = $this->parseTimeStartMinutes($curr['time'] ?? '') ?? 0;
-                $endFood = $this->parseTimeEndMinutes($curr['time'] ?? '') ?? ($start + 60);
-                $endRest = $this->parseTimeEndMinutes($next['time'] ?? '')
-                    ?? ($this->parseTimeStartMinutes($next['time'] ?? '') ?? $endFood) + 20;
-                $end = max($endFood, $endRest);
-
-                $activity = trim((string) ($curr['activity'] ?? ''));
-                $activityLower = mb_strtolower($activity);
-                if (!str_contains($activityLower, 'nghỉ')) {
-                    $activity = rtrim($activity, ". \t") . ', rồi nghỉ ngơi nhẹ trước khi đi tiếp.';
-                }
-
-                $tip = trim((string) ($curr['tip'] ?? ''));
-                $restTip = trim((string) ($next['tip'] ?? ''));
-                if ($restTip !== '' && $tip !== '' && !str_contains(mb_strtolower($tip), mb_strtolower(mb_substr($restTip, 0, 20)))) {
-                    $tip = $tip . ' ' . $restTip;
-                } elseif ($tip === '') {
-                    $tip = $restTip;
-                }
-
-                $curr['time'] = $this->formatTimeRange($start, $end);
-                $curr['activity'] = $activity;
-                $curr['type'] = 'food';
-                $curr['tip'] = $tip !== '' ? $tip : ($curr['tip'] ?? null);
-                $merged[] = $curr;
-                $i++; // skip rest
-                continue;
-            }
-
-            $merged[] = $curr;
-        }
-
-        return $merged;
-    }
-
-    protected function isMealSlot(array $slot): bool
-    {
-        $type = $slot['type'] ?? '';
-        $activity = mb_strtolower((string) ($slot['activity'] ?? ''));
-        if ($type === 'food') {
-            return true;
-        }
-        return str_contains($activity, 'ăn sáng')
-            || str_contains($activity, 'ăn trưa')
-            || str_contains($activity, 'ăn tối')
-            || str_contains($activity, 'bữa ');
-    }
-
-    protected function isPostMealRestSlot(array $slot): bool
-    {
-        $type = $slot['type'] ?? '';
-        $activity = mb_strtolower((string) ($slot['activity'] ?? ''));
-        if ($type === 'transport' || $type === 'visit' || $type === 'photo' || $type === 'food') {
-            return false;
-        }
-        // Nghỉ sau bữa / thư giãn — không phải nghỉ chuẩn bị lên xe về (gộp với dinner tùy case)
-        if ($type === 'rest' || str_contains($activity, 'nghỉ')) {
-            return true;
-        }
-        return str_contains($activity, 'thư giãn') || str_contains($activity, 'tĩnh tâm');
-    }
-
-    protected function samePlaceOrRest(array $meal, array $rest): bool
-    {
-        $a = mb_strtolower(trim((string) ($meal['location'] ?? '')));
-        $b = mb_strtolower(trim((string) ($rest['location'] ?? '')));
-        if ($a === '' || $b === '') {
-            return true;
-        }
-        if ($a === $b) {
-            return true;
-        }
-        return str_contains($a, $b) || str_contains($b, $a);
-    }
-
-    protected function cleanAreaLabel(string $area): string
-    {
-        $area = trim($area);
-        $area = preg_replace('/^(khu\s*vực\s*)+/iu', '', $area) ?: $area;
-        return trim($area) !== '' ? trim($area) : 'điểm tham quan';
-    }
-
-    protected function formatTimeRange(int $startMin, int $endMin): string
-    {
-        $startMin = max(0, min(23 * 60 + 59, $startMin));
-        $endMin = max($startMin + 15, min(23 * 60 + 59, $endMin));
-        return sprintf(
-            '%02d:%02d - %02d:%02d',
-            intdiv($startMin, 60),
-            $startMin % 60,
-            intdiv($endMin, 60),
-            $endMin % 60
-        );
-    }
-
-    /**
-     * @return array{0:int,1:int}|null
-     */
-    protected function findFreeGap(array $slots, int $preferredStart, int $duration, int $windowStart, int $windowEnd): ?array
-    {
-        if ($windowEnd - $windowStart < $duration) {
-            return null;
-        }
-
-        $busy = [];
-        foreach ($slots as $slot) {
-            $s = $this->parseTimeStartMinutes($slot['time'] ?? '');
-            $e = $this->parseTimeEndMinutes($slot['time'] ?? '');
-            if ($s === null) {
-                continue;
-            }
-            if ($e === null || $e <= $s) {
-                $e = $s + 30;
-            }
-            $busy[] = [$s, $e];
-        }
-        usort($busy, fn ($a, $b) => $a[0] <=> $b[0]);
-
-        $tryStarts = [$preferredStart];
-        for ($t = $windowStart; $t <= $windowEnd - $duration; $t += 15) {
-            if ($t !== $preferredStart) {
-                $tryStarts[] = $t;
-            }
-        }
-
-        foreach ($tryStarts as $start) {
-            if ($start < $windowStart || $start + $duration > $windowEnd) {
-                continue;
-            }
-            $end = $start + $duration;
-            $overlap = false;
-            foreach ($busy as [$bs, $be]) {
-                if ($start < $be && $end > $bs) {
-                    $overlap = true;
-                    break;
-                }
-            }
-            if (!$overlap) {
-                return [$start, $end];
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Sắp xếp lại giờ để không chồng chéo; ăn tối luôn trước giờ về.
-     */
-    protected function resolveTimelineConflicts(array $slots): array
-    {
-        if (count($slots) < 2) {
-            return $slots;
-        }
-
-        $dinnerIdx = null;
-        $homeIdx = null;
-        foreach ($slots as $i => $slot) {
-            $activity = mb_strtolower((string) ($slot['activity'] ?? ''));
-            $type = $slot['type'] ?? '';
-            if ($type === 'food' && (str_contains($activity, 'ăn tối') || str_contains($activity, 'bữa tối'))) {
-                $dinnerIdx = $i;
-            }
-            if (
-                $type === 'transport'
-                && (str_contains($activity, 'về') || str_contains($activity, 'trở về') || str_contains($activity, 'xuất phát'))
-            ) {
-                $homeIdx = $i;
-            }
-        }
-
-        if ($dinnerIdx !== null && $homeIdx !== null) {
-            $dinnerStart = $this->parseTimeStartMinutes($slots[$dinnerIdx]['time'] ?? '');
-            $homeStart = $this->parseTimeStartMinutes($slots[$homeIdx]['time'] ?? '');
-            if ($dinnerStart !== null && $homeStart !== null && $dinnerStart >= $homeStart) {
-                $dur = 60;
-                $dEnd = $this->parseTimeEndMinutes($slots[$dinnerIdx]['time'] ?? '');
-                if ($dEnd !== null) {
-                    $dur = max(30, $dEnd - $dinnerStart);
-                }
-                $newEnd = $homeStart;
-                $newStart = max(16 * 60, $newEnd - $dur);
-                $slots[$dinnerIdx]['time'] = $this->formatTimeRange($newStart, $newEnd);
-            }
-        }
-
-        usort($slots, function ($a, $b) {
-            $am = $this->parseTimeStartMinutes($a['time'] ?? '') ?? 0;
-            $bm = $this->parseTimeStartMinutes($b['time'] ?? '') ?? 0;
-            return $am <=> $bm;
-        });
-
-        $prevEnd = null;
-        foreach ($slots as &$slot) {
-            $start = $this->parseTimeStartMinutes($slot['time'] ?? '');
-            $end = $this->parseTimeEndMinutes($slot['time'] ?? '');
-            if ($start === null) {
-                continue;
-            }
-            if ($end === null || $end <= $start) {
-                $end = $start + 30;
-            }
-            $duration = max(15, $end - $start);
-            $type = $slot['type'] ?? '';
-
-            if ($prevEnd !== null && $start < $prevEnd) {
-                // Rest ngắn bị chồng: cắt/ghép sát sau slot trước thay vì đẩy cả chuỗi về
-                if ($type === 'rest' && $duration <= 30) {
-                    $start = $prevEnd;
-                    $end = min($start + $duration, $start + 20);
-                    if ($end <= $start) {
-                        $end = $start + 15;
-                    }
-                } else {
-                    $start = $prevEnd;
-                    $end = $start + $duration;
-                }
-                if ($end > 21 * 60 + 30) {
-                    $end = 21 * 60 + 30;
-                    $start = max($prevEnd, $end - min($duration, 60));
-                }
-                $slot['time'] = $this->formatTimeRange($start, $end);
-            }
-
-            $prevEnd = $this->parseTimeEndMinutes($slot['time'] ?? '') ?? ($start + $duration);
-        }
-        unset($slot);
-
-        return $slots;
-    }
-
-    protected function parseTimeEndMinutes(?string $time): ?int
-    {
-        if (!$time) {
-            return null;
-        }
-        if (preg_match_all('/(\d{1,2})\s*:\s*(\d{2})/', $time, $m, PREG_SET_ORDER) && count($m) >= 2) {
-            $h = (int) $m[1][1];
-            $min = (int) $m[1][2];
-            if ($h >= 0 && $h <= 23 && $min >= 0 && $min <= 59) {
-                return $h * 60 + $min;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Sửa khung giờ bữa ăn lệch (vd: \"Ăn trưa\" lúc 16:30).
-     */
-    protected function fixMealTimes(array $slots): array
-    {
-        foreach ($slots as &$slot) {
-            $activity = mb_strtolower((string) ($slot['activity'] ?? ''));
-            $type = $slot['type'] ?? '';
-            $isFood = $type === 'food'
-                || str_contains($activity, 'ăn sáng')
-                || str_contains($activity, 'ăn trưa')
-                || str_contains($activity, 'ăn tối')
-                || str_contains($activity, 'bữa sáng')
-                || str_contains($activity, 'bữa trưa')
-                || str_contains($activity, 'bữa tối');
-
-            if (!$isFood) {
-                continue;
-            }
-
-            $meal = null;
-            if (str_contains($activity, 'ăn sáng') || str_contains($activity, 'bữa sáng') || str_contains($activity, 'breakfast')) {
-                $meal = 'breakfast';
-            } elseif (str_contains($activity, 'ăn tối') || str_contains($activity, 'bữa tối') || str_contains($activity, 'dinner')) {
-                $meal = 'dinner';
-            } elseif (str_contains($activity, 'ăn trưa') || str_contains($activity, 'bữa trưa') || str_contains($activity, 'lunch')) {
-                $meal = 'lunch';
-            } elseif ($type === 'food') {
-                // Food slot không ghi rõ: suy từ giờ hiện tại
-                $startMin = $this->parseTimeStartMinutes($slot['time'] ?? '');
-                if ($startMin !== null) {
-                    if ($startMin < 10 * 60) {
-                        $meal = 'breakfast';
-                    } elseif ($startMin < 15 * 60) {
-                        $meal = 'lunch';
-                    } else {
-                        $meal = 'dinner';
-                    }
-                } else {
-                    $meal = 'lunch';
-                }
-            }
-
-            // Dinner: cho phép sớm từ 16:00 (ăn trước khi về), không ép cứng 18:00
-            $ranges = [
-                'breakfast' => ['07:30 - 08:30', 7 * 60 + 30, 9 * 60],
-                'lunch' => ['11:45 - 13:00', 11 * 60 + 30, 13 * 60 + 30],
-                'dinner' => ['17:00 - 18:00', 16 * 60, 20 * 60],
-            ];
-
-            if (!$meal || !isset($ranges[$meal])) {
-                continue;
-            }
-
-            [$defaultRange, $minOk, $maxOk] = $ranges[$meal];
-            $startMin = $this->parseTimeStartMinutes($slot['time'] ?? '');
-
-            // Chỉ sửa khi giờ lệch khung — không đụng dinner đã đặt trước giờ về
-            if ($startMin === null || $startMin < $minOk || $startMin > $maxOk) {
-                $slot['time'] = $defaultRange;
-            }
-
-            if ($meal === 'lunch' && $startMin !== null && $startMin >= 15 * 60) {
-                $slot['time'] = $defaultRange;
-            }
-
-            // Chuẩn hóa wording nếu giờ đã là dinner nhưng text vẫn \"ăn trưa\"
-            if ($meal === 'dinner' && (str_contains($activity, 'ăn trưa') || str_contains($activity, 'bữa trưa'))) {
-                $slot['activity'] = preg_replace('/ăn\s*trưa|bữa\s*trưa/iu', 'Ăn tối', (string) $slot['activity']);
-            }
-            if ($meal === 'lunch' && (str_contains($activity, 'ăn tối') || str_contains($activity, 'bữa tối'))) {
-                $slot['activity'] = preg_replace('/ăn\s*tối|bữa\s*tối/iu', 'Ăn trưa', (string) $slot['activity']);
-            }
-        }
-        unset($slot);
-
-        // Sắp lại theo giờ bắt đầu để timeline không đảo
-        usort($slots, function ($a, $b) {
-            $am = $this->parseTimeStartMinutes($a['time'] ?? '') ?? 0;
-            $bm = $this->parseTimeStartMinutes($b['time'] ?? '') ?? 0;
-            return $am <=> $bm;
-        });
-
-        return $slots;
-    }
-
-    protected function parseTimeStartMinutes(?string $time): ?int
-    {
-        if (!$time) {
-            return null;
-        }
-        if (preg_match('/(\d{1,2})\s*:\s*(\d{2})/', $time, $m)) {
-            $h = (int) $m[1];
-            $min = (int) $m[2];
-            if ($h >= 0 && $h <= 23 && $min >= 0 && $min <= 59) {
-                return $h * 60 + $min;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Nếu slot food quá xa điểm trước: viết lại activity kiểu \"gần khu vực X hoặc tham khảo quán Y\".
-     */
-    protected function softenFarFoodSlots(array $slots): array
-    {
-        $farThresholdKm = 6.0;
-        $prevVisit = null;
-
-        foreach ($slots as &$slot) {
-            $type = $slot['type'] ?? 'visit';
-            $hasGps = !empty($slot['_lat']) && !empty($slot['_lng']);
-
-            if (in_array($type, ['visit', 'photo'], true) && $hasGps) {
-                $prevVisit = $slot;
-            }
-
-            $isFood = $type === 'food'
-                || str_contains(mb_strtolower((string) ($slot['activity'] ?? '')), 'ăn ');
-
-            if (!$isFood || !$hasGps || !$prevVisit) {
-                continue;
-            }
-
-            $km = $this->distanceKm(
-                (float) $prevVisit['_lat'],
-                (float) $prevVisit['_lng'],
-                (float) $slot['_lat'],
-                (float) $slot['_lng']
-            );
-
-            if ($km < $farThresholdKm) {
-                continue;
-            }
-
-            $areaName = $prevVisit['location'] ?? 'điểm tham quan';
-            $foodName = $slot['location'] ?? 'quán đặc sản';
-            $activityLower = mb_strtolower((string) ($slot['activity'] ?? ''));
-
-            $mealWord = 'Ăn';
-            if (str_contains($activityLower, 'ăn sáng') || str_contains($activityLower, 'bữa sáng')) {
-                $mealWord = 'Ăn sáng';
-            } elseif (str_contains($activityLower, 'ăn tối') || str_contains($activityLower, 'bữa tối')) {
-                $mealWord = 'Ăn tối';
-            } elseif (str_contains($activityLower, 'ăn trưa') || str_contains($activityLower, 'bữa trưa')) {
-                $mealWord = 'Ăn trưa';
-            } else {
-                $startMin = $this->parseTimeStartMinutes($slot['time'] ?? '');
-                if ($startMin !== null && $startMin < 10 * 60) {
-                    $mealWord = 'Ăn sáng';
-                } elseif ($startMin !== null && $startMin >= 16 * 60) {
-                    $mealWord = 'Ăn tối';
-                } else {
-                    $mealWord = 'Ăn trưa';
-                }
-            }
-
-            $slot['activity'] = "{$mealWord} tại các quán ăn gần khu vực {$areaName} hoặc có thể tham khảo quán {$foodName} nếu tiện đường.";
-            $slot['tip'] = trim(($slot['tip'] ?? '') . " Quán {$foodName} cách khoảng " . round($km, 1) . " km — chỉ nên ghé nếu cùng hướng di chuyển.");
-            $slot['distance_note'] = 'far_food';
-
-            // Neo location về khu vực đang ở để người dùng không bị zoom sang quán xa
-            $slot['location'] = $areaName;
-            if (!empty($prevVisit['location_id'])) {
-                $slot['location_id'] = $prevVisit['location_id'];
-                $slot['_lat'] = $prevVisit['_lat'];
-                $slot['_lng'] = $prevVisit['_lng'];
-            }
-            $slot['reference_food'] = $foodName;
-        }
-        unset($slot);
-
-        return $slots;
-    }
-
-    /**
-     * Greedy nearest-neighbor reorder cho các slot có GPS (giữ slot không GPS tại chỗ tương đối).
-     */
-    protected function optimizeDayRoute(array $slots): array
-    {
-        $withGps = [];
-        $without = [];
-        foreach ($slots as $i => $slot) {
-            if (!empty($slot['_lat']) && !empty($slot['_lng']) && in_array($slot['type'] ?? 'visit', ['visit', 'food', 'photo'], true)) {
-                $withGps[] = $slot;
-            } else {
-                $without[] = ['index' => $i, 'slot' => $slot];
-            }
-        }
-
-        if (count($withGps) < 2) {
-            return $slots;
-        }
-
-        $ordered = [];
-        $remaining = $withGps;
-        $current = array_shift($remaining);
-        $ordered[] = $current;
-
-        while (!empty($remaining)) {
-            $bestIdx = 0;
-            $bestDist = PHP_FLOAT_MAX;
-            foreach ($remaining as $idx => $cand) {
-                $d = $this->distanceKm($current['_lat'], $current['_lng'], $cand['_lat'], $cand['_lng']);
-                if ($d < $bestDist) {
-                    $bestDist = $d;
-                    $bestIdx = $idx;
-                }
-            }
-            $current = $remaining[$bestIdx];
-            $ordered[] = $current;
-            array_splice($remaining, $bestIdx, 1);
-        }
-
-        // Ghép lại: thay các slot có GPS bằng thứ tự tối ưu, giữ transport/rest theo vị trí gốc
-        $result = [];
-        $oi = 0;
-        $gpsPositions = [];
-        foreach ($slots as $i => $slot) {
-            if (!empty($slot['_lat']) && !empty($slot['_lng']) && in_array($slot['type'] ?? 'visit', ['visit', 'food', 'photo'], true)) {
-                $gpsPositions[] = $i;
-            }
-        }
-
-        $result = $slots;
-        foreach ($gpsPositions as $pos) {
-            if (isset($ordered[$oi])) {
-                // Giữ time gốc nếu có
-                $newSlot = $ordered[$oi];
-                if (!empty($slots[$pos]['time'])) {
-                    $newSlot['time'] = $slots[$pos]['time'];
-                }
-                $result[$pos] = $newSlot;
-                $oi++;
-            }
-        }
-
-        return array_values($result);
-    }
-
-    /**
-     * Thay điểm quá xa điểm trước bằng địa điểm gần hơn trong cùng cụm DB.
-     */
-    protected function constrainFarJumps(array $slots, array $prefs): array
-    {
-        $maxKm = (($prefs['focus'] ?? '') === 'it_di_chuyen') ? 8.0 : 12.0;
-        $usedIds = [];
-        foreach ($slots as $s) {
-            if (!empty($s['location_id'])) {
-                $usedIds[(int) $s['location_id']] = true;
-            }
-        }
-
-        $prevGps = null;
-        foreach ($slots as &$slot) {
-            $type = $slot['type'] ?? 'visit';
-            $hasGps = !empty($slot['_lat']) && !empty($slot['_lng']);
-
-            // food/rest đã xử lý riêng; chỉ siết visit/photo/transport điểm
-            if (!in_array($type, ['visit', 'photo'], true) || !$hasGps) {
-                if ($hasGps && in_array($type, ['visit', 'photo', 'food'], true)) {
-                    $prevGps = $slot;
-                }
-                continue;
-            }
-
-            if ($prevGps) {
-                $km = $this->distanceKm(
-                    (float) $prevGps['_lat'],
-                    (float) $prevGps['_lng'],
-                    (float) $slot['_lat'],
-                    (float) $slot['_lng']
-                );
-
-                if ($km > $maxKm) {
-                    $replacement = $this->findNearestAlternative(
-                        (float) $prevGps['_lat'],
-                        (float) $prevGps['_lng'],
-                        $slot['_category_slug'] ?? null,
-                        $usedIds,
-                        $maxKm
-                    );
-
-                    if ($replacement) {
-                        $oldName = $slot['location'] ?? '';
-                        $oldId = isset($slot['location_id']) ? (int) $slot['location_id'] : null;
-                        if ($oldId) {
-                            unset($usedIds[$oldId]);
-                        }
-
-                        $slot['location_id'] = $replacement->id;
-                        $slot['location'] = $replacement->name;
-                        $slot['_lat'] = (float) $replacement->lat;
-                        $slot['_lng'] = (float) $replacement->lng;
-                        $slot['_category_slug'] = $replacement->category->slug ?? ($slot['_category_slug'] ?? '');
-                        $usedIds[$replacement->id] = true;
-
-                        $newKm = $this->distanceKm(
-                            (float) $prevGps['_lat'],
-                            (float) $prevGps['_lng'],
-                            (float) $slot['_lat'],
-                            (float) $slot['_lng']
-                        );
-                        $slot['tip'] = trim(($slot['tip'] ?? '') . " Đã ưu tiên điểm gần hơn (~" . round($newKm, 1) . " km) thay vì đi xa tới {$oldName}.");
-                        if (!empty($slot['activity'])) {
-                            // Giữ mô tả chung, đổi tên địa điểm nếu có trong activity
-                            $slot['activity'] = str_replace($oldName, $replacement->name, $slot['activity']);
-                        }
-                    } else {
-                        // Không tìm được điểm thay: gắn lại về khu vực điểm trước để tránh nhảy xa
-                        $slot['type'] = 'rest';
-                        $slot['activity'] = 'Nghỉ ngắn / dạo quanh khu vực ' . ($prevGps['location'] ?? 'điểm trước') . ' thay vì di chuyển quá xa.';
-                        $slot['location'] = $prevGps['location'] ?? $slot['location'];
-                        $slot['location_id'] = $prevGps['location_id'] ?? null;
-                        $slot['_lat'] = $prevGps['_lat'];
-                        $slot['_lng'] = $prevGps['_lng'];
-                        $slot['tip'] = 'Bỏ đoạn di chuyển > ' . round($km, 1) . ' km trong cùng buổi để lịch trình gọn hơn.';
-                    }
-                }
-            }
-
-            if (!empty($slot['_lat']) && !empty($slot['_lng'])) {
-                $prevGps = $slot;
-            }
-        }
-        unset($slot);
-
-        return $slots;
-    }
-
-    /**
-     * Tìm địa điểm gần nhất trong bán kính, ưu tiên cùng category, chưa dùng trong ngày.
-     */
-    protected function findNearestAlternative(float $lat, float $lng, ?string $preferredSlug, array $usedIds, float $maxKm): ?Location
-    {
-        if (empty($this->locationsById)) {
-            return null;
-        }
-
         $best = null;
-        $bestDist = PHP_FLOAT_MAX;
+        $bestScore = -1;
 
-        foreach ($this->locationsById as $loc) {
-            if (!$loc->lat || !$loc->lng) {
+        foreach ($catalog as $loc) {
+            if (!isset($allowedSet[(int) $loc->id])) {
                 continue;
             }
-            if (isset($usedIds[$loc->id])) {
+            if (($loc->category->slug ?? '') !== 'am-thuc') {
                 continue;
             }
-            $slug = $loc->category->slug ?? '';
-            if (in_array($slug, ['am-thuc', 'luu-tru'], true)) {
-                continue; // thay điểm tham quan, không thay bằng quán
-            }
-
-            $d = $this->distanceKm($lat, $lng, (float) $loc->lat, (float) $loc->lng);
-            if ($d > $maxKm) {
+            if ($vegetarian && $this->isMeatHeavyName((string) $loc->name)) {
                 continue;
             }
 
-            // Ưu tiên cùng category: giảm khoảng cách ảo
-            $score = $d;
-            if ($preferredSlug && $slug === $preferredSlug) {
-                $score -= 2.0;
+            $score = 1.0;
+            $name = mb_strtolower((string) $loc->name);
+            if ($vegetarian && str_contains($name, 'chay')) {
+                $score += 40;
+            }
+            if ($near && $near->lat && $near->lng && $loc->lat && $loc->lng) {
+                $km = $this->distanceKm(
+                    (float) $near->lat,
+                    (float) $near->lng,
+                    (float) $loc->lat,
+                    (float) $loc->lng
+                );
+                $score += max(0, 25 - $km);
             }
 
-            if ($score < $bestDist) {
-                $bestDist = $score;
+            if ($score > $bestScore) {
+                $bestScore = $score;
                 $best = $loc;
             }
         }
@@ -1430,7 +642,39 @@ class TripPlannerService
     }
 
     /**
-     * Điểm vào chính: sinh lịch trình hoàn chỉnh từ câu trả lời khảo sát.
+     * @param  \Illuminate\Support\Collection<int, Location>  $catalog
+     * @param  array<int, true>  $allowedSet
+     */
+    protected function findLocationByName(string $name, $catalog, array $allowedSet): ?Location
+    {
+        $norm = mb_strtolower(trim($name));
+        if ($norm === '') {
+            return null;
+        }
+
+        foreach ($catalog as $loc) {
+            if (!isset($allowedSet[(int) $loc->id])) {
+                continue;
+            }
+            if (mb_strtolower((string) $loc->name) === $norm) {
+                return $loc;
+            }
+        }
+
+        foreach ($catalog as $loc) {
+            if (!isset($allowedSet[(int) $loc->id])) {
+                continue;
+            }
+            $locName = mb_strtolower((string) $loc->name);
+            if ($locName !== '' && (str_contains($locName, $norm) || str_contains($norm, $locName))) {
+                return $loc;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Gộp toàn bộ quy trình phân tích -> lọc địa điểm -> gọi AI -> hậu xử lý.
      */
     public function generateItinerary(array $answers, ?string $tripType = null): array
@@ -1474,45 +718,39 @@ class TripPlannerService
         if (!empty($prefs['interests'])) {
             $extraRules[] = 'Sở thích đã chọn: ' . implode(', ', $prefs['interests']) . ' — ưu tiên địa điểm thuộc các nhóm này.';
         }
-        if (($prefs['focus'] ?? '') === 'it_di_chuyen' || ($prefs['focus'] ?? '') === 'anh_dep') {
-            // soft hint already in focus
-        }
         $extraRulesText = '';
         if ($extraRules) {
             $lines = [];
-            foreach ($extraRules as $i => $r) {
+            foreach ($extraRules as $r) {
                 $lines[] = '- ' . $r;
             }
             $extraRulesText = "\nCÁ NHÂN HÓA THEO HỒ SƠ:\n" . implode("\n", $lines);
         }
 
-        $systemPrompt = "Bạn là chuyên gia lập kế hoạch du lịch chuyên nghiệp.
-Nhiệm vụ của bạn là lập LỊCH TRÌNH DU LỊCH CHI TIẾT theo dạng Timeline dựa trên hồ sơ mong muốn của người dùng.
+        $systemPrompt = "Bạn là chuyên gia lập kế hoạch du lịch. Trả về đúng 1 object JSON, không markdown.
 
-QUY TẮC BẮT BUỘC (TUYỆT ĐỐI TUÂN THỦ 100%):
-
-0. SỐ NGÀY: mảng \"days\" BẮT BUỘC có ĐÚNG {$days} phần tử (day: 1..{$days}).
-1. NGÂN SÁCH: estimated_cost BẮT BUỘC là \"{$prefs['budget_label']}\" (khớp lựa chọn người dùng).
+QUY TẮC:
+0. SỐ NGÀY: mảng \"days\" ĐÚNG {$days} phần tử (day: 1..{$days}).
+1. NGÂN SÁCH: estimated_cost BẮT BUỘC là \"{$prefs['budget_label']}\".
 2. LƯU TRÚ: {$hotelRule}
-3. NHỊP ĐỘ: {$paceLabel}. Mỗi ngày khoảng {$slotMin}–{$slotMax} slot chính (không được sơ sài bỏ bữa/nghỉ).
-4. GOM CỤM GPS — ƯU TIÊN TUYỆT ĐỐI:
-   - Chỉ chọn các điểm GẦN NHAU trong cùng vùng (ưu tiên < 8–10 km giữa 2 điểm liên tiếp).
-   - KHÔNG nhảy xa > 12 km trong cùng một ngày/buổi (trừ khi bắt buộc vận chuyển về).
-   - Sắp xếp tuyến tính xuôi đường, tuyệt đối tránh zig-zag.
-   - Danh sách bên dưới đã được lọc theo cụm gần nhau — hãy dùng điểm trong cụm đó.
-5. CHỈ chọn địa điểm từ danh sách bên dưới. Mỗi slot visit/food/photo BẮT BUỘC có location_id đúng.
-6. ĂN UỐNG + NGHỈ — BẮT BUỘC ĐỦ (quan trọng):
-   - Mỗi ngày PHẢI có ít nhất 1 slot type \"food\" ĂN TRƯA trong khung 11:30–13:30.
-   - KHÔNG được để trống khoảng 12:00–13:30 (ví dụ kết thúc 12:00 rồi nhảy 13:30 mà không có ăn trưa).
-   - ĂN + NGHỈ = 1 SLOT: gộp nghỉ sau bữa vào cùng slot \"food\" (vd: \"Ăn trưa … rồi nghỉ ngơi nhẹ\"). KHÔNG tách slot \"rest\" ngay sau ăn trưa/ăn tối cùng địa điểm.
-   - Chỉ dùng type \"rest\" khi nghỉ giữa chừng KHÔNG kèm bữa ăn (vd: nghỉ chân giữa 2 cụm tham quan, hoặc chuẩn bị lên xe về).
-   - Nếu lịch còn hoạt động sau 17:00: thêm slot type \"food\" ĂN TỐI trước giờ về (có thể gộp nghỉ nhẹ trong cùng slot).
+3. NHỊP ĐỘ: {$paceLabel}. Mỗi ngày khoảng {$slotMin}–{$slotMax} slot chính.
+4. GOM CỤM GPS:
+   - Chỉ chọn điểm GẦN NHAU (ưu tiên < 8–10 km giữa 2 điểm liên tiếp).
+   - Không nhảy xa > 12 km trong cùng ngày (trừ khi về).
+   - Sắp xếp tuyến tính, không zig-zag.
+   - Chỉ dùng địa điểm trong danh sách (đã lọc theo cụm).
+5. Mỗi slot visit/food/photo BẮT BUỘC có location_id đúng từ danh sách.
+6. ĂN UỐNG + NGHỈ:
+   - Mỗi ngày ít nhất 1 slot type \"food\" ăn trưa 11:30–13:30.
+   - Không để trống 12:00–13:30.
+   - Ăn + nghỉ = 1 slot food (vd: \"Ăn trưa … rồi nghỉ ngơi nhẹ\"). Không tách rest ngay sau bữa cùng chỗ.
+   - type \"rest\" chỉ khi nghỉ giữa chừng không kèm bữa.
+   - Nếu còn hoạt động sau 17:00: thêm food ăn tối.
    - Ăn sáng 07:00–09:00 nếu bắt đầu sớm / có lưu trú.
-7. ẨM THỰC GẦN ĐIỂM ĐANG Ở:
-   - Ưu tiên quán ăn GẦN cụm/điểm tham quan vừa xếp.
-   - Nếu quán trong DB ở XA (> ~5–8 km): viết \"Ăn trưa tại các quán gần khu vực [điểm đang ở] hoặc có thể tham khảo quán [tên quán] nếu tiện đường.\"
+7. Ẩm thực gần điểm đang ở. Nếu quán DB xa (> 5–8 km): gợi ý quán gần khu vực hiện tại, không gắn sai quán.
+   - Nếu khách chọn đồ chay / thanh đạm: CẤM gắn quán thịt dê, thịt, đặc sản mặn. Chỉ chọn quán có chữ chay; không có thì ghi \"quán chay gần khu vực\" và không gắn location_id quán thịt.
 8. Mô tả ngắn 1–2 câu mỗi slot.{$extraRulesText}
-9. Trả về ĐÚNG 1 ĐỐI TƯỢNG JSON thuần túy:
+9. Schema JSON:
 {
   \"title\": \"Tiêu đề chuyến đi\",
   \"summary\": \"Tóm tắt 1-2 câu\",
@@ -1541,7 +779,7 @@ type chỉ nhận: visit, food, transport, rest, photo.
 
         $userPrompt = "Hồ sơ mong muốn của người dùng:\n{$answersText}\nSố ngày bắt buộc: {$days}.\nNgân sách bắt buộc: {$prefs['budget_label']}.\nNhịp độ: {$paceLabel}.\nHãy sinh lịch trình dạng JSON chi tiết, sát ý khách theo hồ sơ trên.";
 
-        $rawResponse = $this->callAI($systemPrompt, $userPrompt, 3500, 0.55);
+        $rawResponse = $this->callAI($systemPrompt, $userPrompt, 3500, 0.4);
 
         if ($rawResponse) {
             $decoded = $this->cleanAndDecodeJson($rawResponse);

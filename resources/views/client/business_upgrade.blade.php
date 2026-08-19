@@ -1113,11 +1113,6 @@
                                     <input type="tel" class="form-control-clean flex-grow-1" id="input_phone" name="phone" required placeholder="Ví dụ: 0912345678" style="margin-bottom: 0;">
                                 </div>
                             </div>
-
-                            <div class="mb-4">
-                                <label class="form-label-clean">Trang web (không bắt buộc)</label>
-                                <input type="url" class="form-control-clean" id="input_website" name="website" placeholder="Ví dụ: https://mybusiness.com">
-                            </div>
                         </div>
 
                         <!-- Step 6: Map Coordinates -->
@@ -2971,6 +2966,10 @@
                         return false;
                     }
                 } else if (bizStep === 11) {
+                    if (!Number.isFinite(verificationLat) || !Number.isFinite(verificationLng)) {
+                        showToast('Chưa lấy được GPS. Bật Vị trí trên trình duyệt rồi nhấn "Lấy lại GPS".', false);
+                        return false;
+                    }
                     if (!verificationPhotos || verificationPhotos.length === 0) {
                         showToast('Bắt buộc phải bật Camera chụp ảnh xác thực thực địa!', false);
                         return false;
@@ -3024,6 +3023,15 @@
 
             // Final AJAX form submission
             function submitBizRegistrationForm() {
+                if (!Number.isFinite(verificationLat) || !Number.isFinite(verificationLng)) {
+                    showToast('Chưa lấy được GPS. Bật Vị trí trên trình duyệt rồi nhấn "Lấy lại GPS" trước khi gửi.', false);
+                    return;
+                }
+                if (!verificationPhotos || verificationPhotos.length === 0) {
+                    showToast('Bắt buộc phải chụp ảnh xác thực thực địa trước khi gửi.', false);
+                    return;
+                }
+
                 const submitBtn = bizNextBtn;
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Đang gửi...`;

@@ -2643,7 +2643,7 @@
                                     </div>
                                 </div>
                                 <div class="data-actions">
-                                    <button type="button" class="btn-solid itinerary-view-btn" data-id="{{ $it->id }}">Xem lại</button>
+                                    <a href="{{ route('home') }}?itinerary={{ $it->id }}" class="btn-solid itinerary-view-btn" style="text-decoration:none;">Xem lại</a>
                                     <button type="button" class="btn-danger-ghost itinerary-delete-btn" data-id="{{ $it->id }}">Xóa</button>
                                 </div>
                             </div>
@@ -2653,27 +2653,6 @@
                                 <a href="{{ route('home') }}" class="btn-solid" style="text-decoration:none;display:inline-block;" onclick="if(window.openTripPlanner){event.preventDefault(); window.openTripPlanner(true);}">Lên lịch trình AI</a>
                             </div>
                         @endforelse
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal xem lịch trình -->
-            <div class="modal fade" id="itineraryViewModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-                    <div class="modal-content it-modal-content">
-                        <div class="it-modal-header">
-                            <div class="it-modal-header-text">
-                                <div class="it-modal-kicker">Lịch trình đã lưu</div>
-                                <h5 class="it-modal-title" id="itineraryModalTitle">Lịch trình</h5>
-                                <div class="it-modal-summary" id="itineraryModalSummary"></div>
-                            </div>
-                            <button type="button" class="it-modal-close" data-bs-dismiss="modal" aria-label="Close">&times;</button>
-                        </div>
-                        <div class="modal-body it-modal-body" id="itineraryModalBody"></div>
-                        <div class="it-modal-footer">
-                            <div class="it-modal-cost" id="itineraryModalCost"></div>
-                            <button type="button" class="it-modal-btn" data-bs-dismiss="modal">Đóng</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -3475,103 +3454,13 @@
             });
         }
 
-        // --- Saved Itineraries: view / delete ---
+        // --- Saved Itineraries: delete ---
         const itinerariesGrid = document.getElementById('itinerariesGrid');
         const itinerariesCountBadge = document.getElementById('itinerariesCountBadge');
-        const itineraryModalEl = document.getElementById('itineraryViewModal');
-        const itineraryModal = itineraryModalEl ? new bootstrap.Modal(itineraryModalEl) : null;
-
-        function escapeHtml(str) {
-            return String(str ?? '').replace(/[&<>"']/g, s => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            }[s]));
-        }
-
-        function renderItineraryModal(data, meta) {
-            document.getElementById('itineraryModalTitle').textContent = data.title || 'Lịch trình';
-            document.getElementById('itineraryModalSummary').textContent = data.summary || (meta?.created_at ? ('Lưu lúc ' + meta.created_at) : '');
-            const costEl = document.getElementById('itineraryModalCost');
-            costEl.textContent = data.estimated_cost ? ('Chi phí: ' + data.estimated_cost) : '';
-
-            const typeLabel = {
-                visit: 'Tham quan',
-                food: 'Ẩm thực',
-                transport: 'Di chuyển',
-                rest: 'Nghỉ ngơi',
-                photo: 'Check-in',
-            };
-
-            function cleanDayTitle(day) {
-                let title = String(day.title || '').trim();
-                const n = day.day ?? '';
-                // Bỏ trùng kiểu "Ngày 1: Ngày 1: ..."
-                title = title.replace(new RegExp(`^\\s*Ngày\\s*${n}\\s*[:\\-–]?\\s*`, 'i'), '');
-                title = title.replace(/^Ngày\s*\d+\s*[:\-–]?\s*/i, '');
-                return title.trim();
-            }
-
-            let html = '';
-            (data.days || []).forEach(day => {
-                const dayTitle = cleanDayTitle(day);
-                html += `<div class="it-day">
-                    <div class="it-day-head">
-                        <span class="it-day-badge">NGÀY ${escapeHtml(day.day)}</span>
-                        <h6 class="it-day-title">${escapeHtml(dayTitle || ('Hành trình ngày ' + day.day))}</h6>
-                    </div>`;
-
-                (day.slots || []).forEach(slot => {
-                    const type = slot.type || 'visit';
-                    const pill = typeLabel[type] || 'Hoạt động';
-                    html += `<div class="it-slot">
-                        <div class="it-slot-time">${escapeHtml(slot.time || '')}</div>
-                        <div class="it-slot-rail"><span class="it-slot-dot ${escapeHtml(type)}"></span></div>
-                        <div>
-                            <span class="it-type-pill ${escapeHtml(type)}">${escapeHtml(pill)}</span>
-                            <div class="it-slot-activity">${escapeHtml(slot.activity || '')}</div>
-                            ${slot.location ? `<div class="it-slot-location">${escapeHtml(slot.location)}</div>` : ''}
-                            ${slot.distance_from_prev_km ? `<div class="it-slot-meta">↔ ${escapeHtml(slot.distance_from_prev_km)} km từ điểm trước</div>` : ''}
-                            ${slot.tip ? `<div class="it-slot-tip">${escapeHtml(slot.tip)}</div>` : ''}
-                        </div>
-                    </div>`;
-                });
-
-                html += `</div>`;
-            });
-
-            if ((data.tips || []).length) {
-                html += `<div class="it-tips"><div class="it-tips-title">Lưu ý</div><ul>${data.tips.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul></div>`;
-            }
-
-            document.getElementById('itineraryModalBody').innerHTML = html || '<p class="text-secondary mb-0">Không có nội dung.</p>';
-            if (itineraryModal) itineraryModal.show();
-        }
 
         if (itinerariesGrid) {
             itinerariesGrid.addEventListener('click', function(e) {
-                const viewBtn = e.target.closest('.itinerary-view-btn');
                 const deleteBtn = e.target.closest('.itinerary-delete-btn');
-
-                if (viewBtn) {
-                    const id = viewBtn.getAttribute('data-id');
-                    viewBtn.disabled = true;
-                    fetch(`/trip-planner/${id}`, {
-                        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        viewBtn.disabled = false;
-                        if (!data.success) {
-                            showToast(data.error || 'Không tải được lịch trình.', false);
-                            return;
-                        }
-                        renderItineraryModal(data.itinerary || {}, data.meta || {});
-                    })
-                    .catch(() => {
-                        viewBtn.disabled = false;
-                        showToast('Có lỗi xảy ra.', false);
-                    });
-                    return;
-                }
 
                 if (deleteBtn) {
                     const id = deleteBtn.getAttribute('data-id');

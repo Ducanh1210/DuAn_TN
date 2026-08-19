@@ -155,7 +155,12 @@ class InteractionController extends Controller
             'description' => 'nullable|string|max:1000',
         ]);
 
-        $modelClass = '\\App\\Models\\' . $request->reportable_type;
+        $typeName = preg_replace('/[^A-Za-z]/', '', (string) $request->reportable_type);
+        if (!in_array($typeName, ['Location', 'Comment'], true)) {
+            return response()->json(['success' => false, 'message' => 'Loại báo cáo không hợp lệ.'], 400);
+        }
+
+        $modelClass = 'App\\Models\\' . $typeName;
         if (!class_exists($modelClass)) {
             return response()->json(['success' => false, 'message' => 'Loại báo cáo không hợp lệ.'], 400);
         }
@@ -168,7 +173,7 @@ class InteractionController extends Controller
         // Chặn nếu người dùng đã báo cáo nội dung này và đang chờ xử lý
         $existingReport = \App\Models\Report::where('reporter_id', Auth::id())
             ->where('reportable_id', $request->reportable_id)
-            ->where('reportable_type', $modelClass)
+            ->whereIn('reportable_type', [$modelClass, '\\' . $modelClass])
             ->where('status', 'pending')
             ->first();
 

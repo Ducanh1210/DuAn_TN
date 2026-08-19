@@ -6,8 +6,8 @@
 @php
     $pendingBiz = \App\Models\BusinessProfile::where('status', 'pending')->count();
     $pendingSuggestions = \App\Models\LocationSuggestion::where('status', 'pending')->count();
-    $pendingReportLocations = \App\Models\Report::where('reportable_type', \App\Models\Location::class)->where('status', 'pending')->count();
-    $pendingReportComments = \App\Models\Report::where('reportable_type', \App\Models\Comment::class)->where('status', 'pending')->count();
+    $pendingReportLocations = \App\Models\Report::whereIn('reportable_type', \App\Models\Report::morphTypes(\App\Models\Location::class))->where('status', 'pending')->count();
+    $pendingReportComments = \App\Models\Report::whereIn('reportable_type', \App\Models\Report::morphTypes(\App\Models\Comment::class))->where('status', 'pending')->count();
     $pendingFeedbacks = \App\Models\FeedbackReport::where('status', 'pending')->count();
     $pendingTasks = [
         ['label' => 'Duyệt doanh nghiệp', 'count' => $pendingBiz, 'url' => route('admin.business-profiles.index', ['status' => 'pending'])],
