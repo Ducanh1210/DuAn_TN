@@ -47,6 +47,7 @@ class TripPlannerService
             'food' => null,
             'focus' => null,
             'who' => null,
+            'preferred_location_ids' => [],
         ];
 
         foreach ($answers as $a) {
@@ -140,6 +141,10 @@ class TripPlannerService
 
             if (!$prefs['trip_type'] && ($key === 'trip_type' || str_contains(mb_strtolower($a['question'] ?? ''), 'kiểu chuyến'))) {
                 $prefs['trip_type'] = $value ?: $answer;
+            }
+
+            if ($key === 'preferred_locations' && $value) {
+                $prefs['preferred_location_ids'] = array_filter(array_map('intval', explode(',', $value)));
             }
         }
 
@@ -260,6 +265,12 @@ class TripPlannerService
                 $slug = $loc->category->slug ?? '';
                 return $slug === 'am-thuc' && $this->isMeatHeavyName((string) $loc->name);
             })->values();
+        }
+
+        $preferredIds = $prefs['preferred_location_ids'] ?? [];
+        if (!empty($preferredIds)) {
+            $preferred = $locations->filter(fn ($l) => in_array((int) $l->id, $preferredIds, true));
+            $sorted = $preferred->concat($sorted)->unique('id')->values();
         }
 
         $this->locationsById = $sorted->keyBy('id')->all();
@@ -405,6 +416,13 @@ class TripPlannerService
                 $jsonCandidate = substr($jsonCandidate, 0, $lastBrace + 1);
             }
             $decoded = json_decode($jsonCandidate, true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+
+            $fixed = preg_replace('/[\x00-\x1F\x7F]/', ' ', $jsonCandidate);
+            $fixed = preg_replace('/,\s*([\]\}])/', '$1', $fixed);
+            $decoded = json_decode($fixed, true);
             if (is_array($decoded)) {
                 return $decoded;
             }
@@ -718,6 +736,14 @@ class TripPlannerService
         if (!empty($prefs['interests'])) {
             $extraRules[] = 'Sở thích đã chọn: ' . implode(', ', $prefs['interests']) . ' — ưu tiên địa điểm thuộc các nhóm này.';
         }
+        $preferredIds = $prefs['preferred_location_ids'] ?? [];
+        if (!empty($preferredIds)) {
+            $preferredNames = $locations->filter(fn ($l) => in_array((int) $l->id, $preferredIds, true))->pluck('name')->all();
+            if ($preferredNames) {
+                $extraRules[] = 'Khách ĐÃ CHỌN muốn ghé: ' . implode(', ', $preferredNames) . ' — BẮT BUỘC đưa vào lịch trình nếu hợp lý về khoảng cách.';
+            }
+        }
+
         $extraRulesText = '';
         if ($extraRules) {
             $lines = [];
@@ -779,9 +805,14 @@ type chỉ nhận: visit, food, transport, rest, photo.
 
         $userPrompt = "Hồ sơ mong muốn của người dùng:\n{$answersText}\nSố ngày bắt buộc: {$days}.\nNgân sách bắt buộc: {$prefs['budget_label']}.\nNhịp độ: {$paceLabel}.\nHãy sinh lịch trình dạng JSON chi tiết, sát ý khách theo hồ sơ trên.";
 
-        $rawResponse = $this->callAI($systemPrompt, $userPrompt, 3500, 0.4);
+        for ($attempt = 1; $attempt <= 2; $attempt++) {
+            $rawResponse = $this->callAI($systemPrompt, $userPrompt, 3500, 0.4);
 
-        if ($rawResponse) {
+            if (!$rawResponse) {
+                Log::warning("TripPlanner: AI trả null (lần $attempt)");
+                continue;
+            }
+
             $decoded = $this->cleanAndDecodeJson($rawResponse);
             if (is_array($decoded) && (isset($decoded['days']) || isset($decoded['title']))) {
                 $decoded = $this->postProcessItinerary($decoded, $prefs);
@@ -796,10 +827,10 @@ type chỉ nhận: visit, food, transport, rest, photo.
                 ];
             }
 
-            return ['success' => true, 'raw' => $rawResponse];
+            Log::warning("TripPlanner: JSON parse thất bại (lần $attempt)", ['raw' => mb_substr($rawResponse, 0, 500)]);
         }
 
-        return ['success' => false, 'error' => 'Không thể tạo lịch trình lúc này. Vui lòng thử lại.'];
+        return ['success' => false, 'error' => 'Không thể tạo lịch trình lúc này. Vui lòng bấm "Lên lịch mới" để thử lại.'];
     }
 
     /**

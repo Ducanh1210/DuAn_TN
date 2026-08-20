@@ -514,16 +514,9 @@
                 $pendingReportsTotal = $pendingReportLocations + $pendingReportComments + $pendingFeedbacks;
             @endphp
             <nav>
-                <div class="sidebar-nav-group {{ $contentOpen ? 'open' : '' }}">
-                    <button type="button" class="sidebar-nav-toggle" aria-expanded="{{ $contentOpen ? 'true' : 'false' }}">
-                        <span>Tin tức &amp; sự kiện</span>
-                        <i class="fas fa-chevron-down sidebar-chevron"></i>
-                    </button>
-                    <div class="sidebar-subnav">
-                        <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.*') ? 'active' : '' }}">Tin tức</a>
-                        <a href="{{ route('admin.events.index') }}" class="{{ request()->routeIs('admin.events.*') ? 'active' : '' }}">Sự kiện</a>
-                    </div>
-                </div>
+                <a href="{{ route('admin.news.index') }}" class="{{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
+                    Tin tức & sự kiện
+                </a>
                 <a href="{{ route('admin.comments.index') }}" class="{{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
                     Quản lý bình luận
                 </a>

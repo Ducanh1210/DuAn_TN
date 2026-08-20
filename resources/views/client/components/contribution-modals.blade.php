@@ -205,11 +205,33 @@
     background: #f1f5f9;
 }
 
+.thumb-preview-card.is-oversized {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
+
 .thumb-preview-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+.contrib-form-error {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.contrib-upload-hint {
+    margin-top: 6px;
+    font-size: 0.72rem;
+    color: #64748b;
 }
 
 .thumb-remove-btn {
@@ -354,6 +376,8 @@
                             <div class="dropzone-text" id="dropzoneText">Kéo thả ảnh hoặc nhấp để chọn</div>
                         </div>
                         <div id="filePreviewGrid" class="file-preview-grid"></div>
+                        <div id="suggestFormError" class="contrib-form-error d-none"></div>
+                        <p class="contrib-upload-hint">Tối đa 10 ảnh, mỗi ảnh không quá 10MB (JPG, PNG, WEBP).</p>
                     </div>
                 </div>
 
@@ -373,6 +397,50 @@
 </div>
 
 <script>
+const SUGGEST_MAX_FILES = 10;
+const SUGGEST_MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB
+
+function formatFileSize(bytes) {
+    if (bytes >= 1024 * 1024) {
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+    return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+}
+
+function showSuggestFormError(message) {
+    const box = document.getElementById('suggestFormError');
+    if (!box) return;
+    if (!message) {
+        box.classList.add('d-none');
+        box.textContent = '';
+        return;
+    }
+    box.textContent = message;
+    box.classList.remove('d-none');
+}
+
+function validateSuggestFiles(files) {
+    if (!files || files.length === 0) {
+        return { ok: true };
+    }
+    if (files.length > SUGGEST_MAX_FILES) {
+        return {
+            ok: false,
+            message: `Chỉ được chọn tối đa ${SUGGEST_MAX_FILES} ảnh. Bạn đang chọn ${files.length} ảnh.`,
+        };
+    }
+    const oversized = Array.from(files).filter(f => f.size > SUGGEST_MAX_FILE_BYTES);
+    if (oversized.length > 0) {
+        const names = oversized.slice(0, 3).map(f => `"${f.name}" (${formatFileSize(f.size)})`).join(', ');
+        const suffix = oversized.length > 3 ? ` và ${oversized.length - 3} ảnh khác` : '';
+        return {
+            ok: false,
+            message: `Ảnh quá lớn (tối đa 10MB/ảnh): ${names}${suffix}. Hãy xóa hoặc chọn ảnh nhỏ hơn.`,
+        };
+    }
+    return { ok: true };
+}
+
 let modalPickerMap = null;
 let modalPickerMarker = null;
 let modalHaNamBoundaryGeoJSON = null;
@@ -385,7 +453,9 @@ function handleFileSelect(files) {
     const dt = new DataTransfer();
     Array.from(files).forEach(f => dt.items.add(f));
     fileInput.files = dt.files;
-    
+
+    const check = validateSuggestFiles(dt.files);
+    showSuggestFormError(check.ok ? '' : check.message);
     renderThumbnailPreviews(dt.files);
 }
 
@@ -393,18 +463,19 @@ function renderThumbnailPreviews(files) {
     const previewGrid = document.getElementById('filePreviewGrid');
     const dropzoneText = document.getElementById('dropzoneText');
     if (!previewGrid) return;
-    
+
     previewGrid.innerHTML = '';
-    
+
     if (files.length > 0) {
         dropzoneText.innerHTML = `Đã chọn <strong style="color: #0f172a;">${files.length} hình ảnh</strong>`;
         Array.from(files).forEach((file, index) => {
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const isOversized = file.size > SUGGEST_MAX_FILE_BYTES;
                     const card = document.createElement('div');
-                    card.className = 'thumb-preview-card';
-                    card.title = file.name;
+                    card.className = 'thumb-preview-card' + (isOversized ? ' is-oversized' : '');
+                    card.title = `${file.name} (${formatFileSize(file.size)})`;
                     card.innerHTML = `
                         <img src="${e.target.result}" alt="Preview" />
                         <span class="thumb-remove-btn" onclick="removeFileAtIndex(event, ${index})" title="Xóa">&times;</span>
@@ -415,7 +486,7 @@ function renderThumbnailPreviews(files) {
             }
         });
     } else {
-        dropzoneText.innerHTML = `Kéo thả ảnh hoặc nhấp để chọn`;
+        dropzoneText.innerHTML = 'Kéo thả ảnh hoặc nhấp để chọn';
     }
 }
 
@@ -433,6 +504,8 @@ function removeFileAtIndex(event, indexToRemove) {
         }
     }
     fileInput.files = dt.files;
+    const check = validateSuggestFiles(fileInput.files);
+    showSuggestFormError(check.ok ? '' : check.message);
     renderThumbnailPreviews(fileInput.files);
 }
 
@@ -639,16 +712,30 @@ function submitLocationSuggestion(e) {
     const form = e.target;
     const formData = new FormData(form);
     const submitBtn = form.querySelector('button[type="submit"]');
+    const fileInput = document.getElementById('contribFileInput');
+
+    showSuggestFormError('');
 
     if (!formData.get('lat') || !formData.get('lng')) {
+        const msg = 'Vui lòng nhấp chọn vị trí hợp lệ trong địa phận tỉnh Ninh Bình!';
+        showSuggestFormError(msg);
         if (typeof showToast === 'function') {
-            showToast('⚠️ Vui lòng nhấp chọn vị trí hợp lệ trong địa phận tỉnh Ninh Bình!', 'warning', 3500);
+            showToast('⚠️ ' + msg, 'warning', 3500);
         } else {
-            alert('⚠️ Vui lòng nhấp chọn vị trí hợp lệ trong địa phận tỉnh Ninh Bình!');
+            alert('⚠️ ' + msg);
         }
         return;
     }
-    
+
+    const fileCheck = validateSuggestFiles(fileInput ? fileInput.files : []);
+    if (!fileCheck.ok) {
+        showSuggestFormError(fileCheck.message);
+        if (typeof showToast === 'function') {
+            showToast('⚠️ ' + fileCheck.message, 'warning', 4500);
+        }
+        return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Đang gửi...';
 
@@ -656,12 +743,22 @@ function submitLocationSuggestion(e) {
         method: 'POST',
         body: formData,
         headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
         }
     })
-    .then(res => res.json())
+    .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            const serverMsg = data.message
+                || (data.errors ? Object.values(data.errors).flat().join(' ') : '')
+                || 'Không gửi được đề xuất. Vui lòng thử lại.';
+            throw new Error(serverMsg);
+        }
+        return data;
+    })
     .then(data => {
-        if(data.success) {
+        if (data.success) {
             if (typeof showToast === 'function') {
                 showToast(data.message, 'success', 3500);
             } else {
@@ -669,6 +766,7 @@ function submitLocationSuggestion(e) {
             }
             closeModal('suggestLocationModal');
             form.reset();
+            showSuggestFormError('');
             if (modalPickerMarker) {
                 modalPickerMap.removeLayer(modalPickerMarker);
                 modalPickerMarker = null;
@@ -678,11 +776,22 @@ function submitLocationSuggestion(e) {
             if (previewGrid) previewGrid.innerHTML = '';
             if (dropzoneText) dropzoneText.innerHTML = 'Kéo thả ảnh hoặc nhấp để chọn';
         } else {
+            const msg = data.message || 'Có lỗi xảy ra.';
+            showSuggestFormError(msg);
             if (typeof showToast === 'function') {
-                showToast(data.message || 'Có lỗi xảy ra.', 'error', 3500);
+                showToast(msg, 'error', 3500);
             } else {
-                alert(data.message || 'Có lỗi xảy ra.');
+                alert(msg);
             }
+        }
+    })
+    .catch(err => {
+        const msg = err.message || 'Không gửi được đề xuất. Vui lòng thử lại.';
+        showSuggestFormError(msg);
+        if (typeof showToast === 'function') {
+            showToast(msg, 'error', 4500);
+        } else {
+            alert(msg);
         }
     })
     .finally(() => {

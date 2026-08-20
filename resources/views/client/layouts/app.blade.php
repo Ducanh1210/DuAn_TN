@@ -604,5 +604,19 @@
 
     <!-- Trip Planner (chatbot chỉ hiện ở trang chủ / bản đồ) -->
     <x-trip-planner-widget />
+    <script>
+        document.querySelectorAll('form#logout-form, form[action*="logout"]').forEach(function (form) {
+            form.addEventListener('submit', function () {
+                try {
+                    Object.keys(localStorage).forEach(function (k) {
+                        if (k === 'biz_wizard_state' || k.indexOf('biz_wizard_state_') === 0) {
+                            localStorage.removeItem(k);
+                        }
+                    });
+                } catch (e) {}
+                try { indexedDB.deleteDatabase('biz_wizard_db'); } catch (e) {}
+            });
+        });
+    </script>
 </body>
 </html>

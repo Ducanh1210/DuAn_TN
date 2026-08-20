@@ -354,6 +354,56 @@
         box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
     }
 
+    /* ─── Location Picker Step ─── */
+    .tp-loc-toolbar {
+        display: flex; gap: 8px; margin-bottom: 10px;
+    }
+    .tp-loc-search {
+        flex: 1; padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 7px;
+        font-size: 0.75rem; color: #1e3a5f; background: #fff; outline: none; font-family: inherit;
+    }
+    .tp-loc-search:focus { border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(2,132,199,0.1); }
+    .tp-loc-cat-filter {
+        padding: 7px 8px; border: 1px solid #e2e8f0; border-radius: 7px;
+        font-size: 0.72rem; color: #475569; background: #fff; cursor: pointer; font-family: inherit;
+    }
+    .tp-loc-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px;
+        max-height: 260px; overflow-y: auto; padding: 2px;
+    }
+    .tp-loc-card {
+        background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer;
+        transition: all 0.18s ease; position: relative; overflow: hidden; user-select: none;
+    }
+    .tp-loc-card:hover { border-color: #93c5fd; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .tp-loc-card.selected {
+        border-color: #1e3a5f;
+        background: #f0f5fa;
+        box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.18);
+    }
+    .tp-loc-card-img {
+        width: 100%; height: 80px; object-fit: cover; display: block;
+    }
+    .tp-loc-card-img-placeholder {
+        height: 80px; display: flex; align-items: center; justify-content: center;
+        background: #f1f5f9; color: #94a3b8;
+    }
+    .tp-loc-card-body { padding: 6px 8px; }
+    .tp-loc-card-name {
+        font-size: 0.72rem; font-weight: 600; color: #1e3a5f; line-height: 1.3;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .tp-loc-card-cat { font-size: 0.62rem; color: #94a3b8; margin-top: 2px; }
+    .tp-loc-actions {
+        display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;
+    }
+    .tp-btn { padding: 8px 18px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; }
+    .tp-btn-skip { background: #f1f5f9; color: #64748b; }
+    .tp-btn-skip:hover { background: #e2e8f0; }
+    .tp-btn-confirm { background: #1e3a5f; color: #fff; }
+    .tp-btn-confirm:hover { background: #162d4a; }
+    .tp-btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
     .tp-card-icon {
         font-size: 1.15rem;
         margin-bottom: 4px;
@@ -1181,13 +1231,13 @@
                         <div class="tp-result-hero" id="tp-result-hero">
                             <div class="tp-result-hero-copy">
                                 <div class="tp-result-kicker" id="tp-result-kicker">Hành trình</div>
-                                <div class="tp-result-title" id="tp-result-title"></div>
-                                <div class="tp-result-summary" id="tp-result-summary"></div>
+                    <div class="tp-result-title" id="tp-result-title"></div>
+                    <div class="tp-result-summary" id="tp-result-summary"></div>
                                 <div class="tp-result-stats" id="tp-result-stats"></div>
                             </div>
-                        </div>
-                        <div class="tp-result-body" id="tp-result-body"></div>
-                        <div class="tp-result-footer">
+                </div>
+                <div class="tp-result-body" id="tp-result-body"></div>
+                <div class="tp-result-footer">
                             <button class="tp-btn-save" id="tp-btn-save" type="button">Lưu hành trình</button>
                             <div class="tp-result-footer-side">
                                 <button class="tp-btn-new" id="tp-btn-restart" type="button">Lên lịch mới</button>
@@ -1327,6 +1377,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('form#logout-form, form[action*="logout"]').forEach(function (form) {
         form.addEventListener('submit', function () {
             clearTripDraftStorage();
+            try {
+                Object.keys(localStorage).forEach(function (k) {
+                    if (k === 'biz_wizard_state' || k.indexOf('biz_wizard_state_') === 0) {
+                        localStorage.removeItem(k);
+                    }
+                });
+            } catch (e) {}
+            try { indexedDB.deleteDatabase('biz_wizard_db'); } catch (e) {}
         });
     });
 
@@ -1383,8 +1441,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!el) return;
 
-        el.style.display = 'flex';
-        el.classList.add('active');
+            el.style.display = 'flex';
+            el.classList.add('active');
         el.classList.remove('minimizing');
 
         if (container && btn) {
@@ -1412,7 +1470,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             setTimeout(() => el.classList.add('visible'), 20);
         }
-    }
+        }
 
     window.openTripPlanner = function(forceNew = false) {
         console.log('openTripPlanner triggered');
@@ -1421,12 +1479,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!forceNew) {
             const saved = loadTripDraft();
             if (saved && (saved.days || saved.title)) {
-                wizardBody.style.display = 'none';
-                footer.style.display = 'none';
-                loadingPanel.classList.remove('active');
+                        wizardBody.style.display = 'none';
+                        footer.style.display = 'none';
+                        loadingPanel.classList.remove('active');
                 renderItinerary(saved, false);
-                return;
-            }
+                        return;
+                    }
         } else {
             clearTripDraftStorage();
         }
@@ -1493,7 +1551,7 @@ document.addEventListener('DOMContentLoaded', function() {
         void container.offsetWidth;
 
         el.classList.add('minimizing');
-        el.classList.remove('visible');
+            el.classList.remove('visible');
 
         requestAnimationFrame(() => {
             container.style.transition = '';
@@ -1728,8 +1786,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         { value: 'gia_dinh_vui', label: 'Thuận tiện cho cả gia đình' },
                         { value: 'tiet_kiem_tg', label: 'Sắp xếp giờ lễ hợp lý' },
                         { value: 'anh_dep', label: 'Có ảnh kỷ niệm đẹp' },
-                        { value: 'other', label: 'Khác...' }
-                    ]
+                { value: 'other', label: 'Khác...' }
+            ]
                 }
             },
             food_tour: {
@@ -2281,22 +2339,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const cfg = byType[type] || {};
 
         return [
-            cfg.who || sharedWho,
-            cfg.transport || sharedTransport,
             cfg.duration_hotel || sharedDuration,
-            cfg.budget || sharedBudget,
-            cfg.pace || {
-                key: 'pace',
-                greeting: `Tiếp theo là nhịp độ cho chuyến ${label}.`,
-                question: 'Bạn muốn lịch trình dày hay thoải mái?',
-                type: 'single',
-                options: [
-                    { value: 'cham_rai', label: 'Chậm rãi, thư giãn (ít điểm)' },
-                    { value: 'can_bang', label: 'Cân bằng (3–4 điểm/ngày)' },
-                    { value: 'dap_dong', label: 'Dồn dập, xem nhiều điểm' },
-                    { value: 'other', label: 'Khác...' }
-                ]
-            },
+            cfg.who || sharedWho,
             cfg.interests || {
                 key: 'interests',
                 greeting: 'Chọn đúng sở thích sẽ giúp lịch trình sát ý bạn hơn.',
@@ -2312,33 +2356,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     { value: 'other', label: 'Khác...' }
                 ]
             },
-            cfg.food || {
-                key: 'food',
-                greeting: 'Ăn uống cũng là một phần quan trọng của chuyến đi.',
-                question: 'Bạn thích kiểu ẩm thực nào?',
+            cfg.budget || sharedBudget,
+            cfg.pace || {
+                key: 'pace',
+                greeting: `Tiếp theo là nhịp độ cho chuyến ${label}.`,
+                question: 'Bạn muốn lịch trình dày hay thoải mái?',
                 type: 'single',
                 options: [
-                    { value: 'dac_san', label: 'Đặc sản địa phương' },
-                    { value: 'chay', label: 'Đồ chay / Thanh đạm' },
-                    { value: 'quan_binh_dan', label: 'Quán bình dân, giá mềm' },
-                    { value: 'nha_hang', label: 'Nhà hàng / View đẹp' },
-                    { value: 'linh_hoat', label: 'Linh hoạt, tùy chỗ' },
+                    { value: 'cham_rai', label: 'Chậm rãi, thư giãn (ít điểm)' },
+                    { value: 'can_bang', label: 'Cân bằng (3–4 điểm/ngày)' },
+                    { value: 'dap_dong', label: 'Dồn dập, xem nhiều điểm' },
                     { value: 'other', label: 'Khác...' }
                 ]
             },
-            cfg.focus || {
-                key: 'focus',
-                greeting: 'Gần xong rồi — còn một câu nữa thôi!',
-                question: 'Điều quan trọng nhất với bạn trong chuyến đi này là gì?',
-                type: 'single',
-                options: [
-                    { value: 'anh_dep', label: 'Có nhiều góc ảnh đẹp' },
-                    { value: 'it_di_chuyen', label: 'Ít di chuyển, gần nhau' },
-                    { value: 'trai_nghiem_sau', label: 'Trải nghiệm sâu từng điểm' },
-                    { value: 'gia_dinh_vui', label: 'Phù hợp cả gia đình / nhóm' },
-                    { value: 'tiet_kiem_tg', label: 'Tối ưu thời gian' },
-                    { value: 'other', label: 'Khác...' }
-                ]
+            {
+                key: '__location_picker',
+                type: 'location_picker',
+                greeting: 'Gần xong rồi! Bạn có muốn chọn trước điểm cụ thể không?',
+                question: 'Chọn 1 địa điểm bạn muốn ghé (có thể bỏ qua)',
             }
         ];
     }
@@ -2387,17 +2422,131 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    let pickedLocationId = null;
+
     function renderDefaultStep(idx) {
         if (!activeSteps.length && tripType) {
             activeSteps = getWizardSteps(tripType);
         }
         if (idx < activeSteps.length) {
-            currentAiQuestion = activeSteps[idx];
-            renderAiQuestion(activeSteps[idx]);
-        } else {
+            const step = activeSteps[idx];
+            currentAiQuestion = step;
+            if (step.type === 'location_picker') {
+                renderLocationPickerStep(step);
+                } else {
+                renderAiQuestion(step);
+                }
+            } else {
+            aiDone = true;
+            renderDoneStep('Đã ghi nhận đủ thông tin cho chuyến đi của bạn.');
+            }
+    }
+
+    function renderLocationPickerStep(q) {
+        backBtn.disabled = stepHistory.length === 0;
+        nextBtn.classList.remove('visible');
+        multiHint.style.display = 'none';
+        updateProgress();
+        pickedLocationId = null;
+
+        const allLocs = (typeof locations !== 'undefined' && Array.isArray(locations)) ? locations : [];
+        const getCatName = l => l.category?.name || l.category_name || 'Khác';
+        const cats = [...new Set(allLocs.map(getCatName))].sort();
+
+        let html = '<div class="tp-step tp-location-picker-step">';
+        if (q.greeting) html += `<div class="tp-step-greeting">${q.greeting}</div>`;
+        html += `<div class="tp-step-question">${q.question}</div>`;
+
+        html += `<div class="tp-loc-toolbar">
+            <input type="text" id="tp-loc-search" class="tp-loc-search" placeholder="Tìm địa điểm..." autocomplete="off" />
+            <select id="tp-loc-cat-filter" class="tp-loc-cat-filter">
+                <option value="">Tất cả danh mục</option>
+                ${cats.map(c => `<option value="${c}">${c}</option>`).join('')}
+            </select>
+        </div>`;
+
+        html += '<div class="tp-loc-grid" id="tp-loc-grid">';
+        html += buildLocCards(allLocs);
+        html += '</div>';
+
+        html += `<div class="tp-loc-actions">
+            <button class="tp-btn tp-btn-skip" id="tp-loc-skip">Bỏ qua</button>
+            <button class="tp-btn tp-btn-confirm" id="tp-loc-confirm" disabled>Xác nhận</button>
+        </div>`;
+        html += '</div>';
+        wizardBody.innerHTML = html;
+
+        const grid = document.getElementById('tp-loc-grid');
+        const searchInput = document.getElementById('tp-loc-search');
+        const catFilter = document.getElementById('tp-loc-cat-filter');
+        const confirmBtn = document.getElementById('tp-loc-confirm');
+        const skipBtn = document.getElementById('tp-loc-skip');
+
+        function filterLocs() {
+            const keyword = (searchInput?.value || '').trim().toLowerCase();
+            const cat = catFilter?.value || '';
+            let filtered = allLocs;
+            if (keyword) filtered = filtered.filter(l => (l.name || '').toLowerCase().includes(keyword) || (l.address || '').toLowerCase().includes(keyword));
+            if (cat) filtered = filtered.filter(l => getCatName(l) === cat);
+            grid.innerHTML = buildLocCards(filtered);
+            bindLocCards();
+        }
+
+        function bindLocCards() {
+            grid.querySelectorAll('.tp-loc-card').forEach(card => {
+                const id = parseInt(card.dataset.id);
+                if (pickedLocationId === id) card.classList.add('selected');
+                card.addEventListener('click', () => {
+                    if (pickedLocationId === id) {
+                        pickedLocationId = null;
+                        card.classList.remove('selected');
+                    } else {
+                        grid.querySelectorAll('.tp-loc-card').forEach(c => c.classList.remove('selected'));
+                        pickedLocationId = id;
+                        card.classList.add('selected');
+                    }
+                    confirmBtn.disabled = pickedLocationId === null;
+                });
+            });
+        }
+
+        if (searchInput) searchInput.addEventListener('input', filterLocs);
+        if (catFilter) catFilter.addEventListener('change', filterLocs);
+        bindLocCards();
+
+        function finishLocStep(picked) {
+            const names = picked.map(id => { const l = allLocs.find(x => x.id === id); return l ? l.name : id; });
+            aiAnswers.push({
+                question: q.question,
+                answer: names.length ? names.join(', ') : 'Bỏ qua',
+                key: 'preferred_locations',
+                value: picked.join(','),
+            });
+            stepHistory.push({ step: currentStep, question: q, selection: picked, answersSnapshot: JSON.parse(JSON.stringify(aiAnswers)) });
+            updateProfile();
+            currentStep++;
+            defaultStepIndex = activeSteps.length;
             aiDone = true;
             renderDoneStep('Đã ghi nhận đủ thông tin cho chuyến đi của bạn.');
         }
+
+        skipBtn.addEventListener('click', () => finishLocStep([]));
+        confirmBtn.addEventListener('click', () => finishLocStep(pickedLocationId ? [pickedLocationId] : []));
+    }
+
+    function buildLocCards(locs) {
+        if (!locs.length) return '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:0.75rem;">Không tìm thấy địa điểm nào.</div>';
+        return locs.map(l => {
+            const img = l.thumbnail_url || l.image || '';
+            const imgHtml = img ? `<img src="${img}" alt="" class="tp-loc-card-img" loading="lazy" />` : `<div class="tp-loc-card-img tp-loc-card-img-placeholder"><span class="material-symbols-rounded">place</span></div>`;
+            return `<div class="tp-loc-card" data-id="${l.id}">
+                ${imgHtml}
+                <div class="tp-loc-card-body">
+                    <div class="tp-loc-card-name">${l.name || 'Địa điểm'}</div>
+                    <div class="tp-loc-card-cat">${l.category?.name || l.category_name || ''}</div>
+                </div>
+            </div>`;
+        }).join('');
     }
 
     function renderAiQuestion(q) {
@@ -2581,8 +2730,8 @@ document.addEventListener('DOMContentLoaded', function() {
             aiDone = false; currentAiQuestion = prev.question; generateBtn.disabled = true;
             defaultStepIndex = Math.max(0, currentStep - 1);
             if (!activeSteps.length && tripType) activeSteps = getWizardSteps(tripType);
-            updateProfile();
-            renderDefaultStep(defaultStepIndex);
+                updateProfile();
+                renderDefaultStep(defaultStepIndex);
         }
     });
 
@@ -2610,7 +2759,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateProgress() {
-        const stepCount = activeSteps.length || 8;
+        const stepCount = activeSteps.length || 6;
         const totalFixed = 1 + stepCount; // trip type + follow-up steps
         let html = '';
         for (let i = 0; i < totalFixed; i++) {
@@ -2704,10 +2853,11 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingBarFill.style.width = '100%';
             setTimeout(() => {
                 loadingPanel.classList.remove('active'); isLoading = false;
-                if (data.success) {
-                    if (data.itinerary) renderItinerary(data.itinerary);
-                    else if (data.raw) renderRawResult(data.raw);
-                } else renderError(data.error || 'Có lỗi xảy ra.');
+                if (data.success && data.itinerary) {
+                    renderItinerary(data.itinerary);
+                } else {
+                    renderError(data.error || 'Có lỗi xảy ra. Bấm "Lên lịch mới" để thử lại.');
+                }
             }, 500);
         })
         .catch(() => {
@@ -2994,7 +3144,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const provinceBounds = border.getBounds();
             tpMiniMap.setMaxBounds(provinceBounds.pad(0.5));
             return provinceBounds;
-        } catch (e) {
+            } catch (e) {
             return null;
         }
     }

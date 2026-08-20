@@ -60,6 +60,8 @@ class InteractionController extends Controller
             'status' => 'visible',
         ]);
 
+        $this->refreshLocationRating($location);
+
         \App\Services\MissionService::trackProgress(Auth::user(), 'write_comment', 1);
 
         $comment->load('user.equippedFrame');
@@ -101,6 +103,8 @@ class InteractionController extends Controller
             'rating' => $request->input('rating', $comment->rating),
         ]);
 
+        $this->refreshLocationRating($comment->location);
+
         $comment->load('user.equippedFrame');
         $frame = $comment->user->equippedFrame;
 
@@ -130,8 +134,27 @@ class InteractionController extends Controller
             return response()->json(['success' => false, 'message' => 'Không có quyền xóa.'], 403);
         }
 
+        $location = $comment->location;
         $comment->delete();
+        $this->refreshLocationRating($location);
         return response()->json(['success' => true, 'message' => 'Đã xóa bình luận.']);
+    }
+
+    private function refreshLocationRating(?Location $location): void
+    {
+        if (!$location) {
+            return;
+        }
+
+        $averageRating = Comment::where('location_id', $location->id)
+            ->whereNull('parent_id')
+            ->where('status', 'visible')
+            ->whereNotNull('rating')
+            ->avg('rating');
+
+        $location->update([
+            'average_rating' => $averageRating !== null ? round((float) $averageRating, 2) : 0,
+        ]);
     }
 
     /** Trang danh sách địa điểm yêu thích của người dùng. */
@@ -208,7 +231,14 @@ class InteractionController extends Controller
             'category_suggest' => 'nullable|string|max:80',
             'lat' => 'nullable|numeric',
             'lng' => 'nullable|numeric',
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120' // tối đa 5MB mỗi ảnh
+            'images' => 'nullable|array|max:10',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:10240',
+        ], [
+            'name.required' => 'Vui lòng nhập tên địa điểm.',
+            'images.max' => 'Chỉ được đính kèm tối đa 10 ảnh.',
+            'images.*.image' => 'File đính kèm phải là hình ảnh.',
+            'images.*.mimes' => 'Ảnh chỉ hỗ trợ định dạng JPG, PNG hoặc WEBP.',
+            'images.*.max' => 'Mỗi ảnh không được lớn hơn 10MB. Hãy nén ảnh hoặc chọn ảnh nhỏ hơn.',
         ]);
 
         $imagePaths = [];

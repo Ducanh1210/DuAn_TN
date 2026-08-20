@@ -56,7 +56,7 @@
                         <div class="mb-4">
                             <h2 class="section-label mb-3">Chương trình</h2>
                             <div class="content-body" style="font-size: 1rem; line-height: 1.75; color: #3f3f46;">
-                                {!! $event->program !!}
+                                {!! \App\Models\News::rewriteContentImageUrls($event->program) !!}
                             </div>
                         </div>
                     @endif

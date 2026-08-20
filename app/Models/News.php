@@ -94,4 +94,23 @@ class News extends Model
 
         return asset('storage/' . ltrim($path, '/'));
     }
+
+    /**
+     * Sửa src ảnh trong HTML nội dung: TinyMCE lúc thêm tin hay lưu ../../../storage/...
+     * khiến trang xem tin bị gãy, còn trang sửa (cùng thư mục admin) thì vẫn hiện được.
+     */
+    public static function rewriteContentImageUrls(?string $html): string
+    {
+        if (!$html) {
+            return '';
+        }
+
+        return preg_replace_callback('/(<img\b[^>]*\bsrc=")([^"]+)(")/i', function ($matches) {
+            $src = html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8');
+            if (preg_match('#storage/(news/content/[^"?]+)#i', $src, $pathMatch)) {
+                return $matches[1] . asset('storage/' . ltrim($pathMatch[1], '/')) . $matches[3];
+            }
+            return $matches[0];
+        }, $html) ?? $html;
+    }
 }

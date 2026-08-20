@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\LocationSuggestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Controller quản trị đóng góp của người dùng: danh sách đề xuất địa điểm,
@@ -87,5 +88,24 @@ class ContributionController extends Controller
         return redirect()
             ->route('admin.contributions.suggestions.show', $suggestion->id)
             ->with('success', 'Đã cập nhật đóng góp.');
+    }
+
+    /** Xóa một đề xuất địa điểm và ảnh đính kèm. */
+    public function destroySuggestion($id)
+    {
+        $suggestion = LocationSuggestion::findOrFail($id);
+
+        foreach ($suggestion->images ?? [] as $imagePath) {
+            $relative = ltrim(str_replace('storage/', '', (string) $imagePath), '/');
+            if ($relative !== '') {
+                Storage::disk('public')->delete($relative);
+            }
+        }
+
+        $suggestion->delete();
+
+        return redirect()
+            ->route('admin.contributions.index', ['tab' => 'suggestions'])
+            ->with('success', 'Đã xóa đề xuất địa điểm.');
     }
 }

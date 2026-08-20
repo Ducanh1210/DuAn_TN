@@ -260,6 +260,7 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     Route::get('contributions', [\App\Http\Controllers\Admin\ContributionController::class, 'index'])->name('contributions.index');
     Route::get('contributions/suggestions/{id}', [\App\Http\Controllers\Admin\ContributionController::class, 'showSuggestion'])->name('contributions.suggestions.show');
     Route::put('contributions/suggestions/{id}', [\App\Http\Controllers\Admin\ContributionController::class, 'updateSuggestion'])->name('contributions.suggestions.update');
+    Route::delete('contributions/suggestions/{id}', [\App\Http\Controllers\Admin\ContributionController::class, 'destroySuggestion'])->name('contributions.suggestions.destroy');
 
     // Legacy redirects
     Route::redirect('location_suggestions', '/admin/contributions');

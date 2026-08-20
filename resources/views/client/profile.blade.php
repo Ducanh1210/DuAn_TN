@@ -66,16 +66,25 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px 0 12px;
+            padding: 0 16px 0 8px;
             z-index: 100;
             color: var(--text-main);
         }
-        .top-navbar > div:last-child {
-            font-weight: 700 !important;
-            font-size: 0.82rem !important;
+        .top-navbar-brand {
+            font-weight: 700;
+            font-size: 0.82rem;
             letter-spacing: 0.02em;
-            text-transform: none;
-            color: var(--primary) !important;
+            color: var(--primary);
+        }
+        .top-navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+        .top-navbar-spacer {
+            width: 72px;
+            flex-shrink: 0;
         }
         .btn-back {
             background-color: transparent;
@@ -2138,10 +2147,14 @@
 
 <!-- Top Navigation Bar -->
 <div class="top-navbar">
-    <div></div>
-    <div style="font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-        Ninh Bình Travel Hub
+    <div class="top-navbar-left">
+        <a href="{{ route('home') }}" class="btn-back" title="Quay lại bản đồ">
+            <span class="back-chevron">‹</span>
+            Quay lại
+        </a>
     </div>
+    <div class="top-navbar-brand">Ninh Bình Travel Hub</div>
+    <div class="top-navbar-spacer" aria-hidden="true"></div>
 </div>
 
 <!-- Main Layout Wrapper -->
@@ -3674,7 +3687,14 @@
                         cancelBizModal.hide();
 
                         if (data.success) {
-                            localStorage.removeItem('biz_wizard_state');
+                            try {
+                                Object.keys(localStorage).forEach(function (k) {
+                                    if (k === 'biz_wizard_state' || k.indexOf('biz_wizard_state_') === 0) {
+                                        localStorage.removeItem(k);
+                                    }
+                                });
+                            } catch (e) {}
+                            try { indexedDB.deleteDatabase('biz_wizard_db'); } catch (e) {}
                             showToast(data.message, true);
                             setTimeout(() => window.location.reload(), 1500);
                         } else {

@@ -900,7 +900,7 @@
         /* Write Review Modal (Light Theme Google Maps Style) */
         .write-review-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.45); z-index: 10000;
+            background: rgba(15, 23, 42, 0.45); z-index: 10100;
             display: none; align-items: center; justify-content: center;
             backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
         }
@@ -2476,10 +2476,10 @@
                                 </button>
                                 <div class="gmaps-dropdown-menu" id="gmapsMenu-{{ $comment->id }}">
                                     @if(Auth::check() && Auth::id() === $comment->user_id)
-                                        <div class="gmaps-dropdown-item" onclick="openEditReviewModal({{ $comment->id }}, {{ $comment->rating }}, '{{ addslashes($comment->content) }}')">
+                                        <div class="gmaps-dropdown-item" onclick="event.stopPropagation(); openEditReviewModal({{ $comment->id }}, {{ $comment->rating }}, {{ json_encode($comment->content) }})">
                                             Chỉnh sửa
                                         </div>
-                                        <div class="gmaps-dropdown-item text-danger" onclick="deleteUserComment({{ $comment->id }})">
+                                        <div class="gmaps-dropdown-item text-danger" onclick="event.stopPropagation(); deleteUserComment({{ $comment->id }})">
                                             Xóa
                                         </div>
                                     @else
@@ -3146,6 +3146,10 @@
         };
 
         // Google Maps Review Card Helpers
+        window.closeAllGmapsMenus = function() {
+            document.querySelectorAll('.gmaps-dropdown-menu').forEach(m => m.classList.remove('show'));
+        };
+
         window.toggleGmapsMenu = function(e, id) {
             if (e) e.stopPropagation();
             const targetMenu = document.getElementById(`gmapsMenu-${id}`);
@@ -3607,10 +3611,10 @@
                                             <i class="fa-solid fa-ellipsis-vertical"></i>
                                         </button>
                                         <div class="gmaps-dropdown-menu" id="gmapsMenu-${c.id}">
-                                            <div class="gmaps-dropdown-item" onclick="openEditReviewModal(${c.id}, ${ratingVal}, '${c.content.replace(/'/g, "\\'")}')">
+                                            <div class="gmaps-dropdown-item" onclick="event.stopPropagation(); openEditReviewModal(${c.id}, ${ratingVal}, ${JSON.stringify(c.content || '')})">
                                                 Chỉnh sửa
                                             </div>
-                                            <div class="gmaps-dropdown-item text-danger" onclick="deleteUserComment(${c.id})">
+                                            <div class="gmaps-dropdown-item text-danger" onclick="event.stopPropagation(); deleteUserComment(${c.id})">
                                                 Xóa
                                             </div>
                                         </div>

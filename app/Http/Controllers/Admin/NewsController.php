@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Controller quản trị tin tức/bài viết: liệt kê (tìm kiếm, lọc), thêm, sửa, ẩn/hiện, xóa;
@@ -58,15 +60,7 @@ class NewsController extends Controller
     /** Lưu bài viết mới: tạo slug, lưu ảnh nổi bật, xử lý ảnh trong nội dung và đặt ngày xuất bản. */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'summary' => 'nullable|string|max:500',
-            'content' => 'required|string',
-            'type' => 'required|in:news,guide,announcement,event',
-            'status' => 'required|in:draft,published,hidden',
-            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:20480',
-            'published_at' => 'nullable|date',
-        ]);
+        $this->validateNewsPayload($request);
 
         $data = $request->except('featured_image');
         $data['slug'] = Str::slug($request->title) . '-' . uniqid();
@@ -98,15 +92,7 @@ class NewsController extends Controller
     /** Cập nhật bài viết: đổi slug khi đổi tiêu đề, thay ảnh nổi bật và dọn ảnh nội dung không còn dùng. */
     public function update(Request $request, News $news)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'summary' => 'nullable|string|max:500',
-            'content' => 'required|string',
-            'type' => 'required|in:news,guide,announcement,event',
-            'status' => 'required|in:draft,published,hidden',
-            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:20480',
-            'published_at' => 'nullable|date',
-        ]);
+        $this->validateNewsPayload($request);
 
         $data = $request->except('featured_image');
 
@@ -194,7 +180,7 @@ class NewsController extends Controller
             }
             
             $path = $this->imageCompression->compressAndSave($file, 'news/content');
-            return response()->json(['url' => Storage::url($path)]);
+            return response()->json(['url' => '/storage/' . ltrim($path, '/')]);
         }
         return response()->json(['error' => 'No file uploaded.'], 400);
     }
@@ -227,11 +213,11 @@ class NewsController extends Controller
 
         return preg_replace_callback('/<img[^>]+src="([^"]+)"[^>]*>/i', function ($matches) {
             $imgTag = $matches[0];
-            $src = $matches[1];
+            $src = html_entity_decode($matches[1], ENT_QUOTES, 'UTF-8');
 
-            // Ảnh nội bộ -> bỏ qua
-            if (str_starts_with($src, '/') || str_contains($src, request()->getHost())) {
-                return $imgTag;
+            // TinyMCE lúc thêm tin hay đổi /storage/... thành ../../../storage/...
+            if (preg_match('#storage/(news/content/[^"?]+)#i', $src, $pathMatch)) {
+                return str_replace($matches[1], '/storage/' . ltrim($pathMatch[1], '/'), $imgTag);
             }
 
             // Ảnh từ URL ngoài -> tải về lưu nội bộ
@@ -246,11 +232,11 @@ class NewsController extends Controller
                         $filename = Str::random(40) . '.' . $extension;
                         $path = 'news/content/' . $filename;
                         Storage::disk('public')->put($path, $imageContent);
-                        return str_replace($src, Storage::url($path), $imgTag);
+                        return str_replace($matches[1], '/storage/' . $path, $imgTag);
                     }
                 } catch (\Exception $e) {}
             }
-            
+
             // Ảnh base64 -> giải mã và lưu nội bộ
             if (str_starts_with($src, 'data:image')) {
                 preg_match('/data:image\/(.*?);base64,(.*)/', $src, $base64Matches);
@@ -261,11 +247,56 @@ class NewsController extends Controller
                     $filename = Str::random(40) . '.' . $extension;
                     $path = 'news/content/' . $filename;
                     Storage::disk('public')->put($path, $base64Data);
-                    return str_replace($src, Storage::url($path), $imgTag);
+                    return str_replace($matches[1], '/storage/' . $path, $imgTag);
                 }
             }
 
             return $imgTag;
         }, $content);
+    }
+
+    /** Validate form thêm/sửa tin — nội dung TinyMCE trống hoặc chỉ thẻ rỗng cũng báo lỗi. */
+    private function validateNewsPayload(Request $request): void
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'summary' => 'nullable|string|max:500',
+            'content' => 'nullable|string',
+            'type' => 'required|in:news,guide,announcement,event',
+            'status' => 'required|in:draft,published,hidden',
+            'featured_image' => 'nullable|image|mimes:png,jpg,jpeg,gif,webp|max:20480',
+            'published_at' => 'nullable|date',
+        ], [
+            'title.required' => 'Vui lòng nhập tiêu đề.',
+            'title.max' => 'Tiêu đề không được vượt quá 255 ký tự.',
+            'summary.max' => 'Tóm tắt không được vượt quá 500 ký tự.',
+            'type.required' => 'Vui lòng chọn loại bài viết.',
+            'status.required' => 'Vui lòng chọn trạng thái.',
+            'featured_image.image' => 'Ảnh đại diện phải là file hình ảnh.',
+            'featured_image.max' => 'Ảnh đại diện không được lớn hơn 20MB.',
+        ]);
+
+        $validator->after(function ($v) use ($request) {
+            if ($this->isContentEmpty($request->input('content'))) {
+                $v->errors()->add('content', 'Vui lòng nhập nội dung chi tiết.');
+            }
+        });
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+    }
+
+    private function isContentEmpty(?string $content): bool
+    {
+        if ($content === null || trim($content) === '') {
+            return true;
+        }
+
+        $text = html_entity_decode(strip_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/\x{00a0}/u', ' ', $text);
+        $text = preg_replace('/\s+/u', ' ', trim($text));
+
+        return $text === '';
     }
 }

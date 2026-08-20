@@ -60,7 +60,11 @@ class BusinessDashboardController extends Controller
 
         $favoritesCount = FavoriteLocation::where('location_id', $location->id)->count();
         $viewsCount = $location->view_count ?? 0;
-        $averageRating = $location->average_rating ?? 0;
+        $averageRating = Comment::where('location_id', $location->id)
+            ->whereNull('parent_id')
+            ->where('status', 'visible')
+            ->whereNotNull('rating')
+            ->avg('rating') ?? 0;
 
         $panoramaServiceRequests = PanoramaServiceRequest::where('user_id', $user->id)
             ->latest()
@@ -182,7 +186,7 @@ class BusinessDashboardController extends Controller
             ->with('success', 'Đã lưu thông tin liên hệ cho khách.');
     }
 
-    /** Tải ảnh lên thư viện doanh nghiệp (mặt tiền hoặc thực đơn) và thêm vào ảnh địa điểm. */
+    /** Tải ảnh lên thư viện doanh nghiệp và thêm vào ảnh địa điểm. */
     public function uploadPhoto(Request $request)
     {
         $user = Auth::user();
@@ -190,22 +194,22 @@ class BusinessDashboardController extends Controller
             ->where('status', 'approved')
             ->firstOrFail();
 
+        $photos = $businessProfile->menu_photos ?? [];
+        $legacyStorefrontPhotos = $businessProfile->storefront_photos ?? [];
+        $galleryTotal = count($photos) + count($legacyStorefrontPhotos);
+
+        if ($galleryTotal >= 20) {
+            return redirect()->route('business.dashboard')
+                ->with('error', 'Bạn chỉ có thể tải tối đa 20 ảnh. Vui lòng xóa bớt ảnh cũ trước khi thêm ảnh mới.');
+        }
+
         $request->validate([
             'photo' => 'required|image|max:20480',
-            'type' => 'required|in:storefront,menu',
         ]);
 
         $path = $this->imageCompression->compressAndSave($request->file('photo'), 'business_photos');
-
-        if ($request->type === 'storefront') {
-            $photos = $businessProfile->storefront_photos ?? [];
-            $photos[] = $path;
-            $businessProfile->update(['storefront_photos' => array_values($photos)]);
-        } else {
-            $photos = $businessProfile->menu_photos ?? [];
-            $photos[] = $path;
-            $businessProfile->update(['menu_photos' => array_values($photos)]);
-        }
+        $photos[] = $path;
+        $businessProfile->update(['menu_photos' => array_values($photos)]);
 
         // Đồng thời thêm vào thư viện ảnh của địa điểm (nếu có)
         $location = Location::where('created_by', $user->id)->first();
@@ -213,7 +217,7 @@ class BusinessDashboardController extends Controller
             LocationImage::create([
                 'location_id' => $location->id,
                 'image_url' => $path,
-                'caption' => $request->type === 'storefront' ? 'Mặt tiền cửa hàng' : 'Thực đơn / Dịch vụ',
+                'caption' => 'Hình ảnh địa điểm',
                 'is_thumbnail' => false,
                 'sort_order' => 99,
             ]);

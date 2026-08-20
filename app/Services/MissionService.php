@@ -343,17 +343,10 @@ class MissionService
     }
 
     /**
-     * Tự động mở khóa các khung avatar theo hạng dựa trên tổng điểm hiện tại của người dùng.
+     * @deprecated Không dùng tự mở khóa theo số xu đang có — khung shop phải bấm đổi, khung mốc/nhiệm vụ nhận riêng.
      */
     public static function checkRankFramesUnlocked(User $user)
     {
-        $rankFrames = AvatarFrame::where('status', 'active')
-            ->where('type', 'rank')
-            ->where('required_points', '<=', $user->points)
-            ->get();
-
-        foreach ($rankFrames as $frame) {
-            self::unlockFrame($user, $frame->id);
-        }
+        return;
     }
 }
