@@ -44,11 +44,6 @@ class PointService
                 'description' => $description,
             ]);
 
-            // Chỉ kiểm tra mở khóa khung theo hạng khi có cộng thêm điểm
-            if ($amount > 0) {
-                MissionService::checkRankFramesUnlocked($user->fresh());
-            }
-
             return $tx;
         });
     }

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
     
     <style>
         :root {
@@ -36,8 +37,13 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+
+        html {
+            overflow-x: hidden;
         }
 
         h1, .h1 { font-size: 1.3rem !important; font-weight: 600 !important; color: #1e3a5f !important; }
@@ -703,13 +709,15 @@
         /* ============ Registration redesign (Google-Ads style wizard) ============ */
         .reg-wrap {
             width: 100%;
+            max-width: 100%;
             margin: 0;
             padding: 30px 36px 40px;
             display: grid;
-            grid-template-columns: 240px 1fr;
+            grid-template-columns: 240px minmax(0, 1fr);
             gap: 32px;
             align-items: start;
             flex: 1 0 auto;
+            box-sizing: border-box;
         }
 
         /* Left step navigation (grouped phases + sub-steps) */
@@ -737,14 +745,20 @@
         .reg-nav__sub.active { color: #1e3a5f; font-weight: 600; }
 
         /* Main content — centered card */
-        .reg-main { min-width: 0; }
+        .reg-main { min-width: 0; max-width: 100%; }
         .reg-main .content-panel {
-            max-width: 700px; margin: 0 auto; padding: 26px 30px;
-            border: 1px solid #e5e7eb; border-radius: 10px; background: #ffffff;
+            width: 100%;
+            max-width: min(700px, 100%);
+            margin: 0 auto;
+            padding: 26px 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #ffffff;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
             transition: max-width .2s ease;
+            box-sizing: border-box;
         }
-        .reg-main .content-panel.content-panel--wide { max-width: 1040px; }
+        .reg-main .content-panel.content-panel--wide { max-width: min(1040px, 100%); }
         .camera-verification-box:fullscreen,
         .camera-verification-box:-webkit-full-screen { background: #000; padding: 0; }
         .camera-verification-box:fullscreen #cameraVideo,
@@ -852,7 +866,12 @@
         .nav-logo strong { font-weight: 700; }
         .nav-sep { width: 1px; height: 20px; background: #e0e0e0; }
         .nav-page-title { font-size: 0.95rem; color: #3c4043; font-weight: 400; }
-        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .nav-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+        .nav-right .avatar-frame-wrapper {
+            position: relative;
+            overflow: visible;
+            flex-shrink: 0;
+        }
         .nav-help { font-size: 0.82rem; color: #5f6368; text-decoration: none; }
         .nav-help:hover { color: #1e3a5f; }
         .nav-user-email { font-size: 0.8rem; color: #5f6368; }
@@ -1138,7 +1157,7 @@
                             </div>
                         </div>
 
-                        <!-- Step 8: Public Gallery Photos (menu + storefront combined) -->
+                        <!-- Step 8: Public Gallery Photos -->
                         <div class="biz-step-pane d-none" data-step="8">
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;" id="step8Title">Thêm ảnh về địa điểm của bạn *</h4>
                             <p class="text-secondary small mb-2" id="step8Desc">Bao gồm ảnh mặt tiền, không gian, món ăn / dịch vụ, bảng giá... để khách hình dung rõ về bạn.</p>
@@ -1404,7 +1423,6 @@
 
             // Image uploading & Verification states
             let menuPhotos = [];
-            let storefrontPhotos = [];
             let avatarPhoto = null;
             let businessDocs = [];
             let verificationPhotos = [];
@@ -1795,9 +1813,19 @@
             }
 
             // State Persistence Functions
+            // Bản nháp gắn theo user — không dùng chung key trên trình duyệt khi đổi tài khoản
+            const BIZ_USER_ID = {{ (int) auth()->id() }};
+            const BIZ_STATE_KEY = 'biz_wizard_state_u' + BIZ_USER_ID;
+            const BIZ_LEGACY_STATE_KEY = 'biz_wizard_state';
+            function purgeForeignBizDrafts() {
+                try {
+                    localStorage.removeItem(BIZ_LEGACY_STATE_KEY);
+                } catch (e) {}
+            }
             // ---- IndexedDB persistence for large base64 camera photos (localStorage would exceed quota) ----
             const IDB_NAME = 'biz_wizard_db';
             const IDB_STORE = 'photos';
+            const IDB_PHOTO_KEY = 'u' + BIZ_USER_ID;
             function idbOpen() {
                 return new Promise((resolve, reject) => {
                     const req = indexedDB.open(IDB_NAME, 1);
@@ -1814,7 +1842,8 @@
                     const db = await idbOpen();
                     await new Promise((resolve, reject) => {
                         const tx = db.transaction(IDB_STORE, 'readwrite');
-                        tx.objectStore(IDB_STORE).put(data, 'current');
+                        tx.objectStore(IDB_STORE).put(data, IDB_PHOTO_KEY);
+                        tx.objectStore(IDB_STORE).delete('current');
                         tx.oncomplete = () => resolve();
                         tx.onerror = () => reject(tx.error);
                     });
@@ -1826,7 +1855,7 @@
                     const db = await idbOpen();
                     const val = await new Promise((resolve, reject) => {
                         const tx = db.transaction(IDB_STORE, 'readonly');
-                        const r = tx.objectStore(IDB_STORE).get('current');
+                        const r = tx.objectStore(IDB_STORE).get(IDB_PHOTO_KEY);
                         r.onsuccess = () => resolve(r.result);
                         r.onerror = () => reject(r.error);
                     });
@@ -1839,6 +1868,7 @@
                     const db = await idbOpen();
                     await new Promise((resolve) => {
                         const tx = db.transaction(IDB_STORE, 'readwrite');
+                        tx.objectStore(IDB_STORE).delete(IDB_PHOTO_KEY);
                         tx.objectStore(IDB_STORE).delete('current');
                         tx.oncomplete = () => resolve();
                         tx.onerror = () => resolve();
@@ -1868,6 +1898,7 @@
                     const categoryNameVal = selectedCategorySpan ? selectedCategorySpan.textContent : '';
 
                     const state = {
+                        userId: BIZ_USER_ID,
                         bizStep: bizStep,
                         businessName: inputBizName ? inputBizName.value.trim() : '',
                         businessTypes: Array.from(document.querySelectorAll('.biz-type-card.selected')).map(c => c.getAttribute('data-val')),
@@ -1886,7 +1917,6 @@
                         receiveSurveys: document.getElementById('receive_surveys') ? document.getElementById('receive_surveys').checked : false,
                         description: inputDesc ? inputDesc.value.trim() : '',
                         menuPhotos: menuPhotos || [],
-                        storefrontPhotos: storefrontPhotos || [],
                         avatarPhoto: avatarPhoto || null,
                         businessDocs: businessDocs || [],
                         verificationPhotos: cleanVerificationPhotos,
@@ -1894,7 +1924,8 @@
                         verificationLng: typeof verificationLng !== 'undefined' ? verificationLng : null,
                         verificationTime: typeof verificationTime !== 'undefined' ? verificationTime : null
                     };
-                    localStorage.setItem('biz_wizard_state', JSON.stringify(state));
+                    localStorage.setItem(BIZ_STATE_KEY, JSON.stringify(state));
+                    localStorage.removeItem(BIZ_LEGACY_STATE_KEY);
                 } catch (e) {
                     console.warn('Could not save biz wizard state:', e);
                 }
@@ -1938,7 +1969,8 @@
             }
 
             function loadWizardState() {
-                const raw = localStorage.getItem('biz_wizard_state');
+                purgeForeignBizDrafts();
+                const raw = localStorage.getItem(BIZ_STATE_KEY);
                 if (!raw) return;
 
                 let state;
@@ -1946,6 +1978,11 @@
                     state = JSON.parse(raw);
                 } catch (e) {
                     console.error('Error parsing wizard state:', e);
+                    return;
+                }
+
+                if (state.userId && Number(state.userId) !== Number(BIZ_USER_ID)) {
+                    localStorage.removeItem(BIZ_STATE_KEY);
                     return;
                 }
 
@@ -2080,10 +2117,6 @@
                         state.menuPhotos.forEach(p => menuPhotos.push(p));
                         restorePhotoPreviews('menuPreviews', menuPhotos);
                     }
-                    if (state.storefrontPhotos && Array.isArray(state.storefrontPhotos)) {
-                        storefrontPhotos.length = 0;
-                        state.storefrontPhotos.forEach(p => storefrontPhotos.push(p));
-                    }
                 });
 
                 restore('ảnh đại diện', () => {
@@ -2118,7 +2151,10 @@
             }
 
             function clearWizardState() {
-                localStorage.removeItem('biz_wizard_state');
+                try {
+                    localStorage.removeItem(BIZ_STATE_KEY);
+                    localStorage.removeItem(BIZ_LEGACY_STATE_KEY);
+                } catch (e) {}
             }
 
             function restorePhotoPreviews(containerId, photosArray) {
@@ -3059,7 +3095,6 @@
                         receive_surveys: (document.getElementById('receive_surveys') && document.getElementById('receive_surveys').checked) ? 1 : 0,
                         description: inputDesc.value.trim(),
                         menu_photos: menuPhotos || [],
-                        storefront_photos: storefrontPhotos || [],
                         avatar_photo: avatarPhoto || null,
                         business_documents: businessDocs || [],
                         verification_photo: (verificationPhotos && verificationPhotos.length > 0) ? verificationPhotos[0] : (verificationPhotoData || null),

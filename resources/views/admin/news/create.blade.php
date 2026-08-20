@@ -25,8 +25,10 @@
             </div>
             <div class="mb-0">
                 <label for="content" class="form-label text-dark fw-medium" style="font-size: 0.825rem;">Nội dung chi tiết <span class="text-danger">*</span></label>
-                <textarea class="form-control form-control-sm @error('content') is-invalid @enderror" id="content" name="content" rows="14" required style="border-color: #e2e8f0;">{{ old('content') }}</textarea>
-                @error('content')<div class="invalid-feedback" style="font-size: 0.75rem;">{{ $message }}</div>@enderror
+                <textarea class="form-control form-control-sm @error('content') is-invalid @enderror" id="content" name="content" rows="14" style="border-color: #e2e8f0;">{{ old('content') }}</textarea>
+                <div id="contentClientError" class="text-danger small mt-1 {{ $errors->has('content') ? '' : 'd-none' }}" style="font-size: 0.75rem;">
+                    {{ $errors->first('content') ?: 'Vui lòng nhập nội dung chi tiết.' }}
+                </div>
             </div>
         </div>
     </div>
@@ -92,6 +94,10 @@ $(document).ready(function() {
         height: 500,
         image_title: true,
         automatic_uploads: true,
+        relative_urls: false,
+        remove_script_host: true,
+        convert_urls: true,
+        document_base_url: '{{ rtrim(url('/'), '/') }}/',
         promotion: false,
         branding: false,
         statusbar: false,
@@ -135,12 +141,16 @@ $(document).ready(function() {
             });
         },
         setup: function (editor) {
-            editor.on('change', function () {
+            editor.on('change input keyup', function () {
                 tinymce.triggerSave();
+                if (typeof window.clearNewsContentError === 'function') {
+                    window.clearNewsContentError();
+                }
             });
         }
     });
 });
 </script>
+@include('admin.partials.tinymce-content-guard')
 @endpush
 @include('admin.partials.featured-image-compress')

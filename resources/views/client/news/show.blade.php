@@ -54,7 +54,7 @@
 
                     <!-- Content Body -->
                     <div class="article-content-body" style="font-size: 1rem; line-height: 1.75; color: #3f3f46; font-weight: 400;">
-                        {!! $news->content !!}
+                        {!! \App\Models\News::rewriteContentImageUrls($news->content) !!}
                     </div>
                 </article>
             </div>

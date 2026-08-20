@@ -15,7 +15,7 @@
                     <th>Danh mục gợi ý</th>
                     <th>Ngày</th>
                     <th>Trạng thái</th>
-                    <th class="text-end pe-4">Xem</th>
+                    <th class="text-end pe-4">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,7 +43,14 @@
                         @endif
                     </td>
                     <td class="text-end pe-4">
-                        <a href="{{ route('admin.contributions.suggestions.show', $item->id) }}" class="btn-minimal py-1 px-2" style="font-size:0.75rem;">Chi tiết</a>
+                        <div class="d-inline-flex gap-1 flex-wrap justify-content-end">
+                            <a href="{{ route('admin.contributions.suggestions.show', $item->id) }}" class="btn-minimal py-1 px-2" style="font-size:0.75rem;">Chi tiết</a>
+                            <form action="{{ route('admin.contributions.suggestions.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xóa đề xuất địa điểm này?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size:0.75rem;">Xóa</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @empty

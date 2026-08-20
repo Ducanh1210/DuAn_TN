@@ -1179,21 +1179,6 @@
             transform: none;
         }
 
-        .featured-loc-badge {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            background: rgba(15, 23, 42, 0.72);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            padding: 2px 6px;
-            border-radius: 4px;
-            z-index: 2;
-        }
-
         .featured-loc-info {
             position: absolute;
             bottom: 0;
@@ -1227,11 +1212,6 @@
             width: 205px !important;
             height: 115px !important;
             border-radius: 4px !important;
-        }
-        .featured-loc-badge {
-            white-space: nowrap !important;
-            background: rgba(15, 36, 66, 0.8) !important;
-            border-radius: 3px !important;
         }
         .news-dropdown-banner .banner-title {
             white-space: nowrap !important;
@@ -2910,9 +2890,6 @@
                     <a href="#" class="featured-loc-card" data-cat="{{ $loc->category ? $loc->category->id : '' }}" onclick="flyToLocation({{ $loc->id }}); return false;">
                         <img src="{{ $loc->thumbnail_url ?: 'https://placehold.co/300x200/1e3a8a/ffffff?text=No+Image' }}"
                             alt="{{ $loc->name }}" class="featured-loc-img">
-                        <div class="featured-loc-badge">
-                            {{ $loc->category ? $loc->category->name : 'Điểm đến' }}
-                        </div>
                         <div class="featured-loc-info">
                             <span class="material-symbols-rounded">location_on</span>
                             <div class="featured-loc-title">{{ $loc->name }}</div>

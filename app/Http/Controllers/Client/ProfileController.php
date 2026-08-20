@@ -817,9 +817,11 @@ class ProfileController extends Controller
         $milestoneFrameCodes = ['frame-bronze', 'frame-silver', 'frame-diamond', 'frame-streak'];
         $shopFrames = AvatarFrame::where('status', 'active')
             ->whereNotIn('code', $milestoneFrameCodes)
+            ->where('required_points', '>', 0)
             ->whereNotIn('id', $unlockedFrameIds)
             ->orderBy('required_points')
             ->get();
+        $shopRewards = Reward::active()->orderBy('cost_points')->get();
         $userRedemptions = $user
             ? UserRedemption::where('user_id', $user->id)->with('reward')->latest()->get()
             : collect();
@@ -835,6 +837,7 @@ class ProfileController extends Controller
             'unlockedFrameIds',
             'leaderboard',
             'shopFrames',
+            'shopRewards',
             'userRedemptions',
             'redeemedRewardIds'
         ));
@@ -920,8 +923,6 @@ class ProfileController extends Controller
         if ($frame) {
             MissionService::unlockFrame($user, $frame->id);
         }
-
-        MissionService::checkRankFramesUnlocked($user->fresh());
 
         return response()->json([
             'success' => true,
