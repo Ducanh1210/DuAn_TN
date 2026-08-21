@@ -268,12 +268,19 @@ class ProfileController extends Controller
     public function updateAvatar(Request $request)
     {
         $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'avatar' => [
+                'required',
+                'image',
+                'mimes:jpeg,jpg,png,gif,svg,webp,jfif',
+                'mimetypes:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,image/jfif,image/pjpeg',
+                'max:5120',
+            ],
         ], [
             'avatar.required' => 'Vui lòng chọn một hình ảnh.',
             'avatar.image' => 'Tệp được chọn phải là hình ảnh.',
-            'avatar.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif, hoặc svg.',
-            'avatar.max' => 'Kích thước hình ảnh tối đa là 2MB.',
+            'avatar.mimes' => 'Hình ảnh phải có định dạng: jpeg, jpg, png, gif, svg, webp hoặc jfif.',
+            'avatar.mimetypes' => 'Định dạng ảnh này chưa được hỗ trợ. Hãy thử ảnh jpg, png hoặc webp.',
+            'avatar.max' => 'Kích thước hình ảnh tối đa là 5MB.',
         ]);
 
         /** @var \App\Models\User $user */

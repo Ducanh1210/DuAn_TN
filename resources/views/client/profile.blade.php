@@ -335,6 +335,10 @@
             align-items: center;
             min-width: 0;
         }
+        .sidebar-business-label {
+            min-width: 0;
+            white-space: nowrap;
+        }
         .sidebar-menu-tabs .nav-link:hover {
             background-color: #f1f5f9;
             color: var(--text-main);
@@ -361,7 +365,21 @@
             color: #1e3a5f;
             border-color: #cbdbe8;
         }
-
+        .sidebar-status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 1px 7px;
+            border-radius: 999px;
+            border: 1px solid #fed7aa;
+            background: #fff7ed;
+            color: #b45309;
+            font-size: 0.6rem;
+            font-weight: 700;
+            line-height: 1.35;
+            white-space: nowrap;
+        }
         /* Content Workspace Area */
         .dashboard-content {
             flex: 1;
@@ -599,6 +617,82 @@
             font-size: 0.7rem;
             color: var(--text-sub);
             font-weight: 400;
+        }
+        .notification-toolbar-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #dbe4ee;
+            background: #f8fafc;
+            color: #1e3a5f;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border-radius: 999px;
+            padding: 7px 12px;
+            white-space: nowrap;
+        }
+        .notification-toolbar-btn:hover {
+            background: #f1f5f9;
+        }
+        .notification-unread-badge {
+            min-width: 18px;
+            height: 18px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -6px;
+            right: -2px;
+        }
+        .notification-modal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 58vh;
+            overflow-y: auto;
+        }
+        .notification-modal-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #fff;
+            padding: 12px 14px;
+        }
+        .notification-modal-item.is-unread {
+            border-color: #fecaca;
+            background: #fffdfd;
+        }
+        .notification-modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .notification-modal-title {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .notification-modal-time {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+        .notification-modal-body {
+            color: #475569;
+            font-size: 0.8rem;
+            line-height: 1.55;
+            white-space: pre-line;
+        }
+        @media (max-width: 768px) {
+            .notification-toolbar-btn { padding: 7px 10px; }
         }
         @media (max-width: 992px) {
             .profile-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -869,6 +963,129 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
+        }
+        .biz-pending-shell {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .biz-pending-status {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 16px;
+            border: 1px solid #fde68a;
+            background: linear-gradient(180deg, #fffdf3 0%, #fffbeb 100%);
+            border-radius: 8px;
+        }
+        .biz-pending-status strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.86rem;
+            color: #78350f;
+        }
+        .biz-pending-status p {
+            margin: 0;
+            color: #92400e;
+            font-size: 0.77rem;
+            line-height: 1.55;
+        }
+        .biz-pending-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.25fr);
+            gap: 14px;
+            align-items: stretch;
+        }
+        .biz-pending-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .biz-pending-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .biz-pending-card-title {
+            margin: 0;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .biz-pending-card-sub {
+            margin: 2px 0 0;
+            font-size: 0.72rem;
+            color: var(--text-sub);
+        }
+        .biz-pending-card-body {
+            padding: 14px;
+        }
+        .biz-pending-fields {
+            display: grid;
+            gap: 12px;
+        }
+        .biz-pending-field {
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eef2f7;
+        }
+        .biz-pending-field:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .biz-pending-label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.69rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        .biz-pending-value {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.45;
+        }
+        .biz-pending-value.is-primary {
+            color: #2563eb;
+        }
+        .biz-pending-map {
+            height: 100%;
+            min-height: 320px;
+            width: 100%;
+            border-radius: 0 0 8px 8px;
+            border: 0;
+            z-index: 1;
+        }
+        .biz-pending-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        @media (max-width: 992px) {
+            .biz-pending-grid {
+                grid-template-columns: 1fr;
+            }
+            .biz-pending-map {
+                min-height: 260px;
+            }
+        }
+        @media (max-width: 640px) {
+            .biz-pending-status {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .biz-pending-actions {
+                justify-content: stretch;
+            }
+            .biz-pending-actions .btn-danger-ghost {
+                width: 100%;
+            }
         }
         .biz-feature {
             border: 1px solid var(--border-color);
@@ -2243,15 +2460,9 @@
 
             <div class="sidebar-nav-group">Mở rộng</div>
             <button class="nav-link" id="tab-business-btn" data-bs-toggle="pill" data-bs-target="#tab-business" type="button" role="tab" aria-selected="false">
-                <span>Tài khoản doanh nghiệp</span>
-                @if(isset($businessProfile))
-                    @if($businessProfile->status === 'pending')
-                        <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">Chờ duyệt</span>
-                    @elseif($businessProfile->status === 'approved')
-                        <span class="badge bg-success" style="font-size: 0.6rem;">DN</span>
-                    @elseif($businessProfile->status === 'rejected')
-                        <span class="badge bg-danger" style="font-size: 0.6rem;">Từ chối</span>
-                    @endif
+                <span class="sidebar-business-label">Tài khoản doanh nghiệp</span>
+                @if(isset($businessProfile) && $businessProfile->status === 'pending')
+                    <span class="sidebar-status-pill">Chờ duyệt</span>
                 @endif
             </button>
         </div>
@@ -2265,7 +2476,17 @@
                 <span class="sep">/</span>
                 <strong id="workspaceTabTitle">Thông tin cá nhân</strong>
             </div>
-            <div class="workspace-actions"></div>
+            <div class="workspace-actions">
+                @if(isset($notifications) && $notifications->count() > 0)
+                    @php $unreadCount = $notifications->whereNull('read_at')->count(); @endphp
+                    <button type="button" class="notification-toolbar-btn" data-bs-toggle="modal" data-bs-target="#notificationListModal">
+                        <span>Thông báo</span>
+                        @if($unreadCount > 0)
+                            <span class="notification-unread-badge">{{ $unreadCount }}</span>
+                        @endif
+                    </button>
+                @endif
+            </div>
         </div>
 
         <div class="workspace-body">
@@ -2339,30 +2560,33 @@
                     </div>
                 </div>
 
-                @if(isset($notifications) && $notifications->count() > 0)
-                <div class="content-panel" style="margin-bottom:16px;">
-                    <div class="section-title" style="display:flex;align-items:center;gap:8px;">
-                        <span>Thông báo</span>
-                        @php $unreadCount = $notifications->whereNull('read_at')->count(); @endphp
-                        @if($unreadCount > 0)
-                            <span style="background:#ef4444;color:#fff;border-radius:999px;font-size:0.68rem;padding:1px 8px;font-weight:600;">{{ $unreadCount }} mới</span>
-                        @endif
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px;">
-                        @foreach($notifications as $noti)
-                            <div style="border:1px solid {{ is_null($noti->read_at) ? '#fecaca' : '#e2e8f0' }};background:{{ is_null($noti->read_at) ? '#fef2f2' : '#ffffff' }};border-radius:10px;padding:12px 14px;">
-                                <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
-                                    <strong style="font-size:0.86rem;color:#1e293b;">{{ $noti->title }}</strong>
-                                    <span style="font-size:0.7rem;color:#94a3b8;white-space:nowrap;">{{ $noti->created_at->format('d/m/Y H:i') }}</span>
-                                </div>
-                                @if($noti->message)
-                                    <div style="font-size:0.8rem;color:#475569;margin-top:4px;white-space:pre-line;line-height:1.5;">{{ $noti->message }}</div>
-                                @endif
+                <div class="modal fade" id="notificationListModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content rounded-3 border-0 shadow-sm">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Thông báo</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                        @endforeach
+                            <div class="modal-body">
+                                <div class="notification-modal-list">
+                                    @if(isset($notifications) && $notifications->count() > 0)
+                                        @foreach($notifications as $noti)
+                                            <div class="notification-modal-item {{ is_null($noti->read_at) ? 'is-unread' : '' }}">
+                                                <div class="notification-modal-head">
+                                                    <div class="notification-modal-title">{{ $noti->title }}</div>
+                                                    <div class="notification-modal-time">{{ $noti->created_at->format('d/m/Y H:i') }}</div>
+                                                </div>
+                                                <div class="notification-modal-body">{{ $noti->message ?: 'Không có nội dung chi tiết.' }}</div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="text-secondary small">Chưa có thông báo nào.</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                @endif
 
                 <div class="profile-stat-grid">
                     <div class="stat-tile">
@@ -2726,28 +2950,52 @@
                     @if($businessProfile->status === 'pending')
                         <div class="content-panel">
                             <div class="section-title">Yêu cầu nâng cấp tài khoản doanh nghiệp</div>
-                            <div class="panel-note warn">
-                                <div><strong>Đang chờ phê duyệt.</strong> Chúng tôi đang xác minh thông tin doanh nghiệp (thường 24–48h làm việc).</div>
-                            </div>
-                            <!-- Display filled details -->
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="fw-semibold text-secondary small">Tên doanh nghiệp</div>
-                                    <div class="fw-bold fs-5 mt-1 text-primary">{{ $businessProfile->business_name }}</div>
+                            <div class="biz-pending-shell">
+                                <div class="biz-pending-status">
+                                    <div>
+                                        <strong>Đang chờ phê duyệt</strong>
+                                        <p>Hồ sơ doanh nghiệp của bạn đã được gửi thành công. Hệ thống đang xác minh thông tin và vị trí bản đồ.</p>
+                                    </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="fw-semibold text-secondary small">Danh mục</div>
-                                    <div class="fw-bold fs-5 mt-1">{{ $businessProfile->category ? $businessProfile->category->name : 'N/A' }}</div>
+
+                                <div class="biz-pending-grid">
+                                    <div class="biz-pending-card">
+                                        <div class="biz-pending-card-head">
+                                            <div>
+                                                <div class="biz-pending-card-title">Thông tin đã gửi</div>
+                                                <p class="biz-pending-card-sub">Bạn có thể kiểm tra lại hồ sơ trước khi được kích hoạt.</p>
+                                            </div>
+                                        </div>
+                                        <div class="biz-pending-card-body">
+                                            <div class="biz-pending-fields">
+                                                <div class="biz-pending-field">
+                                                    <span class="biz-pending-label">Tên doanh nghiệp</span>
+                                                    <div class="biz-pending-value is-primary">{{ $businessProfile->business_name }}</div>
+                                                </div>
+                                                <div class="biz-pending-field">
+                                                    <span class="biz-pending-label">Danh mục</span>
+                                                    <div class="biz-pending-value">{{ $businessProfile->category ? $businessProfile->category->name : 'N/A' }}</div>
+                                                </div>
+                                                <div class="biz-pending-field">
+                                                    <span class="biz-pending-label">Địa chỉ</span>
+                                                    <div class="biz-pending-value">{{ $businessProfile->address_street }}, {{ $businessProfile->address_city }}, {{ $businessProfile->address_province }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="biz-pending-card">
+                                        <div class="biz-pending-card-head">
+                                            <div>
+                                                <div class="biz-pending-card-title">Vị trí doanh nghiệp</div>
+                                                <p class="biz-pending-card-sub">Địa điểm bạn đã ghim khi gửi yêu cầu nâng cấp.</p>
+                                            </div>
+                                        </div>
+                                        <div id="pendingBusinessMap" class="biz-pending-map"></div>
+                                    </div>
                                 </div>
-                                <div class="col-12 mb-3">
-                                    <div class="fw-semibold text-secondary small">Địa chỉ</div>
-                                    <div class="mt-1">{{ $businessProfile->address_street }}, {{ $businessProfile->address_city }}, {{ $businessProfile->address_province }}</div>
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <div class="fw-semibold text-secondary small mb-2"><i class="fa-solid fa-map-location-dot text-primary me-1"></i>Vị trí doanh nghiệp trên bản đồ</div>
-                                    <div id="pendingBusinessMap" style="height: 260px; width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; z-index: 1;"></div>
-                                </div>
-                                <div class="col-12 mt-4 text-center">
+
+                                <div class="biz-pending-actions">
                                     <button type="button" class="btn-danger-ghost" id="cancelBusinessRequestBtn">
                                         Hủy yêu cầu đăng ký
                                     </button>

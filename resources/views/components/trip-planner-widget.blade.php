@@ -2805,8 +2805,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const LOADING_MESSAGES = [
         'Đang phân tích thông tin...',
-        'Đang tìm địa điểm phù hợp...',
-        'Đang sắp xếp lịch trình...',
+        'Đang chọn địa điểm phù hợp...',
+        'AI đang sắp xếp lịch trình (thường 20–45 giây)...',
         'Đang tối ưu di chuyển...',
         'Gần xong rồi...',
     ];
@@ -2844,26 +2844,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
         fetch('{{ route("client.trip_planner.generate") }}', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
             body: JSON.stringify({ answers: fullAnswers, trip_type: tripType || tripTypeLabel }),
         })
-        .then(res => res.json())
-        .then(data => {
+        .then(async (res) => {
+            const text = await res.text();
+            let data = null;
+            try {
+                data = text ? JSON.parse(text) : null;
+            } catch (e) {
+                data = null;
+            }
+
             clearInterval(msgInterval); clearInterval(barInterval);
             loadingBarFill.style.width = '100%';
             setTimeout(() => {
                 loadingPanel.classList.remove('active'); isLoading = false;
-                if (data.success && data.itinerary) {
+                if (data && data.success && data.itinerary) {
                     renderItinerary(data.itinerary);
-                } else {
-                    renderError(data.error || 'Có lỗi xảy ra. Bấm "Lên lịch mới" để thử lại.');
+                    return;
                 }
+                if (data && data.error) {
+                    renderError(data.error);
+                    return;
+                }
+                if (res.status === 419) {
+                    renderError('Phiên làm việc hết hạn. Tải lại trang rồi thử lại.');
+                    return;
+                }
+                if (res.status === 504 || res.status >= 500) {
+                    renderError('Máy chủ xử lý quá lâu. Bấm "Lên lịch mới" để thử lại.');
+                    return;
+                }
+                renderError('Không tạo được lịch trình. Bấm "Lên lịch mới" để thử lại.');
             }, 500);
         })
         .catch(() => {
             clearInterval(msgInterval); clearInterval(barInterval);
             loadingPanel.classList.remove('active'); isLoading = false;
-            renderError('Không thể kết nối máy chủ.');
+            renderError('Không thể kết nối máy chủ. Kiểm tra mạng rồi bấm "Lên lịch mới".');
         });
     }
 

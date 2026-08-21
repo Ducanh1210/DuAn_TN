@@ -669,6 +669,27 @@
             z-index: 1;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
+        .biz-locate-control {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            font-size: 15px;
+            color: #334155;
+            background: #fff;
+            cursor: pointer;
+        }
+        .biz-locate-control:hover {
+            background: #f8fafc;
+            color: #1e3a5f;
+        }
+        .biz-locate-control.is-loading {
+            opacity: 0.85;
+            pointer-events: none;
+        }
+        .toast-custom.toast-locating {
+            border-left-color: #3b82f6 !important;
+        }
 
         .wizard-row {
             display: block;
@@ -1137,7 +1158,7 @@
                         <!-- Step 6: Map Coordinates -->
                         <div class="biz-step-pane d-none" data-step="6">
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Doanh nghiệp của bạn ở đâu?</h4>
-                            <p class="text-secondary small mb-3">Kéo và di chuyển điểm đánh dấu (marker) đến vị trí chính xác của doanh nghiệp.</p>
+                            <p class="text-secondary small mb-3">Kéo marker hoặc nhấp trên bản đồ để ghim vị trí. Dùng nút định vị góc phải bản đồ để lấy vị trí hiện tại.</p>
                             
                             <div id="businessMap"></div>
                             
@@ -1376,6 +1397,28 @@
             toast.style.transition = 'opacity 0.25s ease';
             setTimeout(() => toast.remove(), 250);
         }, 3000);
+    }
+
+    let bizLocateStatusToast = null;
+
+    function showLocateStatusToast(message) {
+        dismissLocateStatusToast();
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-custom toast-locating';
+        toast.style.borderLeftColor = '#3b82f6';
+        toast.innerHTML = `<span>${message}</span>`;
+        container.appendChild(toast);
+        bizLocateStatusToast = toast;
+    }
+
+    function dismissLocateStatusToast() {
+        if (bizLocateStatusToast) {
+            bizLocateStatusToast.remove();
+            bizLocateStatusToast = null;
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -2308,6 +2351,8 @@
             // Leaflet Map vars & GeoJSON boundary
             let bizMap = null;
             let bizMarker = null;
+            let bizLocateBtn = null;
+            let bizLocateInProgress = false;
             let bizHaNamBoundaryGeoJSON = null;
 
             function isPointInHaNamGeoJSON(lat, lng, geojson) {
@@ -2347,6 +2392,184 @@
             }
 
             // Map initialization matching Contribution Modal style
+            function updateBizMarkerLocation(latlng) {
+                const mapContainer = document.getElementById('businessMap');
+                if (!mapContainer || !latlng) return false;
+
+                const isInside = isPointInHaNamGeoJSON(latlng.lat, latlng.lng, bizHaNamBoundaryGeoJSON);
+                if (!isInside) {
+                    mapContainer.style.borderColor = '#ef4444';
+                    mapContainer.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.18)';
+                    showToast('Vị trí ngoài địa phận Ninh Bình. Vui lòng chọn lại trên bản đồ.', false);
+                    return false;
+                }
+
+                mapContainer.style.borderColor = '#10b981';
+                mapContainer.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
+                document.getElementById('input_lat').value = latlng.lat.toFixed(6);
+                document.getElementById('input_lng').value = latlng.lng.toFixed(6);
+                saveWizardState();
+                return true;
+            }
+
+            function applyBizMapPosition(position) {
+                const latlng = L.latLng(position.coords.latitude, position.coords.longitude);
+                if (bizMap && bizMarker && updateBizMarkerLocation(latlng)) {
+                    bizMarker.setLatLng(latlng);
+                    bizMap.setView(latlng, Math.max(bizMap.getZoom(), 16));
+                    showToast('Đã lấy vị trí hiện tại của bạn.', true);
+                    return true;
+                }
+                if (bizMap) {
+                    bizMap.panTo(latlng);
+                }
+                return false;
+            }
+
+            async function getBizGeolocationPermissionState() {
+                if (!navigator.permissions || !navigator.permissions.query) return null;
+                try {
+                    const result = await navigator.permissions.query({ name: 'geolocation' });
+                    return result.state;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function showBizLocateError(err, permissionState) {
+                let msg = 'Không lấy được vị trí. Thử lại hoặc kéo marker thủ công.';
+                if (err && err.code === 1) {
+                    if (permissionState === 'granted') {
+                        msg = 'Trình duyệt đã cho phép nhưng thiết bị chưa lấy được GPS. Bật Vị trí trong Cài đặt Windows (hoặc điện thoại), rồi thử lại — hoặc kéo marker thủ công.';
+                    } else if (permissionState === 'denied') {
+                        msg = 'Trình duyệt đã chặn Vị trí. Bấm icon ổ khóa trên thanh địa chỉ → Cho phép Vị trí.';
+                    } else {
+                        msg = 'Hãy chọn Cho phép khi trình duyệt hỏi quyền Vị trí.';
+                    }
+                } else if (err && err.code === 3) {
+                    msg = 'Định vị quá lâu. Thử lại hoặc kéo marker thủ công.';
+                } else if (err && err.code === 2) {
+                    msg = 'Chưa có tín hiệu GPS. Đợi vài giây rồi thử lại.';
+                }
+                showToast(msg, false);
+            }
+
+            function requestBizMapPosition(options) {
+                return new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+                });
+            }
+
+            function requestBizMapPositionWatch(options, maxWaitMs) {
+                const waitMs = maxWaitMs || 25000;
+                return new Promise((resolve, reject) => {
+                    if (!navigator.geolocation.watchPosition) {
+                        reject({ code: 2, message: 'watchPosition unavailable' });
+                        return;
+                    }
+
+                    let watchId = null;
+                    let settled = false;
+
+                    const finish = (fn, value) => {
+                        if (settled) return;
+                        settled = true;
+                        clearTimeout(timeoutId);
+                        if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+                        fn(value);
+                    };
+
+                    const timeoutId = setTimeout(() => {
+                        finish(reject, { code: 3, message: 'Timeout' });
+                    }, waitMs);
+
+                    watchId = navigator.geolocation.watchPosition(
+                        (position) => finish(resolve, position),
+                        (err) => {
+                            if (err && err.code === 1) {
+                                finish(reject, err);
+                            }
+                        },
+                        options
+                    );
+                });
+            }
+
+            async function locateBizMapCurrentPosition(triggerBtn) {
+                const btn = triggerBtn || bizLocateBtn;
+                if (!navigator.geolocation) {
+                    showToast('Trình duyệt không hỗ trợ định vị GPS.', false);
+                    return;
+                }
+                if (bizLocateInProgress) return;
+
+                bizLocateInProgress = true;
+                if (btn) btn.classList.add('is-loading');
+                showLocateStatusToast('Đang lấy vị trí...');
+
+                const attempts = [
+                    { mode: 'get', options: { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 } },
+                    { mode: 'get', options: { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 } },
+                    { mode: 'watch', options: { enableHighAccuracy: false, maximumAge: 0 }, waitMs: 22000 },
+                ];
+
+                let lastError = null;
+                for (let i = 0; i < attempts.length; i++) {
+                    try {
+                        if (i > 0) {
+                            await new Promise(r => setTimeout(r, 500));
+                        }
+
+                        const attempt = attempts[i];
+                        const position = attempt.mode === 'watch'
+                            ? await requestBizMapPositionWatch(attempt.options, attempt.waitMs)
+                            : await requestBizMapPosition(attempt.options);
+
+                        dismissLocateStatusToast();
+                        if (applyBizMapPosition(position)) {
+                            bizLocateInProgress = false;
+                            if (btn) btn.classList.remove('is-loading');
+                            return;
+                        }
+
+                        bizLocateInProgress = false;
+                        if (btn) btn.classList.remove('is-loading');
+                        return;
+                    } catch (err) {
+                        lastError = err;
+                        console.warn('Geolocation attempt ' + (i + 1) + ' failed:', err);
+                    }
+                }
+
+                dismissLocateStatusToast();
+                const permissionState = await getBizGeolocationPermissionState();
+                bizLocateInProgress = false;
+                if (btn) btn.classList.remove('is-loading');
+                showBizLocateError(lastError, permissionState);
+            }
+
+            function addBizLocateControl() {
+                if (!bizMap || bizLocateBtn) return;
+
+                const locateControl = L.control({ position: 'topright' });
+                locateControl.onAdd = function() {
+                    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                    const btn = L.DomUtil.create('a', 'biz-locate-control', container);
+                    btn.href = '#';
+                    btn.title = 'Lấy vị trí hiện tại';
+                    btn.setAttribute('aria-label', 'Lấy vị trí hiện tại');
+                    btn.innerHTML = '<i class="bi bi-crosshair"></i>';
+                    L.DomEvent.disableClickPropagation(btn);
+                    L.DomEvent.on(btn, 'click', function(e) {
+                        L.DomEvent.preventDefault(e);
+                        locateBizMapCurrentPosition(btn);
+                    });
+                    bizLocateBtn = btn;
+                    return container;
+                };
+                locateControl.addTo(bizMap);
+            }
+
             function initBizMap() {
                 setTimeout(() => {
                     const mapContainer = document.getElementById('businessMap');
@@ -2396,40 +2619,19 @@
 
                         bizMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(bizMap);
 
-                        function updateMarkerLocation(latlng) {
-                            const isInside = isPointInHaNamGeoJSON(latlng.lat, latlng.lng, bizHaNamBoundaryGeoJSON);
-
-                            if (!isInside) {
-                                mapContainer.style.borderColor = '#ef4444';
-                                mapContainer.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.18)';
-                                if (typeof showToastCustom === 'function') {
-                                    showToastCustom('⚠️ Vị trí ngoài tỉnh Ninh Bình! Vui lòng nhấp chọn lại.');
-                                }
-                                return false;
-                            }
-
-                            mapContainer.style.borderColor = '#10b981';
-                            mapContainer.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
-                            document.getElementById('input_lat').value = latlng.lat.toFixed(6);
-                            document.getElementById('input_lng').value = latlng.lng.toFixed(6);
-                            saveWizardState();
-                            return true;
-                        }
-
-                        // Drag end event
-                        bizMarker.on('dragend', function(e) {
-                            const pos = bizMarker.getLatLng();
-                            updateMarkerLocation(pos);
+                        bizMarker.on('dragend', function() {
+                            updateBizMarkerLocation(bizMarker.getLatLng());
                         });
 
-                        // Map click event
                         bizMap.on('click', function(e) {
-                            if (updateMarkerLocation(e.latlng)) {
+                            if (updateBizMarkerLocation(e.latlng)) {
                                 bizMarker.setLatLng(e.latlng);
                             }
                         });
 
-                        updateMarkerLocation({ lat: defaultLat, lng: defaultLng });
+                        updateBizMarkerLocation({ lat: defaultLat, lng: defaultLng });
+
+                        addBizLocateControl();
                     } else {
                         bizMap.invalidateSize();
                     }

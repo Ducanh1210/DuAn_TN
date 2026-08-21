@@ -693,7 +693,7 @@
             maxZoom: 19
         }).addTo(map);
 
-        fetch(@json(asset('geo/ha-nam-old.geojson')))
+        fetch(@json(asset('geo/ninh-binh.geojson')))
             .then(res => res.json())
             .then(data => {
                 L.geoJSON(data, {
