@@ -253,10 +253,10 @@ class TripPlannerService
             return $hasGps + (float) ($loc->average_rating ?? 0) * 10 + (int) ($loc->view_count ?? 0) / 100;
         })->values();
 
-        if ($sorted->count() > 40) {
-            $hotels = $sorted->filter(fn ($l) => ($l->category->slug ?? '') === 'luu-tru')->take(6);
-            $food = $sorted->filter(fn ($l) => ($l->category->slug ?? '') === 'am-thuc')->take(10);
-            $rest = $sorted->reject(fn ($l) => in_array($l->category->slug ?? '', ['luu-tru', 'am-thuc'], true))->take(24);
+        if ($sorted->count() > 28) {
+            $hotels = $sorted->filter(fn ($l) => ($l->category->slug ?? '') === 'luu-tru')->take(4);
+            $food = $sorted->filter(fn ($l) => ($l->category->slug ?? '') === 'am-thuc')->take(8);
+            $rest = $sorted->reject(fn ($l) => in_array($l->category->slug ?? '', ['luu-tru', 'am-thuc'], true))->take(16);
             $sorted = $hotels->concat($food)->concat($rest)->unique('id')->values();
         }
 
@@ -358,14 +358,14 @@ class TripPlannerService
             return '';
         }
 
-        $context = "\n--- DANH SÁCH BẮT BUỘC 100% CÁC ĐỊA ĐIỂM ĐƯỢC PHÉP DÙNG (KÈM GPS) ---\n";
+        $context = "\n--- ĐỊA ĐIỂM ĐƯỢC PHÉP (id|tên|loại|gps) ---\n";
         foreach ($locations as $loc) {
             $catName = $loc->category->name ?? 'Địa điểm';
             $lat = $loc->lat ? round((float) $loc->lat, 4) : 'N/A';
             $lng = $loc->lng ? round((float) $loc->lng, 4) : 'N/A';
-            $context .= "- ID:{$loc->id} | \"{$loc->name}\" | Loại:{$catName} | GPS:({$lat},{$lng}) | Địa chỉ:" . ($loc->address ?? '') . "\n";
+            $context .= "{$loc->id}|{$loc->name}|{$catName}|{$lat},{$lng}\n";
         }
-        $context .= "---------------------------------------------------------\n";
+        $context .= "--------------------------------\n";
 
         return $context;
     }
@@ -373,7 +373,7 @@ class TripPlannerService
     /**
      * Gọi Gemini: trả về nội dung text (đã gỡ code fence) hoặc null nếu thất bại.
      */
-    protected function callAI(string $systemPrompt, string $userPrompt, int $maxTokens = 800, float $temperature = 0.4): ?string
+    protected function callAI(string $systemPrompt, string $userPrompt, int $maxTokens = 8192, float $temperature = 0.4): ?string
     {
         if (!$this->gemini->isConfigured()) {
             Log::error('TripPlannerService: Chưa cấu hình GEMINI_API_KEY.');
@@ -383,7 +383,10 @@ class TripPlannerService
         $content = $this->gemini->generate([
             ['role' => 'system', 'content' => $systemPrompt],
             ['role' => 'user', 'content' => $userPrompt],
-        ], $temperature, $maxTokens, 90, ['json' => true]);
+        ], $temperature, $maxTokens, 50, [
+            'json' => true,
+            'models' => ['gemini-flash-latest', 'gemini-3.5-flash-lite'],
+        ]);
 
         if ($content) {
             $content = preg_replace('/^```(?:json)?\s*/i', '', trim($content));
@@ -806,7 +809,8 @@ type chỉ nhận: visit, food, transport, rest, photo.
         $userPrompt = "Hồ sơ mong muốn của người dùng:\n{$answersText}\nSố ngày bắt buộc: {$days}.\nNgân sách bắt buộc: {$prefs['budget_label']}.\nNhịp độ: {$paceLabel}.\nHãy sinh lịch trình dạng JSON chi tiết, sát ý khách theo hồ sơ trên.";
 
         for ($attempt = 1; $attempt <= 2; $attempt++) {
-            $rawResponse = $this->callAI($systemPrompt, $userPrompt, 3500, 0.4);
+            $tokenBudget = $attempt === 1 ? 6144 : 8192;
+            $rawResponse = $this->callAI($systemPrompt, $userPrompt, $tokenBudget, 0.35);
 
             if (!$rawResponse) {
                 Log::warning("TripPlanner: AI trả null (lần $attempt)");
@@ -814,7 +818,7 @@ type chỉ nhận: visit, food, transport, rest, photo.
             }
 
             $decoded = $this->cleanAndDecodeJson($rawResponse);
-            if (is_array($decoded) && (isset($decoded['days']) || isset($decoded['title']))) {
+            if (is_array($decoded) && !empty($decoded['days']) && is_array($decoded['days'])) {
                 $decoded = $this->postProcessItinerary($decoded, $prefs);
                 return [
                     'success' => true,
@@ -827,7 +831,10 @@ type chỉ nhận: visit, food, transport, rest, photo.
                 ];
             }
 
-            Log::warning("TripPlanner: JSON parse thất bại (lần $attempt)", ['raw' => mb_substr($rawResponse, 0, 500)]);
+            Log::warning("TripPlanner: JSON parse thất bại (lần $attempt)", [
+                'raw' => mb_substr($rawResponse, 0, 500),
+                'len' => mb_strlen($rawResponse),
+            ]);
         }
 
         return ['success' => false, 'error' => 'Không thể tạo lịch trình lúc này. Vui lòng bấm "Lên lịch mới" để thử lại.'];

@@ -493,6 +493,7 @@
                         <a class="site-nav__link {{ request()->routeIs('client.landing') ? 'is-active' : '' }}" href="{{ route('client.landing') }}">Trang chủ</a>
                         <a class="site-nav__link {{ request()->routeIs('client.about') ? 'is-active' : '' }}" href="{{ route('client.about') }}">Giới thiệu</a>
                         <a class="site-nav__link {{ request()->routeIs('client.events.*') || request()->routeIs('client.news.*') ? 'is-active' : '' }}" href="{{ route('client.events.index') }}">Tin tức</a>
+                        <a class="site-nav__link {{ request()->routeIs('client.pano_service') ? 'is-active' : '' }}" href="{{ route('client.pano_service') }}">Dịch vụ</a>
                         <a class="site-nav__link {{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ route('home') }}">Bản đồ</a>
                     </nav>
                 </div>

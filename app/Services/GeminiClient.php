@@ -44,13 +44,25 @@ class GeminiClient
         }
 
         $payload = $this->buildPayload($messages, $temperature, $maxTokens, $options);
-        $modelsToTry = array_values(array_unique(array_filter([
+        $defaultModels = [
             $this->primaryModel,
             'gemini-3.6-flash',
             'gemini-3.5-flash',
             'gemini-flash-latest',
             'gemini-3.5-flash-lite',
-        ])));
+        ];
+        // Trip planner / tác vụ nặng: ít model hơn để tránh vượt max_execution_time PHP.
+        if (!empty($options['compact_models'])) {
+            $defaultModels = [
+                $this->primaryModel,
+                'gemini-flash-latest',
+                'gemini-3.5-flash-lite',
+            ];
+        }
+        if (!empty($options['models']) && is_array($options['models'])) {
+            $defaultModels = $options['models'];
+        }
+        $modelsToTry = array_values(array_unique(array_filter($defaultModels)));
 
         foreach ($this->apiKeys as $keyIndex => $apiKey) {
             foreach ($modelsToTry as $modelName) {

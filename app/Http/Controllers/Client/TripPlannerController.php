@@ -23,6 +23,10 @@ class TripPlannerController extends Controller
      */
     public function generate(Request $request): JsonResponse
     {
+        // Lịch trình cần gọi Gemini lâu hơn chatbot; tránh FatalError 60s làm frontend báo "không kết nối".
+        @set_time_limit(180);
+        @ini_set('max_execution_time', '180');
+
         $answers = $request->input('answers', []);
         $tripType = $request->input('trip_type');
 
@@ -33,9 +37,16 @@ class TripPlannerController extends Controller
             ], 422);
         }
 
-        $result = $this->tripPlannerService->generateItinerary($answers, $tripType);
-
-        return response()->json($result);
+        try {
+            $result = $this->tripPlannerService->generateItinerary($answers, $tripType);
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('TripPlanner generate failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Máy chủ xử lý quá lâu hoặc AI đang bận. Vui lòng bấm "Lên lịch mới" để thử lại.',
+            ], 504);
+        }
     }
 
     /**

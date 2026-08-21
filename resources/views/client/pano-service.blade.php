@@ -24,6 +24,11 @@
         color: var(--nb-ink);
         outline: none;
         font-family: inherit;
+        box-sizing: border-box;
+        min-height: 42px;
+    }
+    .ps-form .ps-field::placeholder {
+        color: var(--nb-muted);
     }
     .ps-form .ps-field:focus {
         border-color: var(--nb-ink);
@@ -49,7 +54,40 @@
     }
     .ps-alert-ok { border-left-color: #15803d; }
     .ps-alert-err { border-left-color: #b91c1c; }
-    #panoRequestModal .modal-content { border-radius: 2px; border: 1px solid var(--nb-line-soft); }
+    #panoRequestModal .modal-content {
+        border-radius: 2px;
+        border: 1px solid #e0e3e5;
+        --nb-ink: #000000;
+        --nb-ink-hover: #565e74;
+        --nb-line: #c6c6cd;
+        --nb-line-soft: #e0e3e5;
+        --nb-muted: #76777d;
+        --nb-accent: #735c00;
+        --nb-surface-mist: #f2f4f6;
+    }
+    #panoRequestModal .modal-footer {
+        border-top: 0;
+        padding: 8px 24px 20px;
+        gap: 10px;
+        justify-content: flex-start;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #panoRequestModal .nb-btn--solid {
+        background: #000000 !important;
+        border: 1px solid #000000 !important;
+        color: #ffffff !important;
+    }
+    #panoRequestModal .nb-btn--solid:hover {
+        background: #565e74 !important;
+        border-color: #565e74 !important;
+        color: #ffffff !important;
+    }
+    #panoRequestModal .nb-btn--outline {
+        background: #ffffff !important;
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+    }
 </style>
 @endpush
 
@@ -228,7 +266,7 @@
 
 {{-- Modal form --}}
 <div class="modal fade" id="panoRequestModal" tabindex="-1" aria-labelledby="panoRequestModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0">
             <div class="modal-header border-0 pb-0 px-4 pt-4">
                 <div>
@@ -237,63 +275,104 @@
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
-            <div class="modal-body px-4 pb-4 pt-3">
-                @if(session('error'))
-                    <div class="ps-alert ps-alert-err">{{ session('error') }}</div>
-                @endif
-                @if($errors->any())
-                    <div class="ps-alert ps-alert-err">
-                        <ul class="mb-0 ps-3">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
 
-                <form action="{{ route('client.pano_service.submit') }}" method="POST" class="ps-form row g-3">
-                    @csrf
-                    <input type="hidden" name="from" value="public">
-                    <div class="col-md-6">
-                        <label>Tên liên hệ</label>
-                        <input type="text" name="contact_name" class="ps-field" required maxlength="120" value="{{ $defaultContact }}">
+            <form action="{{ route('client.pano_service.submit') }}" method="POST" class="ps-form">
+                @csrf
+                <input type="hidden" name="from" value="public">
+
+                <div class="modal-body px-4 pb-2 pt-3">
+                    @if(session('error'))
+                        <div class="ps-alert ps-alert-err">{{ session('error') }}</div>
+                    @endif
+                    @if($errors->any())
+                        <div class="ps-alert ps-alert-err">
+                            <ul class="mb-0 ps-3">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="pano_contact_name">Tên liên hệ</label>
+                            <input
+                                id="pano_contact_name"
+                                type="text"
+                                name="contact_name"
+                                class="ps-field"
+                                required
+                                maxlength="120"
+                                value="{{ old('contact_name', $defaultContact) }}"
+                                placeholder="Họ và tên của bạn"
+                                autocomplete="name"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label for="pano_phone">SĐT / Zalo</label>
+                            <input
+                                id="pano_phone"
+                                type="text"
+                                name="phone"
+                                class="ps-field"
+                                required
+                                maxlength="30"
+                                value="{{ old('phone', $defaultPhone) }}"
+                                placeholder="09xx..."
+                                autocomplete="tel"
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label for="pano_place_name">Tên địa điểm</label>
+                            <input
+                                id="pano_place_name"
+                                type="text"
+                                name="place_name"
+                                class="ps-field"
+                                required
+                                maxlength="180"
+                                value="{{ old('place_name', $defaultPlace) }}"
+                                placeholder="VD: Homestay Hoa Lư..."
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label for="pano_place_type">Loại địa điểm</label>
+                            <select id="pano_place_type" name="place_type" class="ps-field">
+                                <option value="">Chọn loại</option>
+                                @foreach($panoTypeLabels as $key => $label)
+                                    <option value="{{ $key }}" @selected(old('place_type') === $key)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="pano_scene_estimate">Số góc / scene ước lượng</label>
+                            <select id="pano_scene_estimate" name="scene_estimate" class="ps-field">
+                                <option value="">Chọn mức</option>
+                                @foreach($panoSceneLabels as $key => $label)
+                                    <option value="{{ $key }}" @selected(old('scene_estimate') === $key)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="pano_note">Ghi chú thêm (tuỳ chọn)</label>
+                            <textarea
+                                id="pano_note"
+                                name="note"
+                                class="ps-field"
+                                rows="3"
+                                maxlength="800"
+                                placeholder="VD: muốn quay sảnh + 2 phòng..."
+                            >{{ old('note') }}</textarea>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label>SĐT / Zalo</label>
-                        <input type="text" name="phone" class="ps-field" required maxlength="30" value="{{ $defaultPhone }}" placeholder="09xx...">
-                    </div>
-                    <div class="col-md-6">
-                        <label>Tên địa điểm</label>
-                        <input type="text" name="place_name" class="ps-field" required maxlength="180" value="{{ $defaultPlace }}" placeholder="VD: Homestay Hoa Lư...">
-                    </div>
-                    <div class="col-md-6">
-                        <label>Loại địa điểm</label>
-                        <select name="place_type" class="ps-field">
-                            <option value="">Chọn loại</option>
-                            @foreach($panoTypeLabels as $key => $label)
-                                <option value="{{ $key }}" @selected(old('place_type') === $key)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label>Số góc / scene ước lượng</label>
-                        <select name="scene_estimate" class="ps-field">
-                            <option value="">Chọn mức</option>
-                            @foreach($panoSceneLabels as $key => $label)
-                                <option value="{{ $key }}" @selected(old('scene_estimate') === $key)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <label>Ghi chú thêm (tuỳ chọn)</label>
-                        <textarea name="note" class="ps-field" rows="3" maxlength="800" placeholder="VD: muốn quay sảnh + 2 phòng...">{{ old('note') }}</textarea>
-                    </div>
-                    <div class="col-12 d-flex flex-wrap gap-2 align-items-center pt-1">
-                        <button type="submit" class="nb-btn nb-btn--solid">Gửi yêu cầu</button>
-                        <button type="button" class="nb-btn nb-btn--outline" data-bs-dismiss="modal">Đóng</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="modal-footer border-0">
+                    <button type="submit" class="nb-btn nb-btn--solid">Gửi yêu cầu</button>
+                    <button type="button" class="nb-btn nb-btn--outline" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
