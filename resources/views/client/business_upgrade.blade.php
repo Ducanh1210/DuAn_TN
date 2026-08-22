@@ -878,6 +878,15 @@
         #bizPrevBtn:hover:not(:disabled) { border-color: #1e3a5f !important; color: #1e3a5f !important; }
         #bizPrevBtn:disabled { opacity: 0.4; }
 
+        #bizNextBtn.is-locked, #bizNextBtn:disabled, #bizNextBtn[disabled] {
+            opacity: 0.45 !important;
+            pointer-events: none !important;
+            cursor: not-allowed !important;
+            background-color: #64748b !important;
+            border-color: #64748b !important;
+            box-shadow: none !important;
+        }
+
         /* Top bar (Google-Ads style) */
         .top-navbar { padding: 12px 24px; }
         .nav-left { display: flex; align-items: center; gap: 14px; }
@@ -1190,7 +1199,7 @@
                             <div class="dropzone-area" id="menuDropzone">
                                 <i class="bi bi-images dropzone-icon"></i>
                                 <div class="fw-semibold small" id="step8Text">Kéo các hình ảnh vào đây</div>
-                                <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính</div>
+                                <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính <span class="fw-normal text-muted">(Tối đa 10 ảnh, ≤ 10MB/ảnh)</span></div>
                                 <input type="file" id="menuFilesInput" class="d-none" multiple accept="image/*">
                             </div>
 
@@ -1239,7 +1248,7 @@
                             <div class="dropzone-area" id="docDropzone">
                                 <i class="bi bi-shield-check dropzone-icon"></i>
                                 <div class="fw-semibold small">Kéo ảnh bằng chứng vào đây</div>
-                                <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính</div>
+                                <div class="text-secondary small mt-1">hoặc click để chọn từ máy tính <span class="fw-normal text-muted">(Tối đa 10 ảnh, ≤ 10MB/ảnh)</span></div>
                                 <input type="file" id="docFilesInput" class="d-none" multiple accept="image/*">
                             </div>
 
@@ -1475,6 +1484,24 @@
             let verificationTime = null;
             let cameraStream = null;
             let cameraFacingMode = 'environment';
+            let activeUploadsCount = 0;
+
+            function updateNextButtonState() {
+                if (!bizNextBtn) return;
+                const spinners = document.querySelectorAll('.uploader-spinner');
+                const isUploading = activeUploadsCount > 0 || spinners.length > 0;
+                if (isUploading) {
+                    bizNextBtn.disabled = true;
+                    bizNextBtn.classList.add('is-locked');
+                    bizNextBtn.setAttribute('title', 'Đang tải lên hình ảnh, vui lòng chờ tất cả ảnh load xong...');
+                } else {
+                    bizNextBtn.disabled = false;
+                    bizNextBtn.classList.remove('is-locked');
+                    bizNextBtn.removeAttribute('title');
+                }
+            }
+
+            setInterval(updateNextButtonState, 250);
 
             // Render Verification Photos Gallery
             // Lightbox: view a captured photo at full size
@@ -2157,8 +2184,8 @@
                 restore('ảnh địa điểm', () => {
                     if (state.menuPhotos && Array.isArray(state.menuPhotos)) {
                         menuPhotos.length = 0;
-                        state.menuPhotos.forEach(p => menuPhotos.push(p));
-                        restorePhotoPreviews('menuPreviews', menuPhotos);
+                        state.menuPhotos.slice(0, 10).forEach(p => menuPhotos.push(p));
+                        restorePhotoPreviews('menuPreviews', menuPhotos, 10);
                     }
                 });
 
@@ -2172,8 +2199,8 @@
                 restore('giấy tờ doanh nghiệp', () => {
                     if (state.businessDocs && Array.isArray(state.businessDocs)) {
                         businessDocs.length = 0;
-                        state.businessDocs.forEach(p => businessDocs.push(p));
-                        restorePhotoPreviews('docPreviews', businessDocs);
+                        state.businessDocs.slice(0, 10).forEach(p => businessDocs.push(p));
+                        restorePhotoPreviews('docPreviews', businessDocs, 10);
                     }
                 });
 
@@ -2200,10 +2227,14 @@
                 } catch (e) {}
             }
 
-            function restorePhotoPreviews(containerId, photosArray) {
+            function restorePhotoPreviews(containerId, photosArray, maxFiles = 10) {
                 const container = document.getElementById(containerId);
                 if (!container) return;
                 container.innerHTML = '';
+                
+                if (photosArray.length > maxFiles) {
+                    photosArray.splice(maxFiles);
+                }
                 
                 photosArray.forEach(path => {
                     const previewItem = document.createElement('div');
@@ -2330,6 +2361,8 @@
                 if (bizSkipBtn) {
                     bizSkipBtn.classList.add('d-none');
                 }
+
+                updateNextButtonState();
 
                 // If entering Map step, initialize/invalidate map
                 if (bizStep === 6) {
@@ -2884,16 +2917,22 @@
             }
 
             // Image Drag and Drop and Select logic
-            function setupUploader(dropzoneId, fileInputId, previewsId, previewArray) {
+            function setupUploader(dropzoneId, fileInputId, previewsId, previewArray, maxFiles = 10) {
                 const dropzone = document.getElementById(dropzoneId);
                 const fileInput = document.getElementById(fileInputId);
                 const previews = document.getElementById(previewsId);
 
                 if (!dropzone || !fileInput) return;
 
-                dropzone.addEventListener('click', () => fileInput.click());
+                dropzone.addEventListener('click', () => {
+                    const totalExisting = Math.max(previewArray.length, previews.querySelectorAll('.preview-thumbnail').length);
+                    if (totalExisting >= maxFiles) {
+                        showToast(`Bạn chỉ được tải lên tối đa ${maxFiles} hình ảnh. Vui lòng xóa bớt ảnh hiện tại.`, false);
+                        return;
+                    }
+                    fileInput.click();
+                });
 
-                // Drag and drop highlights
                 ['dragenter', 'dragover'].forEach(eventName => {
                     dropzone.addEventListener(eventName, (e) => {
                         e.preventDefault();
@@ -2918,14 +2957,34 @@
 
                 fileInput.addEventListener('change', function() {
                     handleFiles(this.files);
+                    this.value = '';
                 });
 
                 function handleFiles(files) {
-                    Array.from(files).forEach(file => {
-                        if (!file.type.startsWith('image/')) {
-                            showToast('Chỉ cho phép tải lên hình ảnh.', false);
-                            return;
-                        }
+                    if (!files || files.length === 0) return;
+
+                    const totalExisting = Math.max(previewArray.length, previews.querySelectorAll('.preview-thumbnail').length);
+                    const remainingSlots = maxFiles - totalExisting;
+
+                    if (remainingSlots <= 0) {
+                        showToast(`Bạn chỉ được tải lên tối đa ${maxFiles} hình ảnh. Vui lòng xóa bớt ảnh hiện tại.`, false);
+                        return;
+                    }
+
+                    const validFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+                    if (validFiles.length < files.length) {
+                        showToast('Chỉ cho phép tải lên tệp hình ảnh.', false);
+                    }
+
+                    if (validFiles.length > remainingSlots) {
+                        showToast(`Chỉ tải lên ${remainingSlots} ảnh đầu tiên (tối đa ${maxFiles} ảnh).`, false);
+                    }
+
+                    const filesToUpload = validFiles.slice(0, remainingSlots);
+
+                    filesToUpload.forEach(file => {
+                        activeUploadsCount++;
+                        updateNextButtonState();
 
                         // Create unique preview item with progress spinner
                         const previewItem = document.createElement('div');
@@ -2953,7 +3012,7 @@
                             const img = previewItem.querySelector('img');
 
                             if (data.success) {
-                                spinner.remove();
+                                if (spinner) spinner.remove();
                                 img.src = data.url;
                                 img.style.display = 'block';
 
@@ -2972,6 +3031,7 @@
                                     }
                                     updateMockPhotosGrid();
                                     saveWizardState();
+                                    updateNextButtonState();
                                 });
                                 previewItem.appendChild(removeBtn);
 
@@ -2983,9 +3043,14 @@
                                 previewItem.remove();
                                 showToast(data.message || 'Lỗi tải ảnh.', false);
                             }
+
+                            activeUploadsCount = Math.max(0, activeUploadsCount - 1);
+                            updateNextButtonState();
                         })
                         .catch(err => {
                             previewItem.remove();
+                            activeUploadsCount = Math.max(0, activeUploadsCount - 1);
+                            updateNextButtonState();
                             showToast('Có lỗi xảy ra khi tải ảnh lên.', false);
                             console.error(err);
                         });
@@ -3048,8 +3113,12 @@
                         showToast('Chỉ cho phép tải lên hình ảnh.', false);
                         return;
                     }
+
+                    activeUploadsCount++;
+                    updateNextButtonState();
+
                     const container = document.getElementById('avatarPreview');
-                    container.innerHTML = `<div class="preview-thumbnail"><div class="position-absolute w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"><span class="spinner-border spinner-border-sm text-white" role="status"></span></div></div>`;
+                    container.innerHTML = `<div class="preview-thumbnail"><div class="position-absolute w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center uploader-spinner"><span class="spinner-border spinner-border-sm text-white" role="status"></span></div></div>`;
 
                     const formData = new FormData();
                     formData.append('file', file);
@@ -3066,9 +3135,13 @@
                                 container.innerHTML = '';
                                 showToast(data.message || 'Lỗi tải ảnh.', false);
                             }
+                            activeUploadsCount = Math.max(0, activeUploadsCount - 1);
+                            updateNextButtonState();
                         })
                         .catch(() => {
                             container.innerHTML = '';
+                            activeUploadsCount = Math.max(0, activeUploadsCount - 1);
+                            updateNextButtonState();
                             showToast('Có lỗi xảy ra khi tải ảnh lên.', false);
                         });
                 }
@@ -3113,6 +3186,11 @@
 
             // Step validations
             function validateBizStep() {
+                if (activeUploadsCount > 0 || document.querySelectorAll('.uploader-spinner').length > 0) {
+                    showToast('Hình ảnh đang được tải lên, vui lòng chờ trong giây lát...', false);
+                    return false;
+                }
+
                 // Clear previous red error highlights in current step pane
                 const currentPane = document.querySelector(`.biz-step-pane[data-step="${bizStep}"]`);
                 if (currentPane) {
@@ -3193,6 +3271,10 @@
                         showToast('Vui lòng tải lên ít nhất 1 hình ảnh về địa điểm của bạn.', false);
                         return false;
                     }
+                    if (menuPhotos.length > 10) {
+                        showToast('Tối đa chỉ được chọn 10 hình ảnh. Vui lòng xóa bớt ảnh.', false);
+                        return false;
+                    }
                 } else if (bizStep === 9) {
                     if (!avatarPhoto) {
                         showToast('Vui lòng chọn 1 ảnh đại diện cho địa điểm của bạn.', false);
@@ -3201,6 +3283,10 @@
                 } else if (bizStep === 10) {
                     if (!businessDocs || businessDocs.length === 0) {
                         showToast('Vui lòng tải lên ít nhất 1 bằng chứng xác minh.', false);
+                        return false;
+                    }
+                    if (businessDocs.length > 10) {
+                        showToast('Tối đa chỉ được chọn 10 ảnh bằng chứng. Vui lòng xóa bớt ảnh.', false);
                         return false;
                     }
                 } else if (bizStep === 11) {

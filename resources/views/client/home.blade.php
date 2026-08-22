@@ -2907,7 +2907,7 @@
         <div class="monuments-modal-dialog">
             <div class="monuments-modal-header">
                 <div class="monuments-modal-title-row">
-                    <h3 class="monuments-modal-title">DANH SÁCH DI TÍCH</h3>
+                    <h3 class="monuments-modal-title">DANH SÁCH ĐỊA ĐIỂM</h3>
                     <button type="button" class="monuments-close-btn" onclick="closeMonumentsModal()" title="Đóng">✕</button>
                 </div>
                 <div class="monuments-controls-bar">

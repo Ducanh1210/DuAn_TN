@@ -228,6 +228,10 @@
     line-height: 1.45;
 }
 
+.contrib-form-error.d-none, .contrib-form-error:empty {
+    display: none !important;
+}
+
 .contrib-upload-hint {
     margin-top: 6px;
     font-size: 0.72rem;
@@ -308,6 +312,87 @@
 .btn-contrib-submit:hover {
     background: #1e293b;
 }
+
+.btn-contrib-gps {
+    background: #f1f5f9;
+    color: #1e3a5f;
+    border: 1px solid #cbdbe8;
+    border-radius: 5px;
+    padding: 3px 9px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+}
+
+.btn-contrib-gps:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.btn-contrib-gps:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.contrib-map-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.btn-map-locate-floating {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
+    color: #1e3a5f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.btn-map-locate-floating:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.btn-map-locate-floating:disabled, .btn-map-locate-floating.is-loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.locate-floating-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999999;
+    background: #ffffff;
+    color: #1e3a5f;
+    border: 1px solid #cbdbe8;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    display: none;
+    align-items: center;
+    gap: 8px;
+}
 </style>
 
 <!-- Contribution Modal (Dedicated Location Suggestion) -->
@@ -351,8 +436,21 @@
 
                     <!-- Embedded Leaflet Map for Coordinates Selection -->
                     <div class="contrib-form-group contrib-grid-full">
-                        <label class="contrib-form-label">Chọn vị trí trên bản đồ</label>
-                        <div id="modalPickerMap"></div>
+                        <label class="contrib-form-label" style="margin-bottom: 3px;">Chọn vị trí trên bản đồ</label>
+                        <p class="text-secondary small mb-2" style="font-size: 0.75rem; color: #64748b; margin-bottom: 8px;">Kéo marker hoặc nhấp trên bản đồ để ghim vị trí. Dùng nút định vị góc phải bản đồ để lấy vị trí hiện tại.</p>
+                        <div class="contrib-map-wrapper">
+                            <div id="modalPickerMap"></div>
+                            <button type="button" class="btn-map-locate-floating" id="btnModalMapLocate" onclick="getContribCurrentLocation(this)" title="Lấy vị trí hiện tại" aria-label="Lấy vị trí hiện tại">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+                                    <circle cx="12" cy="12" r="8"/>
+                                    <line x1="12" y1="2" x2="12" y2="4"/>
+                                    <line x1="12" y1="20" x2="12" y2="22"/>
+                                    <line x1="2" y1="12" x2="4" y2="12"/>
+                                    <line x1="20" y1="12" x2="22" y2="12"/>
+                                    <circle cx="12" cy="12" r="2"/>
+                                </svg>
+                            </button>
+                        </div>
                         <input type="hidden" id="suggestLat" name="lat" required>
                         <input type="hidden" id="suggestLng" name="lng" required>
                     </div>
@@ -376,7 +474,7 @@
                             <div class="dropzone-text" id="dropzoneText">Kéo thả ảnh hoặc nhấp để chọn</div>
                         </div>
                         <div id="filePreviewGrid" class="file-preview-grid"></div>
-                        <div id="suggestFormError" class="contrib-form-error d-none"></div>
+                        <div id="suggestFormError" class="contrib-form-error d-none" style="display: none;"></div>
                         <p class="contrib-upload-hint">Tối đa 10 ảnh, mỗi ảnh không quá 10MB (JPG, PNG, WEBP).</p>
                     </div>
                 </div>
@@ -410,13 +508,15 @@ function formatFileSize(bytes) {
 function showSuggestFormError(message) {
     const box = document.getElementById('suggestFormError');
     if (!box) return;
-    if (!message) {
+    if (!message || !message.trim()) {
         box.classList.add('d-none');
+        box.style.display = 'none';
         box.textContent = '';
         return;
     }
     box.textContent = message;
     box.classList.remove('d-none');
+    box.style.display = 'block';
 }
 
 function validateSuggestFiles(files) {
@@ -597,6 +697,60 @@ function isPointInHaNamGeoJSON(lat, lng, geojson) {
     return true;
 }
 
+let modalLocateBtn = null;
+let modalLocateInProgress = false;
+
+function reverseGeocodeContribAddress(lat, lng) {
+    const addressInput = document.querySelector('#suggestLocationForm input[name="address"]');
+    if (!addressInput) return;
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=vi`, {
+        headers: {
+            'Accept-Language': 'vi-VN,vi;q=0.9,en;q=0.8'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.display_name) {
+            let addrStr = data.display_name.replace(/, Việt Nam$/i, '').trim();
+            addressInput.value = addrStr;
+        }
+    })
+    .catch(err => console.warn('Reverse geocoding error:', err));
+}
+
+function addModalLocateControl() {
+    if (!modalPickerMap) return;
+
+    const existingBtn = document.querySelector('#modalPickerMap .contrib-locate-control');
+    if (existingBtn) return;
+
+    const locateControl = L.control({ position: 'topright' });
+    locateControl.onAdd = function() {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        const btn = L.DomUtil.create('a', 'contrib-locate-control', container);
+        btn.href = '#';
+        btn.title = 'Lấy vị trí hiện tại';
+        btn.setAttribute('aria-label', 'Lấy vị trí hiện tại');
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: #1e3a5f;">
+            <circle cx="12" cy="12" r="8"/>
+            <line x1="12" y1="2" x2="12" y2="4"/>
+            <line x1="12" y1="20" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="4" y2="12"/>
+            <line x1="20" y1="12" x2="22" y2="12"/>
+            <circle cx="12" cy="12" r="2"/>
+        </svg>`;
+        L.DomEvent.disableClickPropagation(btn);
+        L.DomEvent.on(btn, 'click', function(e) {
+            L.DomEvent.preventDefault(e);
+            getContribCurrentLocation(btn);
+        });
+        modalLocateBtn = btn;
+        return container;
+    };
+    locateControl.addTo(modalPickerMap);
+}
+
 function initModalPickerMap() {
     if (modalPickerMap) return;
 
@@ -614,6 +768,8 @@ function initModalPickerMap() {
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(modalPickerMap);
+
+    addModalLocateControl();
 
     fetch('{{ asset('geo/ha-nam-old.geojson') }}')
         .then(res => res.json())
@@ -642,7 +798,6 @@ function initModalPickerMap() {
         
         const isInside = isPointInHaNamGeoJSON(lat, lng, modalHaNamBoundaryGeoJSON);
 
-        // TỨC THỜI BÁO ĐỎ KHUNG MAP KHI NGOÀI ĐỊA PHẬN HÀ NAM!
         if (!isInside) {
             mapContainer.style.borderColor = '#ef4444';
             mapContainer.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.18)';
@@ -661,7 +816,6 @@ function initModalPickerMap() {
             return;
         }
 
-        // KHI HỢP LỆ -> VIỀN XANH LÁ HỢP LỆ
         mapContainer.style.borderColor = '#10b981';
         mapContainer.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
 
@@ -673,7 +827,140 @@ function initModalPickerMap() {
         } else {
             modalPickerMarker = L.marker(e.latlng).addTo(modalPickerMap);
         }
+
+        reverseGeocodeContribAddress(lat, lng);
     });
+}
+
+let contribLocateToast = null;
+
+function showLocateStatusToast(message) {
+    dismissLocateStatusToast();
+    let container = document.getElementById('locateFloatingToast');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'locateFloatingToast';
+        container.className = 'locate-floating-toast';
+        document.body.appendChild(container);
+    }
+    container.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" style="width: 12px; height: 12px; border-width: 1.5px; color: #1e3a5f;"></span><span>${message || 'Đang lấy vị trí...'}</span>`;
+    container.style.display = 'flex';
+}
+
+function dismissLocateStatusToast() {
+    const container = document.getElementById('locateFloatingToast');
+    if (container) {
+        container.style.display = 'none';
+    }
+}
+
+function triggerContribToast(msg, type = 'info', duration = 3500) {
+    if (typeof showToast === 'function') {
+        return showToast(msg, type, duration);
+    }
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 8px;';
+        document.body.appendChild(container);
+    }
+    const t = document.createElement('div');
+    t.style.cssText = 'background: #ffffff; color: #1e3a5f; border: 1px solid #cbdbe8; box-shadow: 0 4px 12px rgba(15,23,42,0.12); padding: 10px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease;';
+    t.innerHTML = (type === 'loading' ? '<span class="spinner-border spinner-border-sm" role="status" style="width: 12px; height: 12px;"></span> ' : '') + `<span>${msg}</span>`;
+    container.appendChild(t);
+    t.dismiss = () => { t.remove(); };
+    if (duration > 0) {
+        setTimeout(() => { t.dismiss(); }, duration);
+    }
+    return t;
+}
+
+function getContribCurrentLocation(triggerBtn) {
+    const btn = triggerBtn || document.getElementById('btnModalMapLocate');
+    const mapContainer = document.getElementById('modalPickerMap');
+    
+    if (!navigator.geolocation) {
+        triggerContribToast('Trình duyệt của bạn không hỗ trợ định vị Geolocation.', 'error', 4000);
+        return;
+    }
+
+    if (modalLocateInProgress) return;
+    modalLocateInProgress = true;
+
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('is-loading');
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" style="width: 12px; height: 12px; border-width: 1.5px; color: #1e3a5f;"></span>`;
+    }
+
+    showLocateStatusToast('Đang lấy vị trí...');
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            modalLocateInProgress = false;
+            dismissLocateStatusToast();
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('is-loading');
+                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="2"/></svg>`;
+            }
+
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            if (!modalPickerMap) {
+                initModalPickerMap();
+            }
+
+            const isInside = isPointInHaNamGeoJSON(lat, lng, modalHaNamBoundaryGeoJSON);
+
+            if (!isInside) {
+                if (mapContainer) {
+                    mapContainer.style.borderColor = '#ef4444';
+                    mapContainer.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.18)';
+                }
+                const warnMsg = 'Vị trí hiện tại của bạn nằm ngoài tỉnh Ninh Bình! Vui lòng nhấp chọn lại trên bản đồ.';
+                triggerContribToast(warnMsg, 'warning', 4500);
+                return;
+            }
+
+            document.getElementById('suggestLat').value = lat.toFixed(6);
+            document.getElementById('suggestLng').value = lng.toFixed(6);
+
+            if (mapContainer) {
+                mapContainer.style.borderColor = '#10b981';
+                mapContainer.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
+            }
+
+            if (modalPickerMarker) {
+                modalPickerMarker.setLatLng([lat, lng]);
+            } else {
+                modalPickerMarker = L.marker([lat, lng]).addTo(modalPickerMap);
+            }
+
+            modalPickerMap.setView([lat, lng], 16);
+            reverseGeocodeContribAddress(lat, lng);
+            triggerContribToast('Đã lấy vị trí hiện tại thành công!', 'success', 3000);
+        },
+        (err) => {
+            modalLocateInProgress = false;
+            dismissLocateStatusToast();
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('is-loading');
+                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1e3a5f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="2"/></svg>`;
+            }
+
+            console.warn('Geolocation error:', err);
+            let msg = 'Không thể định vị vị trí hiện tại. Vui lòng bật Vị Trí trên trình duyệt.';
+            if (err.code === err.PERMISSION_DENIED) {
+                msg = 'Bạn đã từ chối quyền truy cập vị trí trên trình duyệt.';
+            }
+            triggerContribToast(msg, 'error', 4000);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
 }
 
 function openModal(id) {
@@ -686,6 +973,7 @@ function openModal(id) {
             initModalPickerMap();
             if (modalPickerMap) {
                 modalPickerMap.invalidateSize();
+                addModalLocateControl();
                 
                 if (typeof map !== 'undefined' && map && !modalPickerMarker) {
                     const center = map.getCenter();
@@ -695,6 +983,7 @@ function openModal(id) {
                         document.getElementById('suggestLat').value = center.lat.toFixed(6);
                         document.getElementById('suggestLng').value = center.lng.toFixed(6);
                         modalPickerMarker = L.marker(center).addTo(modalPickerMap);
+                        reverseGeocodeContribAddress(center.lat, center.lng);
                     }
                 }
             }
