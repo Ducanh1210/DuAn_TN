@@ -1,1298 +1,15 @@
-<!-- AI Trip Planner Widget — Refined Hybrid UI -->
-<style>
-    /* ═══════════════════════════════════════════════════
-       OVERLAY & CONTAINER
-       ═══════════════════════════════════════════════════ */
-    #trip-planner-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 10500;
-        display: none;
-        opacity: 0;
-        transition: opacity 0.35s ease;
-    }
-    #trip-planner-overlay.active {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #trip-planner-overlay.visible { opacity: 1; }
-    #trip-planner-overlay.minimizing {
-        pointer-events: none;
-        opacity: 1;
-        transition: none;
-    }
-    #trip-planner-overlay.minimizing .tp-backdrop {
-        opacity: 0;
-        transition: opacity 0.35s ease;
-    }
 
-    .tp-backdrop {
-        position: absolute;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.6);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        transition: opacity 0.35s ease;
-    }
-
-    .tp-container {
-        position: relative;
-        width: min(96vw, 1040px);
-        height: min(90vh, 720px);
-        max-width: 1040px;
-        max-height: 720px;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 20px 56px rgba(0, 0, 0, 0.16);
-        display: flex;
-        overflow: hidden;
-        transform: scale(0.92) translateY(20px);
-        opacity: 1;
-        transform-origin: center center;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, border-radius 0.4s ease;
-        will-change: transform, opacity;
-    }
-    #trip-planner-overlay.visible .tp-container {
-        transform: scale(1) translateY(0);
-    }
-    #trip-planner-overlay.minimizing .tp-container {
-        /* transform set via JS toward dock button */
-        transition: transform 0.5s cubic-bezier(0.45, 0.05, 0.55, 0.95), opacity 0.4s ease 0.08s, border-radius 0.45s ease;
-    }
-    /* Khi xem kết quả: ẩn cột hồ sơ trống, timeline full-width */
-    .tp-container.tp-mode-result {
-        width: min(98vw, 1480px);
-        height: min(96vh, 920px);
-        max-width: 1480px;
-        max-height: 920px;
-        border-radius: 6px;
-    }
-    .tp-container.tp-mode-result .tp-right {
-        display: none;
-    }
-    .tp-container.tp-mode-result .tp-progress,
-    .tp-container.tp-mode-result .tp-footer {
-        display: none !important;
-    }
-    .tp-container.tp-mode-result .tp-wizard-body,
-    .tp-container.tp-mode-result .tp-loading-panel {
-        display: none !important;
-    }
-    .tp-container.tp-mode-result .tp-left {
-        min-height: 0;
-        overflow: hidden;
-    }
-    .tp-container.tp-mode-result .tp-header {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 30;
-        padding: 14px 16px;
-        background: transparent;
-        border-bottom: 0;
-        pointer-events: none;
-    }
-    .tp-container.tp-mode-result .tp-header-left { display: none; }
-    .tp-container.tp-mode-result .tp-close-btn {
-        pointer-events: auto;
-        margin-left: auto;
-        width: 38px;
-        height: 38px;
-        border: 0;
-        border-radius: 50%;
-        color: #2a2118;
-        background: rgba(255, 251, 245, 0.94);
-        box-shadow: 0 10px 28px rgba(42, 33, 24, 0.18);
-    }
-    .tp-container.tp-mode-result .tp-close-btn:hover {
-        background: #fff;
-        color: #9a3412;
-        border-color: transparent;
-        transform: scale(1.04);
-    }
-    .tp-container.tp-mode-loading .tp-right {
-        opacity: 0.55;
-        pointer-events: none;
-    }
-
-    @keyframes tpDockPulse {
-        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
-        35% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(2, 132, 199, 0.28); background: #0284c7; color: #fff; border-color: #0284c7; }
-        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
-    }
-    #randomFlyBtn.tp-dock-pulse {
-        animation: tpDockPulse 0.65s ease;
-    }
-    #randomFlyBtn.tp-dock-pulse .material-symbols-rounded {
-        color: #fff !important;
-    }
-
-    .tp-left {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        min-height: 0;
-        overflow: hidden;
-    }
-
-    /* ─── Header ─── */
-    .tp-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 28px;
-        border-bottom: 1px solid #e8ecf2;
-        flex-shrink: 0;
-    }
-    .tp-header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .tp-header-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1e3a5f;
-        letter-spacing: -0.02em;
-    }
-    .tp-header-subtitle {
-        font-size: 0.78rem;
-        color: #6482a6;
-        font-weight: 400;
-        margin-top: 2px;
-    }
-    .tp-close-btn {
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-        background: transparent;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.15s;
-        color: #94a3b8;
-        flex-shrink: 0;
-    }
-    .tp-close-btn:hover {
-        background: #fef2f2;
-        border-color: #fca5a5;
-        color: #dc2626;
-    }
-
-    /* ─── Progress Bar ─── */
-    .tp-progress {
-        padding: 0 20px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        height: 28px;
-        flex-shrink: 0;
-        border-bottom: 1px solid #f1f5f9;
-    }
-    .tp-progress-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #e2e8f0;
-        transition: all 0.3s ease;
-        flex-shrink: 0;
-    }
-    .tp-progress-dot.active {
-        background: #1e3a5f;
-        width: 18px;
-        border-radius: 3px;
-    }
-    .tp-progress-dot.done { background: #22c55e; }
-    .tp-progress-label {
-        font-size: 0.62rem;
-        color: #a1a1aa;
-        margin-left: auto;
-        font-weight: 400;
-    }
-
-    /* ─── Wizard Body ─── */
-    .tp-wizard-body {
-        flex: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 24px 28px;
-        position: relative;
-    }
-    .tp-wizard-body::-webkit-scrollbar { width: 5px; }
-    .tp-wizard-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
-    .tp-step {
-        animation: tpSlideIn 0.35s ease forwards;
-    }
-    @keyframes tpSlideIn {
-        from { opacity: 0; transform: translateX(20px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-    .tp-step-greeting {
-        font-size: 0.75rem;
-        color: #6482a6;
-        margin-bottom: 4px;
-        font-weight: 400;
-    }
-    .tp-step-question {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #1e3a5f;
-        margin-bottom: 16px;
-        line-height: 1.35;
-    }
-
-    /* ─── Card Grid ─── */
-    .tp-card-grid {
-        display: grid;
-        gap: 8px;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
-    .tp-card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .tp-card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .tp-card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
-
-    .tp-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 12px 10px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-align: center;
-        position: relative;
-        user-select: none;
-    }
-    .tp-card:hover {
-        border-color: #93c5fd;
-        background: #f8fafc;
-    }
-    .tp-card.selected {
-        border-color: #1e3a5f;
-        background: #f0f5fa;
-    }
-    .tp-card.selected::after {
-        content: '\2713';
-        position: absolute;
-        top: 6px;
-        right: 8px;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: #1e3a5f;
-        color: #fff;
-        font-size: 0.55rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .tp-card:active { transform: scale(0.97); }
-
-    /* ─── Multi-select Checkbox Card Styling ─── */
-    .tp-card.tp-card-multi {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-align: left;
-        padding: 10px 12px;
-    }
-    .tp-card.tp-card-multi .tp-checkbox-box {
-        width: 18px;
-        height: 18px;
-        border: 2px solid #cbd5e1;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        background: #ffffff;
-        transition: all 0.15s ease;
-        color: transparent;
-    }
-    .tp-card.tp-card-multi:hover .tp-checkbox-box {
-        border-color: #94a3b8;
-    }
-    .tp-card.tp-card-multi.selected {
-        border-color: #1e3a5f;
-        background: #f0f5fa;
-    }
-    .tp-card.tp-card-multi.selected .tp-checkbox-box {
-        background: #1e3a5f;
-        border-color: #1e3a5f;
-        color: #ffffff;
-    }
-    .tp-card.tp-card-multi.selected::after {
-        display: none !important;
-    }
-
-    /* ─── Other / Custom Input Option Styling ─── */
-    .tp-other-input-wrap {
-        width: 100%;
-        margin-top: 10px;
-        animation: tpSlideIn 0.25s ease forwards;
-    }
-    .tp-other-input {
-        width: 100%;
-        padding: 9px 12px;
-        border: 1.5px solid #0284c7;
-        border-radius: 8px;
-        font-size: 0.78rem;
-        color: #1e3a5f;
-        background: #ffffff;
-        outline: none;
-        box-sizing: border-box;
-        font-family: inherit;
-        transition: all 0.2s ease;
-    }
-    .tp-other-input:focus {
-        border-color: #0369a1;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-    }
-
-    /* ─── Location Picker Step ─── */
-    .tp-loc-toolbar {
-        display: flex; gap: 8px; margin-bottom: 10px;
-    }
-    .tp-loc-search {
-        flex: 1; padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 7px;
-        font-size: 0.75rem; color: #1e3a5f; background: #fff; outline: none; font-family: inherit;
-    }
-    .tp-loc-search:focus { border-color: #93c5fd; box-shadow: 0 0 0 2px rgba(2,132,199,0.1); }
-    .tp-loc-cat-filter {
-        padding: 7px 8px; border: 1px solid #e2e8f0; border-radius: 7px;
-        font-size: 0.72rem; color: #475569; background: #fff; cursor: pointer; font-family: inherit;
-    }
-    .tp-loc-grid {
-        display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px;
-        max-height: 260px; overflow-y: auto; padding: 2px;
-    }
-    .tp-loc-card {
-        background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer;
-        transition: all 0.18s ease; position: relative; overflow: hidden; user-select: none;
-    }
-    .tp-loc-card:hover { border-color: #93c5fd; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    .tp-loc-card.selected {
-        border-color: #1e3a5f;
-        background: #f0f5fa;
-        box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.18);
-    }
-    .tp-loc-card-img {
-        width: 100%; height: 80px; object-fit: cover; display: block;
-    }
-    .tp-loc-card-img-placeholder {
-        height: 80px; display: flex; align-items: center; justify-content: center;
-        background: #f1f5f9; color: #94a3b8;
-    }
-    .tp-loc-card-body { padding: 6px 8px; }
-    .tp-loc-card-name {
-        font-size: 0.72rem; font-weight: 600; color: #1e3a5f; line-height: 1.3;
-        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .tp-loc-card-cat { font-size: 0.62rem; color: #94a3b8; margin-top: 2px; }
-    .tp-loc-actions {
-        display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;
-    }
-    .tp-btn { padding: 8px 18px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; }
-    .tp-btn-skip { background: #f1f5f9; color: #64748b; }
-    .tp-btn-skip:hover { background: #e2e8f0; }
-    .tp-btn-confirm { background: #1e3a5f; color: #fff; }
-    .tp-btn-confirm:hover { background: #162d4a; }
-    .tp-btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .tp-card-icon {
-        font-size: 1.15rem;
-        margin-bottom: 4px;
-        display: block;
-        line-height: 1;
-        filter: grayscale(30%);
-        opacity: 0.85;
-    }
-    .tp-card-label {
-        display: block;
-        font-size: 0.72rem;
-        font-weight: 500;
-        color: #3b5980;
-        line-height: 1.25;
-    }
-    .tp-card-desc {
-        display: block;
-        font-size: 0.62rem;
-        color: #a1a1aa;
-        margin-top: 3px;
-        line-height: 1.3;
-        font-weight: 400;
-    }
-
-    .tp-card.tp-card-large { padding: 14px 10px; }
-    .tp-card.tp-card-large .tp-card-icon { font-size: 1.3rem; margin-bottom: 5px; }
-    .tp-card.tp-card-large .tp-card-label { font-size: 0.75rem; }
-
-    /* ─── AI Thinking ─── */
-    .tp-thinking {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-        animation: tpSlideIn 0.25s ease forwards;
-    }
-    .tp-thinking-dots {
-        display: flex;
-        gap: 5px;
-        margin-bottom: 10px;
-    }
-    .tp-thinking-dot {
-        width: 6px;
-        height: 6px;
-        background: #6482a6;
-        border-radius: 50%;
-        animation: tpThinkBounce 1.4s infinite ease-in-out both;
-    }
-    .tp-thinking-dot:nth-child(2) { animation-delay: 0.16s; }
-    .tp-thinking-dot:nth-child(3) { animation-delay: 0.32s; }
-    @keyframes tpThinkBounce {
-        0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; }
-        40% { transform: scale(1); opacity: 1; }
-    }
-    .tp-thinking-text {
-        font-size: 0.72rem;
-        color: #a1a1aa;
-        font-weight: 400;
-    }
-
-    /* ─── Footer ─── */
-    .tp-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 28px;
-        border-top: 1px solid #f1f5f9;
-        flex-shrink: 0;
-    }
-    .tp-btn {
-        padding: 6px 16px;
-        border-radius: 8px;
-        font-size: 0.73rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.15s;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        border: none;
-        outline: none;
-        font-family: inherit;
-    }
-    .tp-btn-back {
-        background: #f1f5f9;
-        color: #6482a6;
-        border: 1px solid #e2e8f0;
-    }
-    .tp-btn-back:hover { background: #e2e8f0; color: #3b5980; }
-    .tp-btn-back:disabled { opacity: 0.35; cursor: not-allowed; }
-
-    .tp-multi-hint {
-        font-size: 0.65rem;
-        color: #a1a1aa;
-        font-weight: 400;
-    }
-    .tp-btn-next {
-        padding: 6px 18px;
-        border-radius: 8px;
-        font-size: 0.73rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: none;
-        align-items: center;
-        gap: 5px;
-        border: none;
-        outline: none;
-        font-family: inherit;
-        background: #1e3a5f;
-        color: #ffffff;
-    }
-    .tp-btn-next:hover { background: #2b4c7e; }
-    .tp-btn-next:disabled { opacity: 0.35; cursor: not-allowed; }
-    .tp-btn-next.visible { display: flex; }
-
-    /* ═══════════════════════════════════════════════════
-       RIGHT PANEL (PROFILE)
-       ═══════════════════════════════════════════════════ */
-    .tp-right {
-        width: 280px;
-        background: #f7f9fc;
-        border-left: 1px solid #eef2f7;
-        display: flex;
-        flex-direction: column;
-        flex-shrink: 0;
-    }
-    .tp-profile-header {
-        padding: 16px 20px;
-        border-bottom: 1px solid #e8ecf2;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .tp-profile-title {
-        font-size: 0.82rem;
-        font-weight: 600;
-        color: #1e3a5f;
-    }
-    .tp-profile-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 16px 20px;
-    }
-    .tp-profile-body::-webkit-scrollbar { width: 4px; }
-    .tp-profile-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-
-    .tp-profile-empty {
-        text-align: center;
-        padding: 36px 12px;
-        color: #94a3b8;
-        font-size: 0.78rem;
-        font-weight: 400;
-        line-height: 1.6;
-    }
-
-    .tp-profile-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 10px 0;
-        border-bottom: 1px solid #eef2f7;
-        animation: tpFadeIn 0.3s ease forwards;
-    }
-    .tp-profile-item:last-child { border-bottom: none; }
-    @keyframes tpFadeIn {
-        from { opacity: 0; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .tp-profile-item-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #94b4d0;
-        margin-top: 6px;
-        flex-shrink: 0;
-    }
-    .tp-profile-item-content { flex: 1; min-width: 0; }
-    .tp-profile-item-label {
-        font-size: 0.68rem;
-        color: #94a3b8;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.35px;
-    }
-    .tp-profile-item-value {
-        font-size: 0.82rem;
-        color: #334155;
-        font-weight: 500;
-        margin-top: 3px;
-        line-height: 1.4;
-    }
-
-    .tp-generate-cta {
-        padding: 16px 20px;
-        border-top: 1px solid #e8ecf2;
-    }
-    .tp-btn-generate {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        background: #1e3a5f;
-        color: #fff;
-        font-size: 0.82rem;
-        font-weight: 500;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-family: inherit;
-    }
-    .tp-btn-generate:hover { background: #2b4c7e; }
-    .tp-btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* ═══════════════════════════════════════════════════
-       LOADING PANEL
-       ═══════════════════════════════════════════════════ */
-    .tp-loading-panel {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 36px 20px;
-        text-align: center;
-        flex: 1;
-    }
-    .tp-loading-panel.active { display: flex; }
-    .tp-loading-spinner {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 2px solid #e2e8f0;
-        border-top-color: #1e3a5f;
-        animation: tpSpin 0.8s linear infinite;
-        margin-bottom: 16px;
-    }
-    @keyframes tpSpin { to { transform: rotate(360deg); } }
-    .tp-loading-title { font-size: 0.85rem; font-weight: 600; color: #1e3a5f; margin-bottom: 6px; }
-    .tp-loading-msg { font-size: 0.72rem; color: #6482a6; transition: opacity 0.3s; min-height: 1em; font-weight: 400; }
-    .tp-loading-bar { width: 160px; height: 3px; background: #e2e8f0; border-radius: 3px; margin-top: 16px; overflow: hidden; }
-    .tp-loading-bar-fill {
-        height: 100%;
-        width: 0%;
-        background: linear-gradient(90deg, #1e3a5f, #6482a6, #1e3a5f);
-        background-size: 200% 100%;
-        border-radius: 3px;
-        animation: tpBarShimmer 1.5s ease infinite;
-        transition: width 0.5s ease;
-    }
-    @keyframes tpBarShimmer {
-        0% { background-position: 100% 0; }
-        100% { background-position: -100% 0; }
-    }
-
-    /* ═══════════════════════════════════════════════════
-       RESULT: split journey + route map
-       ═══════════════════════════════════════════════════ */
-    .tp-result-panel {
-        display: none;
-        flex-direction: column;
-        flex: 1;
-        overflow: hidden;
-        background: #f3efe7;
-        min-height: 0;
-    }
-    .tp-result-panel.active { display: flex; }
-    .tp-result-stage {
-        display: grid;
-        grid-template-columns: minmax(340px, 42%) 1fr;
-        flex: 1;
-        min-height: 0;
-        overflow: hidden;
-    }
-    .tp-result-stage:has(.tp-route-pane.hidden) {
-        grid-template-columns: 1fr;
-    }
-    .tp-journey {
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        min-height: 0;
-        height: 100%;
-        overflow: hidden;
-        background: #f3efe7;
-        border-right: 1px solid #e4ddd2;
-    }
-    .tp-result-hero {
-        position: relative;
-        min-height: 210px;
-        flex-shrink: 0;
-        overflow: hidden;
-        background: #1b2433 center/cover no-repeat;
-    }
-    .tp-result-hero::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(16,24,38,.18) 0%, rgba(16,24,38,.78) 100%);
-    }
-    .tp-result-hero-copy {
-        position: relative;
-        z-index: 1;
-        padding: 28px 24px 20px;
-        color: #fff;
-        min-height: 210px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-    }
-    .tp-result-kicker {
-        font-size: 0.68rem;
-        font-weight: 600;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,.72);
-        margin-bottom: 8px;
-    }
-    .tp-result-title {
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: #fff;
-        margin: 0 0 8px;
-        letter-spacing: -0.03em;
-        line-height: 1.25;
-        text-wrap: balance;
-    }
-    .tp-result-summary {
-        font-size: 0.82rem;
-        color: rgba(255,255,255,.82);
-        line-height: 1.5;
-        font-weight: 400;
-        max-width: 40rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-    .tp-result-stats {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 14px;
-    }
-    .tp-result-stats:empty { display: none; }
-    .tp-stat {
-        background: rgba(255,255,255,.12);
-        border: 1px solid rgba(255,255,255,.16);
-        border-radius: 999px;
-        padding: 5px 10px;
-        color: #fff;
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .tp-result-body {
-        flex: 1 1 auto;
-        min-height: 0;
-        overflow-y: auto;
-        overflow-x: hidden;
-        overscroll-behavior: contain;
-        padding: 8px 8px 18px 0;
-        -webkit-overflow-scrolling: touch;
-    }
-    .tp-result-body::-webkit-scrollbar { width: 5px; }
-    .tp-result-body::-webkit-scrollbar-thumb { background: #d4cbbd; border-radius: 6px; }
-
-    .tp-day-section { padding: 12px 18px 4px; }
-    .tp-day-title {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #5c4f3e;
-        margin: 4px 0 4px 70px;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-    }
-    .tp-day-badge { display: none; }
-
-    .tp-rail {
-        position: relative;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
-    .tp-rail::before {
-        content: '';
-        position: absolute;
-        left: 62px;
-        top: 18px;
-        bottom: 18px;
-        width: 1px;
-        background: #d7cfc3;
-    }
-    .tp-stop {
-        position: relative;
-        display: grid;
-        grid-template-columns: 62px 108px 1fr;
-        gap: 12px;
-        padding: 10px 18px 10px 8px;
-        cursor: pointer;
-        transition: background 0.2s cubic-bezier(0.32, 0.72, 0, 1);
-    }
-    .tp-stop:hover { background: rgba(255,255,255,.45); }
-    .tp-stop.is-active { background: #fff; }
-    .tp-stop-index {
-        margin: 6px 0 0;
-        padding-right: 10px;
-        background: transparent;
-        color: #b45309;
-        font-size: 0.68rem;
-        font-weight: 700;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        justify-content: flex-start;
-        gap: 2px;
-        position: relative;
-        z-index: 1;
-        box-shadow: none;
-        border-radius: 0;
-        width: auto;
-        height: auto;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: 0.01em;
-        line-height: 1.2;
-        text-align: right;
-        white-space: nowrap;
-    }
-    .tp-stop-index-end {
-        color: #8a7d6e;
-        font-size: 0.62rem;
-        font-weight: 600;
-    }
-    .tp-stop.is-active .tp-stop-index { background: transparent; color: #9a3412; }
-    .tp-stop-photo {
-        width: 108px;
-        height: 86px;
-        border-radius: 4px;
-        object-fit: cover;
-        background: #d8cfc2;
-        display: block;
-    }
-    .tp-stop-photo.placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #7a6a58;
-        font-size: 0.62rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }
-    .tp-stop-copy { min-width: 0; padding-top: 4px; }
-    .tp-stop-time { display: none; }
-    .tp-stop-name {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: #1d1914;
-        letter-spacing: -0.02em;
-        line-height: 1.3;
-        margin: 2px 0 4px;
-    }
-    .tp-stop-activity {
-        font-size: 0.78rem;
-        color: #6b6258;
-        line-height: 1.45;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-    .tp-stop-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 6px;
-        font-size: 0.7rem;
-        color: #8a7d6e;
-        font-weight: 600;
-    }
-    .tp-stop-link {
-        color: #1e3a5f;
-        text-decoration: none;
-        font-weight: 700;
-    }
-    .tp-stop-link:hover { text-decoration: underline; }
-
-    .tp-tips-section {
-        margin: 8px 18px 0;
-        padding: 12px 0 0;
-        border-top: 1px solid #e4ddd2;
-    }
-    .tp-tips-title {
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: #5c4f3e;
-        margin-bottom: 8px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }
-    .tp-tips-list { list-style: none; padding: 0; margin: 0; }
-    .tp-tips-list li {
-        font-size: 0.78rem;
-        color: #6b6258;
-        padding: 4px 0;
-        line-height: 1.45;
-    }
-
-    .tp-route-pane {
-        position: relative;
-        min-width: 0;
-        min-height: 0;
-        background: #d7e0ea;
-        overflow: hidden;
-    }
-    .tp-route-pane.hidden { display: none; }
-    #tp-route-map, #tp-mini-map {
-        width: 100%;
-        height: 100%;
-    }
-    .tp-route-tools {
-        position: absolute;
-        right: 14px;
-        bottom: 14px;
-        z-index: 400;
-        pointer-events: none;
-    }
-    .tp-mini-map-btn {
-        pointer-events: auto;
-        display: inline-flex;
-        align-items: center;
-        border: 0;
-        border-radius: 8px;
-        background: #fff;
-        color: #1a1a1a;
-        font-size: 0.78rem;
-        font-weight: 600;
-        padding: 9px 14px;
-        cursor: pointer;
-        font-family: inherit;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
-        transition: background 0.15s ease, transform 0.15s ease;
-    }
-    .tp-mini-map-btn:hover { background: #f4f4f5; }
-    .tp-mini-map-btn:active { transform: scale(0.98); }
-
-    .tp-map-num { background: none !important; border: none !important; }
-    .tp-pin-num {
-        position: absolute;
-        top: -7px;
-        right: -9px;
-        z-index: 2;
-        min-width: 16px;
-        height: 16px;
-        padding: 0 4px;
-        border-radius: 999px;
-        background: #101826;
-        color: #fff;
-        font-size: 9px;
-        font-weight: 700;
-        line-height: 16px;
-        text-align: center;
-        border: 1.5px solid #fff;
-        box-sizing: border-box;
-    }
-    #tp-route-map .custom-map-pin {
-        position: relative;
-        width: 26px;
-        height: 35px;
-    }
-    #tp-route-map .custom-map-pin svg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 26px;
-        height: 35px;
-    }
-    #tp-route-map .pin-icon-img {
-        position: absolute !important;
-        top: 3px !important;
-        left: 3px !important;
-        width: 20px !important;
-        height: 20px !important;
-        max-width: 20px !important;
-        max-height: 20px !important;
-        object-fit: cover !important;
-        border-radius: 50% !important;
-    }
-    #tp-route-map .custom-pin-tooltip {
-        position: absolute;
-        top: 16px;
-        left: calc(100% - 2px);
-        transform: translate(0, -50%);
-        background: linear-gradient(to right, color-mix(in srgb, var(--tip-color) 40%, black), var(--tip-color));
-        color: #fff;
-        padding: 4px 11px;
-        border-radius: 16px;
-        font-size: 12px;
-        font-weight: 600;
-        white-space: nowrap;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        z-index: 10001;
-    }
-    #tp-route-map .custom-map-pin:hover .custom-pin-tooltip {
-        opacity: 1;
-        visibility: visible;
-        transform: translate(6px, -50%);
-    }
-    #tp-route-map .tp-stop-pin.is-active .tp-pin-num { background: #b45309; }
-    #tp-route-map .leaflet-popup-content-wrapper {
-        border-radius: 4px;
-        box-shadow: none;
-        padding: 0;
-        overflow: hidden;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-    #tp-route-map .leaflet-popup-content {
-        font-family: inherit;
-        margin: 0;
-        width: 260px !important;
-    }
-    #tp-route-map .leaflet-popup-tip-container { display: none; }
-    #tp-route-map .poi-popup-inner {
-        display: flex;
-        flex-direction: column;
-        text-align: center;
-    }
-    #tp-route-map .poi-thumbnail {
-        width: 100%;
-        height: 140px;
-        object-fit: cover;
-        background: #f1f5f9;
-        display: block;
-    }
-    #tp-route-map .poi-content { padding: 16px; }
-    #tp-route-map .poi-title {
-        font-weight: 700;
-        font-size: 17px;
-        color: #1a1a1a;
-        margin-bottom: 6px;
-    }
-    #tp-route-map .poi-desc {
-        font-size: 13px;
-        color: #555;
-        margin-bottom: 16px;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        line-height: 1.5;
-    }
-    #tp-route-map .poi-btn-360 {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        color: var(--poi-color, #1e3a5f) !important;
-        padding: 6px 20px;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 14px;
-        text-decoration: none !important;
-        border: 2px solid var(--poi-color, #1e3a5f);
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .tp-result-footer {
-        padding: 12px 16px 16px;
-        border-top: 1px solid rgba(90, 72, 55, 0.1);
-        display: flex;
-        align-items: center;
-        gap: 10px 16px;
-        flex-shrink: 0;
-        flex-wrap: wrap;
-        background: #f6f1e8;
-    }
-    .tp-result-footer-side {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        margin-left: auto;
-    }
-    .tp-btn-new {
-        background: transparent;
-        color: #6b5d4f;
-        font-size: 0.78rem;
-        font-weight: 600;
-        border: 0;
-        border-radius: 999px;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-family: inherit;
-        transition: color 0.2s ease, background 0.2s ease;
-    }
-    .tp-btn-new:hover { background: rgba(42, 33, 24, 0.06); color: #2a2118; }
-    .tp-btn-save {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        min-width: 168px;
-        padding: 12px 18px;
-        border-radius: 8px;
-        background: #1e3a5f;
-        color: #fff;
-        font-size: 0.82rem;
-        font-weight: 650;
-        letter-spacing: -0.01em;
-        border: none;
-        cursor: pointer;
-        font-family: inherit;
-        box-shadow: none;
-        transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), background 0.2s ease;
-    }
-    .tp-btn-save:hover { background: #2b4c7e; }
-    .tp-btn-save:active { transform: scale(0.98); }
-    .tp-btn-save:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
-    .tp-btn-save.saved { background: #166534; box-shadow: none; }
-
-    .tp-raw-result {
-        white-space: pre-wrap;
-        font-size: 0.85rem;
-        color: #334155;
-        line-height: 1.6;
-        padding: 20px 28px;
-        font-weight: 400;
-    }
-
-    /* ═══════════════════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════════════════ */
-    @media (max-width: 900px) {
-        .tp-container {
-            width: 96vw;
-            height: min(92vh, 700px);
-        }
-        .tp-right { width: 240px; }
-        .tp-container.tp-mode-result .tp-result-stage {
-            display: flex;
-            flex-direction: column;
-        }
-        .tp-container.tp-mode-result .tp-route-pane {
-            order: -1;
-            flex: 0 0 38vh;
-            min-height: 220px;
-        }
-        .tp-journey { border-right: 0; flex: 1; min-height: 0; }
-    }
-    @media (max-width: 768px) {
-        .tp-container {
-            width: 100vw; height: 100vh;
-            max-width: 100%; max-height: 100%;
-            border-radius: 0;
-            flex-direction: column;
-        }
-        .tp-right {
-            width: 100%; height: auto; max-height: 140px;
-            border-left: none; border-top: 1px solid #f1f5f9; order: -1;
-        }
-        .tp-container.tp-mode-result .tp-right { display: none; }
-        .tp-profile-body { padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 4px; }
-        .tp-profile-item { padding: 4px 0; border-bottom: none; flex: 0 0 auto; gap: 5px; }
-        .tp-generate-cta { padding: 10px 16px; }
-        .tp-card-grid.cols-4, .tp-card-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
-        .tp-header { padding: 14px 18px; }
-        .tp-container.tp-mode-result {
-            width: 100vw;
-            height: 100dvh;
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 0;
-        }
-        .tp-stop { grid-template-columns: 52px 84px 1fr; padding-right: 10px; }
-        .tp-stop-index { margin-left: 0; padding-right: 8px; font-size: 0.62rem; }
-        .tp-rail::before { left: 52px; }
-        .tp-day-title { margin-left: 60px; }
-        .tp-result-title { font-size: 1.12rem; }
-        .tp-result-hero, .tp-result-hero-copy { min-height: 170px; }
-        .tp-result-footer { padding: 12px 14px 14px; }
-        .tp-result-footer-side { width: 100%; margin-left: 0; justify-content: space-between; }
-        .tp-btn-save { width: 100%; }
-    }
-    @media (max-width: 480px) {
-        .tp-card-grid.cols-2 { grid-template-columns: 1fr; }
-        .tp-right { max-height: 120px; }
-        .tp-result-title { font-size: 1rem; }
-    }
-</style>
-
-<!-- ═══════════════════════════════════════════════════
-     HTML
-     ═══════════════════════════════════════════════════ -->
-<div id="trip-planner-overlay">
-    <div class="tp-backdrop" id="tp-backdrop"></div>
-    <div class="tp-container">
-        <div class="tp-left">
-            <div class="tp-header">
-                <div class="tp-header-left">
-                    <div>
-                        <div class="tp-header-title">Lên lịch trình</div>
-                        <div class="tp-header-subtitle">Chọn vài bước — AI sinh lịch trình</div>
-                    </div>
-                </div>
-                <button class="tp-close-btn" id="tp-close-btn" title="Đóng">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-            </div>
-            <div class="tp-progress" id="tp-progress"></div>
-            <div class="tp-wizard-body" id="tp-wizard-body"></div>
-
-            <div class="tp-loading-panel" id="tp-loading-panel">
-                <div class="tp-loading-spinner"></div>
-                <div class="tp-loading-title">Đang tạo lịch trình</div>
-                <div class="tp-loading-msg" id="tp-loading-msg">Đang phân tích thông tin...</div>
-                <div class="tp-loading-bar"><div class="tp-loading-bar-fill" id="tp-loading-bar-fill"></div></div>
-            </div>
-
-            <div class="tp-result-panel" id="tp-result-panel">
-                <div class="tp-result-stage">
-                    <div class="tp-journey">
-                        <div class="tp-result-hero" id="tp-result-hero">
-                            <div class="tp-result-hero-copy">
-                                <div class="tp-result-kicker" id="tp-result-kicker">Hành trình</div>
-                    <div class="tp-result-title" id="tp-result-title"></div>
-                    <div class="tp-result-summary" id="tp-result-summary"></div>
-                                <div class="tp-result-stats" id="tp-result-stats"></div>
-                            </div>
-                </div>
-                <div class="tp-result-body" id="tp-result-body"></div>
-                <div class="tp-result-footer">
-                            <button class="tp-btn-save" id="tp-btn-save" type="button">Lưu hành trình</button>
-                            <div class="tp-result-footer-side">
-                                <button class="tp-btn-new" id="tp-btn-restart" type="button">Lên lịch mới</button>
-                                <button class="tp-btn-new" id="tp-btn-close-result" type="button">Đóng</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tp-route-pane" id="tp-route-pane">
-                        <div id="tp-route-map"></div>
-                        <div class="tp-route-tools">
-                            <button type="button" class="tp-mini-map-btn" id="tp-btn-show-route">Google Maps</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tp-footer" id="tp-footer">
-                <button class="tp-btn tp-btn-back" id="tp-btn-back" disabled>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-                    Quay lại
-                </button>
-                <span class="tp-multi-hint" id="tp-multi-hint" style="display:none">Có thể chọn nhiều</span>
-                <button class="tp-btn tp-btn-next" id="tp-btn-next" disabled>
-                    Tiếp theo
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
-                </button>
-            </div>
-        </div>
-
-        <div class="tp-right">
-            <div class="tp-profile-header">
-                <div class="tp-profile-title">Hồ sơ chuyến đi</div>
-            </div>
-            <div class="tp-profile-body" id="tp-profile-body">
-                <div class="tp-profile-empty">Chọn các thẻ bên trái để xây dựng hồ sơ</div>
-            </div>
-            <div class="tp-generate-cta">
-                <button class="tp-btn-generate" id="tp-btn-generate" disabled>Tạo lịch trình</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
 document.addEventListener('DOMContentLoaded', function() {
 
     const TRIP_TYPES = [
-        { value: 'spiritual',      icon: '☸', label: 'Tâm linh',     desc: 'Chùa, đền, phủ' },
-        { value: 'food_tour',      icon: '◎', label: 'Ẩm thực',      desc: 'Đặc sản địa phương' },
-        { value: 'check_in',       icon: '◉', label: 'Check-in',     desc: 'Điểm đẹp, chụp ảnh' },
-        { value: 'family',         icon: '⌂', label: 'Gia đình',     desc: 'Cả nhà cùng đi' },
-        { value: 'couple',         icon: '♡', label: 'Cặp đôi',      desc: 'Đi hai người' },
-        { value: 'resort',         icon: '△', label: 'Nghỉ dưỡng',   desc: 'Ở lại, thư giãn' },
-        { value: 'team_building',  icon: '⬡', label: 'Đoàn nhóm',    desc: 'Công ty, team' },
-        { value: 'backpacking',    icon: '↗', label: 'Phượt',        desc: 'Tự túc, khám phá' },
+        { value: 'spiritual',      icon: '☸', label: 'Tâm linh',      desc: 'Chùa, đền, phủ' },
+        { value: 'food_tour',      icon: '◎', label: 'Food Tour',     desc: 'Ẩm thực địa phương' },
+        { value: 'check_in',       icon: '◉', label: 'Check-in',      desc: 'Địa điểm đẹp' },
+        { value: 'family',         icon: '⌂', label: 'Gia đình',      desc: 'Cả nhà cùng đi' },
+        { value: 'couple',         icon: '♡', label: 'Couple',        desc: 'Hẹn hò lãng mạn' },
+        { value: 'resort',         icon: '△', label: 'Nghỉ dưỡng',    desc: 'Thư giãn' },
+        { value: 'team_building',  icon: '⬡', label: 'Team Building', desc: 'Nhóm & công ty' },
+        { value: 'backpacking',    icon: '↗', label: 'Phượt',         desc: 'Khám phá tự do' },
     ];
 
     let tripType = '';
@@ -1308,15 +25,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastAnswersPayload = [];
     let tpMiniMap = null;
     let tpRouteMarkers = [];
-    const IS_AUTHENTICATED = @json(auth()->check());
-    const CURRENT_USER_ID = @json(auth()->id());
-    const LOGIN_URL = @json(route('login'));
-    const PROFILE_URL = @json(route('client.profile'));
+    const IS_AUTHENTICATED = null;
+    const CURRENT_USER_ID = null;
+    const LOGIN_URL = null;
+    const PROFILE_URL = null;
 
     // Bản nháp chỉ giữ trong tab hiện tại + theo user — không dùng chung localStorage mãi
     const TP_DRAFT_KEY = 'nb_trip_draft_' + (CURRENT_USER_ID ? ('u' + CURRENT_USER_ID) : 'guest');
     const TP_LEGACY_KEYS = ['nb_saved_itinerary', 'nb_trip_draft_guest'];
-    const TP_BOUNDARY_URL = @json(asset('geo/ha-nam-old.geojson'));
+    const TP_BOUNDARY_URL = null;
 
     function clearTripDraftStorage() {
         try {
@@ -1650,199 +367,315 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getWizardSteps(type) {
-        const duration = {
+        const label = tripTypeLabel || 'chuyến đi';
+        // Loại chuyến đã nói lên sở thích chính, nên câu sở thích bỏ bớt lựa chọn trùng.
+        const impliedInterest = {
+            spiritual: 'tam_linh',
+            food_tour: 'am_thuc',
+            check_in: 'check_in',
+            resort: 'nghi_duong'
+        };
+
+        const sharedDuration = {
             key: 'duration_hotel',
-            greeting: 'Thời gian quyết định lịch trình dài hay ngắn.',
-            question: 'Bạn đi trong bao lâu?',
-            type: 'single',
-            options: type === 'resort'
-                ? [
-                    { value: '2d1n_hotel', label: '2 ngày 1 đêm' },
-                    { value: '3d2n_hotel', label: '3 ngày 2 đêm' },
-                    { value: '1_day', label: 'Đi trong ngày' },
-                ]
-                : [
-                    { value: '1_day', label: 'Đi trong ngày' },
-                    { value: '2d1n_hotel', label: '2 ngày 1 đêm' },
-                    { value: '3d2n_hotel', label: '3 ngày 2 đêm' },
-                ],
-        };
-
-        const whoByType = {
-            spiritual: [
-                { value: 'gia_dinh_nguoi_lon', label: 'Gia đình có người lớn tuổi' },
-                { value: 'gia_dinh_tre_nho', label: 'Gia đình có trẻ nhỏ' },
-                { value: 'nhom_ban', label: 'Nhóm bạn' },
-                { value: 'doi_lua', label: 'Hai người' },
-                { value: 'mot_minh', label: 'Một mình' },
-            ],
-            family: [
-                { value: 'gia_dinh_tre_nho', label: 'Có trẻ nhỏ' },
-                { value: 'gia_dinh_nguoi_lon', label: 'Có người lớn tuổi' },
-                { value: 'nhom_ban', label: 'Cả nhà / họ hàng' },
-            ],
-            team_building: [
-                { value: 'nhom_ban', label: 'Nhóm nhỏ, dưới 15 người' },
-                { value: 'gia_dinh_nguoi_lon', label: 'Đoàn vừa, 15–40 người' },
-                { value: 'gia_dinh_tre_nho', label: 'Đoàn lớn, trên 40 người' },
-            ],
-        };
-
-        const who = type === 'couple' ? null : {
-            key: 'who',
-            greeting: type === 'team_building' ? 'Đoàn đông hay ít sẽ đổi cách xếp lịch.' : 'Đi cùng ai thì lịch trình sẽ khác nhau.',
-            question: type === 'team_building' ? 'Đoàn của bạn khoảng bao nhiêu người?' : 'Bạn đi cùng ai?',
-            type: 'single',
-            options: whoByType[type] || [
-                { value: 'mot_minh', label: 'Một mình' },
-                { value: 'doi_lua', label: 'Hai người' },
-                { value: 'nhom_ban', label: 'Nhóm bạn' },
-                { value: 'gia_dinh_tre_nho', label: 'Gia đình' },
-            ],
-        };
-
-        const interestsByType = {
-            spiritual: [
-                { value: 'tam_linh', label: 'Chùa, đền, phủ' },
-                { value: 'van_hoa', label: 'Di tích lịch sử' },
-                { value: 'am_thuc', label: 'Ăn chay, quán thanh đạm' },
-                { value: 'thien_nhien', label: 'Cảnh quanh điểm lễ' },
-            ],
-            food_tour: [
-                { value: 'am_thuc', label: 'Đặc sản địa phương' },
-                { value: 'check_in', label: 'Quán đẹp, dễ chụp' },
-                { value: 'van_hoa', label: 'Món gắn với vùng' },
-                { value: 'thien_nhien', label: 'Quán gần thiên nhiên' },
-            ],
-            check_in: [
-                { value: 'check_in', label: 'Điểm view, sống ảo' },
-                { value: 'thien_nhien', label: 'Núi, sông, thiên nhiên' },
-                { value: 'van_hoa', label: 'Kiến trúc, di tích' },
-                { value: 'am_thuc', label: 'Quán cafe, đồ uống' },
-                { value: 'tam_linh', label: 'Chùa đền có cảnh đẹp' },
-            ],
-            family: [
-                { value: 'thien_nhien', label: 'Chỗ thoáng, dễ đi' },
-                { value: 'check_in', label: 'Điểm vui, chụp ảnh gia đình' },
-                { value: 'am_thuc', label: 'Ăn uống dễ cho cả nhà' },
-                { value: 'tam_linh', label: 'Ghé chùa, đền' },
-                { value: 'nghi_duong', label: 'Nghỉ ngơi' },
-            ],
-            couple: [
-                { value: 'check_in', label: 'Góc ảnh đẹp' },
-                { value: 'am_thuc', label: 'Ăn uống, cafe' },
-                { value: 'thien_nhien', label: 'Hoàng hôn, thiên nhiên' },
-                { value: 'nghi_duong', label: 'Nghỉ dưỡng' },
-            ],
-            resort: [
-                { value: 'nghi_duong', label: 'Chỗ nghỉ dễ chịu' },
-                { value: 'thien_nhien', label: 'Không gian xanh' },
-                { value: 'am_thuc', label: 'Ăn uống tại chỗ' },
-                { value: 'check_in', label: 'Góc chill, chụp ảnh' },
-            ],
-            team_building: [
-                { value: 'thien_nhien', label: 'Ngoài trời, thiên nhiên' },
-                { value: 'am_thuc', label: 'Ăn uống tập thể' },
-                { value: 'check_in', label: 'Điểm chụp ảnh nhóm' },
-                { value: 'nghi_duong', label: 'Chỗ ở đủ cho đoàn' },
-            ],
-            backpacking: [
-                { value: 'thien_nhien', label: 'Đường đẹp, thiên nhiên' },
-                { value: 'check_in', label: 'Điểm view' },
-                { value: 'am_thuc', label: 'Quán địa phương' },
-                { value: 'van_hoa', label: 'Làng, di tích' },
-            ],
-        };
-
-        const interests = {
-            key: 'interests',
-            greeting: 'Chọn thứ bạn muốn làm, có thể chọn nhiều.',
-            question: 'Bạn muốn ưu tiên điều gì?',
-            type: 'multi',
-            options: interestsByType[type] || [
-                { value: 'tam_linh', label: 'Tâm linh' },
-                { value: 'am_thuc', label: 'Ẩm thực' },
-                { value: 'check_in', label: 'Check-in' },
-                { value: 'thien_nhien', label: 'Thiên nhiên' },
-                { value: 'van_hoa', label: 'Văn hóa, lịch sử' },
-                { value: 'nghi_duong', label: 'Nghỉ dưỡng' },
-            ],
-        };
-
-        const budget = {
-            key: 'budget',
-            greeting: 'Ngân sách tính trên mỗi người, cả ăn uống và đi lại.',
-            question: 'Bạn dự chi khoảng bao nhiêu mỗi người?',
+            greeting: 'Thời lượng quyết định khá nhiều đến lịch trình.',
+            question: 'Bạn dự định đi trong bao lâu và có cần khách sạn không?',
             type: 'single',
             options: [
-                { value: 'tiet_kiem', label: 'Dưới 1 triệu' },
-                { value: 'tieu_chuan', label: '1 – 2,5 triệu' },
-                { value: 'cao_cap', label: 'Trên 2,5 triệu' },
-            ],
+                { value: '1_day', label: 'Đi 1 ngày (Không ở lại)' },
+                { value: '2d1n_hotel', label: '2 ngày 1 đêm (Cần khách sạn)' },
+                { value: '3d2n_hotel', label: '3 ngày 2 đêm (Cần khách sạn)' },
+                { value: 'other', label: 'Khác...' }
+            ]
         };
 
-        const paceByType = {
-            spiritual: [
-                { value: 'cham_rai', label: 'Chậm, ít điểm, tĩnh tâm' },
-                { value: 'can_bang', label: 'Vừa lễ vừa tham quan' },
-                { value: 'dap_dong', label: 'Ghé nhiều chùa trong ngày' },
-            ],
-            food_tour: [
-                { value: 'cham_rai', label: 'Ít quán, ăn kỹ' },
-                { value: 'can_bang', label: 'Vài quán mỗi ngày' },
-                { value: 'dap_dong', label: 'Thử nhiều quán' },
-            ],
-            check_in: [
-                { value: 'cham_rai', label: 'Ít điểm, chụp kỹ' },
-                { value: 'can_bang', label: 'Vài điểm mỗi ngày' },
-                { value: 'dap_dong', label: 'Ghé nhiều góc ảnh' },
-            ],
-            family: [
-                { value: 'cham_rai', label: 'Chậm, nhiều nghỉ' },
-                { value: 'can_bang', label: 'Vừa chơi vừa nghỉ' },
-                { value: 'dap_dong', label: 'Xem nhiều điểm' },
-            ],
-            resort: [
-                { value: 'cham_rai', label: 'Ở chỗ nghỉ là chính' },
-                { value: 'can_bang', label: 'Nửa nghỉ, nửa đi chơi' },
-                { value: 'dap_dong', label: 'Vẫn muốn đi nhiều' },
-            ],
-            team_building: [
-                { value: 'cham_rai', label: 'Nhẹ, thiên về nghỉ' },
-                { value: 'can_bang', label: 'Có hoạt động và nghỉ' },
-                { value: 'dap_dong', label: 'Nhiều hoạt động nhóm' },
-            ],
-            backpacking: [
-                { value: 'cham_rai', label: 'Đi chậm, tùy hứng' },
-                { value: 'can_bang', label: 'Cân bằng' },
-                { value: 'dap_dong', label: 'Khám phá nhiều điểm' },
-            ],
+        // Mỗi loại chuyến chỉ tinh chỉnh ba câu thực sự ảnh hưởng tới lịch trình.
+        const byType = {
+            spiritual: {
+                duration_hotel: {
+                    ...sharedDuration,
+                    greeting: 'Nhiều người kết hợp hành hương 1–2 ngày.',
+                },
+                pace: {
+                    key: 'pace',
+                    greeting: 'Với chuyến tâm linh, nhịp độ thoải mái thường hợp hơn.',
+                    question: 'Bạn muốn lịch trình tâm linh theo kiểu nào?',
+                    type: 'single',
+                    options: [
+                        { value: 'cham_rai', label: 'Chậm rãi, tĩnh tâm (ít điểm)' },
+                        { value: 'can_bang', label: 'Vừa lễ vừa tham quan' },
+                        { value: 'dap_dong', label: 'Ghé nhiều chùa / phủ trong ngày' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                interests: {
+                    key: 'interests',
+                    greeting: 'Chọn đúng điểm nhấn tâm linh bạn quan tâm.',
+                    question: 'Bạn muốn ưu tiên điều gì? (có thể chọn nhiều)',
+                    type: 'multi',
+                    options: [
+                        { value: 'tam_linh', label: 'Chùa / Đền / Phủ nổi tiếng' },
+                        { value: 'van_hoa', label: 'Di tích lịch sử kèm theo' },
+                        { value: 'am_thuc', label: 'Quán ăn thanh đạm gần điểm lễ' },
+                        { value: 'thien_nhien', label: 'Cảnh quan thiên nhiên quanh điểm lễ' },
+                        { value: 'check_in', label: 'Chụp ảnh kỷ niệm' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                }
+            },
+            food_tour: {
+                pace: {
+                    key: 'pace',
+                    greeting: 'Food tour cần cân lượng ăn và khoảng cách các quán.',
+                    question: 'Bạn muốn “ăn” với nhịp độ nào?',
+                    type: 'single',
+                    options: [
+                        { value: 'cham_rai', label: 'Ít quán, ăn kỹ từng món' },
+                        { value: 'can_bang', label: '3–4 điểm ăn / ngày' },
+                        { value: 'dap_dong', label: 'Thử càng nhiều quán càng tốt' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                interests: {
+                    key: 'interests',
+                    greeting: 'Chọn đúng “gu” ẩm thực sẽ giúp lộ trình ngon hơn.',
+                    question: 'Bạn muốn tập trung vào đâu? (có thể chọn nhiều)',
+                    type: 'multi',
+                    options: [
+                        { value: 'am_thuc', label: 'Đặc sản địa phương' },
+                        { value: 'check_in', label: 'Quán có view / sống ảo' },
+                        { value: 'thien_nhien', label: 'Quán ngoài trời / gần thiên nhiên' },
+                        { value: 'van_hoa', label: 'Ẩm thực gắn văn hóa vùng' },
+                        { value: 'nghi_duong', label: 'Quán thư giãn, không ồn' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                }
+            },
+            check_in: {
+                pace: {
+                    key: 'pace',
+                    greeting: 'Ảnh đẹp phụ thuộc thời gian ánh sáng và số điểm.',
+                    question: 'Bạn muốn “săn ảnh” dày hay thong thả?',
+                    type: 'single',
+                    options: [
+                        { value: 'cham_rai', label: 'Ít điểm, chụp kỹ / đợi ánh sáng' },
+                        { value: 'can_bang', label: '3–4 điểm check-in / ngày' },
+                        { value: 'dap_dong', label: 'Ghé thật nhiều góc sống ảo' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                interests: {
+                    key: 'interests',
+                    greeting: 'Chọn kiểu cảnh bạn thích để lịch trình “ra ảnh”.',
+                    question: 'Bạn muốn ưu tiên góc nào? (có thể chọn nhiều)',
+                    type: 'multi',
+                    options: [
+                        { value: 'check_in', label: 'Điểm viral / view đẹp' },
+                        { value: 'thien_nhien', label: 'Thiên nhiên / Núi sông' },
+                        { value: 'van_hoa', label: 'Kiến trúc / Di tích' },
+                        { value: 'am_thuc', label: 'Quán cafe / Đồ uống sống ảo' },
+                        { value: 'tam_linh', label: 'Chùa đền có khung cảnh đẹp' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                }
+            },
+            family: {
+                pace: {
+                    key: 'pace',
+                    greeting: 'Với gia đình, lịch quá dày dễ mệt.',
+                    question: 'Nhịp độ phù hợp với cả nhà?',
+                    type: 'single',
+                    options: [
+                        { value: 'cham_rai', label: 'Chậm, nhiều nghỉ' },
+                        { value: 'can_bang', label: 'Cân bằng, vừa chơi vừa nghỉ' },
+                        { value: 'dap_dong', label: 'Muốn xem nhiều điểm' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                interests: {
+                    key: 'interests',
+                    greeting: 'Chọn hoạt động cả nhà cùng thích.',
+                    question: 'Ưu tiên trải nghiệm nào? (có thể chọn nhiều)',
+                    type: 'multi',
+                    options: [
+                        { value: 'thien_nhien', label: 'Thiên nhiên / Không khí trong lành' },
+                        { value: 'check_in', label: 'Điểm vui / Dễ chụp ảnh gia đình' },
+                        { value: 'am_thuc', label: 'Ăn uống phù hợp trẻ em' },
+                        { value: 'van_hoa', label: 'Tham quan nhẹ nhàng' },
+                        { value: 'tam_linh', label: 'Ghé chùa / Đền' },
+                        { value: 'nghi_duong', label: 'Nghỉ dưỡng' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                }
+            },
+            couple: {
+                pace: {
+                    key: 'pace',
+                    greeting: 'Nhịp độ quyết định vibe chuyến couple.',
+                    question: 'Bạn muốn chuyến đi thế nào?',
+                    type: 'single',
+                    options: [
+                        { value: 'cham_rai', label: 'Chậm, thư giãn, ít điểm' },
+                        { value: 'can_bang', label: 'Vừa khám phá vừa chill' },
+                        { value: 'dap_dong', label: 'Nhiều trải nghiệm trong ngày' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                interests: {
+                    key: 'interests',
+                    greeting: 'Chọn vibe couple bạn thích.',
+                    question: 'Ưu tiên trải nghiệm nào? (có thể chọn nhiều)',
+                    type: 'multi',
+                    options: [
+                        { value: 'check_in', label: 'Góc ảnh lãng mạn' },
+                        { value: 'am_thuc', label: 'Ăn uống / Cafe đẹp' },
+                        { value: 'thien_nhien', label: 'Hoàng hôn / Thiên nhiên' },
+                        { value: 'nghi_duong', label: 'Nghỉ dưỡng riêng tư' },
+                        { value: 'van_hoa', label: 'Dạo nhẹ di tích' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                }
+            },
+            resort: {
+                duration_hotel: {
+                    ...sharedDuration,
+                    greeting: 'Nghỉ dưỡng thường nên ở lại ít nhất 1 đêm.',
+                    options: [
+                        { value: '2d1n_hotel', label: '2 ngày 1 đêm (Cần khách sạn)' },
+                        { value: '3d2n_hotel', label: '3 ngày 2 đêm (Cần khách sạn)' },
+                        { value: '1_day', label: 'Đi trong ngày (spa / nghỉ ngắn)' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                pace: {
+                    key: 'pace',
+                    greeting: 'Nghỉ dưỡng = ít lịch, nhiều thời gian rảnh.',
+                    question: 'Bạn muốn lịch trình nghỉ dưỡng thế nào?',
+                    type: 'single',
+                    options: [
+                        { value: 'cham_rai', label: 'Chủ yếu ở resort / khách sạn' },
+                        { value: 'can_bang', label: 'Nửa nghỉ, nửa đi chơi nhẹ' },
+                        { value: 'dap_dong', label: 'Vẫn muốn tham quan khá nhiều' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                interests: {
+                    key: 'interests',
+                    greeting: 'Chọn trải nghiệm nghỉ dưỡng bạn thích.',
+                    question: 'Bạn muốn ưu tiên gì? (có thể chọn nhiều)',
+                    type: 'multi',
+                    options: [
+                        { value: 'nghi_duong', label: 'Khách sạn / Resort chất lượng' },
+                        { value: 'thien_nhien', label: 'Không gian xanh / View đẹp' },
+                        { value: 'am_thuc', label: 'Ăn uống tại chỗ / Nhà hàng' },
+                        { value: 'check_in', label: 'Góc check-in thư giãn' },
+                        { value: 'tam_linh', label: 'Ghé điểm tâm linh gần đó' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                }
+            },
+            team_building: {
+                pace: {
+                    key: 'pace',
+                    greeting: 'Team building cần lịch rõ, dễ điều phối.',
+                    question: 'Bạn muốn lịch trình đoàn thế nào?',
+                    type: 'single',
+                    options: [
+                        { value: 'can_bang', label: 'Cân bằng hoạt động + nghỉ' },
+                        { value: 'dap_dong', label: 'Nhiều hoạt động gắn kết' },
+                        { value: 'cham_rai', label: 'Nhẹ nhàng, thiên về nghỉ' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                interests: {
+                    key: 'interests',
+                    greeting: 'Chọn hoạt động phù hợp team.',
+                    question: 'Ưu tiên trải nghiệm nào? (có thể chọn nhiều)',
+                    type: 'multi',
+                    options: [
+                        { value: 'thien_nhien', label: 'Outdoor / Thiên nhiên' },
+                        { value: 'am_thuc', label: 'Ăn uống tập thể' },
+                        { value: 'check_in', label: 'Điểm tham quan chụp ảnh nhóm' },
+                        { value: 'van_hoa', label: 'Tham quan văn hóa' },
+                        { value: 'nghi_duong', label: 'Nơi ở đủ chỗ cho đoàn' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                }
+            },
+            backpacking: {
+                pace: {
+                    key: 'pace',
+                    greeting: 'Phượt có thể chill hoặc “cày” nhiều điểm.',
+                    question: 'Nhịp độ bạn muốn?',
+                    type: 'single',
+                    options: [
+                        { value: 'dap_dong', label: 'Khám phá nhiều điểm' },
+                        { value: 'can_bang', label: 'Cân bằng' },
+                        { value: 'cham_rai', label: 'Đi chậm, tùy hứng' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                },
+                interests: {
+                    key: 'interests',
+                    greeting: 'Chọn hướng khám phá bạn thích.',
+                    question: 'Ưu tiên trải nghiệm nào? (có thể chọn nhiều)',
+                    type: 'multi',
+                    options: [
+                        { value: 'thien_nhien', label: 'Thiên nhiên / Đường đẹp' },
+                        { value: 'check_in', label: 'Điểm view / Check-in' },
+                        { value: 'am_thuc', label: 'Quán địa phương giá mềm' },
+                        { value: 'van_hoa', label: 'Làng / Di tích ít người' },
+                        { value: 'tam_linh', label: 'Ghé chùa đền dọc đường' },
+                        { value: 'other', label: 'Khác...' }
+                    ]
+                }
+            }
         };
 
-        const pace = {
-            key: 'pace',
-            greeting: 'Nhịp độ quyết định ngày dày hay thoải mái.',
-            question: 'Bạn muốn lịch trình thế nào?',
-            type: 'single',
-            options: paceByType[type] || [
-                { value: 'cham_rai', label: 'Chậm, ít điểm' },
-                { value: 'can_bang', label: 'Vừa phải' },
-                { value: 'dap_dong', label: 'Nhiều điểm' },
-            ],
+        const cfg = byType[type] || {};
+
+        const interests = cfg.interests || {
+            key: 'interests',
+            greeting: 'Chọn đúng sở thích sẽ giúp lịch trình sát ý bạn hơn.',
+            question: 'Bạn muốn ưu tiên trải nghiệm nào? (có thể chọn nhiều)',
+            type: 'multi',
+            options: [
+                { value: 'tam_linh', label: 'Tâm linh / Chùa đền' },
+                { value: 'am_thuc', label: 'Ẩm thực đặc sản' },
+                { value: 'check_in', label: 'Check-in / Sống ảo' },
+                { value: 'thien_nhien', label: 'Thiên nhiên / Sinh thái' },
+                { value: 'van_hoa', label: 'Văn hóa - Lịch sử' },
+                { value: 'nghi_duong', label: 'Nghỉ dưỡng / Thư giãn' },
+                { value: 'other', label: 'Khác...' }
+            ]
         };
+
+        const duplicate = impliedInterest[type];
+        const trimmedInterests = duplicate
+            ? { ...interests, options: interests.options.filter(o => o.value !== duplicate) }
+            : interests;
 
         return [
-            duration,
-            ...(who ? [who] : []),
-            interests,
-            budget,
-            pace,
+            cfg.duration_hotel || sharedDuration,
+            trimmedInterests,
+            cfg.pace || {
+                key: 'pace',
+                greeting: `Tiếp theo là nhịp độ cho chuyến ${label}.`,
+                question: 'Bạn muốn lịch trình dày hay thoải mái?',
+                type: 'single',
+                options: [
+                    { value: 'cham_rai', label: 'Chậm rãi, thư giãn (ít điểm)' },
+                    { value: 'can_bang', label: 'Cân bằng (3–4 điểm/ngày)' },
+                    { value: 'dap_dong', label: 'Dồn dập, xem nhiều điểm' },
+                    { value: 'other', label: 'Khác...' }
+                ]
+            },
             {
                 key: '__location_picker',
                 type: 'location_picker',
-                greeting: 'Nếu đã có chỗ muốn ghé, chọn trước để lịch giữ điểm đó.',
-                question: 'Bạn muốn ghé địa điểm nào? Có thể bỏ qua.',
-            },
+                greeting: 'Gần xong rồi! Bạn có muốn chọn trước điểm cụ thể không?',
+                question: 'Chọn 1 địa điểm bạn muốn ghé (có thể bỏ qua)',
+            }
         ];
     }
 
@@ -1859,8 +692,8 @@ document.addEventListener('DOMContentLoaded', function() {
         multiHint.style.display = 'none';
 
         let html = '<div class="tp-step">';
-        html += '<div class="tp-step-greeting">Chọn kiểu chuyến đi để xếp lịch cho đúng.</div>';
-        html += '<div class="tp-step-question">Bạn muốn đi theo hướng nào?</div>';
+        html += '<div class="tp-step-greeting">Xin chào, mình giúp bạn lên lịch trình nhé.</div>';
+        html += '<div class="tp-step-question">Bạn muốn chuyến đi kiểu gì?</div>';
         html += '<div class="tp-card-grid cols-4">';
         TRIP_TYPES.forEach(opt => {
             html += `<div class="tp-card tp-card-large" data-value="${opt.value}" data-label="${opt.label}">
@@ -1876,16 +709,6 @@ document.addEventListener('DOMContentLoaded', function() {
             card.addEventListener('click', () => {
                 tripType = card.dataset.value;
                 tripTypeLabel = card.dataset.label;
-                if (tripType === 'couple') {
-                    aiAnswers = [{
-                        question: 'Bạn đi cùng ai?',
-                        answer: 'Hai người',
-                        key: 'who',
-                        value: 'doi_lua',
-                    }];
-                } else {
-                    aiAnswers = [];
-                }
                 wizardBody.querySelectorAll('.tp-card').forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
                 updateProfile();
@@ -1928,7 +751,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pickedLocationId = null;
 
         const allLocs = (typeof locations !== 'undefined' && Array.isArray(locations)) ? locations : [];
-        const getCatName = l => l.category?.name || l.category_name || 'Chưa phân loại';
+        const getCatName = l => l.category?.name || l.category_name || 'Khác';
         const cats = [...new Set(allLocs.map(getCatName))].sort();
 
         let html = '<div class="tp-step tp-location-picker-step">';
@@ -2036,7 +859,13 @@ document.addEventListener('DOMContentLoaded', function() {
         else { nextBtn.classList.remove('visible'); }
         updateProgress();
 
-        const optionsList = q.options || [];
+        const rawOpts = q.options || [];
+        const hasOther = rawOpts.some(o => o.value === 'other' || o.label.toLowerCase().includes('khác'));
+        const optionsList = [...rawOpts];
+        if (!hasOther) {
+            optionsList.push({ value: 'other', label: 'Khác...' });
+        }
+
         const optCount = optionsList.length;
         let colClass = optCount <= 2 ? 'cols-2' : optCount <= 4 ? 'cols-2' : optCount <= 6 ? 'cols-3' : 'cols-4';
 
@@ -2045,22 +874,38 @@ document.addEventListener('DOMContentLoaded', function() {
         html += `<div class="tp-step-question">${q.question}</div>`;
         html += `<div class="tp-card-grid ${colClass}">`;
         optionsList.forEach(opt => {
+            const isOther = (opt.value === 'other' || opt.label.toLowerCase().includes('khác'));
             if (isMulti) {
-                html += `<div class="tp-card tp-card-multi" data-value="${opt.value}" data-label="${opt.label}" data-type="${q.type}">
+                html += `<div class="tp-card tp-card-multi" data-value="${opt.value}" data-label="${opt.label}" data-type="${q.type}" data-is-other="${isOther}">
                     <div class="tp-checkbox-box">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
                     <span class="tp-card-label">${opt.label}</span>
                 </div>`;
             } else {
-                html += `<div class="tp-card" data-value="${opt.value}" data-label="${opt.label}" data-type="${q.type}">
+                html += `<div class="tp-card" data-value="${opt.value}" data-label="${opt.label}" data-type="${q.type}" data-is-other="${isOther}">
                     <span class="tp-card-label">${opt.label}</span>
                 </div>`;
             }
         });
-        html += '</div></div>';
+        html += '</div>';
+
+        html += `<div class="tp-other-input-wrap" id="tp-other-input-wrap" style="display: none;">
+            <input type="text" id="tp-other-input" class="tp-other-input" placeholder="Nhập ý kiến / lựa chọn khác của bạn..." maxlength="150" autocomplete="off" />
+        </div>`;
+        html += '</div>';
 
         wizardBody.innerHTML = html;
+
+        const otherInput = document.getElementById('tp-other-input');
+        if (otherInput) {
+            otherInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentAiQuestion) advanceFromQuestion(currentAiQuestion);
+                }
+            });
+        }
 
         wizardBody.querySelectorAll('.tp-card').forEach(card => {
             card.addEventListener('click', () => handleCardClick(card, q));
@@ -2070,6 +915,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleCardClick(card, q) {
         const value = card.dataset.value;
         const label = card.dataset.label;
+        const isOther = card.dataset.isOther === 'true';
+        const otherWrap = document.getElementById('tp-other-input-wrap');
+        const otherInput = document.getElementById('tp-other-input');
 
         if (q.type === 'multi') {
             if (!currentSelection) currentSelection = [];
@@ -2077,27 +925,58 @@ document.addEventListener('DOMContentLoaded', function() {
             if (idx > -1) {
                 currentSelection.splice(idx, 1);
                 card.classList.remove('selected');
+                if (isOther && otherWrap) {
+                    otherWrap.style.display = 'none';
+                    if (otherInput) otherInput.value = '';
+                }
             } else {
-                currentSelection.push({ value, label });
+                currentSelection.push({ value, label, isOther });
                 card.classList.add('selected');
+                if (isOther && otherWrap) {
+                    otherWrap.style.display = 'block';
+                    if (otherInput) setTimeout(() => otherInput.focus(), 100);
+                }
             }
             nextBtn.disabled = currentSelection.length === 0;
             return;
         }
 
-        currentSelection = { value, label };
+        currentSelection = { value, label, isOther };
         wizardBody.querySelectorAll('.tp-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
-        nextBtn.classList.remove('visible');
-        setTimeout(() => advanceFromQuestion(q), 250);
+
+        if (isOther) {
+            if (otherWrap) otherWrap.style.display = 'block';
+            if (otherInput) setTimeout(() => otherInput.focus(), 100);
+            nextBtn.classList.add('visible');
+            nextBtn.disabled = false;
+        } else {
+            if (otherWrap) otherWrap.style.display = 'none';
+            if (otherInput) otherInput.value = '';
+            nextBtn.classList.remove('visible');
+            setTimeout(() => advanceFromQuestion(q), 250);
+        }
     }
 
     function advanceFromQuestion(q) {
+        const otherInput = document.getElementById('tp-other-input');
+        const customText = otherInput ? otherInput.value.trim() : '';
+
         let answerText = '';
         if (Array.isArray(currentSelection)) {
-            answerText = currentSelection.map(s => s.label).join(', ');
+            let labels = currentSelection.map(s => {
+                if (s.isOther) {
+                    return customText ? `Khác (${customText})` : s.label;
+                }
+                return s.label;
+            });
+            answerText = labels.join(', ');
         } else if (currentSelection) {
-            answerText = currentSelection.label;
+            if (currentSelection.isOther) {
+                answerText = customText ? `Khác (${customText})` : currentSelection.label;
+            } else {
+                answerText = currentSelection.label;
+            }
         }
 
         if (!answerText) return;
@@ -2264,12 +1143,12 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         lastAnswersPayload = fullAnswers;
 
-        fetch('{{ route("client.trip_planner.generate") }}', {
+        fetch('X', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-CSRF-TOKEN': 'X',
             },
             body: JSON.stringify({ answers: fullAnswers, trip_type: tripType || tripTypeLabel }),
         })
@@ -2389,7 +1268,6 @@ document.addEventListener('DOMContentLoaded', function() {
             stops: data.stats?.stops || stops,
             meals: data.stats?.meals || meals,
             distance_km: data.stats?.distance_km || Math.round(distance * 10) / 10,
-            budget: data.stats?.budget || data.estimated_cost || null,
         });
         if (!data.stats.stops) data.stats.stops = stops;
         if (!data.stats.distance_km) data.stats.distance_km = Math.round(distance * 10) / 10;
@@ -2780,7 +1658,6 @@ document.addEventListener('DOMContentLoaded', function() {
             chips.push(`<span class="tp-stat">${tpEsc(dayCount)} ngày</span>`);
             if (stats.stops) chips.push(`<span class="tp-stat">${tpEsc(stats.stops)} điểm dừng</span>`);
             if (dist) chips.push(`<span class="tp-stat">${tpEsc(dist)} km</span>`);
-            if (stats.budget || data.estimated_cost) chips.push(`<span class="tp-stat">${tpEsc(stats.budget || data.estimated_cost)}</span>`);
             resultStats.innerHTML = chips.join('');
         }
 
@@ -2874,9 +1751,9 @@ document.addEventListener('DOMContentLoaded', function() {
             saveBtn.disabled = true;
             saveBtn.textContent = 'Đang lưu...';
 
-            fetch('{{ route("client.trip_planner.save") }}', {
+            fetch('X', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': 'X', 'Accept': 'application/json' },
                 body: JSON.stringify({
                     itinerary: currentItinerary,
                     answers: lastAnswersPayload,
@@ -2962,8 +1839,8 @@ document.addEventListener('DOMContentLoaded', function() {
     (function bootSavedItineraryFromUrl() {
         const id = new URLSearchParams(window.location.search).get('itinerary');
         if (!id) return;
-        fetch('{{ url("/trip-planner") }}/' + encodeURIComponent(id), {
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        fetch('X/' + encodeURIComponent(id), {
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': 'X' }
         })
         .then(res => res.json())
         .then(data => {
@@ -2974,4 +1851,3 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(() => {});
     })();
 });
-</script>

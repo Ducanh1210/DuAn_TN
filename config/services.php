@@ -41,6 +41,11 @@ return [
         'url' => env('VIENEU_TTS_URL', 'http://127.0.0.1:8001'),
     ],
 
+    'osrm' => [
+        'url' => env('OSRM_BASE_URL'),
+        'timeout' => env('OSRM_TIMEOUT', 6),
+    ],
+
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
         'api_keys' => env('GEMINI_API_KEYS'),
