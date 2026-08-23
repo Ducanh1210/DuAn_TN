@@ -65,28 +65,54 @@
         --nb-accent: #735c00;
         --nb-surface-mist: #f2f4f6;
     }
-    #panoRequestModal .modal-footer {
-        border-top: 0;
-        padding: 8px 24px 20px;
-        gap: 10px;
-        justify-content: flex-start;
+    #panoRequestModal .ps-actions {
         display: flex;
         flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 8px;
+        padding-top: 4px;
     }
-    #panoRequestModal .nb-btn--solid {
-        background: #000000 !important;
-        border: 1px solid #000000 !important;
-        color: #ffffff !important;
+    #panoRequestModal .ps-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 12px 24px;
+        border: 1px solid #000;
+        border-radius: 2px;
+        background: #000;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
     }
-    #panoRequestModal .nb-btn--solid:hover {
-        background: #565e74 !important;
-        border-color: #565e74 !important;
-        color: #ffffff !important;
+    #panoRequestModal .ps-submit:hover {
+        background: #565e74;
+        border-color: #565e74;
+        color: #fff;
     }
-    #panoRequestModal .nb-btn--outline {
-        background: #ffffff !important;
-        border: 1px solid #000000 !important;
-        color: #000000 !important;
+    #panoRequestModal .ps-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 12px 24px;
+        border: 1px solid #000;
+        border-radius: 2px;
+        background: #fff;
+        color: #000;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+    #panoRequestModal .ps-cancel:hover {
+        background: #f2f4f6;
     }
 </style>
 @endpush
@@ -365,12 +391,13 @@
                                 placeholder="VD: muốn quay sảnh + 2 phòng..."
                             >{{ old('note') }}</textarea>
                         </div>
+                        <div class="col-12">
+                            <div class="ps-actions">
+                                <button type="submit" class="ps-submit">Gửi yêu cầu</button>
+                                <button type="button" class="ps-cancel" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="modal-footer border-0">
-                    <button type="submit" class="nb-btn nb-btn--solid">Gửi yêu cầu</button>
-                    <button type="button" class="nb-btn nb-btn--outline" data-bs-dismiss="modal">Đóng</button>
                 </div>
             </form>
         </div>
