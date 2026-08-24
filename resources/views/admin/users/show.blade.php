@@ -29,16 +29,22 @@
 
         <div class="card-minimal p-3">
             <div class="fw-medium text-dark mb-3 pb-2 border-bottom" style="font-size: 0.85rem; border-color: var(--border-light) !important;">Thay đổi điểm số</div>
-            <form action="{{ route('admin.users.adjust_points', $user->id) }}" method="POST">
+            <form action="{{ route('admin.users.adjust_points', $user->id) }}" method="POST" novalidate>
                 @csrf
                 @method('PATCH')
                 <div class="mb-2">
                     <label class="form-label text-muted" style="font-size: 0.775rem;">Số điểm (dùng số âm để trừ)</label>
-                    <input type="number" name="amount" class="form-control form-control-sm" placeholder="Ví dụ: 50 hoặc -20" required style="border-color: #e2e8f0;">
+                    <input type="number" name="amount" class="form-control form-control-sm @error('amount') is-invalid @enderror" placeholder="Ví dụ: 50 hoặc -20" value="{{ old('amount') }}" style="border-color: #e2e8f0;">
+                    @error('amount')
+                        <div class="invalid-feedback d-block mt-1" style="font-size: 0.725rem;">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label text-muted" style="font-size: 0.775rem;">Lý do thay đổi</label>
-                    <input type="text" name="description" class="form-control form-control-sm" placeholder="Lý do thay đổi điểm" required style="border-color: #e2e8f0;">
+                    <input type="text" name="description" class="form-control form-control-sm @error('description') is-invalid @enderror" placeholder="Lý do thay đổi điểm" value="{{ old('description') }}" style="border-color: #e2e8f0;">
+                    @error('description')
+                        <div class="invalid-feedback d-block mt-1" style="font-size: 0.725rem;">{{ $message }}</div>
+                    @enderror
                 </div>
                 <button type="submit" class="btn-minimal btn-minimal-primary w-100">Cập nhật điểm</button>
             </form>
