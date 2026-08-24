@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\Admin\User\StoreUserRequest;
+use App\Http\Requests\Admin\User\UpdateUserRequest;
+use App\Http\Requests\Admin\User\AdjustUserPointsRequest;
 
 use App\Models\User;
 use App\Services\PointService;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
@@ -30,26 +34,17 @@ class UserController extends Controller
     }
 
     /** Lưu người dùng mới vào cơ sở dữ liệu. */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $request->validate([
-            'username' => 'required|string|max:50|unique:users',
-            'email' => 'required|string|email|max:100|unique:users',
-            'display_name' => 'required|string|max:100',
-            'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:admin,moderator,user',
-            'status' => 'required|in:active,inactive,banned',
-        ]);
+        $validated = $request->validated();
 
         $user = new User();
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->display_name = $request->display_name;
-        // LƯU Ý: tài khoản tạo từ trang admin đang băm mật khẩu bằng md5 (khác với đăng ký
-        // phía người dùng dùng Hash::make). Nên cân nhắc thống nhất về Hash::make sau này.
-        $user->password_hash = md5($request->password);
-        $user->role = $request->role;
-        $user->status = $request->status;
+        $user->username = $validated['username'];
+        $user->email = $validated['email'];
+        $user->display_name = $validated['display_name'];
+        $user->password_hash = md5($validated['password']);
+        $user->role = $validated['role'];
+        $user->status = $validated['status'];
         $user->provider = 'local';
         
         if ($request->hasFile('avatar')) {
@@ -91,27 +86,19 @@ class UserController extends Controller
     }
 
     /** Cập nhật người dùng (đổi mật khẩu nếu có nhập, thay avatar nếu có tải lên). */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, string $id)
     {
         $user = User::findOrFail($id);
+        $validated = $request->validated();
 
-        $request->validate([
-            'username' => 'required|string|max:50|unique:users,username,'.$user->id,
-            'email' => 'required|string|email|max:100|unique:users,email,'.$user->id,
-            'display_name' => 'required|string|max:100',
-            'password' => 'nullable|string|min:6|confirmed',
-            'role' => 'required|in:admin,moderator,user',
-            'status' => 'required|in:active,inactive,banned',
-        ]);
-
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->display_name = $request->display_name;
-        $user->role = $request->role;
-        $user->status = $request->status;
+        $user->username = $validated['username'];
+        $user->email = $validated['email'];
+        $user->display_name = $validated['display_name'];
+        $user->role = $validated['role'];
+        $user->status = $validated['status'];
         
-        if ($request->filled('password')) {
-            $user->password_hash = md5($request->password);
+        if (!empty($validated['password'])) {
+            $user->password_hash = md5($validated['password']);
         }
 
         if ($request->hasFile('avatar')) {
@@ -159,17 +146,13 @@ class UserController extends Controller
     }
 
     /** Điều chỉnh điểm của người dùng (cộng hoặc trừ) kèm mô tả lý do. */
-    public function adjustPoints(Request $request, string $id)
+    public function adjustPoints(AdjustUserPointsRequest $request, string $id)
     {
         $user = User::findOrFail($id);
+        $validated = $request->validated();
 
-        $request->validate([
-            'amount' => 'required|integer',
-            'description' => 'required|string|max:255',
-        ]);
-
-        $amount = (int) $request->input('amount');
-        $description = $request->input('description');
+        $amount = (int) $validated['amount'];
+        $description = $validated['description'];
 
         \App\Services\PointService::awardPoints($user, $amount, 'manual_adjust', $description);
 

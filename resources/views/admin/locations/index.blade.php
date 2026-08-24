@@ -89,7 +89,11 @@
                                     data-action="{{ route('admin.locations.destroy', $item->id) }}"
                                     data-name="{{ $item->name }}">Xóa</button>
                             @else
-                                <form action="{{ route('admin.locations.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa điểm này?');">
+                                <form action="{{ route('admin.locations.destroy', $item->id) }}" method="POST" class="d-inline"
+                                      data-confirm-title="Xóa địa điểm" 
+                                      data-confirm-text="Bạn có chắc chắn muốn xóa địa điểm <strong>&quot;{{ $item->name }}&quot;</strong> không? Thao tác này không thể hoàn tác." 
+                                      data-confirm-btn="Xóa địa điểm" 
+                                      data-confirm-type="danger">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size: 0.75rem;">Xóa</button>

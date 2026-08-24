@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="card-minimal p-4">
-    <form action="{{ route('admin.users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.users.update', $user->id) }}" method="POST" enctype="multipart/form-data" novalidate>
         @csrf
         @method('PUT')
         
