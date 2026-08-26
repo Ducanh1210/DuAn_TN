@@ -41,6 +41,10 @@ Route::get('/gioi-thieu', [LandingController::class, 'about'])->name('client.abo
 Route::get('/dich-vu-tour-360', [LandingController::class, 'panoService'])->name('client.pano_service');
 Route::post('/dich-vu-tour-360', [LandingController::class, 'submitPanoService'])->name('client.pano_service.submit');
 
+Route::get('/api/location/provinces', [\App\Http\Controllers\Api\LocationController::class, 'getProvinces']);
+Route::get('/api/location/wards/{provinceCode}', [\App\Http\Controllers\Api\LocationController::class, 'getWards']);
+
+
 Route::get('/ban-do', function () {
     $locations = \App\Models\Location::with(['category', 'images'])->withCount('panoramas')->where('status', 'published')->get();
     if ($locations->isEmpty()) {

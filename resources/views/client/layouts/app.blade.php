@@ -12,10 +12,83 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- SweetAlert2 JS & Theme -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Avatar Frames CSS -->
     <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
     @stack('styles')
     <style>
+        /* Custom SweetAlert2 Theme for Ninh Bình POI Client */
+        .swal2-container {
+            z-index: 20000 !important;
+        }
+        .custom-swal-popup {
+            border-radius: 16px !important;
+            padding: 1.5rem 1.75rem !important;
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+            border: 1px solid #cbdbe8 !important;
+            box-shadow: 0 20px 25px -5px rgba(30, 58, 95, 0.12), 0 8px 10px -6px rgba(30, 58, 95, 0.06) !important;
+            background: #ffffff !important;
+        }
+        .custom-swal-title {
+            color: #1e3a5f !important;
+            font-size: 1.15rem !important;
+            font-weight: 600 !important;
+            padding-top: 0.25rem !important;
+        }
+        .custom-swal-text {
+            color: #334155 !important;
+            font-size: 0.875rem !important;
+            margin-top: 0.4rem !important;
+            line-height: 1.5 !important;
+        }
+        .custom-swal-confirm-btn {
+            background-color: #1e3a5f !important;
+            color: #ffffff !important;
+            font-size: 0.825rem !important;
+            font-weight: 500 !important;
+            padding: 0.5rem 1.25rem !important;
+            border-radius: 8px !important;
+            border: none !important;
+            margin: 0.25rem !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+            box-shadow: none !important;
+        }
+        .custom-swal-confirm-btn:hover {
+            background-color: #0f2442 !important;
+            color: #ffffff !important;
+        }
+        .custom-swal-confirm-danger {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+        }
+        .custom-swal-confirm-danger:hover {
+            background-color: #b91c1c !important;
+            color: #ffffff !important;
+        }
+        .custom-swal-cancel-btn {
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
+            font-size: 0.825rem !important;
+            font-weight: 500 !important;
+            padding: 0.5rem 1.25rem !important;
+            border-radius: 8px !important;
+            border: 1px solid #cbdbe8 !important;
+            margin: 0.25rem !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+            box-shadow: none !important;
+        }
+        .custom-swal-cancel-btn:hover {
+            background-color: #e2e8f0 !important;
+            color: #1e3a5f !important;
+        }
+        .custom-swal-toast {
+            border-radius: 10px !important;
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+        }
+
         :root {
             /* Bảng màu lấy từ mẫu "Trang chủ Khám phá Ninh Bình Premium" */
             --primary: #000000;
