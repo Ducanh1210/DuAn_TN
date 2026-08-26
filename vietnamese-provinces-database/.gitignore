@@ -1,0 +1,10 @@
+.DS_Store
+# Ignore lock acquired by Libre office
+.~lock*
+
+.vscode
+dataset-generation-scripts/output/*
+dataset-generation-scripts/.env
+
+# Agent credentials (never commit)
+.env.agent

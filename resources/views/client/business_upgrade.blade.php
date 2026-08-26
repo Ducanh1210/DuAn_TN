@@ -998,7 +998,7 @@
             <div class="wizard-row">
                 <!-- Left: Form steps -->
                 <div class="wizard-form-col">
-                    <form id="bizRegisterForm" onsubmit="event.preventDefault();">
+                    <form id="bizRegisterForm" novalidate onsubmit="event.preventDefault();">
                         @csrf
                         <!-- Step 1: Business Name -->
                         <div class="biz-step-pane" data-step="1">
@@ -1006,7 +1006,7 @@
                             <p class="text-secondary small mb-4">Nhập một vài thông tin doanh nghiệp để bắt đầu.</p>
                             <div class="mb-4">
                                 <label class="form-label-clean">Tên doanh nghiệp *</label>
-                                <input type="text" class="form-control-clean" id="input_business_name" name="business_name" required placeholder="Ví dụ: Nhà Hàng Dê Nướng Cố Đô">
+                                <input type="text" class="form-control-clean" id="input_business_name" name="business_name" placeholder="Ví dụ: Nhà Hàng Dê Nướng Cố Đô">
                             </div>
                         </div>
 
@@ -1117,34 +1117,38 @@
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Nhập địa chỉ doanh nghiệp của bạn</h4>
                             <p class="text-secondary small mb-4">Thêm một vị trí khách hàng có thể thực tế ghé thăm doanh nghiệp của bạn.</p>
                             
-                            <!-- Row 1: 2 Fixed Defaults -->
+                            <!-- Row 1: Country & Province -->
                             <div class="row mb-3">
                                 <div class="col-md-6 mb-3 mb-md-0">
                                     <label class="form-label-clean">Quốc gia / Vùng</label>
                                     <input type="text" class="form-control-clean" name="address_country" value="Việt Nam" readonly style="background-color: #f8fafc; color: #64748b;">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label-clean">Tỉnh / Thành phố</label>
-                                    <input type="text" class="form-control-clean" id="input_address_province" name="address_province" value="Ninh Bình" readonly style="background-color: #f8fafc; color: #64748b;" required>
+                                    <label class="form-label-clean">Tỉnh / Thành phố *</label>
+                                    <input type="text" class="form-control-clean" id="input_address_province" name="address_province" value="Tỉnh Ninh Bình" readonly data-code="37" style="background-color: #f8fafc; color: #64748b;">
                                 </div>
                             </div>
 
-                            <!-- Row 2: Fillable City/District & Postal Code -->
+                            <!-- Row 2: District & Ward separate columns -->
                             <div class="row mb-3">
                                 <div class="col-md-6 mb-3 mb-md-0">
-                                    <label class="form-label-clean">Thành phố / Thị xã / Huyện *</label>
-                                    <input type="text" class="form-control-clean" id="input_address_city" name="address_city" required placeholder="Ví dụ: TP. Ninh Bình, Hoa Lư...">
+                                    <label class="form-label-clean">Chọn Phường / Thành phố / Thị xã / Xã *</label>
+                                    <select class="form-select form-control-clean" id="input_address_city" name="address_city">
+                                        <option value="">-- Chọn Huyện / Thị xã / Xã --</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label-clean">Mã bưu chính *</label>
-                                    <input type="text" class="form-control-clean" id="input_address_postal_code" name="address_postal_code" required value="430000" placeholder="Ví dụ: 430000">
+                                    <input type="text" class="form-control-clean" id="input_address_postal_code" name="address_postal_code" value="19000" placeholder="Ví dụ: 19000">
                                 </div>
                             </div>
 
-                            <!-- Row 3: Street Address -->
-                            <div class="mb-3">
-                                <label class="form-label-clean">Đường phố / Số nhà *</label>
-                                <input type="text" class="form-control-clean" id="input_address_street" name="address_street" required placeholder="Ví dụ: 123 Nguyễn Huệ">
+                            <!-- Row 3: Postal Code & Street Address -->
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <label class="form-label-clean">Đường phố / Số nhà *</label>
+                                    <input type="text" class="form-control-clean" id="input_address_street" name="address_street" placeholder="Ví dụ: 123 Nguyễn Huệ">
+                                </div>
                             </div>
                         </div>
 
@@ -1159,7 +1163,7 @@
                                     <div class="d-flex align-items-center px-3 border rounded-2 bg-light text-secondary" style="font-size: 0.875rem; border-color: var(--border-color) !important;">
                                         +84
                                     </div>
-                                    <input type="tel" class="form-control-clean flex-grow-1" id="input_phone" name="phone" required placeholder="Ví dụ: 0912345678" style="margin-bottom: 0;">
+                                    <input type="tel" class="form-control-clean flex-grow-1" id="input_phone" name="phone" placeholder="Ví dụ: 0912345678" style="margin-bottom: 0;">
                                 </div>
                             </div>
                         </div>
@@ -1172,8 +1176,8 @@
                             <div id="businessMap"></div>
                             
                             <!-- Hidden inputs for Lat / Lng -->
-                            <input type="hidden" id="input_lat" name="lat" required>
-                            <input type="hidden" id="input_lng" name="lng" required>
+                            <input type="hidden" id="input_lat" name="lat">
+                            <input type="hidden" id="input_lng" name="lng">
                         </div>
 
                         <!-- Step 7: Description -->
@@ -1182,7 +1186,7 @@
                             <p class="text-secondary small mb-4">Cho phép khách hàng tìm hiểu thêm về doanh nghiệp của bạn bằng cách thêm mô tả ngắn gọn.</p>
                             <div class="mb-3">
                                 <label class="form-label-clean">Giới thiệu về doanh nghiệp *</label>
-                                <textarea class="form-control-clean" id="input_description" name="description" rows="5" maxlength="750" required placeholder="Ví dụ: Nhà hàng chuyên phục vụ các món ăn đặc sản Ninh Bình như thịt dê núi, cơm cháy và các món ăn dân dã truyền thống..."></textarea>
+                                <textarea class="form-control-clean" id="input_description" name="description" rows="5" maxlength="750" placeholder="Ví dụ: Nhà hàng chuyên phục vụ các món ăn đặc sản Ninh Bình như thịt dê núi, cơm cháy và các món ăn dân dã truyền thống..."></textarea>
                                 <div class="text-end text-secondary small mt-1" id="descCharCount">0 / 750</div>
                             </div>
                         </div>
@@ -1460,6 +1464,7 @@
 
             const inputStreet = document.getElementById('input_address_street');
             const inputCity = document.getElementById('input_address_city');
+            const inputDistrict = document.getElementById('input_address_district');
             const inputProvince = document.getElementById('input_address_province');
             const mockBizAddress = document.getElementById('mockBizAddress');
 
@@ -1977,6 +1982,7 @@
                         categorySearchName: inputCategorySearch ? inputCategorySearch.value : '',
                         addressStreet: inputStreet ? inputStreet.value.trim() : '',
                         addressCity: inputCity ? inputCity.value.trim() : '',
+                        addressDistrict: inputDistrict ? inputDistrict.value.trim() : '',
                         addressProvince: inputProvince ? inputProvince.value.trim() : '',
                         addressPostalCode: document.getElementById('input_address_postal_code') ? document.getElementById('input_address_postal_code').value.trim() : '',
                         phone: inputPhone ? inputPhone.value.trim() : '',
@@ -2133,8 +2139,18 @@
 
                 restore('địa chỉ', () => {
                     if (state.addressStreet && inputStreet) inputStreet.value = state.addressStreet;
-                    if (state.addressCity && inputCity) inputCity.value = state.addressCity;
-                    if (state.addressProvince && inputProvince) inputProvince.value = state.addressProvince;
+                    if (state.addressProvince && inputProvince) {
+                        inputProvince.dataset.savedValue = state.addressProvince;
+                        inputProvince.value = state.addressProvince;
+                    }
+                    if (state.addressDistrict && inputDistrict) {
+                        inputDistrict.dataset.savedValue = state.addressDistrict;
+                        inputDistrict.value = state.addressDistrict;
+                    }
+                    if (state.addressCity && inputCity) {
+                        inputCity.dataset.savedValue = state.addressCity;
+                        inputCity.value = state.addressCity;
+                    }
                     const postalEl = document.getElementById('input_address_postal_code');
                     if (state.addressPostalCode && postalEl) {
                         postalEl.value = state.addressPostalCode;
@@ -2855,20 +2871,23 @@
             // Address updates
             function updateMockAddress() {
                 const street = inputStreet ? inputStreet.value.trim() : '';
-                const city = inputCity ? inputCity.value.trim() : '';
+                const ward = inputCity ? inputCity.value.trim() : '';
+                const district = inputDistrict ? inputDistrict.value.trim() : '';
                 const province = inputProvince ? inputProvince.value.trim() : '';
 
                 let addr = '';
                 if (street) addr += street;
-                if (city) addr += (addr ? ', ' : '') + city;
+                if (ward) addr += (addr ? ', ' : '') + ward;
+                if (district) addr += (addr ? ', ' : '') + district;
                 if (province) addr += (addr ? ', ' : '') + province;
 
                 if (mockBizAddress) mockBizAddress.innerText = addr || 'Địa chỉ đường phố, thành phố';
                 saveWizardState();
             }
             if (inputStreet) inputStreet.addEventListener('input', updateMockAddress);
-            if (inputCity) inputCity.addEventListener('input', updateMockAddress);
-            if (inputProvince) inputProvince.addEventListener('input', updateMockAddress);
+            if (inputCity) inputCity.addEventListener('change', updateMockAddress);
+            if (inputDistrict) inputDistrict.addEventListener('change', updateMockAddress);
+            if (inputProvince) inputProvince.addEventListener('change', updateMockAddress);
 
             const inputPostalCode = document.getElementById('input_address_postal_code');
             if (inputPostalCode) {
@@ -3221,7 +3240,11 @@
                     let hasError = false;
                     const postalInput = document.getElementById('input_address_postal_code');
 
-                    if (!inputCity.value.trim()) {
+                    if (inputProvince && (!inputProvince.value || !inputProvince.value.trim())) {
+                        inputProvince.classList.add('is-invalid-clean');
+                        hasError = true;
+                    }
+                    if (inputCity && (!inputCity.value || !inputCity.value.trim())) {
                         inputCity.classList.add('is-invalid-clean');
                         hasError = true;
                     }
@@ -3229,13 +3252,13 @@
                         postalInput.classList.add('is-invalid-clean');
                         hasError = true;
                     }
-                    if (!inputStreet.value.trim()) {
+                    if (inputStreet && !inputStreet.value.trim()) {
                         inputStreet.classList.add('is-invalid-clean');
                         hasError = true;
                     }
 
                     if (hasError) {
-                        showToast('Vui lòng nhập đầy đủ các trường địa chỉ bắt buộc (*).', false);
+                        showToast('Vui lòng chọn Tỉnh/Thành, Huyện/Xã và nhập đầy đủ các trường địa chỉ bắt buộc (*).', false);
                         const firstInvalid = currentPane ? currentPane.querySelector('.is-invalid-clean') : null;
                         if (firstInvalid) firstInvalid.focus();
                         return false;
@@ -3435,6 +3458,91 @@
                     console.error('Payload Build Error:', err);
                 }
             }
+        }
+    });
+
+    // --- TỰ ĐỘNG NẠP DỮ LIỆU TỈNH / THÀNH VÀ XÃ / PHƯỜNG TỪ API ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const provinceSelect = document.getElementById('input_address_province');
+        const citySelect = document.getElementById('input_address_city');
+        const bizForm = document.getElementById('bizRegisterForm');
+        const bizNextBtn = document.getElementById('bizNextBtn');
+
+        const zipCodes = {
+            'Hà Nội': '10000', 'Hồ Chí Minh': '70000', 'Hải Phòng': '15000',
+            'Ninh Bình': '19000', 'Đà Nẵng': '58000', 'Cần Thơ': '95000',
+            'An Giang': '91000', 'Bắc Ninh': '22000', 'Cà Mau': '94000',
+            'Cao Bằng': '02000', 'Đắk Lắk': '67000', 'Điện Biên': '14000',
+            'Đồng Nai': '92000', 'Đồng Tháp': '83000', 'Gia Lai': '63000',
+            'Hà Tĩnh': '38000', 'Thừa Thiên Huế': '53000', 'Huế': '53000',
+            'Hưng Yên': '17000', 'Khánh Hòa': '65000', 'Lai Châu': '13000',
+            'Lạng Sơn': '25000', 'Lào Cai': '27000', 'Lâm Đồng': '66000',
+            'Nghệ An': '37000', 'Phú Thọ': '21000', 'Quảng Ngãi': '57000',
+            'Quảng Ninh': '20000', 'Quảng Trị': '52000', 'Sơn La': '11000',
+            'Tây Ninh': '80000', 'Thái Nguyên': '23000', 'Thanh Hóa': '36000',
+            'Tuyên Quang': '25000', 'Vĩnh Long': '98000'
+        };
+
+        // Khi người dùng gõ phím Enter trên bất kỳ ô nhập nào -> Kích hoạt chuyển bước Tiếp tục
+        if (bizForm) {
+            bizForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (bizNextBtn && !bizNextBtn.disabled) {
+                    bizNextBtn.click();
+                }
+            });
+        }
+
+        if (provinceSelect && citySelect) {
+            const loadNinhBinhWards = function(provCode) {
+                citySelect.innerHTML = '<option value="">-- Đang tải dữ liệu... --</option>';
+
+                fetch('/api/location/wards/' + (provCode || '37'))
+                    .then(res => res.json())
+                    .then(wards => {
+                        const savedCity = citySelect.dataset.savedValue || '';
+                        citySelect.innerHTML = '<option value="">-- Chọn Huyện / Thị xã / Xã --</option>';
+                        if (Array.isArray(wards) && wards.length > 0) {
+                            wards.forEach(w => {
+                                const opt = document.createElement('option');
+                                const valStr = w.full_name || w.name;
+                                opt.value = valStr;
+                                opt.textContent = valStr;
+                                if (savedCity && valStr === savedCity) {
+                                    opt.selected = true;
+                                }
+                                citySelect.appendChild(opt);
+                            });
+                        } else {
+                            citySelect.innerHTML = '<option value="">Không có dữ liệu xã/phường</option>';
+                        }
+                        if (typeof updateMockAddress === 'function') updateMockAddress();
+                    })
+                    .catch(err => {
+                        console.error('Lỗi khi nạp danh sách Xã/Phường:', err);
+                        citySelect.innerHTML = '<option value="">-- Chọn Huyện / Thị xã / Xã --</option>';
+                    });
+            };
+
+            // Nạp mã tỉnh Ninh Bình để lấy danh sách xã/phường
+            fetch('/api/location/provinces')
+                .then(res => res.json())
+                .then(data => {
+                    let code = '37';
+                    if (Array.isArray(data)) {
+                        const nb = data.find(p => (p.full_name || p.name || '').includes('Ninh Bình'));
+                        if (nb && nb.code) code = nb.code;
+                    }
+                    provinceSelect.dataset.code = code;
+                    loadNinhBinhWards(code);
+                })
+                .catch(() => {
+                    loadNinhBinhWards('37');
+                });
+
+            citySelect.addEventListener('change', function() {
+                if (typeof updateMockAddress === 'function') updateMockAddress();
+            });
         }
     });
 </script>
