@@ -71,7 +71,10 @@ class LocationController extends Controller
 
             // 5. Nạp dữ liệu SQL nếu provinces đang rỗng
             if (Schema::hasTable('provinces') && DB::table('provinces')->count() === 0) {
-                $sqlPath = 'd:\laragon\www\vietnamese-provinces-database\mysql\mysql_ImportData_vn_units.sql';
+                $sqlPath = base_path('vietnamese-provinces-database/mysql/mysql_ImportData_vn_units.sql');
+                if (!file_exists($sqlPath)) {
+                    $sqlPath = 'd:\laragon\www\vietnamese-provinces-database\mysql\mysql_ImportData_vn_units.sql';
+                }
                 if (file_exists($sqlPath)) {
                     DB::unprepared(file_get_contents($sqlPath));
                 }

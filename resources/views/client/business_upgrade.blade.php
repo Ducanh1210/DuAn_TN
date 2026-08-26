@@ -1125,9 +1125,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label-clean">Tỉnh / Thành phố *</label>
-                                    <select class="form-select form-control-clean" id="input_address_province" name="address_province" style="background-color: #f8fafc; color: #64748b; pointer-events: none; cursor: not-allowed; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" tabindex="-1">
-                                        <option value="">-- Chọn Tỉnh / Thành phố --</option>
-                                    </select>
+                                    <input type="text" class="form-control-clean" id="input_address_province" name="address_province" value="Tỉnh Ninh Bình" readonly data-code="37" style="background-color: #f8fafc; color: #64748b;">
                                 </div>
                             </div>
 
@@ -1136,12 +1134,12 @@
                                 <div class="col-md-6 mb-3 mb-md-0">
                                     <label class="form-label-clean">Chọn Phường / Thành phố / Thị xã / Xã *</label>
                                     <select class="form-select form-control-clean" id="input_address_city" name="address_city">
-                                        <option value="">-- Chọn Phường / Thành phố / Thị xã / Xã --</option>
+                                        <option value="">-- Chọn Huyện / Thị xã / Xã --</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label-clean">Mã bưu chính *</label>
-                                    <input type="text" class="form-control-clean" id="input_address_postal_code" name="address_postal_code" value="430000" placeholder="Ví dụ: 430000">
+                                    <input type="text" class="form-control-clean" id="input_address_postal_code" name="address_postal_code" value="19000" placeholder="Ví dụ: 19000">
                                 </div>
                             </div>
 
@@ -3496,58 +3494,10 @@
         }
 
         if (provinceSelect && citySelect) {
-            // Nạp danh sách Tỉnh / Thành phố
-            fetch('/api/location/provinces')
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data) && data.length > 0) {
-                        provinceSelect.innerHTML = ''; // Xóa option mặc định, chỉ để Ninh Bình
-
-                        data.forEach(prov => {
-                            const valStr = prov.full_name || prov.name;
-                            // Chỉ lấy tỉnh Ninh Bình
-                            if (valStr.includes('Ninh Bình')) {
-                                const opt = document.createElement('option');
-                                opt.value = valStr;
-                                opt.dataset.code = prov.code;
-                                opt.textContent = valStr;
-                                opt.selected = true;
-                                provinceSelect.appendChild(opt);
-                            }
-                        });
-
-                        // Gọi nạp danh sách Xã/Phường tương ứng
-                        handleProvinceChange();
-                    }
-                })
-                .catch(err => console.error('Lỗi khi nạp danh sách Tỉnh/Thành:', err));
-
-            const handleProvinceChange = function() {
-                const selectedOpt = provinceSelect.options[provinceSelect.selectedIndex];
-                const provCode = selectedOpt ? selectedOpt.dataset.code : '';
-                const provName = selectedOpt ? selectedOpt.textContent : '';
-
-                // Tự động điền mã bưu chính
-                const inputPostalCode = document.getElementById('input_address_postal_code');
-                if (inputPostalCode && provName) {
-                    for (const [key, val] of Object.entries(zipCodes)) {
-                        if (provName.includes(key)) {
-                            inputPostalCode.value = val;
-                            break;
-                        }
-                    }
-                }
-
+            const loadNinhBinhWards = function(provCode) {
                 citySelect.innerHTML = '<option value="">-- Đang tải dữ liệu... --</option>';
 
-                if (typeof updateMockAddress === 'function') updateMockAddress();
-
-                if (!provCode) {
-                    citySelect.innerHTML = '<option value="">-- Chọn Huyện / Thị xã / Xã --</option>';
-                    return;
-                }
-
-                fetch('/api/location/wards/' + provCode)
+                fetch('/api/location/wards/' + (provCode || '37'))
                     .then(res => res.json())
                     .then(wards => {
                         const savedCity = citySelect.dataset.savedValue || '';
@@ -3574,7 +3524,22 @@
                     });
             };
 
-            provinceSelect.addEventListener('change', handleProvinceChange);
+            // Nạp mã tỉnh Ninh Bình để lấy danh sách xã/phường
+            fetch('/api/location/provinces')
+                .then(res => res.json())
+                .then(data => {
+                    let code = '37';
+                    if (Array.isArray(data)) {
+                        const nb = data.find(p => (p.full_name || p.name || '').includes('Ninh Bình'));
+                        if (nb && nb.code) code = nb.code;
+                    }
+                    provinceSelect.dataset.code = code;
+                    loadNinhBinhWards(code);
+                })
+                .catch(() => {
+                    loadNinhBinhWards('37');
+                });
+
             citySelect.addEventListener('change', function() {
                 if (typeof updateMockAddress === 'function') updateMockAddress();
             });
