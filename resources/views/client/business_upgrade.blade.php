@@ -1125,7 +1125,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label-clean">Tỉnh / Thành phố *</label>
-                                    <select class="form-select form-control-clean" id="input_address_province" name="address_province">
+                                    <select class="form-select form-control-clean" id="input_address_province" name="address_province" style="background-color: #f8fafc; color: #64748b; pointer-events: none; cursor: not-allowed; appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;" tabindex="-1">
                                         <option value="">-- Chọn Tỉnh / Thành phố --</option>
                                     </select>
                                 </div>
@@ -3501,20 +3501,19 @@
                 .then(res => res.json())
                 .then(data => {
                     if (Array.isArray(data) && data.length > 0) {
-                        const savedProvince = provinceSelect.dataset.savedValue || 'Tỉnh Ninh Bình';
-                        provinceSelect.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
+                        provinceSelect.innerHTML = ''; // Xóa option mặc định, chỉ để Ninh Bình
 
                         data.forEach(prov => {
-                            const opt = document.createElement('option');
                             const valStr = prov.full_name || prov.name;
-                            opt.value = valStr;
-                            opt.dataset.code = prov.code;
-                            opt.textContent = valStr;
-                            
-                            if (valStr.includes('Ninh Bình') || valStr === savedProvince) {
+                            // Chỉ lấy tỉnh Ninh Bình
+                            if (valStr.includes('Ninh Bình')) {
+                                const opt = document.createElement('option');
+                                opt.value = valStr;
+                                opt.dataset.code = prov.code;
+                                opt.textContent = valStr;
                                 opt.selected = true;
+                                provinceSelect.appendChild(opt);
                             }
-                            provinceSelect.appendChild(opt);
                         });
 
                         // Gọi nạp danh sách Xã/Phường tương ứng
