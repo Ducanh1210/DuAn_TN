@@ -4,50 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Model địa điểm du lịch (POI) - thực thể trung tâm của hệ thống.
  * Chứa thông tin mô tả, tọa độ GPS, danh mục, ảnh, panorama 360°, đánh giá...
- * và xử lý dọn dẹp dữ liệu liên quan khi địa điểm bị xóa.
+ * Hỗ trợ xóa tạm (soft delete); chỉ dọn pivot yêu thích khi xóa vĩnh viễn.
  */
 class Location extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    /** Tiền tố lý do từ chối hồ sơ DN khi địa điểm bị gỡ tạm — dùng để khôi phục đúng. */
+    public const BIZ_SOFT_DELETE_REASON_PREFIX = '[LOCATION_SOFT_DELETED]';
 
     /** Đăng ký các sự kiện vòng đời của model. */
     protected static function booted(): void
     {
-        // Khi xóa địa điểm: dọn dữ liệu liên quan và xử lý hồ sơ doanh nghiệp gắn với nó
-        static::deleting(function (Location $location) {
-            // Dọn pivot để user-side không còn tham chiếu tới địa điểm đã xóa.
+        // Xóa vĩnh viễn: dọn pivot yêu thích (cascade DB đã xử lý comments/images/...).
+        // Xóa tạm: giữ file + quan hệ để có thể khôi phục; ẩn khỏi client nhờ SoftDeletes.
+        static::forceDeleting(function (Location $location) {
             DB::table('favorite_locations')->where('location_id', $location->id)->delete();
-
-            // Hạ trạng thái hồ sơ doanh nghiệp nếu địa điểm của họ bị admin gỡ.
-            if ($location->created_by) {
-                // Chỉ xử lý khi đây là địa điểm cuối cùng của chủ doanh nghiệp
-                $otherLocations = static::where('created_by', $location->created_by)
-                    ->where('id', '!=', $location->id)
-                    ->exists();
-
-                if (!$otherLocations) {
-                    $profile = BusinessProfile::where('user_id', $location->created_by)
-                        ->where('status', 'approved')
-                        ->first();
-
-                    if ($profile) {
-                        $profile->update([
-                            'status' => 'rejected',
-                            'reject_reason' => 'Địa điểm đã bị gỡ khỏi hệ thống bởi quản trị viên. Bạn có thể đăng ký lại nếu cần.',
-                        ]);
-
-                        $user = User::find($location->created_by);
-                        if ($user && $user->role === 'business') {
-                            $user->update(['role' => 'user']);
-                        }
-                    }
-                }
-            }
         });
     }
 
@@ -90,6 +68,7 @@ class Location extends Model
         'lat' => 'decimal:7',
         'lng' => 'decimal:7',
         'average_rating' => 'decimal:2',
+        'deleted_at' => 'datetime',
     ];
 
     public function zaloUrl(): ?string
@@ -121,6 +100,12 @@ class Location extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /** Người tạo / chủ sở hữu địa điểm (user hoặc doanh nghiệp). */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     /** Thư viện ảnh của địa điểm, sắp theo thứ tự hiển thị. */

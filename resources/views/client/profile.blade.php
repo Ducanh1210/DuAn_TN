@@ -2460,7 +2460,7 @@
 
             <div class="sidebar-nav-group">Mở rộng</div>
             <button class="nav-link" id="tab-business-btn" data-bs-toggle="pill" data-bs-target="#tab-business" type="button" role="tab" aria-selected="false">
-                <span class="sidebar-business-label">Tài khoản doanh nghiệp</span>
+                <span class="sidebar-business-label">Doanh nghiệp của bạn</span>
                 @if(isset($businessProfile) && $businessProfile->status === 'pending')
                     <span class="sidebar-status-pill">Chờ duyệt</span>
                 @endif
@@ -3053,16 +3053,71 @@
                         </div>
                         @endif
                     @elseif($businessProfile->status === 'rejected')
-                        <div class="content-panel">
-                            <div class="section-title">Đăng ký tài khoản doanh nghiệp</div>
-                            <div class="panel-note danger">
-                                <div>
-                                    <strong>Yêu cầu bị từ chối.</strong>
-                                    Lý do: {{ $businessProfile->reject_reason ?? 'Thông tin cung cấp chưa chính xác hoặc không đủ điều kiện.' }}
+                        @php
+                            $rejectReason = (string) ($businessProfile->reject_reason ?? '');
+                            $isLocationSoftRemoved = str_starts_with(
+                                $rejectReason,
+                                \App\Models\Location::BIZ_SOFT_DELETE_REASON_PREFIX
+                            );
+                            $isBusinessRevoked = str_starts_with(
+                                $rejectReason,
+                                \App\Models\BusinessProfile::BIZ_REVOKED_REASON_PREFIX
+                            );
+                            $hideRejectBanner = $isLocationSoftRemoved || $isBusinessRevoked;
+                        @endphp
+                        @if($hideRejectBanner)
+                            {{-- Lý do gỡ địa điểm đã gửi qua mục Thông báo — hiện UI đăng ký như chưa có hồ sơ --}}
+                            <div class="content-panel">
+                                <div class="section-title">
+                                    <span>Nâng cấp tài khoản doanh nghiệp</span>
+                                    <span class="dt-meta">Miễn phí</span>
                                 </div>
+                                <div class="biz-hero">
+                                    <div>
+                                        <h5 class="fw-bold mb-2" style="font-size:1.05rem;letter-spacing:-0.02em;">Đưa địa điểm lên bản đồ Ninh Bình Travel Hub</h5>
+                                        <p class="text-secondary mb-3" style="font-size:0.82rem;line-height:1.55;max-width:48ch;">
+                                            Quảng bá nhà hàng, khách sạn, cửa hàng hoặc dịch vụ miễn phí. Tiếp cận người dùng đang tìm địa điểm tại Ninh Bình.
+                                        </p>
+                                        <a href="{{ route('client.profile.business.upgrade') }}" class="btn-solid" style="text-decoration:none;display:inline-block;padding:9px 16px;">Bắt đầu đăng ký</a>
+                                    </div>
+                                    <div class="biz-feature-grid">
+                                        <div class="biz-feature">
+                                            <strong>Xuất hiện trên bản đồ</strong>
+                                            <p>Hiển thị vị trí chính xác trên bản đồ vệ tinh.</p>
+                                        </div>
+                                        <div class="biz-feature">
+                                            <strong>Trình bày hình ảnh</strong>
+                                            <p>Đăng ảnh mặt tiền, phòng nghỉ hoặc thực đơn.</p>
+                                        </div>
+                                        <div class="biz-feature">
+                                            <strong>Tương tác trực tiếp</strong>
+                                            <p>Trả lời bình luận và nhận phản hồi từ khách.</p>
+                                        </div>
+                                        <div class="biz-feature">
+                                            <strong>Trang quản trị</strong>
+                                            <p>Quản lý nội dung và theo dõi tương tác.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="biz-pano-note">
+                                    <i class="fa-solid fa-panorama"></i>
+                                    Muốn địa điểm nổi bật hơn với không gian 360°?
+                                    <a href="{{ route('client.pano_service') }}" target="_blank" rel="noopener">Tìm hiểu dịch vụ chụp Tour 360°</a>
+                                </p>
                             </div>
-                            <a href="{{ route('client.profile.business.upgrade') }}" class="btn-danger-ghost" style="text-decoration:none;display:inline-block;">Đăng ký lại</a>
-                        </div>
+                        @else
+                            <div class="content-panel">
+                                <div class="section-title">Đăng ký tài khoản doanh nghiệp</div>
+                                <div class="panel-note danger">
+                                    <div>
+                                        <strong>Yêu cầu bị từ chối.</strong>
+                                        Lý do: {{ $businessProfile->reject_reason ?? 'Thông tin cung cấp chưa chính xác hoặc không đủ điều kiện.' }}
+                                    </div>
+                                </div>
+                                <a href="{{ route('client.profile.business.upgrade') }}" class="btn-danger-ghost" style="text-decoration:none;display:inline-block;">Đăng ký lại</a>
+                            </div>
+                        @endif
                     @endif
                 @else
                     <div class="content-panel">
@@ -3983,7 +4038,7 @@
                         attributionControl: false
                     }).setView([lat, lng], 15);
 
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    L.tileLayer(@json(config('services.carto.tile_url')), {
                         subdomains: 'abcd',
                         maxZoom: 19
                     }).addTo(pendingBizMap);

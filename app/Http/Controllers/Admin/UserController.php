@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\User;
-use App\Services\PointService;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
- * Controller quản trị người dùng: liệt kê, thêm, sửa, xóa, khóa/mở khóa và điều chỉnh điểm.
+ * Controller quản trị người dùng: liệt kê, thêm, sửa, xóa, khóa/mở khóa.
  */
 class UserController extends Controller
 {
@@ -62,25 +60,12 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được tạo thành công.');
     }
 
-    /** Trang chi tiết người dùng kèm lịch sử điểm (phân trang từ dữ liệu đã tổng hợp). */
+    /** Trang chi tiết người dùng. */
     public function show(string $id)
     {
         $user = User::findOrFail($id);
 
-        $historyData = PointService::aggregatedHistory($user->id);
-        $perPage = 15;
-        $page = (int) request('points_page', 1);
-        $items = collect($historyData['history']);
-
-        $pointHistory = new LengthAwarePaginator(
-            $items->forPage($page, $perPage)->values(),
-            $items->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'pageName' => 'points_page']
-        );
-
-        return view('admin.users.show', compact('user', 'pointHistory', 'historyData'));
+        return view('admin.users.show', compact('user'));
     }
 
     /** Form sửa người dùng. */
@@ -156,23 +141,5 @@ class UserController extends Controller
         
         $action = $user->status === 'banned' ? 'Khóa' : 'Mở khóa';
         return redirect()->route('admin.users.index')->with('success', "{$action} tài khoản thành công.");
-    }
-
-    /** Điều chỉnh điểm của người dùng (cộng hoặc trừ) kèm mô tả lý do. */
-    public function adjustPoints(Request $request, string $id)
-    {
-        $user = User::findOrFail($id);
-
-        $request->validate([
-            'amount' => 'required|integer',
-            'description' => 'required|string|max:255',
-        ]);
-
-        $amount = (int) $request->input('amount');
-        $description = $request->input('description');
-
-        \App\Services\PointService::awardPoints($user, $amount, 'manual_adjust', $description);
-
-        return redirect()->route('admin.users.show', $user->id)->with('success', 'Điểm số của người dùng đã được cập nhật.');
     }
 }

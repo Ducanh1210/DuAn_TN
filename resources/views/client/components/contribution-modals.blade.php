@@ -1,4 +1,4 @@
-<script src="https://unpkg.com/@turf/turf@7.2.0/dist/turf.min.js"></script>
+﻿<script src="https://unpkg.com/@turf/turf@7.2.0/dist/turf.min.js"></script>
 
 <style>
 /* Modern Ultra-Clean Modal Styling - Sharp Crisp Edges */
@@ -764,7 +764,7 @@ function initModalPickerMap() {
         minZoom: 10
     }).setView([20.545, 105.912], 11);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    L.tileLayer(@json(config('services.carto.tile_url')), {
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(modalPickerMap);

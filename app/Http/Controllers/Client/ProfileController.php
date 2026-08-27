@@ -193,6 +193,56 @@ class ProfileController extends Controller
         return view('client.business_upgrade', compact('user', 'categories', 'businessProfile'));
     }
 
+    /**
+     * Gợi ý địa điểm published chưa có chủ DN theo tên (autocomplete bước đăng ký).
+     */
+    public function suggestClaimableLocations(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+        if (mb_strlen($q) < 2) {
+            return response()->json(['data' => []]);
+        }
+
+        $pendingClaimIds = BusinessProfile::where('status', 'pending')
+            ->whereNotNull('location_id')
+            ->pluck('location_id')
+            ->all();
+
+        $locations = Location::with(['category', 'images'])
+            ->where('status', 'published')
+            ->where('name', 'like', '%' . $q . '%')
+            ->when(!empty($pendingClaimIds), fn ($query) => $query->whereNotIn('id', $pendingClaimIds))
+            ->orderBy('name')
+            ->limit(12)
+            ->get()
+            ->filter(fn (Location $loc) => BusinessProfile::isLocationClaimable($loc))
+            ->take(8)
+            ->values()
+            ->map(function (Location $loc) {
+                $thumb = $loc->resolveThumbnailUrl();
+                $gallery = collect($loc->resolveImageUrls())->pluck('url')->filter()->take(2)->values()->all();
+                if (empty($gallery) && $thumb) {
+                    $gallery = [$thumb];
+                }
+                return [
+                    'id' => $loc->id,
+                    'name' => $loc->name,
+                    'address' => $loc->address ?: trim(implode(', ', array_filter([$loc->district, $loc->province]))),
+                    'category' => $loc->category->name ?? null,
+                    'category_id' => $loc->category_id,
+                    'lat' => (float) $loc->lat,
+                    'lng' => (float) $loc->lng,
+                    'thumbnail' => $thumb,
+                    'images' => $gallery,
+                    'rating' => $loc->average_rating !== null ? (float) $loc->average_rating : null,
+                    'review_count' => (int) ($loc->review_count ?? 0),
+                    'description' => $loc->short_description ?: Str::limit((string) $loc->description, 150),
+                ];
+            });
+
+        return response()->json(['data' => $locations]);
+    }
+
     /** Cập nhật thông tin cá nhân cơ bản (tên hiển thị). */
     public function update(Request $request)
     {
@@ -488,34 +538,59 @@ class ProfileController extends Controller
             }
         }
 
-        $validated = $request->validate([
+        $isClaim = $request->filled('location_id');
+
+        $rules = [
             'business_name' => 'required|string|max:255',
-            'business_types' => 'required|array|min:1',
-            'category_id' => 'required|exists:categories,id',
-            'address_country' => 'required|string|max:100',
-            'address_street' => 'required|string|max:255',
-            'address_city' => 'required|string|max:255',
-            'address_province' => 'required|string|max:255',
-            'address_postal_code' => 'required|string|max:20',
             'phone' => 'required|string|max:30',
-            'website' => 'nullable|string|max:255',
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-            'receive_tips' => 'nullable|boolean',
-            'receive_surveys' => 'nullable|boolean',
-            'description' => 'nullable|string|max:750',
-            'menu_photos' => 'nullable|array',
-            'storefront_photos' => 'nullable|array',
-            'avatar_photo' => 'nullable|string',
             'business_documents' => 'nullable|array',
             'verification_photo' => 'nullable|string',
             'verification_photos' => 'required|array|min:1',
             'verification_lat' => 'required|numeric',
             'verification_lng' => 'required|numeric',
             'verification_time' => 'nullable|string',
-        ], [
+            'location_id' => 'nullable|integer|exists:locations,id',
+            'website' => 'nullable|string|max:255',
+            'receive_tips' => 'nullable|boolean',
+            'receive_surveys' => 'nullable|boolean',
+        ];
+
+        if ($isClaim) {
+            $rules += [
+                'business_types' => 'nullable|array',
+                'category_id' => 'nullable|exists:categories,id',
+                'address_country' => 'nullable|string|max:100',
+                'address_street' => 'nullable|string|max:255',
+                'address_city' => 'nullable|string|max:255',
+                'address_province' => 'nullable|string|max:255',
+                'address_postal_code' => 'nullable|string|max:20',
+                'lat' => 'nullable|numeric',
+                'lng' => 'nullable|numeric',
+                'description' => 'nullable|string|max:750',
+                'menu_photos' => 'nullable|array',
+                'storefront_photos' => 'nullable|array',
+                'avatar_photo' => 'nullable|string',
+            ];
+        } else {
+            $rules += [
+                'business_types' => 'nullable|array',
+                'category_id' => 'required|exists:categories,id',
+                'address_country' => 'required|string|max:100',
+                'address_street' => 'required|string|max:255',
+                'address_city' => 'required|string|max:255',
+                'address_province' => 'required|string|max:255',
+                'address_postal_code' => 'required|string|max:20',
+                'lat' => 'required|numeric',
+                'lng' => 'required|numeric',
+                'description' => 'nullable|string|max:750',
+                'menu_photos' => 'nullable|array',
+                'storefront_photos' => 'nullable|array',
+                'avatar_photo' => 'nullable|string',
+            ];
+        }
+
+            $validated = $request->validate($rules, [
             'business_name.required' => 'Vui lòng nhập tên doanh nghiệp.',
-            'business_types.required' => 'Vui lòng chọn loại hình doanh nghiệp.',
             'category_id.required' => 'Vui lòng chọn danh mục kinh doanh.',
             'address_street.required' => 'Vui lòng nhập địa chỉ đường phố.',
             'address_city.required' => 'Vui lòng nhập thành phố.',
@@ -528,7 +603,68 @@ class ProfileController extends Controller
             'verification_photos.min' => 'Vui lòng chụp ít nhất 1 ảnh xác thực thực địa.',
             'verification_lat.required' => 'Chưa lấy được tọa độ GPS. Vui lòng bật Vị trí rồi nhấn Lấy lại GPS.',
             'verification_lng.required' => 'Chưa lấy được tọa độ GPS. Vui lòng bật Vị trí rồi nhấn Lấy lại GPS.',
+            'location_id.exists' => 'Địa điểm được chọn không tồn tại.',
         ]);
+
+        $claimLocation = null;
+        if ($isClaim) {
+            $claimLocation = Location::with('category')->find($validated['location_id']);
+            if (!BusinessProfile::isLocationClaimable($claimLocation)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Địa điểm này không còn nhận được (đã có chủ doanh nghiệp hoặc không công khai).',
+                ], 422);
+            }
+
+            $alreadyPending = BusinessProfile::where('location_id', $claimLocation->id)
+                ->where('status', 'pending')
+                ->where('user_id', '!=', $user->id)
+                ->exists();
+            if ($alreadyPending) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Địa điểm này đang có yêu cầu nhận quyền chờ duyệt từ tài khoản khác.',
+                ], 422);
+            }
+
+            // Prefill hồ sơ từ POI đã chọn
+            $validated['business_name'] = $validated['business_name'] ?: $claimLocation->name;
+            $validated['category_id'] = $claimLocation->category_id;
+            $validated['business_types'] = !empty($validated['business_types'])
+                ? $validated['business_types']
+                : ['local_store'];
+            $validated['address_country'] = 'Việt Nam';
+            $validated['address_province'] = $claimLocation->province ?: 'Ninh Bình';
+            $validated['address_city'] = $claimLocation->district ?: ($claimLocation->ward ?: 'Ninh Bình');
+            $validated['address_street'] = $claimLocation->address ?: $claimLocation->name;
+            $validated['address_postal_code'] = $validated['address_postal_code'] ?? '00000';
+            $validated['lat'] = (float) $claimLocation->lat;
+            $validated['lng'] = (float) $claimLocation->lng;
+            $validated['description'] = $validated['description']
+                ?? ($claimLocation->short_description ?: Str::limit((string) $claimLocation->description, 750));
+            $validated['menu_photos'] = $validated['menu_photos'] ?? [];
+            $validated['storefront_photos'] = $validated['storefront_photos'] ?? [];
+            $validated['avatar_photo'] = $validated['avatar_photo'] ?? $claimLocation->thumbnail_url;
+        }
+
+        // Chặn gửi nếu GPS xác thực cách vị trí ghim > 500m
+        $pinLat = isset($validated['lat']) ? (float) $validated['lat'] : null;
+        $pinLng = isset($validated['lng']) ? (float) $validated['lng'] : null;
+        $vLat = (float) $validated['verification_lat'];
+        $vLng = (float) $validated['verification_lng'];
+        if ($pinLat !== null && $pinLng !== null && is_finite($pinLat) && is_finite($pinLng)) {
+            $maxDistanceM = 500;
+            $distanceM = $this->haversineMeters($vLat, $vLng, $pinLat, $pinLng);
+            if ($distanceM > $maxDistanceM) {
+                $shown = $distanceM >= 1000
+                    ? round($distanceM / 1000, 1) . 'km'
+                    : (string) (int) round($distanceM) . 'm';
+                return response()->json([
+                    'success' => false,
+                    'message' => "Bạn đang cách {$shown} vị trí được ghim; chỉ có thể xác thực trong khoảng {$maxDistanceM}m.",
+                ], 422);
+            }
+        }
 
         $savedVerificationPhotos = [];
         $rawVerificationPhotos = $validated['verification_photos'] ?? [];
@@ -556,72 +692,52 @@ class ProfileController extends Controller
         $verificationPhotoPath = $savedVerificationPhotos[0] ?? null;
         $verificationTime = !empty($validated['verification_time']) ? \Carbon\Carbon::parse($validated['verification_time']) : now();
 
+        $profilePayload = [
+            'business_name' => $validated['business_name'],
+            'business_types' => !empty($validated['business_types']) ? $validated['business_types'] : ['local_store'],
+            'category_id' => $validated['category_id'],
+            'address_country' => $validated['address_country'] ?? 'Việt Nam',
+            'address_street' => $validated['address_street'],
+            'address_city' => $validated['address_city'],
+            'address_province' => $validated['address_province'],
+            'address_postal_code' => $validated['address_postal_code'] ?? '00000',
+            'phone' => $validated['phone'],
+            'website' => $validated['website'] ?? null,
+            'lat' => $validated['lat'],
+            'lng' => $validated['lng'],
+            'receive_tips' => (bool)($validated['receive_tips'] ?? false),
+            'receive_surveys' => (bool)($validated['receive_surveys'] ?? false),
+            'description' => $validated['description'] ?? null,
+            'menu_photos' => $validated['menu_photos'] ?? [],
+            'storefront_photos' => $validated['storefront_photos'] ?? [],
+            'avatar_photo' => $validated['avatar_photo'] ?? null,
+            'business_documents' => $validated['business_documents'] ?? [],
+            'verification_photo' => $verificationPhotoPath,
+            'verification_photos' => $savedVerificationPhotos,
+            'verification_lat' => $validated['verification_lat'] ?? null,
+            'verification_lng' => $validated['verification_lng'] ?? null,
+            'verification_time' => $verificationTime,
+            'location_id' => $claimLocation?->id,
+            'status' => 'pending',
+            'reject_reason' => null,
+        ];
+
         if ($existing) {
             // Cập nhật lại hồ sơ cũ (đã bị từ chối hoặc địa điểm đã bị gỡ) và chuyển về trạng thái chờ duyệt
-            $existing->update([
-                'business_name' => $validated['business_name'],
-                'business_types' => $validated['business_types'],
-                'category_id' => $validated['category_id'],
-                'address_country' => $validated['address_country'],
-                'address_street' => $validated['address_street'],
-                'address_city' => $validated['address_city'],
-                'address_province' => $validated['address_province'],
-                'address_postal_code' => $validated['address_postal_code'],
-                'phone' => $validated['phone'],
-                'website' => $validated['website'] ?? null,
-                'lat' => $validated['lat'],
-                'lng' => $validated['lng'],
-                'receive_tips' => (bool)($validated['receive_tips'] ?? false),
-                'receive_surveys' => (bool)($validated['receive_surveys'] ?? false),
-                'description' => $validated['description'] ?? null,
-                'menu_photos' => $validated['menu_photos'] ?? [],
-                'storefront_photos' => $validated['storefront_photos'] ?? [],
-                'avatar_photo' => $validated['avatar_photo'] ?? null,
-                'business_documents' => $validated['business_documents'] ?? [],
-                'verification_photo' => $verificationPhotoPath,
-                'verification_photos' => $savedVerificationPhotos,
-                'verification_lat' => $validated['verification_lat'] ?? null,
-                'verification_lng' => $validated['verification_lng'] ?? null,
-                'verification_time' => $verificationTime,
-                'status' => 'pending',
-                'reject_reason' => null,
-            ]);
+            $existing->update($profilePayload);
             $business = $existing;
         } else {
             // Tạo hồ sơ doanh nghiệp mới
-            $business = BusinessProfile::create([
+            $business = BusinessProfile::create(array_merge($profilePayload, [
                 'user_id' => $user->id,
-                'business_name' => $validated['business_name'],
-                'business_types' => $validated['business_types'],
-                'category_id' => $validated['category_id'],
-                'address_country' => $validated['address_country'],
-                'address_street' => $validated['address_street'],
-                'address_city' => $validated['address_city'],
-                'address_province' => $validated['address_province'],
-                'address_postal_code' => $validated['address_postal_code'],
-                'phone' => $validated['phone'],
-                'website' => $validated['website'] ?? null,
-                'lat' => $validated['lat'],
-                'lng' => $validated['lng'],
-                'receive_tips' => (bool)($validated['receive_tips'] ?? false),
-                'receive_surveys' => (bool)($validated['receive_surveys'] ?? false),
-                'description' => $validated['description'] ?? null,
-                'menu_photos' => $validated['menu_photos'] ?? [],
-                'storefront_photos' => $validated['storefront_photos'] ?? [],
-                'avatar_photo' => $validated['avatar_photo'] ?? null,
-                'business_documents' => $validated['business_documents'] ?? [],
-                'verification_photo' => $verificationPhotoPath,
-                'verification_photos' => $savedVerificationPhotos,
-                'verification_lat' => $validated['verification_lat'] ?? null,
-                'verification_lng' => $validated['verification_lng'] ?? null,
-                'verification_time' => $verificationTime,
-                'status' => 'pending',
-            ]);
+            ]));
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Đăng ký tài khoản doanh nghiệp thành công! Yêu cầu đang được chờ phê duyệt.',
+            'message' => $isClaim
+                ? 'Đã gửi yêu cầu nhận quyền địa điểm trên bản đồ. Vui lòng chờ quản trị viên duyệt.'
+                : 'Đăng ký tài khoản doanh nghiệp thành công! Yêu cầu đang được chờ phê duyệt.',
             'business' => $business
         ]);
     }
@@ -964,6 +1080,18 @@ class ProfileController extends Controller
         $result = MissionService::purchaseFrame($user, $frameId);
 
         return response()->json($result);
+    }
+
+    /** Khoảng cách haversine giữa 2 tọa độ (mét). */
+    private function haversineMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadius = 6371000.0;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return 2 * $earthRadius * asin(min(1, sqrt($a)));
     }
 }
 

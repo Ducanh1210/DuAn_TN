@@ -400,7 +400,16 @@
                             @foreach((array) ($businessProfile->business_types ?? []) as $type)
                                 <span class="biz-chip">{{ $type }}</span>
                             @endforeach
+                            @if($businessProfile->location_id)
+                                <span class="biz-chip" style="background:#eef2ff;color:#4338ca;">Nhận địa điểm có sẵn</span>
+                            @endif
                         </div>
+                        @if($businessProfile->claimedLocation)
+                            <div class="mt-2" style="font-size:0.82rem;color:#475569;">
+                                POI: <strong>{{ $businessProfile->claimedLocation->name }}</strong>
+                                <a href="{{ route('admin.locations.edit', $businessProfile->claimedLocation->id) }}" class="ms-1">Xem / sửa địa điểm</a>
+                            </div>
+                        @endif
                     </div>
                     <span class="biz-status {{ $statusClass }}">{{ $statusLabel }}</span>
                 </div>
@@ -688,7 +697,7 @@
             attributionControl: false
         }).setView([lat, lng], 15);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        L.tileLayer(@json(config('services.carto.tile_url')), {
             subdomains: 'abcd',
             maxZoom: 19
         }).addTo(map);

@@ -162,6 +162,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/avatar', [\App\Http\Controllers\Client\ProfileController::class, 'updateAvatar'])->name('client.profile.avatar');
     Route::post('/profile/delete', [\App\Http\Controllers\Client\ProfileController::class, 'deleteAccount'])->name('client.profile.delete');
     Route::get('/profile/business/upgrade', [\App\Http\Controllers\Client\ProfileController::class, 'showBusinessUpgradeForm'])->name('client.profile.business.upgrade');
+    Route::get('/profile/business/locations/suggest', [\App\Http\Controllers\Client\ProfileController::class, 'suggestClaimableLocations'])->name('client.profile.business.locations.suggest');
     Route::post('/profile/business/register', [\App\Http\Controllers\Client\ProfileController::class, 'businessRegister'])->name('client.profile.business.register');
     Route::post('/profile/business/upload-photo', [\App\Http\Controllers\Client\ProfileController::class, 'uploadBusinessPhoto'])->name('client.profile.business.upload_photo');
     Route::post('/profile/business/cancel', [\App\Http\Controllers\Client\ProfileController::class, 'cancelBusinessRegistration'])->name('client.profile.business.cancel');
@@ -205,6 +206,14 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
 
     // Locations
     Route::resource('locations', \App\Http\Controllers\Admin\LocationController::class);
+    Route::post('locations/{id}/restore', [\App\Http\Controllers\Admin\LocationController::class, 'restore'])
+        ->whereNumber('id')
+        ->name('locations.restore');
+    Route::delete('locations/{id}/force', [\App\Http\Controllers\Admin\LocationController::class, 'forceDestroy'])
+        ->whereNumber('id')
+        ->name('locations.force_destroy');
+    Route::post('locations/{location}/revoke-business', [\App\Http\Controllers\Admin\LocationController::class, 'revokeBusiness'])
+        ->name('locations.revoke_business');
 
     // Location Images Ajax
     Route::post('locations/{location}/upload-image', [\App\Http\Controllers\Admin\LocationController::class, 'uploadImage'])->name('locations.upload_image');
@@ -240,7 +249,6 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     // Users Management
     Route::resource('users', UserController::class);
     Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle_status');
-    Route::patch('users/{user}/adjust-points', [UserController::class, 'adjustPoints'])->name('users.adjust_points');
     Route::post('locations/{location}/generate-tts', [\App\Http\Controllers\Admin\LocationController::class, 'generateTtsAudio'])->name('locations.generate_tts');
 
     // Comments Management

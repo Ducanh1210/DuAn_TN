@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -885,7 +885,7 @@ document.addEventListener('DOMContentLoaded', function () {
             attributionControl: false
         }).setView([lat, lng], 15);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        L.tileLayer(@json(config('services.carto.tile_url')), {
             subdomains: 'abcd',
             maxZoom: 19
         }).addTo(dashboardMap);

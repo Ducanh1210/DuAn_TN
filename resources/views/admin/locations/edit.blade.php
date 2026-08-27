@@ -100,6 +100,45 @@
                 </div>
             </form>
         </div>
+
+        @if(!empty($isBusinessLocation))
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 px-1">
+                <span class="text-muted" style="font-size: 0.78rem;">
+                    Chủ DN: {{ $businessOwner->email ?? ('#' . $location->created_by) }}
+                </span>
+                <button type="button" class="btn-minimal py-1 px-2" style="font-size: 0.72rem;"
+                    data-bs-toggle="modal" data-bs-target="#revokeBizModal">Thu hồi DN</button>
+            </div>
+
+            <div class="modal fade" id="revokeBizModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <form method="POST" action="{{ route('admin.locations.revoke_business', $location->id) }}" id="revokeBizForm">
+                            @csrf
+                            @foreach(request()->only(['search', 'category_id', 'sort_dir']) as $qKey => $qVal)
+                                <input type="hidden" name="{{ $qKey }}" value="{{ $qVal }}">
+                            @endforeach
+                            <div class="modal-header">
+                                <h5 class="modal-title" style="font-size: 1rem;">Thu hồi quyền DN</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-secondary mb-2" style="font-size: 0.82rem;">
+                                    Gỡ chủ DN khỏi <strong>{{ $location->name }}</strong> (địa điểm vẫn trên map).
+                                </p>
+                                <label class="form-label" style="font-size: 0.8rem;">Lý do <span class="text-danger">*</span></label>
+                                <textarea name="revoke_reason" id="revokeBizReason" class="form-control form-control-sm" rows="3" maxlength="1000" required placeholder="Nhập lý do thu hồi..."></textarea>
+                                <div class="invalid-feedback">Vui lòng nhập lý do.</div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn-minimal" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn-minimal">Thu hồi</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <!-- IMAGES TAB -->
@@ -371,6 +410,19 @@
 
 @push('scripts')
 <script>
+    (function() {
+        const form = document.getElementById('revokeBizForm');
+        const reason = document.getElementById('revokeBizReason');
+        if (form && reason) {
+            form.addEventListener('submit', function(e) {
+                if (!reason.value.trim()) {
+                    e.preventDefault();
+                    reason.classList.add('is-invalid');
+                }
+            });
+        }
+    })();
+
     // CSRF Token Setup
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
