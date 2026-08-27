@@ -1,0 +1,34 @@
+Hà Nội: 10000
+TP. Hồ Chí Minh: 70000
+Hải Phòng: 15000
+Ninh Bình: 19000
+Đà Nẵng: 58000
+Cần Thơ: 95000
+An Giang: 91000
+Bắc Ninh: 22000
+Cà Mau: 94000
+Cao Bằng: 02000
+Đắk Lắk: 67000
+Điện Biên: 14000
+Đồng Nai: 92000
+Đồng Tháp: 83000
+Gia Lai: 63000
+Hà Tĩnh: 38000
+Huế (Thừa Thiên Huế): 53000
+Hưng Yên: 17000
+Khánh Hòa: 65000
+Lai Châu: 13000
+Lạng Sơn: 25000
+Lào Cai: 27000
+Lâm Đồng: 66000
+Nghệ An: 37000
+Phú Thọ: 21000
+Quảng Ngãi: 57000
+Quảng Ninh: 20000
+Quảng Trị: 52000
+Sơn La: 11000
+Tây Ninh: 80000
+Thái Nguyên: 23000
+Thanh Hóa: 36000
+Tuyên Quang: 25000
+Vĩnh Long: 98000

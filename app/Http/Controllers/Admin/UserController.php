@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
+use App\Http\Requests\Admin\User\StoreUserRequest;
+use App\Http\Requests\Admin\User\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Controller quản trị người dùng: liệt kê, thêm, sửa, xóa, khóa/mở khóa.
@@ -16,7 +16,6 @@ class UserController extends Controller
     /** Danh sách người dùng (ẩn tài khoản admin). */
     public function index()
     {
-        // Loại bỏ các tài khoản có vai trò 'admin' khỏi danh sách
         $users = User::where('role', '!=', 'admin')->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.users.index', compact('users'));
     }
@@ -28,28 +27,19 @@ class UserController extends Controller
     }
 
     /** Lưu người dùng mới vào cơ sở dữ liệu. */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $request->validate([
-            'username' => 'required|string|max:50|unique:users',
-            'email' => 'required|string|email|max:100|unique:users',
-            'display_name' => 'required|string|max:100',
-            'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:admin,moderator,user',
-            'status' => 'required|in:active,inactive,banned',
-        ]);
+        $validated = $request->validated();
 
         $user = new User();
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->display_name = $request->display_name;
-        // LƯU Ý: tài khoản tạo từ trang admin đang băm mật khẩu bằng md5 (khác với đăng ký
-        // phía người dùng dùng Hash::make). Nên cân nhắc thống nhất về Hash::make sau này.
-        $user->password_hash = md5($request->password);
-        $user->role = $request->role;
-        $user->status = $request->status;
+        $user->username = $validated['username'];
+        $user->email = $validated['email'];
+        $user->display_name = $validated['display_name'];
+        $user->password_hash = md5($validated['password']);
+        $user->role = $validated['role'];
+        $user->status = $validated['status'];
         $user->provider = 'local';
-        
+
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
             $user->avatar_url = 'avatars/' . basename($path);
@@ -76,31 +66,22 @@ class UserController extends Controller
     }
 
     /** Cập nhật người dùng (đổi mật khẩu nếu có nhập, thay avatar nếu có tải lên). */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, string $id)
     {
         $user = User::findOrFail($id);
+        $validated = $request->validated();
 
-        $request->validate([
-            'username' => 'required|string|max:50|unique:users,username,'.$user->id,
-            'email' => 'required|string|email|max:100|unique:users,email,'.$user->id,
-            'display_name' => 'required|string|max:100',
-            'password' => 'nullable|string|min:6|confirmed',
-            'role' => 'required|in:admin,moderator,user',
-            'status' => 'required|in:active,inactive,banned',
-        ]);
+        $user->username = $validated['username'];
+        $user->email = $validated['email'];
+        $user->display_name = $validated['display_name'];
+        $user->role = $validated['role'];
+        $user->status = $validated['status'];
 
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->display_name = $request->display_name;
-        $user->role = $request->role;
-        $user->status = $request->status;
-        
-        if ($request->filled('password')) {
-            $user->password_hash = md5($request->password);
+        if (!empty($validated['password'])) {
+            $user->password_hash = md5($validated['password']);
         }
 
         if ($request->hasFile('avatar')) {
-            // Xóa file avatar cũ nếu là ảnh nội bộ
             if ($user->avatar_url && str_contains($user->avatar_url, 'avatars/') && !str_starts_with($user->avatar_url, 'http')) {
                 Storage::disk('public')->delete('avatars/' . basename($user->avatar_url));
             }
@@ -117,13 +98,13 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
-        
+
         if (auth()->id() == $user->id) {
             return redirect()->route('admin.users.index')->with('error', 'Bạn không thể xóa tài khoản của chính mình.');
         }
-        
+
         $user->delete();
-        
+
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được xóa thành công.');
     }
 
@@ -131,14 +112,14 @@ class UserController extends Controller
     public function toggleStatus(string $id)
     {
         $user = User::findOrFail($id);
-        
+
         if (auth()->id() == $user->id) {
             return redirect()->route('admin.users.index')->with('error', 'Bạn không thể khóa tài khoản của chính mình.');
         }
-        
+
         $user->status = $user->status === 'banned' ? 'active' : 'banned';
         $user->save();
-        
+
         $action = $user->status === 'banned' ? 'Khóa' : 'Mở khóa';
         return redirect()->route('admin.users.index')->with('success', "{$action} tài khoản thành công.");
     }

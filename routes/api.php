@@ -14,4 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Dự án dùng xác thực session cho web, hiện chưa có API công khai nào.
+
+use App\Http\Controllers\Api\LocationController;
+
+Route::get('/location/provinces', [LocationController::class, 'getProvinces']);
+Route::get('/location/wards/{provinceCode}', [LocationController::class, 'getWards']);
+

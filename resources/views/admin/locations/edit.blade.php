@@ -496,13 +496,65 @@
 
     // Delete Image
     $(document).on('click', '.btn-delete-image', function() {
-        if(!confirm('Xóa ảnh này?')) return;
-        let id = $(this).data('id');
-        $.ajax({
-            url: '/admin/locations/image/' + id,
-            type: 'DELETE',
-            success: function(res) {
-                if(res.success) $('#img-' + id).remove();
+        let btn = $(this);
+        let id = btn.data('id');
+        
+        Swal.fire({
+            title: 'Xóa hình ảnh',
+            html: 'Bạn có chắc chắn muốn xóa ảnh này khỏi địa điểm không?',
+            icon: 'warning',
+            iconColor: '#eab308',
+            showCancelButton: true,
+            confirmButtonText: 'Xóa ảnh',
+            cancelButtonText: 'Hủy bỏ',
+            reverseButtons: true,
+            customClass: {
+                popup: 'custom-swal-popup',
+                title: 'custom-swal-title',
+                htmlContainer: 'custom-swal-text',
+                confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger',
+                cancelButton: 'custom-swal-cancel-btn'
+            },
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/locations/image/' + id,
+                    type: 'DELETE',
+                    success: function(res) {
+                        if (res.success) {
+                            $('#img-' + id).fadeOut(300, function() { $(this).remove(); });
+                            Swal.fire({
+                                icon: 'success',
+                                iconColor: '#166534',
+                                title: 'Thành công',
+                                text: 'Đã xóa hình ảnh thành công!',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true,
+                                customClass: { popup: 'custom-swal-toast' }
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            iconColor: '#dc2626',
+                            title: 'Có lỗi xảy ra',
+                            text: 'Không thể xóa hình ảnh này.',
+                            confirmButtonText: 'Đóng',
+                            customClass: {
+                                popup: 'custom-swal-popup',
+                                title: 'custom-swal-title',
+                                htmlContainer: 'custom-swal-text',
+                                confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    }
+                });
             }
         });
     });
@@ -523,30 +575,96 @@
             processData: false,
             success: function(res) {
                 if (res.success) {
-                    alert('Upload audio thuyết minh thành công!');
-                    location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        iconColor: '#166534',
+                        title: 'Thành công',
+                        text: 'Upload audio thuyết minh thành công!',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        location.reload();
+                    });
                 }
             },
             error: function(xhr) {
-                alert('Lỗi upload audio: ' + (xhr.responseJSON?.message || xhr.responseText));
+                Swal.fire({
+                    icon: 'error',
+                    iconColor: '#dc2626',
+                    title: 'Lỗi upload audio',
+                    text: (xhr.responseJSON?.message || xhr.responseText),
+                    confirmButtonText: 'Đóng',
+                    customClass: {
+                        popup: 'custom-swal-popup',
+                        title: 'custom-swal-title',
+                        htmlContainer: 'custom-swal-text',
+                        confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                    },
+                    buttonsStyling: false
+                });
             }
         });
     });
 
     // Delete Audio
     $(document).on('click', '#btnDeleteAudio', function() {
-        if (!confirm('Xóa audio thuyết minh của địa điểm này?')) return;
-        $.ajax({
-            url: '{{ route("admin.locations.delete_audio", $location->id, false) }}',
-            type: 'DELETE',
-            success: function(res) {
-                if (res.success) {
-                    alert('Đã xóa audio thuyết minh!');
-                    location.reload();
-                }
+        Swal.fire({
+            title: 'Xóa audio thuyết minh',
+            html: 'Bạn có chắc chắn muốn xóa file audio thuyết minh của địa điểm này không?',
+            icon: 'warning',
+            iconColor: '#eab308',
+            showCancelButton: true,
+            confirmButtonText: 'Xóa audio',
+            cancelButtonText: 'Hủy bỏ',
+            reverseButtons: true,
+            customClass: {
+                popup: 'custom-swal-popup',
+                title: 'custom-swal-title',
+                htmlContainer: 'custom-swal-text',
+                confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger',
+                cancelButton: 'custom-swal-cancel-btn'
             },
-            error: function(xhr) {
-                alert('Lỗi xóa audio: ' + xhr.responseText);
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("admin.locations.delete_audio", $location->id, false) }}',
+                    type: 'DELETE',
+                    success: function(res) {
+                        if (res.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                iconColor: '#166534',
+                                title: 'Thành công',
+                                text: 'Đã xóa audio thuyết minh!',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            iconColor: '#dc2626',
+                            title: 'Có lỗi xảy ra',
+                            text: 'Lỗi xóa audio: ' + xhr.responseText,
+                            confirmButtonText: 'Đóng',
+                            customClass: {
+                                popup: 'custom-swal-popup',
+                                title: 'custom-swal-title',
+                                htmlContainer: 'custom-swal-text',
+                                confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    }
+                });
             }
         });
     });
@@ -756,7 +874,20 @@
         let repetitionPenalty = $('#ttsPenaltyInput').val();
 
         if (!text) {
-            alert('Vui lòng nhập văn bản thuyết minh.');
+            Swal.fire({
+                icon: 'warning',
+                iconColor: '#eab308',
+                title: 'Thông báo',
+                text: 'Vui lòng nhập văn bản thuyết minh.',
+                confirmButtonText: 'Đóng',
+                customClass: {
+                    popup: 'custom-swal-popup',
+                    title: 'custom-swal-title',
+                    htmlContainer: 'custom-swal-text',
+                    confirmButton: 'custom-swal-confirm-btn'
+                },
+                buttonsStyling: false
+            });
             return;
         }
 
@@ -821,10 +952,33 @@
                 $('#ttsProgressStatus').html('<i class="fas fa-check-circle text-success me-1"></i> Hoàn thành!');
 
                 if (res.success) {
-                    alert('Tạo âm thanh thuyết minh AI thành công!');
-                    location.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        iconColor: '#166534',
+                        title: 'Thành công',
+                        text: 'Tạo âm thanh thuyết minh AI thành công!',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        location.reload();
+                    });
                 } else {
-                    alert('Lỗi tạo âm thanh: ' + res.message);
+                    Swal.fire({
+                        icon: 'error',
+                        iconColor: '#dc2626',
+                        title: 'Lỗi tạo âm thanh',
+                        text: res.message,
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            popup: 'custom-swal-popup',
+                            title: 'custom-swal-title',
+                            htmlContainer: 'custom-swal-text',
+                            confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                        },
+                        buttonsStyling: false
+                    });
                     resetTtsBtn();
                 }
             },
@@ -832,7 +986,20 @@
                 clearInterval(progressInterval);
                 $('#ttsProgressContainer').addClass('d-none');
                 let msg = xhr.responseJSON?.message || xhr.responseText || 'Lỗi không xác định';
-                alert('Lỗi khi gửi yêu cầu chuyển đổi TTS: ' + msg);
+                Swal.fire({
+                    icon: 'error',
+                    iconColor: '#dc2626',
+                    title: 'Lỗi chuyển đổi TTS',
+                    text: msg,
+                    confirmButtonText: 'Đóng',
+                    customClass: {
+                        popup: 'custom-swal-popup',
+                        title: 'custom-swal-title',
+                        htmlContainer: 'custom-swal-text',
+                        confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                    },
+                    buttonsStyling: false
+                });
                 resetTtsBtn();
             }
         });

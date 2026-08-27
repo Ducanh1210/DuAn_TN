@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Http\Requests\Admin\StoreCategoryRequest;
-use App\Http\Requests\Admin\UpdateCategoryRequest;
+use App\Http\Requests\Admin\Category\StoreCategoryRequest;
+use App\Http\Requests\Admin\Category\UpdateCategoryRequest;
 use Illuminate\Support\Str;
 
 /**

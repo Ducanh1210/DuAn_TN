@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Avatar Frames CSS -->
     <link rel="stylesheet" href="{{ asset('css/avatar-frames.css') }}">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         :root {
@@ -25,6 +27,81 @@
             --text-muted: #64748b;
             --border-light: #e2e8f0;
             --accent-primary: #1e3a5f;
+        }
+
+        /* Custom SweetAlert2 Theme for Ninh Bình POI Admin */
+        .swal2-container {
+            z-index: 1060 !important;
+        }
+        .custom-swal-popup {
+            border-radius: 16px !important;
+            padding: 1.5rem 1.75rem !important;
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+            border: 1px solid var(--border-light, #e2e8f0) !important;
+            box-shadow: 0 20px 25px -5px rgba(15, 36, 66, 0.12), 0 8px 10px -6px rgba(15, 36, 66, 0.06) !important;
+            background: #ffffff !important;
+        }
+        .custom-swal-title {
+            color: var(--text-heading, #0f2442) !important;
+            font-size: 1.15rem !important;
+            font-weight: 600 !important;
+            padding-top: 0.25rem !important;
+        }
+        .custom-swal-text {
+            color: var(--text-body, #334155) !important;
+            font-size: 0.875rem !important;
+            margin-top: 0.4rem !important;
+            line-height: 1.5 !important;
+        }
+        .custom-swal-confirm-btn {
+            background-color: var(--accent-primary, #1e3a5f) !important;
+            color: #ffffff !important;
+            font-size: 0.825rem !important;
+            font-weight: 500 !important;
+            padding: 0.5rem 1.25rem !important;
+            border-radius: 8px !important;
+            border: none !important;
+            margin: 0.25rem !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+            box-shadow: none !important;
+        }
+        .custom-swal-confirm-btn:hover {
+            background-color: #0f2442 !important;
+            color: #ffffff !important;
+        }
+        .custom-swal-confirm-danger {
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+        }
+        .custom-swal-confirm-danger:hover {
+            background-color: #b91c1c !important;
+            color: #ffffff !important;
+        }
+        .custom-swal-cancel-btn {
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
+            font-size: 0.825rem !important;
+            font-weight: 500 !important;
+            padding: 0.5rem 1.25rem !important;
+            border-radius: 8px !important;
+            border: 1px solid #cbdbe8 !important;
+            margin: 0.25rem !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
+            box-shadow: none !important;
+        }
+        .custom-swal-cancel-btn:hover {
+            background-color: #e2e8f0 !important;
+            color: #1e3a5f !important;
+        }
+        .custom-swal-toast {
+            border-radius: 10px !important;
+            font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+            box-shadow: 0 10px 15px -3px rgba(15, 36, 66, 0.1) !important;
+            border: 1px solid #cbdbe8 !important;
+            font-size: 0.825rem !important;
+            background: #ffffff !important;
         }
 
         body {
@@ -679,7 +756,108 @@
                 );
             });
         });
+
+        // Global SweetAlert2 Interceptor for confirm popups across Admin
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            if (!form || form.dataset.confirmed === 'true') {
+                return true;
+            }
+
+            const confirmText = form.getAttribute('data-confirm-text') || form.getAttribute('data-confirm');
+            const onsubmitAttr = form.getAttribute('onsubmit');
+
+            let textToShow = confirmText;
+            let titleToShow = form.getAttribute('data-confirm-title') || 'Xác nhận thao tác';
+            let confirmBtnText = form.getAttribute('data-confirm-btn') || 'Đồng ý';
+            let isDanger = form.getAttribute('data-confirm-type') === 'danger' || (textToShow && textToShow.toLowerCase().includes('xóa'));
+            
+            if (!textToShow && onsubmitAttr && onsubmitAttr.includes('confirm(')) {
+                const match = onsubmitAttr.match(/confirm\(['"](.*?)['"]\)/);
+                if (match && match[1]) {
+                    textToShow = match[1];
+                }
+            }
+
+            if (textToShow) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                Swal.fire({
+                    title: titleToShow,
+                    html: textToShow,
+                    icon: isDanger ? 'warning' : 'question',
+                    iconColor: isDanger ? '#eab308' : '#1e3a5f',
+                    showCancelButton: true,
+                    confirmButtonText: confirmBtnText,
+                    cancelButtonText: 'Hủy bỏ',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'custom-swal-popup',
+                        title: 'custom-swal-title',
+                        htmlContainer: 'custom-swal-text',
+                        confirmButton: 'custom-swal-confirm-btn ' + (isDanger ? 'custom-swal-confirm-danger' : ''),
+                        cancelButton: 'custom-swal-cancel-btn'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.dataset.confirmed = 'true';
+                        form.removeAttribute('onsubmit');
+                        form.submit();
+                    }
+                });
+
+                return false;
+            }
+        }, true);
     </script>
+
+    @if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        iconColor: '#166534',
+                        title: 'Thành công',
+                        text: @json(session('success')),
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3500,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'custom-swal-toast'
+                        }
+                    });
+                }
+            });
+        </script>
+    @endif
+
+    @if(session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        iconColor: '#dc2626',
+                        title: 'Có lỗi xảy ra',
+                        text: @json(session('error')),
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            popup: 'custom-swal-popup',
+                            title: 'custom-swal-title',
+                            htmlContainer: 'custom-swal-text',
+                            confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                        },
+                        buttonsStyling: false
+                    });
+                }
+            });
+        </script>
+    @endif
     @stack('scripts')
 </body>
 

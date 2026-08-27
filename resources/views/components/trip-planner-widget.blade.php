@@ -1190,10 +1190,75 @@
         .tp-result-footer-side { width: 100%; margin-left: 0; justify-content: space-between; }
         .tp-btn-save { width: 100%; }
     }
-    @media (max-width: 480px) {
-        .tp-card-grid.cols-2 { grid-template-columns: 1fr; }
-        .tp-right { max-height: 120px; }
-        .tp-result-title { font-size: 1rem; }
+    /* Custom SweetAlert2 Theme for Ninh Bình POI Widget */
+    .swal2-container {
+        z-index: 20000 !important;
+    }
+    .custom-swal-popup {
+        border-radius: 16px !important;
+        padding: 1.5rem 1.75rem !important;
+        font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+        border: 1px solid #cbdbe8 !important;
+        box-shadow: 0 20px 25px -5px rgba(30, 58, 95, 0.12), 0 8px 10px -6px rgba(30, 58, 95, 0.06) !important;
+        background: #ffffff !important;
+    }
+    .custom-swal-title {
+        color: #1e3a5f !important;
+        font-size: 1.15rem !important;
+        font-weight: 600 !important;
+        padding-top: 0.25rem !important;
+    }
+    .custom-swal-text {
+        color: #334155 !important;
+        font-size: 0.875rem !important;
+        margin-top: 0.4rem !important;
+        line-height: 1.5 !important;
+    }
+    .custom-swal-confirm-btn {
+        background-color: #1e3a5f !important;
+        color: #ffffff !important;
+        font-size: 0.825rem !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1.25rem !important;
+        border-radius: 8px !important;
+        border: none !important;
+        margin: 0.25rem !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
+        box-shadow: none !important;
+    }
+    .custom-swal-confirm-btn:hover {
+        background-color: #0f2442 !important;
+        color: #ffffff !important;
+    }
+    .custom-swal-confirm-danger {
+        background-color: #dc2626 !important;
+        color: #ffffff !important;
+    }
+    .custom-swal-confirm-danger:hover {
+        background-color: #b91c1c !important;
+        color: #ffffff !important;
+    }
+    .custom-swal-cancel-btn {
+        background-color: #f1f5f9 !important;
+        color: #475569 !important;
+        font-size: 0.825rem !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1.25rem !important;
+        border-radius: 8px !important;
+        border: 1px solid #cbdbe8 !important;
+        margin: 0.25rem !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease !important;
+        box-shadow: none !important;
+    }
+    .custom-swal-cancel-btn:hover {
+        background-color: #e2e8f0 !important;
+        color: #1e3a5f !important;
+    }
+    .custom-swal-toast {
+        border-radius: 10px !important;
+        font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, sans-serif !important;
     }
 </style>
 
@@ -2864,52 +2929,206 @@ document.addEventListener('DOMContentLoaded', function() {
         saveBtn.addEventListener('click', () => {
             if (!currentItinerary || saveBtn.disabled) return;
 
+            // 1. Kiểm tra đăng nhập
             if (!IS_AUTHENTICATED) {
-                if (confirm('Bạn cần đăng nhập để lưu lịch trình vào trang cá nhân. Đến trang đăng nhập?')) {
-                    window.location.href = LOGIN_URL + '?redirect=' + encodeURIComponent(window.location.pathname + '#trip-planner');
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Yêu cầu đăng nhập',
+                        html: 'Bạn cần đăng nhập để lưu lịch trình vào trang cá nhân. Bạn có muốn đến trang đăng nhập không?',
+                        icon: 'info',
+                        iconColor: '#1e3a5f',
+                        showCancelButton: true,
+                        confirmButtonText: 'Đăng nhập',
+                        cancelButtonText: 'Để sau',
+                        reverseButtons: true,
+                        customClass: {
+                            popup: 'custom-swal-popup',
+                            title: 'custom-swal-title',
+                            htmlContainer: 'custom-swal-text',
+                            confirmButton: 'custom-swal-confirm-btn',
+                            cancelButton: 'custom-swal-cancel-btn'
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = LOGIN_URL + '?redirect=' + encodeURIComponent(window.location.pathname + '#trip-planner');
+                        }
+                    });
+                } else {
+                    if (confirm('Bạn cần đăng nhập để lưu lịch trình vào trang cá nhân. Đến trang đăng nhập?')) {
+                        window.location.href = LOGIN_URL + '?redirect=' + encodeURIComponent(window.location.pathname + '#trip-planner');
+                    }
                 }
                 return;
             }
 
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Đang lưu...';
+            const itineraryTitle = currentItinerary.title || 'Lịch trình du lịch';
 
-            fetch('{{ route("client.trip_planner.save") }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-                body: JSON.stringify({
-                    itinerary: currentItinerary,
-                    answers: lastAnswersPayload,
-                }),
-            })
-            .then(async res => {
-                const data = await res.json().catch(() => ({}));
-                if (res.status === 401 || data.need_login) {
-                    saveBtn.disabled = false;
-                    saveBtn.textContent = 'Lưu hành trình';
-                    if (confirm('Bạn cần đăng nhập để lưu. Đến trang đăng nhập?')) {
-                        window.location.href = LOGIN_URL;
+            // Hàm thực thi lưu lịch trình lên Server
+            const doSave = () => {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Đang lưu...';
+
+                fetch('{{ route("client.trip_planner.save") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        itinerary: currentItinerary,
+                        answers: lastAnswersPayload,
+                    }),
+                })
+                .then(async res => {
+                    const data = await res.json().catch(() => ({}));
+                    if (res.status === 401 || data.need_login) {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Lưu hành trình';
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                title: 'Hết phiên đăng nhập',
+                                text: 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.',
+                                icon: 'warning',
+                                iconColor: '#eab308',
+                                confirmButtonText: 'Đăng nhập',
+                                customClass: {
+                                    popup: 'custom-swal-popup',
+                                    title: 'custom-swal-title',
+                                    htmlContainer: 'custom-swal-text',
+                                    confirmButton: 'custom-swal-confirm-btn'
+                                },
+                                buttonsStyling: false
+                            }).then(() => { window.location.href = LOGIN_URL; });
+                        } else {
+                            if (confirm('Bạn cần đăng nhập để lưu. Đến trang đăng nhập?')) {
+                                window.location.href = LOGIN_URL;
+                            }
+                        }
+                        return;
                     }
-                    return;
-                }
-                if (!data.success) {
+                    if (!data.success) {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Lưu hành trình';
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                title: 'Không thể lưu',
+                                text: data.error || 'Không lưu được lịch trình.',
+                                icon: 'error',
+                                iconColor: '#dc2626',
+                                confirmButtonText: 'Đóng',
+                                customClass: {
+                                    popup: 'custom-swal-popup',
+                                    title: 'custom-swal-title',
+                                    htmlContainer: 'custom-swal-text',
+                                    confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                                },
+                                buttonsStyling: false
+                            });
+                        } else {
+                            alert(data.error || 'Không lưu được lịch trình.');
+                        }
+                        return;
+                    }
+                    saveBtn.classList.add('saved');
+                    saveBtn.textContent = 'Đã lưu ✓';
+                    try { clearTripDraftStorage(); } catch (e) {}
+
+                    // Hiển thị Popup Modal thông báo lưu thành công và hỏi chuyển sang trang cá nhân
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Lưu lịch trình thành công',
+                            html: 'Lịch trình <strong>"' + tpEsc(itineraryTitle) + '"</strong> đã được lưu vào tài khoản của bạn.<br>Bạn có muốn mở trang cá nhân để xem ngay không?',
+                            icon: 'success',
+                            iconColor: '#166534',
+                            showCancelButton: true,
+                            confirmButtonText: 'Xem trang cá nhân',
+                            cancelButtonText: 'Ở lại trang này',
+                            reverseButtons: true,
+                            customClass: {
+                                popup: 'custom-swal-popup',
+                                title: 'custom-swal-title',
+                                htmlContainer: 'custom-swal-text',
+                                confirmButton: 'custom-swal-confirm-btn',
+                                cancelButton: 'custom-swal-cancel-btn'
+                            },
+                            buttonsStyling: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = (data.profile_url || PROFILE_URL + '#itineraries');
+                            }
+                        });
+                    } else {
+                        if (confirm('Đã lưu vào trang cá nhân. Mở trang cá nhân để xem?')) {
+                            window.location.href = (data.profile_url || PROFILE_URL + '#itineraries');
+                        }
+                    }
+                })
+                .catch(() => {
                     saveBtn.disabled = false;
                     saveBtn.textContent = 'Lưu hành trình';
-                    alert(data.error || 'Không lưu được lịch trình.');
-                    return;
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Lỗi kết nối',
+                            text: 'Không thể kết nối tới máy chủ. Vui lòng thử lại.',
+                            icon: 'error',
+                            iconColor: '#dc2626',
+                            confirmButtonText: 'Đóng',
+                            customClass: {
+                                popup: 'custom-swal-popup',
+                                title: 'custom-swal-title',
+                                htmlContainer: 'custom-swal-text',
+                                confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    } else {
+                        alert('Không thể kết nối máy chủ.');
+                    }
+                });
+            };
+
+            // 2. Hỏi xác nhận TRƯỚC khi gửi request lưu lên Server
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Lưu lịch trình',
+                    html: 'Bạn có chắc chắn muốn lưu lịch trình <strong>"' + tpEsc(itineraryTitle) + '"</strong> vào trang cá nhân không?',
+                    icon: 'question',
+                    iconColor: '#1e3a5f',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý lưu',
+                    cancelButtonText: 'Hủy bỏ',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'custom-swal-popup',
+                        title: 'custom-swal-title',
+                        htmlContainer: 'custom-swal-text',
+                        confirmButton: 'custom-swal-confirm-btn',
+                        cancelButton: 'custom-swal-cancel-btn'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        doSave();
+                    } else {
+                        // Người dùng bấm "Hủy bỏ" -> Tuyệt đối không gửi request, không lưu vào DB
+                        Swal.fire({
+                            icon: 'info',
+                            iconColor: '#64748b',
+                            title: 'Đã hủy thao tác lưu',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2500,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'custom-swal-toast'
+                            }
+                        });
+                    }
+                });
+            } else {
+                if (confirm('Bạn có chắc chắn muốn lưu lịch trình "' + itineraryTitle + '" vào trang cá nhân không?')) {
+                    doSave();
                 }
-                saveBtn.classList.add('saved');
-                saveBtn.textContent = 'Đã lưu ✓';
-                try { clearTripDraftStorage(); } catch (e) {}
-                if (confirm('Đã lưu vào trang cá nhân. Mở trang cá nhân để xem?')) {
-                    window.location.href = (data.profile_url || PROFILE_URL + '#itineraries');
-                }
-            })
-            .catch(() => {
-                saveBtn.disabled = false;
-                saveBtn.textContent = 'Lưu hành trình';
-                alert('Không thể kết nối máy chủ.');
-            });
+            }
         });
     }
 
