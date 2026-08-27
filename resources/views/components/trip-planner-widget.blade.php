@@ -1,4 +1,4 @@
-<!-- AI Trip Planner Widget — Refined Hybrid UI -->
+﻿<!-- AI Trip Planner Widget — Refined Hybrid UI -->
 <style>
     /* ═══════════════════════════════════════════════════
        OVERLAY & CONTAINER
@@ -2712,7 +2712,7 @@ document.addEventListener('DOMContentLoaded', function() {
             maxBoundsViscosity: 0.8,
             maxZoom: 20,
         });
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        L.tileLayer(@json(config('services.carto.tile_url')), {
             maxZoom: 20,
         }).addTo(tpMiniMap);
         L.control.zoom({ position: 'topleft' }).addTo(tpMiniMap);

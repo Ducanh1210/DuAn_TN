@@ -3,26 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Http\Requests\Admin\User\StoreUserRequest;
 use App\Http\Requests\Admin\User\UpdateUserRequest;
-use App\Http\Requests\Admin\User\AdjustUserPointsRequest;
-
 use App\Models\User;
-use App\Services\PointService;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
- * Controller quản trị người dùng: liệt kê, thêm, sửa, xóa, khóa/mở khóa và điều chỉnh điểm.
+ * Controller quản trị người dùng: liệt kê, thêm, sửa, xóa, khóa/mở khóa.
  */
 class UserController extends Controller
 {
     /** Danh sách người dùng (ẩn tài khoản admin). */
     public function index()
     {
-        // Loại bỏ các tài khoản có vai trò 'admin' khỏi danh sách
         $users = User::where('role', '!=', 'admin')->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.users.index', compact('users'));
     }
@@ -46,7 +39,7 @@ class UserController extends Controller
         $user->role = $validated['role'];
         $user->status = $validated['status'];
         $user->provider = 'local';
-        
+
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
             $user->avatar_url = 'avatars/' . basename($path);
@@ -57,25 +50,12 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được tạo thành công.');
     }
 
-    /** Trang chi tiết người dùng kèm lịch sử điểm (phân trang từ dữ liệu đã tổng hợp). */
+    /** Trang chi tiết người dùng. */
     public function show(string $id)
     {
         $user = User::findOrFail($id);
 
-        $historyData = PointService::aggregatedHistory($user->id);
-        $perPage = 15;
-        $page = (int) request('points_page', 1);
-        $items = collect($historyData['history']);
-
-        $pointHistory = new LengthAwarePaginator(
-            $items->forPage($page, $perPage)->values(),
-            $items->count(),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'pageName' => 'points_page']
-        );
-
-        return view('admin.users.show', compact('user', 'pointHistory', 'historyData'));
+        return view('admin.users.show', compact('user'));
     }
 
     /** Form sửa người dùng. */
@@ -96,13 +76,12 @@ class UserController extends Controller
         $user->display_name = $validated['display_name'];
         $user->role = $validated['role'];
         $user->status = $validated['status'];
-        
+
         if (!empty($validated['password'])) {
             $user->password_hash = md5($validated['password']);
         }
 
         if ($request->hasFile('avatar')) {
-            // Xóa file avatar cũ nếu là ảnh nội bộ
             if ($user->avatar_url && str_contains($user->avatar_url, 'avatars/') && !str_starts_with($user->avatar_url, 'http')) {
                 Storage::disk('public')->delete('avatars/' . basename($user->avatar_url));
             }
@@ -119,13 +98,13 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
-        
+
         if (auth()->id() == $user->id) {
             return redirect()->route('admin.users.index')->with('error', 'Bạn không thể xóa tài khoản của chính mình.');
         }
-        
+
         $user->delete();
-        
+
         return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được xóa thành công.');
     }
 
@@ -133,29 +112,15 @@ class UserController extends Controller
     public function toggleStatus(string $id)
     {
         $user = User::findOrFail($id);
-        
+
         if (auth()->id() == $user->id) {
             return redirect()->route('admin.users.index')->with('error', 'Bạn không thể khóa tài khoản của chính mình.');
         }
-        
+
         $user->status = $user->status === 'banned' ? 'active' : 'banned';
         $user->save();
-        
+
         $action = $user->status === 'banned' ? 'Khóa' : 'Mở khóa';
         return redirect()->route('admin.users.index')->with('success', "{$action} tài khoản thành công.");
-    }
-
-    /** Điều chỉnh điểm của người dùng (cộng hoặc trừ) kèm mô tả lý do. */
-    public function adjustPoints(AdjustUserPointsRequest $request, string $id)
-    {
-        $user = User::findOrFail($id);
-        $validated = $request->validated();
-
-        $amount = (int) $validated['amount'];
-        $description = $validated['description'];
-
-        \App\Services\PointService::awardPoints($user, $amount, 'manual_adjust', $description);
-
-        return redirect()->route('admin.users.show', $user->id)->with('success', 'Điểm số của người dùng đã được cập nhật.');
     }
 }

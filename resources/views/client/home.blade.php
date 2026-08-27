@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -2976,7 +2976,7 @@
         // Padding quá cao (như 2.0) sẽ tạo ra canvas khổng lồ (gấp 25 lần màn hình) gây giật lag
         const vectorRenderer = L.canvas({ padding: 0.5 });
         // Thêm Base Map
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        L.tileLayer(@json(config('services.carto.tile_url')), {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 20,

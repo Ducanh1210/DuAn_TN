@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\DB;
  */
 class LocationController extends Controller
 {
-    /** Danh sách địa điểm có tìm kiếm/lọc; kèm danh sách chủ doanh nghiệp để bật popup lý do khi xóa. */
+    /** Danh sách địa điểm có tìm kiếm/lọc; tab thùng rác (xóa tạm); kèm chủ DN để bắt buộc lý do khi xóa. */
     public function index(Request $request)
     {
         $sortDir = $request->input('sort_dir', 'desc');
@@ -33,7 +33,10 @@ class LocationController extends Controller
             $sortDir = 'desc';
         }
 
-        $query = Location::with('category')->orderBy('id', $sortDir);
+        $trash = $request->boolean('trash');
+        $query = $trash
+            ? Location::onlyTrashed()->with('category')->orderBy('deleted_at', $sortDir)
+            : Location::with('category')->orderBy('id', $sortDir);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -46,14 +49,33 @@ class LocationController extends Controller
         $locations = $query->paginate(20)->withQueryString();
         $categories = Category::where('status', 'active')->get();
 
-        // Danh sách user_id là chủ doanh nghiệp đã được duyệt -> địa điểm của họ cần popup lý do khi xóa
+        // Chủ DN đã duyệt (danh sách thường) + mọi hồ sơ DN (tab thùng rác: có thể đã bị hạ về rejected)
         $businessOwnerIds = BusinessProfile::where('status', 'approved')
             ->pluck('user_id')
             ->filter()
             ->values()
             ->all();
 
-        return view('admin.locations.index', compact('locations', 'categories', 'sortDir', 'businessOwnerIds'));
+        if ($trash) {
+            $trashedOwnerIds = $locations->pluck('created_by')->filter()->unique()->values()->all();
+            $businessOwnerIds = array_values(array_unique(array_merge(
+                $businessOwnerIds,
+                BusinessProfile::whereIn('user_id', $trashedOwnerIds)->pluck('user_id')->all()
+            )));
+        }
+
+        $activeCount = Location::count();
+        $trashedCount = Location::onlyTrashed()->count();
+
+        return view('admin.locations.index', compact(
+            'locations',
+            'categories',
+            'sortDir',
+            'businessOwnerIds',
+            'trash',
+            'activeCount',
+            'trashedCount'
+        ));
     }
 
     /** Hiển thị form tạo địa điểm mới. */
@@ -89,7 +111,27 @@ class LocationController extends Controller
         $categories = Category::where('status', 'active')->get();
         $images = $location->images;
         $panoramas = $location->panoramas;
-        return view('admin.locations.edit', compact('location', 'categories', 'images', 'panoramas'));
+
+        $isBusinessLocation = false;
+        $businessOwner = null;
+        if ($location->created_by) {
+            $approvedProfile = BusinessProfile::where('user_id', $location->created_by)
+                ->where('status', 'approved')
+                ->first();
+            if ($approvedProfile) {
+                $isBusinessLocation = true;
+                $businessOwner = User::find($location->created_by);
+            }
+        }
+
+        return view('admin.locations.edit', compact(
+            'location',
+            'categories',
+            'images',
+            'panoramas',
+            'isBusinessLocation',
+            'businessOwner'
+        ));
     }
 
     /** Cập nhật địa điểm, tạo lại slug nếu đổi tên và thay ảnh đại diện nếu upload mới. */
@@ -118,12 +160,11 @@ class LocationController extends Controller
     }
 
     /**
-     * Xóa địa điểm: dọn toàn bộ file liên quan. Nếu là địa điểm doanh nghiệp đã duyệt thì
-     * bắt buộc nhập lý do, gửi thông báo cho chủ, và hạ vai trò/xóa hồ sơ nếu đó là địa điểm cuối.
+     * Xóa tạm địa điểm (soft delete): giữ file & quan hệ để khôi phục.
+     * Địa điểm DN đã duyệt: bắt buộc lý do, thông báo chủ; nếu là địa điểm cuối → hạ vai trò + từ chối hồ sơ (giữ bản ghi).
      */
     public function destroy(Request $request, Location $location)
     {
-        // Xác định địa điểm này có thuộc một doanh nghiệp đã duyệt không
         $ownerId = $location->created_by;
         $businessProfile = null;
         if ($ownerId) {
@@ -133,12 +174,138 @@ class LocationController extends Controller
         }
         $isBusinessLocation = (bool) $businessProfile;
 
-        // Nếu là địa điểm doanh nghiệp -> bắt buộc nhập lý do xóa
         if ($isBusinessLocation) {
             $request->validate([
                 'delete_reason' => 'required|string|max:1000',
             ], [
                 'delete_reason.required' => 'Vui lòng nhập lý do xóa để thông báo cho doanh nghiệp.',
+            ]);
+        }
+
+        $deleteReason = trim((string) $request->input('delete_reason', ''));
+
+        try {
+            DB::transaction(function () use ($location, $ownerId, $businessProfile, $isBusinessLocation, $deleteReason) {
+                if ($isBusinessLocation && $businessProfile) {
+                    $hasOtherLocations = Location::where('created_by', $ownerId)
+                        ->where('id', '!=', $location->id)
+                        ->exists();
+
+                    UserNotification::create([
+                        'user_id' => $ownerId,
+                        'type' => 'business_location_removed',
+                        'title' => 'Địa điểm doanh nghiệp đã bị gỡ tạm',
+                        'message' => 'Địa điểm "' . $location->name . '" của bạn đã bị quản gỡ tạm khỏi bản đồ hệ thống.'
+                            . "\nLý do: " . $deleteReason
+                            . ($hasOtherLocations ? '' : "\nTài khoản doanh nghiệp tạm ngưng.")
+                            . "\nNếu cần hỗ trợ, vui lòng liên hệ hotline 1800 400 389 để được tư vấn và hỗ trợ.",
+                        'link' => route('client.profile'),
+                    ]);
+
+                    if (!$hasOtherLocations) {
+                        $owner = User::find($ownerId);
+                        if ($owner && $owner->role === 'business') {
+                            $owner->update(['role' => 'user']);
+                        }
+                        $businessProfile->update([
+                            'status' => 'rejected',
+                            'reject_reason' => Location::BIZ_SOFT_DELETE_REASON_PREFIX
+                                . ' Địa điểm "' . $location->name . '" đã bị gỡ khỏi bản đồ hệ thống. Lý do: ' . $deleteReason,
+                        ]);
+                    }
+                }
+
+                $location->delete();
+            });
+
+            $msg = $isBusinessLocation
+                ? 'Đã xóa địa điểm và gửi thông báo lý do đến doanh nghiệp.'
+                : 'Đã xóa địa điểm thành công.';
+
+            return redirect()->route('admin.locations.index', $request->only(['search', 'category_id', 'sort_dir']))
+                ->with('success', $msg);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Không thể xóa tạm địa điểm. Vui lòng thử lại.');
+        }
+    }
+
+    /**
+     * Khôi phục địa điểm từ thùng rác.
+     * Nếu hồ sơ DN bị từ chối do gỡ tạm địa điểm này → duyệt lại + trả vai trò business.
+     */
+    public function restore(Request $request, int $id)
+    {
+        $location = Location::onlyTrashed()->findOrFail($id);
+
+        try {
+            DB::transaction(function () use ($location) {
+                $location->restore();
+
+                $ownerId = $location->created_by;
+                if (!$ownerId) {
+                    return;
+                }
+
+                $profile = BusinessProfile::where('user_id', $ownerId)->first();
+                if (!$profile) {
+                    return;
+                }
+
+                $reason = (string) ($profile->reject_reason ?? '');
+                $wasSoftRemoved = $profile->status === 'rejected'
+                    && str_starts_with($reason, Location::BIZ_SOFT_DELETE_REASON_PREFIX);
+
+                if ($wasSoftRemoved) {
+                    $profile->update([
+                        'status' => 'approved',
+                        'reject_reason' => null,
+                    ]);
+
+                    $owner = User::find($ownerId);
+                    if ($owner && in_array($owner->role, ['user', 'member'], true)) {
+                        $owner->update(['role' => 'business']);
+                    }
+
+                    UserNotification::create([
+                        'user_id' => $ownerId,
+                        'type' => 'business_location_restored',
+                        'title' => 'Địa điểm doanh nghiệp đã được khôi phục',
+                        'message' => 'Địa điểm "' . $location->name . '" đã được quản trị viên khôi phục. Tài khoản doanh nghiệp của bạn đã hoạt động trở lại.',
+                        'link' => route('business.dashboard'),
+                    ]);
+                }
+            });
+
+            return redirect()->route('admin.locations.index', ['trash' => 1] + $request->only(['search', 'category_id', 'sort_dir']))
+                ->with('success', 'Đã khôi phục địa điểm thành công.');
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Không thể khôi phục địa điểm. Vui lòng thử lại.');
+        }
+    }
+
+    /**
+     * Xóa vĩnh viễn địa điểm trong thùng rác: dọn file media, cascade quan hệ.
+     * Địa điểm DN: bắt buộc lý do nếu hồ sơ còn tồn tại; không tạo lại hồ sơ đã xử lý lúc soft-delete.
+     */
+    public function forceDestroy(Request $request, int $id)
+    {
+        $location = Location::onlyTrashed()->with(['images', 'panoramas'])->findOrFail($id);
+
+        $ownerId = $location->created_by;
+        $businessProfile = $ownerId
+            ? BusinessProfile::where('user_id', $ownerId)->first()
+            : null;
+        $isBusinessLocation = (bool) $businessProfile;
+
+        if ($isBusinessLocation) {
+            $request->validate([
+                'delete_reason' => 'required|string|max:1000',
+            ], [
+                'delete_reason.required' => 'Vui lòng nhập lý do xóa vĩnh viễn để lưu hồ sơ / thông báo.',
             ]);
         }
 
@@ -163,46 +330,114 @@ class LocationController extends Controller
                     Storage::disk('public')->delete($location->audio_url);
                 }
 
-                // Xử lý phía doanh nghiệp: gửi thông báo kèm lý do, xóa hồ sơ khỏi quản lý, hạ vai trò
-                if ($isBusinessLocation && $businessProfile) {
-                    // Chỉ dọn hồ sơ doanh nghiệp nếu đây là địa điểm cuối cùng của họ
-                    $hasOtherLocations = Location::where('created_by', $ownerId)
-                        ->where('id', '!=', $location->id)
-                        ->exists();
-
+                if ($isBusinessLocation && $businessProfile && $ownerId) {
                     UserNotification::create([
                         'user_id' => $ownerId,
                         'type' => 'business_location_removed',
-                        'title' => 'Địa điểm doanh nghiệp đã bị gỡ',
-                        'message' => 'Địa điểm "' . $location->name . '" của bạn đã bị quản trị viên gỡ khỏi hệ thống.'
+                        'title' => 'Địa điểm doanh nghiệp đã bị xóa vĩnh viễn',
+                        'message' => 'Địa điểm "' . $location->name . '" đã bị quản trị viên xóa vĩnh viễn khỏi hệ thống.'
                             . "\nLý do: " . $deleteReason
-                            . ($hasOtherLocations ? '' : "\nBạn có thể đăng ký lại nếu cần."),
+                            . "\nBạn có thể đăng ký lại tài khoản doanh nghiệp nếu cần."
+                            . "\nNếu cần hỗ trợ, vui lòng liên hệ hotline 1800 400 389 (Thứ Hai – Thứ Sáu, 8:00 – 17:30) hoặc gửi góp ý trong mục Hồ sơ.",
                         'link' => route('client.profile'),
                     ]);
 
+                    $hasOtherLocations = Location::withTrashed()
+                        ->where('created_by', $ownerId)
+                        ->where('id', '!=', $location->id)
+                        ->exists();
+
                     if (!$hasOtherLocations) {
-                        // Hạ vai trò user về thường
                         $owner = User::find($ownerId);
                         if ($owner && $owner->role === 'business') {
                             $owner->update(['role' => 'user']);
                         }
-                        // Xóa hẳn hồ sơ khỏi "Quản lý yêu cầu doanh nghiệp"
-                        $businessProfile->delete();
+                        // Hồ sơ có thể đã rejected lúc soft-delete — giữ bản ghi lịch sử, không hard-delete
+                        if ($businessProfile->status !== 'rejected') {
+                            $businessProfile->update([
+                                'status' => 'rejected',
+                                'reject_reason' => 'Địa điểm đã bị xóa vĩnh viễn. Lý do: ' . $deleteReason,
+                            ]);
+                        }
                     }
                 }
 
-                $location->delete();
+                $location->forceDelete();
             });
 
-            $msg = $isBusinessLocation
-                ? 'Đã xóa địa điểm và gửi thông báo lý do đến tài khoản doanh nghiệp.'
-                : 'Xóa địa điểm thành công! Dữ liệu yêu thích và bình luận liên quan cũng đã được gỡ khỏi người dùng.';
-
-            return back()->with('success', $msg);
+            return redirect()->route('admin.locations.index', ['trash' => 1] + $request->only(['search', 'category_id', 'sort_dir']))
+                ->with('success', 'Đã xóa vĩnh viễn địa điểm và dọn dữ liệu liên quan.');
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Không thể xóa địa điểm. Vui lòng thử lại hoặc liên hệ quản trị viên.');
+            return back()->with('error', 'Không thể xóa vĩnh viễn địa điểm. Vui lòng thử lại.');
+        }
+    }
+
+    /**
+     * Thu hồi quyền quản lý DN: giữ địa điểm trên map, gỡ created_by,
+     * hạ hồ sơ DN + role, gửi thông báo. Địa điểm lại có thể được nhận bởi DN khác.
+     */
+    public function revokeBusiness(Request $request, Location $location)
+    {
+        $ownerId = $location->created_by;
+        if (!$ownerId) {
+            return back()->with('error', 'Địa điểm này chưa có chủ doanh nghiệp.');
+        }
+
+        $businessProfile = BusinessProfile::where('user_id', $ownerId)
+            ->where('status', 'approved')
+            ->first();
+
+        if (!$businessProfile) {
+            return back()->with('error', 'Không tìm thấy hồ sơ doanh nghiệp đang hoạt động cho địa điểm này.');
+        }
+
+        $request->validate([
+            'revoke_reason' => 'required|string|max:1000',
+        ], [
+            'revoke_reason.required' => 'Vui lòng nhập lý do thu hồi quyền quản lý.',
+        ]);
+
+        $reason = trim((string) $request->input('revoke_reason'));
+
+        try {
+            DB::transaction(function () use ($location, $ownerId, $businessProfile, $reason) {
+                $location->update(['created_by' => null]);
+
+                $businessProfile->update([
+                    'status' => 'rejected',
+                    'reject_reason' => BusinessProfile::BIZ_REVOKED_REASON_PREFIX
+                        . ' Thu hồi quyền quản lý địa điểm "' . $location->name . '". Lý do: ' . $reason,
+                    'location_id' => null,
+                ]);
+
+                $owner = User::find($ownerId);
+                if ($owner && $owner->role === 'business') {
+                    $stillOwns = Location::where('created_by', $ownerId)->exists();
+                    if (!$stillOwns) {
+                        $owner->update(['role' => 'user']);
+                    }
+                }
+
+                UserNotification::create([
+                    'user_id' => $ownerId,
+                    'type' => 'business_management_revoked',
+                    'title' => 'Thu hồi quyền quản lý địa điểm',
+                    'message' => 'Quyền quản lý địa điểm "' . $location->name . '" đã bị thu hồi. Địa điểm vẫn hiển thị trên bản đồ.'
+                        . "\nLý do: " . $reason
+                        . "\nNếu cần hỗ trợ, vui lòng liên hệ hotline 1800 400 389 (Thứ Hai – Thứ Sáu, 8:00 – 17:30) hoặc gửi góp ý trong mục Hồ sơ.",
+                    'link' => route('client.profile'),
+                ]);
+            });
+
+            return redirect()
+                ->route('admin.locations.edit', [$location->id] + $request->only(['search', 'category_id', 'sort_dir']))
+                ->with('success', 'Đã thu hồi quyền quản lý doanh nghiệp. Địa điểm vẫn còn trên bản đồ.');
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Không thể thu hồi quyền quản lý. Vui lòng thử lại.');
         }
     }
 

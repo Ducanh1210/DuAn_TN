@@ -1,196 +1,138 @@
-# 🗺️ TỔNG HỢP DANH SÁCH CHỨC NĂNG HỆ THỐNG NINH BÌNH POI 360°
+# DANH SÁCH CHỨC NĂNG — Ninh Bình Travel Hub
 
-Hệ thống **Ninh Bình POI** là nền tảng bản đồ du lịch số kết hợp trải nghiệm thực tế ảo VR Tour 360°, tích hợp Trợ lý AI và hệ thống Gamification tương tác. 
+Website khám phá và trải nghiệm Ninh Bình – Travel Hub  
+Phân theo 4 nhóm quyền: Khách tham quan | Thành viên | Chủ doanh nghiệp | Quản trị viên / Kiểm duyệt viên
 
-Dưới đây là danh sách chi tiết toàn bộ chức năng của ứng dụng được phân chia rõ ràng theo từng nhóm đối tượng sử dụng và vai trò trong hệ thống.
+> Bản này đối chiếu theo code hiện tại (Laravel 10, routes/controllers/views). Không ghi chức năng chưa có trong hệ thống.
 
 ---
 
-## 📌 BẢNG TỔNG QUAN PHÂN QUYỀN HỆ THỐNG
+## Bảng tổng quan phân quyền
 
-| Nhóm đối tượng | Vai trò / Phân quyền | Mô tả ngắn |
+| Nhóm đối tượng | Vai trò | Mô tả ngắn |
 | :--- | :--- | :--- |
-| **Guest / Public Client** | Khách truy cập | Chưa đăng nhập, trải nghiệm bản đồ, xem VR 360°, tin tức, sự kiện, gửi yêu cầu dịch vụ. |
-| **Authenticated User** | Thành viên đã đăng nhập | Sử dụng các tính năng tương tác, lưu địa điểm, lập lịch trình AI, làm nhiệm vụ nhận quà, gửi báo cáo/đóng góp. |
-| **Business Owner** | Chủ Doanh nghiệp | Quản lý địa điểm thuộc sở hữu, cập nhật thông tin liên hệ, phản hồi bình luận khách hàng, quản lý ảnh. |
-| **Admin / Moderator** | Quản trị viên hệ thống | Toàn quyền quản lý dữ liệu, kiểm duyệt AI, duyệt doanh nghiệp, biên tập Tour 360°, quản lý người dùng. |
+| Khách tham quan | Guest / Public Client | Chưa đăng nhập: xem landing, bản đồ, Tour 360°, tin tức, sự kiện, chatbot AI, tạo lịch trình AI (chưa lưu), gửi yêu cầu dịch vụ Tour 360°. |
+| Thành viên đã đăng nhập | Authenticated User | Toàn bộ quyền Guest + hồ sơ, yêu thích, đánh giá, đề xuất địa điểm, báo cáo/góp ý, lưu lịch trình, nhiệm vụ–điểm thưởng, đăng ký doanh nghiệp. |
+| Chủ doanh nghiệp | Business Owner | Tài khoản đã được Admin duyệt: dashboard địa điểm, cập nhật mô tả/liên hệ, quản lý ảnh, trả lời bình luận. |
+| Quản trị viên hệ thống | Admin & Moderator | Quản trị dữ liệu, biên tập 360°, kiểm duyệt, duyệt doanh nghiệp/đóng góp, soft-delete địa điểm. *(Cùng nhóm route `/admin`.)* |
 
 ---
 
-## 1. 🌐 KHÁCH THAM QUAN (GUEST / PUBLIC CLIENT)
+## Bảng chức năng chi tiết (4 cột)
 
-Chức năng dành cho tất cả người dùng khi truy cập vào hệ thống (không bắt buộc đăng nhập):
-
-### 1.1. Trang Chủ & Giới Thiệu (Landing Page)
-- **Trải nghiệm trang giới thiệu:** Xem video/hình ảnh ấn tượng về du lịch Ninh Bình, các thông số thống kê nổi bật (số địa điểm, lượt xem, ảnh 360°).
-- **Danh sách địa điểm nổi bật:** Hiển thị các địa điểm thu hút lượt xem cao nhất kèm hình ảnh đại diện và số lượng cảnh 360°.
-- **Bản tin & Sự kiện mới nhất:** Xem danh sách bài viết tin tức du lịch và các sự kiện nổi bật sắp diễn ra.
-- **Đăng ký Dịch vụ Tour 360°:** Gửi thông tin đăng ký dịch vụ chụp và dựng VR Tour 360° dành cho cá nhân/doanh nghiệp có nhu cầu.
-
-### 1.2. Bản Đồ Du Lịch Tương Tác (Interactive Tourism Map)
-- **Xem bản đồ POI:** Hiển thị trực quan vị trí các điểm du lịch tại Ninh Bình trên bản đồ số.
-- **Bộ lọc danh mục (Category Filter):** Lọc địa điểm theo loại hình (Danh lam thắng cảnh, Di tích lịch sử, Khách sạn, Nhà hàng, Văn hóa - Lễ hội,...).
-- **Marker custom theo danh mục:** Mỗi danh mục địa điểm có icon riêng biệt trên bản đồ.
-- **Banner tin tức trên bản đồ:** Tích hợp slider trình chiếu tin tức du lịch mới nhất ngay trên giao diện bản đồ.
-
-### 1.3. Trải Nghiệm Tour Thực Tế Ảo (360° VR Viewer)
-- **Xem toàn cảnh 360°:** Khám phá địa điểm với góc nhìn 360 độ sắc nét.
-- **Chuyển cảnh thông minh (Hotspot Navigation):** Bấm vào các điểm Hotspot trên ảnh 360° để di chuyển sang các khu vực/góc nhìn khác trong cùng địa điểm.
-- **Thuyết minh âm thanh (Audio Guide):** Bật/Tắt bài thuyết minh âm thanh tự động giới thiệu chi tiết về địa điểm.
-- **Bộ sưu tập ảnh (Gallery):** Xem các hình ảnh chụp 2D chất lượng cao của địa điểm.
-- **Đếm lượt xem (View Counter):** Tự động ghi nhận và tăng lượt xem của địa điểm khi du khách truy cập.
-- **Xem bình luận cộng đồng:** Đọc các đánh giá, cảm nhận và phản hồi từ những du khách khác.
-
-### 1.4. Tin Tức & Sự Kiện Du Lịch
-- **Trang danh sách Tin tức:** Xem danh sách tin tức, bài viết quảng bá văn hóa du lịch Ninh Bình.
-- **Trang danh sách Sự kiện:** Xem các sự kiện, lễ hội kèm mốc thời gian bắt đầu/kết thúc và địa điểm diễn ra.
-- **Trang chi tiết bài viết:** Đọc nội dung chi tiết bài viết kèm hình ảnh minh họa.
-
-### 1.5. Trợ Lý AI & Lập Kế Hoạch Chuyến Đi (AI Assistant & Trip Planner)
-- **Chatbot tư vấn du lịch AI:** Trò chuyện trực tiếp với Trợ lý AI để hỏi đáp thông tin du lịch, thời tiết, ẩm thực, di chuyển tại Ninh Bình (sử dụng Google Gemini AI).
-- **Tự động tạo lịch trình du lịch (AI Trip Planner):** Nhập số ngày, ngân sách, sở thích $\rightarrow$ AI tự động phân tích và tạo lịch trình tham quan tối ưu từng ngày.
-
----
-
-## 2. 👤 THÀNH VIÊN ĐÃ ĐĂNG NHẬP (AUTHENTICATED USER)
-
-Bao gồm toàn bộ chức năng của **Guest**, tích hợp thêm các tính năng cá nhân hóa và tương tác cộng đồng:
-
-### 2.1. Xác Thực & Quản Lý Tài Khoản (Authentication & Profile)
-- **Đăng ký / Đăng nhập:** Bằng Email & Mật khẩu cá nhân.
-- **Đăng nhập nhanh Google:** Đăng nhập 1-click thông qua tài khoản Google (Google OAuth 2.0).
-- **Quản lý hồ sơ (Profile Management):**
-  - Cập nhật thông tin cá nhân: Họ tên, Số điện thoại, Địa chỉ, Bio giới thiệu.
-  - Đổi ảnh đại diện (Avatar).
-  - Đổi mật khẩu tài khoản.
-  - Yêu cầu xóa tài khoản cá nhân.
-
-### 2.2. Tương Tác Địa Điểm & Cộng Đồng
-- **Yêu thích địa điểm (Favorites):** Thêm/Xóa địa điểm vào danh sách yêu thích cá nhân để dễ dàng xem lại.
-- **Bình luận & Thảo luận:**
-  - Gửi bình luận đánh giá tại các trang Tour 360°.
-  - Phản hồi (Reply) bình luận của người dùng khác.
-  - Chỉnh sửa hoặc Xóa bình luận của chính mình.
-- **Đề xuất địa điểm mới (Community Contribution):** Gửi thông tin địa điểm du lịch mới chưa có trên hệ thống để Admin kiểm duyệt và đưa lên bản đồ.
-- **Báo cáo vi phạm & Góp ý hệ thống:**
-  - Báo cáo các bình luận có nội dung không phù hợp/spam.
-  - Gửi góp ý, báo lỗi hệ thống cho ban quản trị.
-
-### 2.3. Quản Lý Lịch Trình Chuyến Đi (Trip Planner Management)
-- **Lưu lịch trình AI:** Lưu lại các kế hoạch du lịch do AI tạo ra vào tài khoản cá nhân.
-- **Quản lý danh sách lịch trình:** Xem lại chi tiết từng lịch trình đã lưu hoặc xóa lịch trình không còn nhu cầu.
-
-### 2.4. Hệ Thống Nhiệm Vụ & Đổi Thưởng (Gamification System)
-- **Điểm danh hàng ngày (Daily Check-in):** Đăng nhập mỗi ngày để nhận điểm thưởng (Points).
-- **Hệ thống Nhiệm vụ (Missions):**
-  - Thực hiện các nhiệm vụ như: Xem Tour 360°, viết bình luận, đề xuất địa điểm,... để tích lũy điểm kinh nghiệm và điểm thưởng.
-  - Thưởng mốc (Milestones): Nhận quà tặng đặc biệt khi hoàn thành các cột mốc nhiệm vụ.
-- **Cửa hàng đổi quà & Khung đại diện (Rewards & Avatar Frames Shop):**
-  - Dùng điểm thưởng đổi lấy các **Khung đại diện (Avatar Frames)** độc đáo.
-  - Dùng điểm đổi các quà tặng / voucher ưu đãi.
-- **Trang bị khung đại diện:** Đổi khung đại diện đang sử dụng (khung đại diện sẽ hiển thị nổi bật quanh avatar ở phần bình luận).
-
-### 2.5. Đăng Ký Tài Khoản Doanh Nghiệp (Business Upgrade)
-- **Gửi hồ sơ nâng cấp:** Người dùng sở hữu địa điểm kinh doanh tại Ninh Bình có thể gửi đơn đăng ký nâng cấp tài khoản cá nhân thành tài khoản Doanh nghiệp (điền tên DN, địa chỉ, giấy phép kinh doanh, ảnh minh chứng).
-- **Theo dõi & Quản lý yêu cầu:** Xem trạng thái xét duyệt của Admin hoặc hủy yêu cầu khi cần.
-
----
-
-## 3. 🏢 CHỦ DOANH NGHIỆP (BUSINESS OWNER PORTAL)
-
-Portal dành riêng cho tài khoản đã được Admin duyệt thành công vai trò **Doanh nghiệp**:
-
-### 3.1. Trang Quan Sát & Thống Kê (Business Dashboard)
-- Xem tổng quan lượt truy cập, lượt xem Tour 360°, số lượng bình luận và tương tác tại địa điểm thuộc sở hữu của doanh nghiệp.
-
-### 3.2. Quản Lý Thông Tin Địa Điểm Kinh Doanh
-- **Cập nhật thông tin chi tiết:** Cập nhật mô tả giới thiệu, giờ mở cửa, giá vé tham quan/dịch vụ, địa chỉ cụ thể.
-- **Cập nhật thông tin liên hệ:** Số điện thoại hotline, Email, địa chỉ Website, đường link Fanpage Facebook.
-
-### 3.3. Quản Lý Thư Viện Hình Ảnh
-- Tải lên (Upload) hình ảnh thực tế chất lượng cao của cơ sở kinh doanh/địa điểm.
-- Xóa ảnh cũ hoặc không còn phù hợp khỏi bộ sưu tập của địa điểm.
-
-### 3.4. Quản Lý Tương Tác & Chăm Sóc Khách Hàng
-- Xem danh sách toàn bộ bình luận của du khách tại địa điểm của mình.
-- **Trả lời bình luận (Official Business Reply):** Phản hồi trực tiếp các thắc mắc/đánh giá của du khách dưới danh nghĩa **Chủ doanh nghiệp** (có huy hiệu Doanh nghiệp xác minh).
-- Chỉnh sửa hoặc Xóa câu trả lời của doanh nghiệp.
+| Quyền / Vai trò | Chức năng | Chi tiết chức năng | Mô tả từng chức năng nhỏ |
+| :--- | :--- | :--- | :--- |
+| Khách tham quan (Guest / Public Client) | Trang chủ & Giới thiệu (Landing Page) | Trải nghiệm trang giới thiệu | Xem hình ảnh / nội dung giới thiệu du lịch Ninh Bình; thống kê số địa điểm, tin tức, sự kiện đã công bố. |
+|  |  | Danh sách địa điểm nổi bật | Hiển thị địa điểm có lượt xem cao kèm ảnh đại diện và thông tin Tour 360° (nếu có). |
+|  |  | Bản tin & Sự kiện mới nhất | Xem tin tức du lịch và sự kiện sắp diễn ra trên trang chủ. |
+|  |  | Trang Giới thiệu | Đọc nội dung giới thiệu vùng đất Ninh Bình và một số địa điểm tiêu biểu. |
+|  |  | Đăng ký Dịch vụ Tour 360° | Gửi form đăng ký dịch vụ chụp/dựng VR Tour 360° (tên, SĐT, địa điểm, nhu cầu); hệ thống chặn gửi trùng khi còn yêu cầu đang chờ. |
+|  | Bản đồ Du lịch tương tác (Interactive Map) | Xem bản đồ POI | Hiển thị vị trí các điểm du lịch Ninh Bình trên bản đồ số (Leaflet), có gom nhóm marker (MarkerCluster). |
+|  |  | Tìm kiếm địa điểm | Nhập từ khóa để tìm và đưa bản đồ tới địa điểm tương ứng. |
+|  |  | Bộ lọc danh mục (Category Filter) | Lọc địa điểm theo loại hình (danh lam, di tích, lưu trú, ẩm thực,…). |
+|  |  | Marker theo danh mục | Mỗi danh mục có icon riêng trên bản đồ. |
+|  |  | Định vị GPS | Xác định vị trí hiện tại của người dùng trên bản đồ (nếu trình duyệt cho phép). |
+|  |  | Ranh giới khu vực | Hiển thị lớp overlay ranh giới khu vực trên bản đồ. |
+|  |  | Thời tiết / tin tức trên bản đồ | Widget thời tiết (Open-Meteo) và slider tin tức mới nhất ngay trên giao diện bản đồ. |
+|  |  | Khay Khám phá (Explore drawer) | Danh sách địa điểm dạng thẻ ngang; chọn địa điểm để bay tới marker trên bản đồ. |
+|  | Trải nghiệm Tour thực tế ảo (360° VR Viewer) | Xem toàn cảnh 360° | Khám phá địa điểm bằng trình xem panorama 360° (Marzipano). |
+|  |  | Chuyển cảnh Hotspot | Bấm hotspot để chuyển sang góc nhìn / khu vực 360° khác hoặc xem thông tin bổ sung. |
+|  |  | Thuyết minh âm thanh (Audio Guide) | Bật/tắt bài thuyết minh âm thanh giới thiệu địa điểm. |
+|  |  | Bộ sưu tập ảnh (Gallery) | Xem ảnh 2D chất lượng cao của địa điểm. |
+|  |  | Đếm lượt xem | Tự tăng `view_count` khi người dùng mở trang Tour 360°. |
+|  |  | Xem bình luận & đánh giá | Đọc đánh giá/bình luận của thành viên và phản hồi của chủ doanh nghiệp (nếu có). |
+|  | Tin tức & Sự kiện du lịch | Trang danh sách Tin tức | Xem danh sách bài viết tin tức du lịch đã công bố. |
+|  |  | Trang danh sách Sự kiện | Xem sự kiện/lễ hội kèm thời gian và địa điểm tổ chức. |
+|  |  | Trang chi tiết bài viết / sự kiện | Đọc nội dung chi tiết kèm hình ảnh minh họa. |
+|  | Trợ lý AI & Lập kế hoạch chuyến đi | Chatbot tư vấn du lịch AI | Trò chuyện với trợ lý AI (Google Gemini) về du lịch, ẩm thực, di chuyển tại Ninh Bình; gợi ý dựa trên dữ liệu địa điểm trong hệ thống. |
+|  |  | Tạo lịch trình AI (Trip Planner) | Trả lời khảo sát (loại chuyến, số ngày, ngân sách, nhịp độ, sở thích…) → AI tạo lịch trình theo ngày; khách xem được kết quả (lưu cần đăng nhập). |
+| Thành viên đã đăng nhập (Authenticated User) | Xác thực & Quản lý tài khoản | Đăng ký / Đăng nhập | Đăng ký và đăng nhập bằng email & mật khẩu. |
+|  |  | Đăng nhập nhanh Google | Đăng nhập / liên kết tài khoản qua Google OAuth 2.0. |
+|  |  | Hồ sơ cá nhân | Cập nhật tên hiển thị; xem điểm, thông báo, yêu thích, bình luận, lịch trình đã lưu, trạng thái doanh nghiệp. |
+|  |  | Đổi ảnh đại diện (Avatar) | Thay đổi ảnh đại diện tài khoản. |
+|  |  | Đổi mật khẩu | Cập nhật mật khẩu (áp dụng tài khoản đăng ký bằng email/mật khẩu). |
+|  |  | Xóa tài khoản | Yêu cầu xóa tài khoản khỏi hệ thống (có xác nhận). |
+|  | Tương tác địa điểm & Cộng đồng | Yêu thích địa điểm | Thêm/xóa địa điểm vào danh sách đã lưu; xem lại trong hồ sơ. |
+|  |  | Đánh giá / bình luận Tour 360° | Gửi đánh giá (sao) và bình luận tại trang Tour 360° (mỗi địa điểm một đánh giá của mình). |
+|  |  | Sửa / Xóa bình luận của mình | Chỉnh sửa hoặc xóa bình luận do chính mình đăng. |
+|  |  | Đề xuất địa điểm mới | Gửi thông tin địa điểm chưa có trên hệ thống (tên, mô tả, vị trí, ảnh…) để Admin kiểm duyệt. |
+|  |  | Báo cáo vi phạm | Báo cáo địa điểm hoặc bình luận có nội dung không phù hợp. |
+|  |  | Góp ý / báo lỗi hệ thống | Gửi góp ý hoặc báo lỗi (sai thông tin, vị trí, ảnh, gợi ý cải thiện…). |
+|  | Quản lý lịch trình chuyến đi | Lưu lịch trình AI | Lưu kế hoạch do Trip Planner tạo vào tài khoản. |
+|  |  | Xem / Xóa lịch trình đã lưu | Xem lại chi tiết lịch trình đã lưu hoặc xóa khi không còn nhu cầu. |
+|  | Hệ thống Nhiệm vụ & Đổi thưởng (Gamification) | Điểm danh hàng ngày | Điểm danh để nhận điểm thưởng theo chuỗi ngày. |
+|  |  | Nhiệm vụ (Missions) | Thực hiện nhiệm vụ (xem Tour 360°, bình luận, yêu thích, online…) để nhận điểm / phần thưởng. |
+|  |  | Thưởng mốc (Milestones) | Nhận khung đại diện khi đạt mốc điểm (ví dụ 100 / 200 / 500). |
+|  |  | Đổi quà & Khung đại diện | Dùng điểm đổi khung avatar / phần thưởng (voucher) trong cửa hàng. |
+|  |  | Trang bị khung đại diện | Chọn khung đang dùng; khung hiển thị quanh avatar (ví dụ ở khu vực bình luận). |
+|  |  | Bảng xếp hạng | Xem top người dùng theo điểm. |
+|  | Đăng ký tài khoản Doanh nghiệp | Gửi hồ sơ nâng cấp | Điền wizard: tên DN, loại hình, danh mục, địa chỉ Ninh Bình, vị trí bản đồ, ảnh, giấy tờ xác minh. |
+|  |  | Theo dõi / Hủy yêu cầu | Xem trạng thái chờ duyệt / đã duyệt / từ chối; hủy yêu cầu khi còn chờ duyệt. |
+|  |  | Nhận thông báo hệ thống | Nhận thông báo in-app (ví dụ địa điểm bị Admin gỡ / được khôi phục) kèm hướng dẫn hỗ trợ. |
+| Chủ doanh nghiệp (Business Owner) | Dashboard doanh nghiệp | Xem tổng quan | Xem lượt xem Tour 360°, số yêu thích, điểm đánh giá trung bình và danh sách bình luận tại địa điểm thuộc sở hữu. |
+|  | Quản lý thông tin địa điểm | Cập nhật mô tả | Cập nhật phần mô tả / giới thiệu địa điểm (đồng bộ lên bản đồ). |
+|  |  | Cập nhật liên hệ công khai | Cập nhật SĐT công khai, Zalo, Facebook hiển thị cho khách. |
+|  | Quản lý thư viện hình ảnh | Tải lên / Xóa ảnh | Upload hoặc xóa ảnh thực tế của cơ sở / địa điểm. |
+|  | Chăm sóc khách hàng | Xem bình luận | Xem toàn bộ đánh giá của khách tại địa điểm của mình. |
+|  |  | Trả lời bình luận (Official Reply) | Phản hồi dưới danh nghĩa chủ doanh nghiệp (có nhận diện doanh nghiệp trên trang 360°). |
+|  |  | Sửa / Thu hồi câu trả lời | Cập nhật hoặc xóa phản hồi đã gửi. |
+|  | Dịch vụ Tour 360° | Gửi / Theo dõi yêu cầu | Gửi và theo dõi yêu cầu thuê chụp/dựng Tour 360° từ dashboard / hồ sơ. |
+| Quản trị viên hệ thống (Admin & Moderator) | Dashboard tổng quan | Việc cần xử lý & số liệu | Xem hàng chờ (doanh nghiệp, đề xuất, báo cáo, góp ý) và các chỉ số tổng quan (người dùng, địa điểm, tin/sự kiện, bình luận…). |
+|  | Quản lý danh mục địa điểm | Thêm / Sửa / Xóa danh mục | Quản lý danh mục (di tích, danh lam, lưu trú, ẩm thực,…). |
+|  |  | Icon danh mục | Upload / quản lý icon hiển thị trên bản đồ. |
+|  | Quản lý địa điểm du lịch | CRUD địa điểm | Thêm, sửa thông tin địa điểm; xóa tạm (chuyển thùng rác). |
+|  |  | Thùng rác & Khôi phục | Xem địa điểm đã xóa tạm; khôi phục hoặc xóa vĩnh viễn (kèm dọn file ảnh/360). |
+|  |  | Xóa địa điểm doanh nghiệp | Bắt buộc nhập lý do; gửi thông báo tới chủ DN; nếu là địa điểm cuối → tạm ngưng vai trò doanh nghiệp (có thể khôi phục cùng địa điểm). |
+|  |  | Tọa độ & trạng thái | Cấu hình Lat/Lng; trạng thái Draft / Published (và các trạng thái khác nếu có). |
+|  |  | Album ảnh 2D | Upload ảnh đại diện; upload/xóa ảnh gallery. |
+|  |  | Album 360° (Panoramas) | Upload ảnh toàn cảnh 360° cho từng khu vực của địa điểm. |
+|  |  | Audio Guide | Upload / xóa file âm thanh thuyết minh. |
+|  |  | Tạo thuyết minh AI (TTS) | Chuyển văn bản mô tả thành file âm thanh thuyết minh bằng VieNeu-TTS (chọn giọng, tham số). |
+|  | Trình biên tập Tour VR 360° | Góc nhìn ban đầu | Thiết lập Pitch, Yaw, FOV mặc định cho cảnh. |
+|  |  | Cảnh mặc định | Chọn ảnh 360° mở đầu khi khách vào Tour. |
+|  |  | Quản lý Hotspot | Thêm, kéo thả vị trí, sửa, xóa hotspot; lưu hàng loạt (bulk save). |
+|  |  | Đổi tên cảnh | Đặt tên các góc nhìn / khu vực 360° trong địa điểm. |
+|  | Quản lý Tin tức | CRUD & Ẩn/Hiện | Đăng, sửa, xóa bài; toggle ẩn/hiện; upload ảnh minh họa. |
+|  | Quản lý Sự kiện | CRUD & Ẩn/Hiện | Tạo/sửa sự kiện; cấu hình thời gian & địa điểm tổ chức; bật/tắt hiển thị. |
+|  | Quản lý Người dùng | Danh sách & phân quyền | Quản lý tài khoản; gán vai trò Admin / Moderator / User. |
+|  |  | Khóa / Mở khóa | Khóa hoặc mở khóa tài khoản vi phạm. |
+|  |  | Cộng / Trừ điểm | Điều chỉnh điểm thưởng trực tiếp cho người dùng. |
+|  | Bình luận & Kiểm duyệt AI | Quản lý bình luận | Xem, ẩn/hiện, xóa bình luận trên hệ thống. |
+|  |  | Quét AI (Scan Moderation) | Phân tích nội dung bình luận bằng AI để phát hiện spam / nội dung không phù hợp. |
+|  | Báo cáo & Góp ý | Xử lý báo cáo | Xem báo cáo địa điểm/bình luận; cập nhật trạng thái xử lý. |
+|  |  | Quản lý góp ý | Đọc góp ý/báo lỗi; cập nhật trạng thái / ghi chú; xóa nếu cần. |
+|  | Đóng góp địa điểm từ cộng đồng | Duyệt đề xuất | Xem chi tiết đề xuất (kèm điểm gần trên bản đồ nếu có). |
+|  |  | Phê duyệt / Từ chối / Yêu cầu bổ sung | Cập nhật trạng thái đề xuất và ghi chú; đưa địa điểm lên bản đồ bằng thao tác tạo/quản lý Location của Admin. |
+|  | Hồ sơ đăng ký Doanh nghiệp | Thẩm định hồ sơ | Xem thông tin pháp lý, ảnh xác minh do người dùng gửi. |
+|  |  | Phê duyệt / Từ chối | Duyệt → nâng role Business và tạo/khôi phục địa điểm trên bản đồ; từ chối kèm lý do. |
+|  | Yêu cầu Dịch vụ Tour 360° | Quản lý đơn | Danh sách yêu cầu thuê chụp/dựng Tour 360°. |
+|  |  | Cập nhật tiến độ | Chuyển trạng thái: Chờ liên hệ → Đã liên hệ → Hoàn thành / Hủy; ghi chú nội bộ. |
 
 ---
 
-## 4. ⚙️ QUẢN TRỊ VIÊN HỆ THỐNG (ADMIN & MODERATOR PANEL)
+## Công nghệ chính (khớp dự án)
 
-Hệ thống quản trị tập trung dành cho Quản trị viên (Admin) và Kiểm duyệt viên (Moderator) tại đường dẫn `/admin`:
-
-### 4.1. Dashboard Tổng Quan Hệ Thống
-- Xem biểu đồ và các số liệu thống kê thời gian thực: Tổng số người dùng, tổng số địa điểm, số lượt xem 360°, số bình luận, số đơn đăng ký mới,...
-
-### 4.2. Quản Lý Danh Mục Địa Điểm (Category Management)
-- Thêm, sửa, xóa các danh mục địa điểm (Di tích, Danh lam thắng cảnh, Lưu trú, Ẩm thực,...).
-- Upload và quản lý Icon hiển thị tương ứng trên bản đồ.
-
-### 4.3. Quản Lý Địa Điểm Du Lịch (Location Management)
-- **Quản lý CRUD địa điểm:** Thêm mới, chỉnh sửa thông tin, xóa địa điểm du lịch.
-- **Quản lý tọa độ & trạng thái:** Cấu hình kinh độ/vĩ độ (Lat/Lng), trạng thái ẩn/hiện (Draft / Published).
-- **Quản lý Album ảnh 2D:** Upload ảnh đại diện, upload/xóa nhiều ảnh trong gallery.
-- **Quản lý Album 360° (Panoramas):** Upload các tệp ảnh toàn cảnh 360 độ cho từng khu vực của địa điểm.
-- **Quản lý Thuyết minh âm thanh (Audio Guide):** Upload/xóa file âm thanh thuyết minh địa điểm.
-- **Tạo giọng nói AI tự động (AI Text-to-Speech - TTS):** Chuyển đổi tự động văn bản mô tả địa điểm thành file âm thanh thuyết minh MP3 sử dụng công nghệ AI TTS với nhiều tùy chọn giọng đọc.
-
-### 4.4. Trình Biên Tập Tour VR 360° Tương Tác (360° VR Editor Tool)
-- **Cấu hình góc nhìn ban đầu (Initial View):** Thiết lập thông số Pitch, Yaw, FOV mặc định cho cảnh 360°.
-- **Đặt cảnh mặc định (Default Scene):** Chọn ảnh 360° làm điểm bắt đầu khi du khách mở Tour.
-- **Quản lý Hotspot tương tác:**
-  - Thêm điểm liên kết (Hotspot) trên không gian 360° để chuyển sang ảnh 360° khác hoặc hiển thị thông tin bổ sung.
-  - Kéo thả vị trí Hotspot trực quan.
-  - Sửa / Xóa Hotspot.
-  - Lưu hàng loạt cấu hình Hotspots (Bulk save).
-- **Quản lý tên cảnh (Scene Names):** Đổi tên các góc nhìn/khu vực 360° trong địa điểm.
-
-### 4.5. Quản Lý Tin Tức & Bài Viết (News Management)
-- Đăng bài viết tin tức, thông tin khuyến mãi, bài viết quảng bá du lịch.
-- Chỉnh sửa, xóa bài viết.
-- Chuyển đổi nhanh trạng thái Ẩn / Hiện bài viết.
-- Upload hình ảnh minh họa cho bài viết.
-
-### 4.6. Quản Lý Sự Kiện Văn Hóa - Du Lịch (Event Management)
-- Tạo mới và quản lý lịch trình các sự kiện, lễ hội diễn ra tại Ninh Bình.
-- Cấu hình địa điểm tổ chức, thời gian bắt đầu, thời gian kết thúc.
-- Bật / Tắt trạng thái hiển thị sự kiện trên giao diện Client.
-
-### 4.7. Quản Lý Người Dùng & Phân Quyền (User Management)
-- Quản lý danh sách tài khoản toàn hệ thống.
-- Phân quyền tài khoản: `Admin`, `Moderator`, `Business`, `Client`.
-- Khóa / Mở khóa tài khoản người dùng vi phạm.
-- Cộng / Trừ điểm thưởng (Points) trực tiếp cho người dùng.
-
-### 4.8. Quản Lý Bình Luận & Kiểm Duyệt AI (Comment & AI Moderation)
-- Quản lý tất cả bình luận trên hệ thống.
-- Ẩn / Hiện các bình luận không phù hợp.
-- **Quét nội dung vi phạm bằng AI (Scan AI Moderation):** Tự động phân tích nội dung bình luận bằng AI để phát hiện từ ngữ độc hại, xúc phạm hoặc nội dung rác (Spam).
-
-### 4.9. Quản Lý Báo Cáo Vi Phạm & Góp Ý (Reports & Feedback)
-- **Xử lý báo cáo vi phạm:** Xem danh sách báo cáo từ người dùng về các bình luận xấu và cập nhật trạng thái xử lý.
-- **Quản lý Góp ý (Feedback):** Đọc góp ý/báo lỗi từ du khách và ghi chú trạng thái phản hồi.
-
-### 4.10. Quản Lý Đóng Góp Địa Điểm Tự Cộng Đồng (Community Contributions)
-- Duyệt bài đề xuất địa điểm mới do người dùng gửi lên.
-- Phê duyệt để đưa vào cơ sở dữ liệu chính thức hoặc từ chối đề xuất.
-
-### 4.11. Quản Lý Hồ Sơ Đăng Ký Doanh Nghiệp (Business Profile Approvals)
-- Thẩm định hồ sơ đăng ký tài khoản Doanh nghiệp.
-- Xem chi tiết thông tin pháp lý/ảnh xác minh do người dùng cung cấp.
-- Bấm **Phê duyệt (Approve)** để nâng cấp tài khoản người dùng lên Doanh nghiệp hoặc **Từ chối (Reject)** kèm lý do cụ thể.
-
-### 4.12. Quản Lý Yêu Cầu Dịch Vụ Tour 360° (Panorama Service Requests)
-- Quản lý danh sách các đơn yêu cầu thuê chụp/dựng Tour 360° từ khách hàng.
-- Cập nhật tiến độ xử lý đơn hàng (Mới tiếp nhận $\rightarrow$ Đang liên hệ $\rightarrow$ Hoàn thành $\rightarrow$ Hủy).
+| Thành phần | Công nghệ |
+| :--- | :--- |
+| Backend | PHP 8.1+, Laravel 10 |
+| Cơ sở dữ liệu | MySQL |
+| Bản đồ | Leaflet, MarkerCluster, GeoJSON ranh giới |
+| Tour 360° | Marzipano (client viewer) + biên tập hotspot phía Admin |
+| AI | Google Gemini (Chatbot, Trip Planner, kiểm duyệt bình luận) |
+| Thuyết minh TTS | VieNeu-TTS |
+| Định tuyến lịch trình | OSRM / Haversine (tối ưu khoảng cách ngày) |
+| Đăng nhập Google | Laravel Socialite (OAuth 2.0) |
+| Thời tiết | Open-Meteo API |
 
 ---
 
-## 🛠️ CÔNG NGHỆ SỬ DỤNG (TECHNICAL STACK)
-- **Backend Framework:** Laravel 10 (PHP 8.3)
-- **Database:** MySQL
-- **VR 360 Library:** Pannellum / Marzipano 360 Viewer
-- **AI Integration:** Google Gemini / OpenRouter API (Tư vấn Chatbot, Lập kế hoạch Trip Planner, AI Comment Moderation, AI Text-to-Speech)
-- **OAuth:** Laravel Socialite (Google Login)
+## Ghi chú chỉnh so với bản cũ (để khỏi overclaim khi bảo vệ)
+
+1. **Xóa địa điểm Admin** = xóa tạm (thùng rác) + khôi phục / xóa vĩnh viễn; địa điểm DN bắt buộc lý do + thông báo.
+2. **Bản đồ** bổ sung: tìm kiếm, GPS, thời tiết, khay Khám phá, MarkerCluster (không chỉ lọc + banner tin).
+3. **Hồ sơ thành viên**: cập nhật tên hiển thị / avatar / mật khẩu (không mô tả như có đủ SĐT–địa chỉ–bio nếu form chưa có).
+4. **Bình luận**: thành viên đánh giá của mình; **chủ DN** mới trả lời chính thức — không ghi “reply mọi user”.
+5. **Đề xuất cộng đồng**: Admin duyệt trạng thái; đưa lên bản đồ qua quản lý Location (không auto-publish mơ hồ).
+6. **Dashboard DN**: mô tả + liên hệ công khai (SĐT/Zalo/Facebook); không ghi quản lý giá vé/giờ mở cửa nếu portal chưa hỗ trợ.
+7. **Dashboard Admin**: hàng chờ + số liệu tổng quan (không khẳng định “biểu đồ realtime lượt xem 360°” nếu UI chưa có).
+8. Tên sản phẩm dùng **Ninh Bình Travel Hub** (không dùng tên cũ “Ninh Bình POI” trên tài liệu nộp).

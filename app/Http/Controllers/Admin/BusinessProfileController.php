@@ -56,18 +56,52 @@ class BusinessProfileController extends Controller
     /** Chi tiết một yêu cầu nâng cấp doanh nghiệp. */
     public function show($id)
     {
-        $businessProfile = BusinessProfile::with(['user', 'category'])->findOrFail($id);
+        $businessProfile = BusinessProfile::with(['user', 'category', 'claimedLocation'])->findOrFail($id);
 
         return view('admin.business.show', compact('businessProfile'));
     }
 
     /**
      * Phê duyệt yêu cầu: đổi trạng thái, nâng vai trò người dùng lên 'business' và
-     * tự tạo địa điểm trên bản đồ (kèm ảnh công khai) nếu chưa có.
+     * nhận địa điểm có sẵn (claim) hoặc tự tạo địa điểm trên bản đồ nếu chưa có.
      */
     public function approve(Request $request, $id)
     {
-        $businessProfile = BusinessProfile::with('user')->findOrFail($id);
+        $businessProfile = BusinessProfile::with(['user', 'claimedLocation'])->findOrFail($id);
+
+        // Nhận địa điểm đã có trên map
+        if ($businessProfile->location_id) {
+            $claimLoc = Location::withTrashed()->find($businessProfile->location_id);
+            if (!$claimLoc) {
+                return back()->with('error', 'Địa điểm được yêu cầu nhận quyền không còn tồn tại.');
+            }
+            if ($claimLoc->trashed()) {
+                $claimLoc->restore();
+            }
+            if (!BusinessProfile::isLocationClaimable($claimLoc) && (int) $claimLoc->created_by !== (int) $businessProfile->user_id) {
+                return back()->with('error', 'Địa điểm này đã thuộc doanh nghiệp khác. Không thể phê duyệt nhận quyền.');
+            }
+
+            $businessProfile->update([
+                'status' => 'approved',
+                'reject_reason' => null,
+            ]);
+
+            if ($businessProfile->user && in_array($businessProfile->user->role, ['user', 'member'], true)) {
+                $businessProfile->user->update(['role' => 'business']);
+            }
+
+            $claimLoc->update([
+                'created_by' => $businessProfile->user_id,
+                'status' => 'published',
+                'phone' => $businessProfile->public_phone ?: $businessProfile->phone ?: $claimLoc->phone,
+                'zalo' => $businessProfile->zalo ?: $claimLoc->zalo,
+                'facebook' => $businessProfile->facebook ?: $claimLoc->facebook,
+            ]);
+
+            return redirect()->route('admin.business-profiles.index')
+                ->with('success', "Đã phê duyệt nhận quyền địa điểm \"{$claimLoc->name}\" cho doanh nghiệp \"{$businessProfile->business_name}\".");
+        }
 
         $businessProfile->update([
             'status' => 'approved',
@@ -79,9 +113,17 @@ class BusinessProfileController extends Controller
             $businessProfile->user->update(['role' => 'business']);
         }
 
-        // Tự tạo địa điểm trên bản đồ nếu chưa có
-        $existingLoc = Location::where('created_by', $businessProfile->user_id)->first();
-        if (!$existingLoc) {
+        // Tự tạo / khôi phục địa điểm trên bản đồ nếu chưa có (hoặc đang trong thùng rác)
+        $existingLoc = Location::withTrashed()
+            ->where('created_by', $businessProfile->user_id)
+            ->first();
+
+        if ($existingLoc && $existingLoc->trashed()) {
+            $existingLoc->restore();
+            if ($existingLoc->status !== 'published') {
+                $existingLoc->update(['status' => 'published']);
+            }
+        } elseif (!$existingLoc) {
             $slug = Str::slug($businessProfile->business_name) . '-' . time();
             $fullAddress = trim($businessProfile->address_street . ', ' . $businessProfile->address_city . ', ' . $businessProfile->address_province);
 
@@ -130,6 +172,8 @@ class BusinessProfileController extends Controller
                     'sort_order' => $index,
                 ]);
             }
+
+            $businessProfile->update(['location_id' => $location->id]);
         }
 
         return redirect()->route('admin.business-profiles.index')

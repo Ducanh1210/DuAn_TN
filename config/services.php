@@ -53,4 +53,15 @@ return [
         'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
     ],
 
+    /*
+    | Carto Voyager basemap (Leaflet). Key miễn phí tại https://carto.com/basemaps/apikey
+    | Không có key → tile bị watermark "API KEY REQUIRED".
+    */
+    'carto' => [
+        'api_key' => env('CARTO_API_KEY'),
+        'tile_url' => env('CARTO_API_KEY')
+            ? 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=' . rawurlencode((string) env('CARTO_API_KEY'))
+            : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    ],
+
 ];

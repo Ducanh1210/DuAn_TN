@@ -758,6 +758,8 @@
         .reg-nav__label { font-size: .86rem; color: #5f6368; font-weight: 400; line-height: 1.3; }
         .reg-nav__phase.active .reg-nav__label { color: #202124; font-weight: 600; }
         .reg-nav__phase.done .reg-nav__label { color: #202124; }
+        .reg-nav__phase.done { cursor: pointer; }
+        .reg-nav__phase.done:hover .reg-nav__label { color: #1e3a5f; }
         .reg-nav__subs { display: none; flex-direction: column; margin: 0 0 6px 27px; padding-left: 13px; border-left: 1px solid #e8eaed; }
         .reg-nav__group.is-open .reg-nav__subs { display: flex; }
         .reg-nav__sub { font-size: .82rem; color: #5f6368; padding: 7px 0; cursor: default; transition: color .15s ease; }
@@ -839,6 +841,214 @@
         /* Tighter typography inside the wizard */
         .biz-step-pane h4 { font-size: 0.98rem !important; margin-bottom: 6px !important; }
         .biz-step-pane > p { font-size: 0.82rem; }
+
+        .biz-loc-suggest {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% - 4px);
+            z-index: 40;
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(60, 64, 67, 0.18);
+            max-height: 340px;
+            overflow-y: auto;
+            padding: 6px 0;
+        }
+        .biz-loc-suggest__create,
+        .biz-loc-suggest__item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: transparent;
+            padding: 10px 16px;
+            cursor: pointer;
+        }
+        .biz-loc-suggest__create:hover,
+        .biz-loc-suggest__item:hover { background: #f1f3f4; }
+        .biz-loc-suggest__create-name,
+        .biz-loc-suggest__name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #202124;
+            line-height: 1.3;
+        }
+        .biz-loc-suggest__create-sub {
+            margin-top: 2px;
+            font-size: 0.78rem;
+            color: #5f6368;
+        }
+        .biz-loc-suggest__sub {
+            margin-top: 2px;
+            font-size: 0.78rem;
+            color: #5f6368;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .biz-loc-suggest__divider {
+            height: 1px;
+            background: #e8eaed;
+            margin: 4px 0;
+        }
+        .biz-claim-panel {
+            margin-top: 10px;
+            border: 1px solid #c7d7e8;
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .biz-claim-panel__head {
+            padding: 7px 12px;
+            border-bottom: 1px solid #e2eaf3;
+            background: rgba(30, 58, 95, 0.04);
+        }
+        .biz-claim-panel__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 650;
+            color: #1e3a5f;
+        }
+        .biz-claim-panel__badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #16a34a;
+            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.18);
+        }
+        .biz-claim-panel__body {
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            align-items: center;
+        }
+        .biz-claim-panel__thumb {
+            width: 56px;
+            height: 56px;
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #e8eef5;
+        }
+        .biz-claim-panel__thumb img,
+        .biz-claim-panel__thumb .biz-claim-card__ph {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .biz-claim-panel__thumb .biz-claim-card__ph {
+            background: linear-gradient(135deg, #dbe5f0, #f1f5f9);
+        }
+        .biz-claim-panel__meta { flex: 1; min-width: 0; }
+        .biz-claim-panel__title {
+            margin: 0 0 2px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.25;
+        }
+        .biz-claim-panel__rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            color: #475569;
+            margin-bottom: 2px;
+        }
+        .biz-claim-panel__rating .biz-claim-card__stars { color: #eab308; letter-spacing: 0.5px; }
+        .biz-claim-panel__addr {
+            font-size: 0.75rem;
+            color: #64748b;
+            line-height: 1.35;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .biz-claim-panel__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 0 12px 10px;
+        }
+        .biz-claim-manage-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            background: var(--primary, #1e3a5f);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .biz-claim-manage-btn:hover { filter: brightness(1.08); }
+        .biz-claim-other {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+            color: #475569;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .biz-claim-other:hover {
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+        @media (max-width: 560px) {
+            .biz-claim-panel__actions { flex-direction: column; }
+            .biz-claim-manage-btn,
+            .biz-claim-other { width: 100%; }
+        }
+        .biz-claim-chip {
+            margin-top: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #bbf7d0;
+            background: #f0fdf4;
+        }
+        .biz-claim-chip__body { flex: 1; min-width: 0; }
+        .biz-claim-chip__label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #15803d;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 2px;
+        }
+        .biz-claim-chip__name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #14532d;
+        }
+        .biz-claim-chip__addr { font-size: 0.75rem; }
+        .biz-claim-chip__clear {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 0 2px;
+            cursor: pointer;
+        }
+        .biz-claim-chip__clear:hover { color: #0f172a; }
+        .reg-nav__sub.is-claim-hidden,
+        .step-progress-node.is-claim-hidden { display: none !important; }
         .form-label-clean { font-size: 0.82rem; }
         .form-control-clean { font-size: 0.85rem; padding: 8px 12px; }
 
@@ -944,7 +1154,7 @@
                 <div class="reg-nav__phase"><span class="reg-nav__circle"></span><span class="reg-nav__label">Thông tin doanh nghiệp</span></div>
                 <div class="reg-nav__subs">
                     <div class="reg-nav__sub" data-step="1">Tên doanh nghiệp</div>
-                    <div class="reg-nav__sub" data-step="2">Loại hình</div>
+                    <div class="reg-nav__sub is-claim-hidden" data-step="2" hidden>Loại hình</div>
                     <div class="reg-nav__sub" data-step="3">Danh mục kinh doanh</div>
                 </div>
             </div>
@@ -998,15 +1208,45 @@
             <div class="wizard-row">
                 <!-- Left: Form steps -->
                 <div class="wizard-form-col">
-                    <form id="bizRegisterForm" novalidate onsubmit="event.preventDefault();">
+                    <form id="bizRegisterForm" onsubmit="event.preventDefault();">
                         @csrf
                         <!-- Step 1: Business Name -->
                         <div class="biz-step-pane" data-step="1">
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Giúp khách hàng tìm thấy doanh nghiệp của bạn trên Tìm kiếm, Maps, v.v.</h4>
-                            <p class="text-secondary small mb-4">Nhập một vài thông tin doanh nghiệp để bắt đầu.</p>
-                            <div class="mb-4">
+                            <p class="text-secondary small mb-4">Nhập tên doanh nghiệp. Nếu địa điểm đã có trên bản đồ, chọn từ gợi ý để chỉ cần xác minh.</p>
+                            <div class="mb-4 position-relative">
                                 <label class="form-label-clean">Tên doanh nghiệp *</label>
-                                <input type="text" class="form-control-clean" id="input_business_name" name="business_name" placeholder="Ví dụ: Nhà Hàng Dê Nướng Cố Đô">
+                                <input type="text" class="form-control-clean" id="input_business_name" name="business_name" required placeholder="Ví dụ: Nhà Hàng Dê Nướng Cố Đô" autocomplete="off">
+                                <input type="hidden" id="input_claim_location_id" name="location_id" value="">
+                                <div id="bizLocationSuggest" class="biz-loc-suggest d-none" role="listbox"></div>
+                                <p class="text-secondary small mt-2 mb-0" id="bizClaimHint">Gõ tên để tạo mới hoặc chọn địa điểm đã có trên map.</p>
+
+                                <div id="bizClaimPreview" class="biz-claim-panel d-none">
+                                    <div class="biz-claim-panel__head">
+                                        <span class="biz-claim-panel__badge">Đã có trên bản đồ</span>
+                                    </div>
+                                    <div class="biz-claim-panel__body">
+                                        <div class="biz-claim-panel__thumb" id="bizClaimPhotos"></div>
+                                        <div class="biz-claim-panel__meta">
+                                            <h3 class="biz-claim-panel__title" id="bizClaimPreviewName">—</h3>
+                                            <div class="biz-claim-panel__rating" id="bizClaimPreviewRating"></div>
+                                            <div class="biz-claim-panel__addr" id="bizClaimPreviewAddr">—</div>
+                                        </div>
+                                    </div>
+                                    <div class="biz-claim-panel__actions">
+                                        <button type="button" class="biz-claim-manage-btn" id="bizClaimManageBtn">Đây là của tôi</button>
+                                        <button type="button" class="biz-claim-other" id="bizClaimOtherBtn">Không phải địa điểm này</button>
+                                    </div>
+                                </div>
+
+                                <div id="bizClaimChip" class="biz-claim-chip d-none">
+                                    <div class="biz-claim-chip__body">
+                                        <div class="biz-claim-chip__label">Đã chọn nhận quyền địa điểm</div>
+                                        <div class="biz-claim-chip__name" id="bizClaimName"></div>
+                                        <div class="biz-claim-chip__addr text-secondary" id="bizClaimAddr"></div>
+                                    </div>
+                                    <button type="button" class="biz-claim-chip__clear" id="bizClaimClear" title="Bỏ chọn">×</button>
+                                </div>
                             </div>
                         </div>
 
@@ -1117,38 +1357,34 @@
                             <h4 class="fw-semibold mb-2" style="font-size: 1.05rem; color: #0f172a;">Nhập địa chỉ doanh nghiệp của bạn</h4>
                             <p class="text-secondary small mb-4">Thêm một vị trí khách hàng có thể thực tế ghé thăm doanh nghiệp của bạn.</p>
                             
-                            <!-- Row 1: Country & Province -->
+                            <!-- Row 1: 2 Fixed Defaults -->
                             <div class="row mb-3">
                                 <div class="col-md-6 mb-3 mb-md-0">
                                     <label class="form-label-clean">Quốc gia / Vùng</label>
                                     <input type="text" class="form-control-clean" name="address_country" value="Việt Nam" readonly style="background-color: #f8fafc; color: #64748b;">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label-clean">Tỉnh / Thành phố *</label>
-                                    <input type="text" class="form-control-clean" id="input_address_province" name="address_province" value="Tỉnh Ninh Bình" readonly data-code="37" style="background-color: #f8fafc; color: #64748b;">
+                                    <label class="form-label-clean">Tỉnh / Thành phố</label>
+                                    <input type="text" class="form-control-clean" id="input_address_province" name="address_province" value="Ninh Bình" readonly style="background-color: #f8fafc; color: #64748b;" required>
                                 </div>
                             </div>
 
-                            <!-- Row 2: District & Ward separate columns -->
+                            <!-- Row 2: Fillable City/District & Postal Code -->
                             <div class="row mb-3">
                                 <div class="col-md-6 mb-3 mb-md-0">
-                                    <label class="form-label-clean">Chọn Phường / Thành phố / Thị xã / Xã *</label>
-                                    <select class="form-select form-control-clean" id="input_address_city" name="address_city">
-                                        <option value="">-- Chọn Huyện / Thị xã / Xã --</option>
-                                    </select>
+                                    <label class="form-label-clean">Thành phố / Thị xã / Huyện *</label>
+                                    <input type="text" class="form-control-clean" id="input_address_city" name="address_city" required placeholder="Ví dụ: TP. Ninh Bình, Hoa Lư...">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label-clean">Mã bưu chính *</label>
-                                    <input type="text" class="form-control-clean" id="input_address_postal_code" name="address_postal_code" value="19000" placeholder="Ví dụ: 19000">
+                                    <input type="text" class="form-control-clean" id="input_address_postal_code" name="address_postal_code" required value="430000" placeholder="Ví dụ: 430000">
                                 </div>
                             </div>
 
-                            <!-- Row 3: Postal Code & Street Address -->
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <label class="form-label-clean">Đường phố / Số nhà *</label>
-                                    <input type="text" class="form-control-clean" id="input_address_street" name="address_street" placeholder="Ví dụ: 123 Nguyễn Huệ">
-                                </div>
+                            <!-- Row 3: Street Address -->
+                            <div class="mb-3">
+                                <label class="form-label-clean">Đường phố / Số nhà *</label>
+                                <input type="text" class="form-control-clean" id="input_address_street" name="address_street" required placeholder="Ví dụ: 123 Nguyễn Huệ">
                             </div>
                         </div>
 
@@ -1163,7 +1399,7 @@
                                     <div class="d-flex align-items-center px-3 border rounded-2 bg-light text-secondary" style="font-size: 0.875rem; border-color: var(--border-color) !important;">
                                         +84
                                     </div>
-                                    <input type="tel" class="form-control-clean flex-grow-1" id="input_phone" name="phone" placeholder="Ví dụ: 0912345678" style="margin-bottom: 0;">
+                                    <input type="tel" class="form-control-clean flex-grow-1" id="input_phone" name="phone" required placeholder="Ví dụ: 0912345678" style="margin-bottom: 0;">
                                 </div>
                             </div>
                         </div>
@@ -1176,8 +1412,8 @@
                             <div id="businessMap"></div>
                             
                             <!-- Hidden inputs for Lat / Lng -->
-                            <input type="hidden" id="input_lat" name="lat">
-                            <input type="hidden" id="input_lng" name="lng">
+                            <input type="hidden" id="input_lat" name="lat" required>
+                            <input type="hidden" id="input_lng" name="lng" required>
                         </div>
 
                         <!-- Step 7: Description -->
@@ -1186,7 +1422,7 @@
                             <p class="text-secondary small mb-4">Cho phép khách hàng tìm hiểu thêm về doanh nghiệp của bạn bằng cách thêm mô tả ngắn gọn.</p>
                             <div class="mb-3">
                                 <label class="form-label-clean">Giới thiệu về doanh nghiệp *</label>
-                                <textarea class="form-control-clean" id="input_description" name="description" rows="5" maxlength="750" placeholder="Ví dụ: Nhà hàng chuyên phục vụ các món ăn đặc sản Ninh Bình như thịt dê núi, cơm cháy và các món ăn dân dã truyền thống..."></textarea>
+                                <textarea class="form-control-clean" id="input_description" name="description" rows="5" maxlength="750" required placeholder="Ví dụ: Nhà hàng chuyên phục vụ các món ăn đặc sản Ninh Bình như thịt dê núi, cơm cháy và các món ăn dân dã truyền thống..."></textarea>
                                 <div class="text-end text-secondary small mt-1" id="descCharCount">0 / 750</div>
                             </div>
                         </div>
@@ -1318,7 +1554,6 @@
                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                             <div>
                                                 <div class="fw-semibold text-dark small" id="gpsStatusTitle">Đang xác định GPS...</div>
-                                                <div class="text-muted small" style="font-size: 0.75rem;" id="gpsStatusDetail">Cấp quyền vị trí để định vị GPS.</div>
                                             </div>
                                             <button type="button" class="btn btn-outline-primary btn-sm px-3" id="btnRefreshGPS" style="font-size: 0.78rem;">
                                                 Lấy lại GPS
@@ -1439,6 +1674,10 @@
         if (bizForm) {
             let bizStep = 1;
             const totalBizSteps = 11;
+            const claimBizSteps = [1, 5, 10, 11];
+            let claimLocationId = null;
+            let claimLocationMeta = null;
+            const bizSuggestUrl = @json(route('client.profile.business.locations.suggest'));
             const bizPanes = document.querySelectorAll('.biz-step-pane');
             const bizPrevBtn = document.getElementById('bizPrevBtn');
             const bizNextBtn = document.getElementById('bizNextBtn');
@@ -1454,6 +1693,278 @@
 
             // Form inputs and preview elements
             const inputBizName = document.getElementById('input_business_name');
+            const inputClaimLocationId = document.getElementById('input_claim_location_id');
+            const bizLocSuggestEl = document.getElementById('bizLocationSuggest');
+            const bizClaimChip = document.getElementById('bizClaimChip');
+            const bizClaimName = document.getElementById('bizClaimName');
+            const bizClaimAddr = document.getElementById('bizClaimAddr');
+            const bizClaimClear = document.getElementById('bizClaimClear');
+            const bizClaimPreview = document.getElementById('bizClaimPreview');
+            const bizClaimPhotos = document.getElementById('bizClaimPhotos');
+            const bizClaimPreviewName = document.getElementById('bizClaimPreviewName');
+            const bizClaimPreviewRating = document.getElementById('bizClaimPreviewRating');
+            const bizClaimPreviewAddr = document.getElementById('bizClaimPreviewAddr');
+            const bizClaimManageBtn = document.getElementById('bizClaimManageBtn');
+            const bizClaimOtherBtn = document.getElementById('bizClaimOtherBtn');
+            const bizClaimHint = document.getElementById('bizClaimHint');
+            let pendingClaimCandidate = null;
+
+            function isClaimMode() {
+                return !!claimLocationId;
+            }
+
+            function getActiveStepList() {
+                // Bỏ bước 2 (loại hình) — luôn mặc định cửa hàng địa phương
+                const skipped = new Set([2]);
+                const base = isClaimMode()
+                    ? claimBizSteps
+                    : Array.from({ length: totalBizSteps }, (_, i) => i + 1);
+                return base.filter((s) => !skipped.has(s));
+            }
+
+            function getActiveStepIndex() {
+                const list = getActiveStepList();
+                const idx = list.indexOf(bizStep);
+                return idx >= 0 ? idx : 0;
+            }
+
+            function getActiveStepCount() {
+                return getActiveStepList().length;
+            }
+
+            function goToRelativeStep(delta) {
+                const list = getActiveStepList();
+                let idx = list.indexOf(bizStep);
+                if (idx < 0) idx = 0;
+                const nextIdx = Math.min(Math.max(idx + delta, 0), list.length - 1);
+                bizStep = list[nextIdx];
+                updateBizStepUI();
+            }
+
+            function haversineMeters(lat1, lng1, lat2, lng2) {
+                const toRad = (d) => d * Math.PI / 180;
+                const R = 6371000;
+                const dLat = toRad(lat2 - lat1);
+                const dLng = toRad(lng2 - lng1);
+                const a = Math.sin(dLat / 2) ** 2
+                    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+                return 2 * R * Math.asin(Math.sqrt(a));
+            }
+
+            function hideSuggestDropdown() {
+                if (!bizLocSuggestEl) return;
+                bizLocSuggestEl.classList.add('d-none');
+                bizLocSuggestEl.innerHTML = '';
+            }
+
+            function starString(rating) {
+                const r = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+                return '★'.repeat(r) + '☆'.repeat(5 - r);
+            }
+
+            function showClaimPreview(loc) {
+                pendingClaimCandidate = loc || null;
+                if (!bizClaimPreview) return;
+                if (!loc) {
+                    bizClaimPreview.classList.add('d-none');
+                    if (bizClaimHint) bizClaimHint.classList.remove('d-none');
+                    return;
+                }
+                hideSuggestDropdown();
+                if (bizClaimHint) bizClaimHint.classList.add('d-none');
+                if (bizClaimPreviewName) bizClaimPreviewName.textContent = loc.name || '—';
+                if (bizClaimPreviewAddr) {
+                    bizClaimPreviewAddr.textContent = [loc.address, loc.category].filter(Boolean).join(' · ') || '—';
+                }
+                if (bizClaimPreviewRating) {
+                    if (loc.rating) {
+                        const count = loc.review_count ? ` (${loc.review_count})` : '';
+                        bizClaimPreviewRating.innerHTML =
+                            `<strong>${Number(loc.rating).toFixed(1).replace('.', ',')}</strong>` +
+                            `<span class="biz-claim-card__stars">${starString(loc.rating)}</span>` +
+                            `<span>${count}</span>`;
+                        bizClaimPreviewRating.classList.remove('d-none');
+                    } else {
+                        bizClaimPreviewRating.innerHTML = '';
+                        bizClaimPreviewRating.classList.add('d-none');
+                    }
+                }
+                if (bizClaimPhotos) {
+                    const thumb = (Array.isArray(loc.images) && loc.images[0])
+                        || loc.thumbnail
+                        || '';
+                    bizClaimPhotos.innerHTML = thumb
+                        ? `<img src="${thumb}" alt="">`
+                        : '<div class="biz-claim-card__ph"></div>';
+                }
+                bizClaimPreview.classList.remove('d-none');
+            }
+
+            function setClaimLocation(loc) {
+                claimLocationId = loc ? loc.id : null;
+                claimLocationMeta = loc || null;
+                pendingClaimCandidate = null;
+                if (inputClaimLocationId) inputClaimLocationId.value = claimLocationId || '';
+                if (bizClaimChip) bizClaimChip.classList.toggle('d-none', !loc);
+                if (bizClaimPreview) bizClaimPreview.classList.add('d-none');
+                if (bizClaimHint) bizClaimHint.classList.toggle('d-none', !!loc);
+                if (loc) {
+                    if (inputBizName) inputBizName.value = loc.name || '';
+                    if (bizClaimName) bizClaimName.textContent = loc.name || '';
+                    if (bizClaimAddr) bizClaimAddr.textContent = [loc.address, loc.category].filter(Boolean).join(' · ');
+                    if (inputCategoryId && loc.category_id) inputCategoryId.value = loc.category_id;
+                    if (inputCategorySearch && loc.category) inputCategorySearch.value = loc.category;
+                    const latEl = document.getElementById('input_lat');
+                    const lngEl = document.getElementById('input_lng');
+                    if (latEl) latEl.value = loc.lat;
+                    if (lngEl) lngEl.value = loc.lng;
+                    hideSuggestDropdown();
+                    bizStep = 1;
+                }
+                updateBizStepUI();
+                saveWizardState();
+            }
+
+            function clearClaimLocation() {
+                setClaimLocation(null);
+                showClaimPreview(null);
+            }
+
+            function chooseCreateNewBusiness() {
+                pendingClaimCandidate = null;
+                claimLocationId = null;
+                claimLocationMeta = null;
+                if (inputClaimLocationId) inputClaimLocationId.value = '';
+                if (bizClaimChip) bizClaimChip.classList.add('d-none');
+                if (bizClaimPreview) bizClaimPreview.classList.add('d-none');
+                if (bizClaimHint) bizClaimHint.classList.remove('d-none');
+                hideSuggestDropdown();
+                updateBizStepUI();
+                saveWizardState();
+            }
+
+            let suggestTimer = null;
+            function escapeHtml(str) {
+                return String(str || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
+            }
+
+            function renderLocationSuggestions(items, typedName) {
+                if (!bizLocSuggestEl) return;
+                if (claimLocationId || pendingClaimCandidate) {
+                    hideSuggestDropdown();
+                    return;
+                }
+                const q = (typedName || '').trim();
+                if (q.length < 2 && !items.length) {
+                    hideSuggestDropdown();
+                    return;
+                }
+
+                let html = '';
+                if (q.length >= 2) {
+                    html += `<button type="button" class="biz-loc-suggest__create" data-action="create">
+                        <div class="biz-loc-suggest__create-name">${escapeHtml(q)}</div>
+                        <div class="biz-loc-suggest__create-sub">Tạo một doanh nghiệp với tên này</div>
+                    </button>`;
+                }
+
+                if (items.length) {
+                    if (html) html += '<div class="biz-loc-suggest__divider"></div>';
+                    html += items.map((item) => {
+                        return `<button type="button" class="biz-loc-suggest__item" data-id="${item.id}">
+                            <div class="biz-loc-suggest__name">${escapeHtml(item.name || '')}</div>
+                            <div class="biz-loc-suggest__sub">${escapeHtml(item.address || item.category || '')}</div>
+                        </button>`;
+                    }).join('');
+                }
+
+                if (!html) {
+                    hideSuggestDropdown();
+                    return;
+                }
+
+                bizLocSuggestEl.innerHTML = html;
+                bizLocSuggestEl.classList.remove('d-none');
+
+                const createBtn = bizLocSuggestEl.querySelector('[data-action="create"]');
+                if (createBtn) {
+                    createBtn.addEventListener('click', function() {
+                        chooseCreateNewBusiness();
+                    });
+                }
+                bizLocSuggestEl.querySelectorAll('.biz-loc-suggest__item').forEach((el) => {
+                    el.addEventListener('click', () => {
+                        const id = parseInt(el.getAttribute('data-id'), 10);
+                        const found = items.find((x) => x.id === id);
+                        if (found) showClaimPreview(found);
+                    });
+                });
+            }
+
+            function fetchLocationSuggestions(q) {
+                if (!bizSuggestUrl || claimLocationId || pendingClaimCandidate) return;
+                fetch(bizSuggestUrl + '?q=' + encodeURIComponent(q), {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then((r) => r.json())
+                    .then((json) => renderLocationSuggestions(Array.isArray(json.data) ? json.data : [], q))
+                    .catch(() => hideSuggestDropdown());
+            }
+
+            if (inputBizName) {
+                inputBizName.addEventListener('input', function() {
+                    const q = this.value.trim();
+                    clearTimeout(suggestTimer);
+                    if (claimLocationId) return;
+                    // Đang xem preview thì gõ lại sẽ hủy preview để tìm tiếp
+                    if (pendingClaimCandidate) {
+                        pendingClaimCandidate = null;
+                        if (bizClaimPreview) bizClaimPreview.classList.add('d-none');
+                        if (bizClaimHint) bizClaimHint.classList.remove('d-none');
+                    }
+                    if (q.length < 2) {
+                        hideSuggestDropdown();
+                        return;
+                    }
+                    suggestTimer = setTimeout(() => fetchLocationSuggestions(q), 280);
+                });
+                inputBizName.addEventListener('focus', function() {
+                    if (!claimLocationId && !pendingClaimCandidate && this.value.trim().length >= 2) {
+                        fetchLocationSuggestions(this.value.trim());
+                    }
+                });
+            }
+            if (bizClaimClear) {
+                bizClaimClear.addEventListener('click', function() {
+                    clearClaimLocation();
+                });
+            }
+            if (bizClaimManageBtn) {
+                bizClaimManageBtn.addEventListener('click', function() {
+                    if (pendingClaimCandidate) {
+                        setClaimLocation(pendingClaimCandidate);
+                    }
+                });
+            }
+            if (bizClaimOtherBtn) {
+                bizClaimOtherBtn.addEventListener('click', function() {
+                    pendingClaimCandidate = null;
+                    if (bizClaimPreview) bizClaimPreview.classList.add('d-none');
+                    if (bizClaimHint) bizClaimHint.classList.remove('d-none');
+                    if (inputBizName) inputBizName.focus();
+                    const q = inputBizName ? inputBizName.value.trim() : '';
+                    if (q.length >= 2) fetchLocationSuggestions(q);
+                });
+            }
+            document.addEventListener('click', function(e) {
+                if (!bizLocSuggestEl || bizLocSuggestEl.classList.contains('d-none')) return;
+                if (e.target.closest('#bizLocationSuggest') || e.target.closest('#input_business_name')) return;
+                hideSuggestDropdown();
+            });
             const mockBizName = document.getElementById('mockBizName');
             const mockSearchText = document.getElementById('mockSearchText');
 
@@ -1464,7 +1975,6 @@
 
             const inputStreet = document.getElementById('input_address_street');
             const inputCity = document.getElementById('input_address_city');
-            const inputDistrict = document.getElementById('input_address_district');
             const inputProvince = document.getElementById('input_address_province');
             const mockBizAddress = document.getElementById('mockBizAddress');
 
@@ -1490,15 +2000,98 @@
             let cameraStream = null;
             let cameraFacingMode = 'environment';
             let activeUploadsCount = 0;
+            const VERIFICATION_MAX_DISTANCE_M = 500;
+            let verificationDistanceM = null;
+
+            function getMapPinCoords() {
+                const lat = parseFloat(document.getElementById('input_lat')?.value);
+                const lng = parseFloat(document.getElementById('input_lng')?.value);
+                if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                    return { lat, lng };
+                }
+                if (claimLocationMeta && Number.isFinite(Number(claimLocationMeta.lat)) && Number.isFinite(Number(claimLocationMeta.lng))) {
+                    return { lat: Number(claimLocationMeta.lat), lng: Number(claimLocationMeta.lng) };
+                }
+                return null;
+            }
+
+            function isVerificationTooFar() {
+                return Number.isFinite(verificationDistanceM) && verificationDistanceM > VERIFICATION_MAX_DISTANCE_M;
+            }
+
+            function formatVerificationDistance(dist) {
+                if (dist >= 1000) return (dist / 1000).toFixed(1) + 'km';
+                return Math.round(dist) + 'm';
+            }
+
+            function setVerificationDistanceGate(dist) {
+                verificationDistanceM = Number.isFinite(dist) ? dist : null;
+                const tooFar = isVerificationTooFar();
+                const startBtn = document.getElementById('btnStartCamera');
+                const captureBtn = document.getElementById('btnCapturePhoto');
+                const captureFsBtn = document.getElementById('btnCapturePhotoFs');
+                const fallbackInput = document.getElementById('inputFallbackVerificationPhoto');
+                const switchBtn = document.getElementById('btnSwitchCamera');
+                const fsBtn = document.getElementById('btnFullscreenCamera');
+                const videoEl = document.getElementById('cameraVideo');
+                const placeholderEl = document.getElementById('cameraPlaceholder');
+
+                if (startBtn) {
+                    startBtn.disabled = tooFar;
+                    startBtn.classList.toggle('disabled', tooFar);
+                    startBtn.title = tooFar
+                        ? 'Bạn đang cách vị trí được ghim quá xa; chỉ có thể xác thực trong khoảng 500m'
+                        : '';
+                }
+                if (captureBtn) {
+                    captureBtn.disabled = tooFar;
+                    captureBtn.style.opacity = tooFar ? '0.45' : '';
+                    captureBtn.style.pointerEvents = tooFar ? 'none' : '';
+                }
+                if (captureFsBtn) {
+                    captureFsBtn.disabled = tooFar;
+                    captureFsBtn.style.opacity = tooFar ? '0.45' : '';
+                    captureFsBtn.style.pointerEvents = tooFar ? 'none' : '';
+                }
+                if (fallbackInput) fallbackInput.disabled = tooFar;
+
+                if (tooFar && cameraStream) {
+                    cameraStream.getTracks().forEach((track) => track.stop());
+                    cameraStream = null;
+                    if (videoEl) {
+                        videoEl.srcObject = null;
+                        videoEl.classList.add('d-none');
+                    }
+                    if (placeholderEl) placeholderEl.classList.remove('d-none');
+                    if (captureBtn) captureBtn.classList.add('d-none');
+                    if (switchBtn) switchBtn.classList.add('d-none');
+                    if (fsBtn) fsBtn.classList.add('d-none');
+                }
+
+                if (bizNextBtn && bizStep === 11) {
+                    if (tooFar) {
+                        bizNextBtn.disabled = true;
+                        bizNextBtn.classList.add('is-locked');
+                        bizNextBtn.setAttribute('title', 'Bạn đang cách vị trí được ghim quá xa; chỉ có thể xác thực trong khoảng 500m');
+                    }
+                }
+            }
+
 
             function updateNextButtonState() {
                 if (!bizNextBtn) return;
                 const spinners = document.querySelectorAll('.uploader-spinner');
                 const isUploading = activeUploadsCount > 0 || spinners.length > 0;
-                if (isUploading) {
+                const tooFarOnVerify = bizStep === 11 && isVerificationTooFar();
+                if (isUploading || tooFarOnVerify) {
                     bizNextBtn.disabled = true;
                     bizNextBtn.classList.add('is-locked');
-                    bizNextBtn.setAttribute('title', 'Đang tải lên hình ảnh, vui lòng chờ tất cả ảnh load xong...');
+                    bizNextBtn.setAttribute(
+                        'title',
+                        tooFarOnVerify
+                            ? 'Bạn đang cách vị trí được ghim quá xa; chỉ có thể xác thực trong khoảng 500m'
+                            : 'Đang tải lên hình ảnh, vui lòng chờ tất cả ảnh load xong...'
+                    );
                 } else {
                     bizNextBtn.disabled = false;
                     bizNextBtn.classList.remove('is-locked');
@@ -1615,7 +2208,7 @@
                             attributionControl: false
                         });
 
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        L.tileLayer(@json(config('services.carto.tile_url')), {
                             subdomains: 'abcd',
                             maxZoom: 19
                         }).addTo(verificationMap);
@@ -1663,60 +2256,128 @@
                 }, 150);
             }
 
-            // Real-time GPS Location Fetcher for Verification
-            function fetchVerificationGPS() {
+            // Real-time GPS Location Fetcher for Verification (cùng chiến lược với bước 6)
+            let verificationGpsInProgress = false;
+            let verificationGpsRequestId = 0;
+
+            function applyVerificationGpsPosition(position) {
                 const statusTitle = document.getElementById('gpsStatusTitle');
-                const statusDetail = document.getElementById('gpsStatusDetail');
+
+                verificationLat = position.coords.latitude;
+                verificationLng = position.coords.longitude;
+                verificationTime = new Date().toISOString();
+
+                if (statusTitle) statusTitle.innerText = `GPS Đã Khóa: ${verificationLat.toFixed(6)}, ${verificationLng.toFixed(6)}`;
+
                 const distanceBadge = document.getElementById('gpsDistanceBadge');
                 const distanceText = document.getElementById('gpsDistanceText');
+                const pin = getMapPinCoords();
+                if (pin && distanceBadge && distanceText) {
+                    const dist = calculateDistanceMeters(verificationLat, verificationLng, pin.lat, pin.lng);
+                    distanceBadge.classList.remove('d-none');
+                    if (dist <= 100) {
+                        distanceText.style.cssText = 'background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:600; padding:6px 10px;';
+                        distanceText.innerHTML = `Trùng khớp vị trí bản đồ (lệch ${Math.round(dist)}m)`;
+                    } else if (dist <= VERIFICATION_MAX_DISTANCE_M) {
+                        distanceText.style.cssText = 'background:#fef3c7; color:#92400e; border:1px solid #fcd34d; font-weight:600; padding:6px 10px;';
+                        distanceText.innerHTML = `Bạn đang cách ${Math.round(dist)}m vị trí được ghim`;
+                    } else {
+                        distanceText.style.cssText = 'background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:600; padding:6px 10px;';
+                        distanceText.innerHTML = `Bạn đang cách ${formatVerificationDistance(dist)} vị trí được ghim; chỉ có thể xác thực trong khoảng ${VERIFICATION_MAX_DISTANCE_M}m`;
+                    }
+                    setVerificationDistanceGate(dist);
+                } else {
+                    setVerificationDistanceGate(null);
+                }
+
+                renderVerificationMiniMap(verificationLat, verificationLng);
+                saveWizardState();
+            }
+
+            function showVerificationGpsError(err, permissionState) {
+                const statusTitle = document.getElementById('gpsStatusTitle');
+                let title = 'Chưa lấy được tọa độ GPS. Thử nhấn Lấy lại GPS.';
+
+                if (err && err.code === 1) {
+                    if (permissionState === 'granted') {
+                        title = 'Chưa lấy được tín hiệu GPS. Bật Vị trí trong Cài đặt hệ thống rồi nhấn Lấy lại GPS.';
+                    } else if (permissionState === 'denied') {
+                        title = 'Trình duyệt đang chặn Vị trí. Cho phép Vị trí rồi nhấn Lấy lại GPS.';
+                    } else {
+                        title = 'Hãy cho phép quyền Vị trí khi trình duyệt hỏi, rồi nhấn Lấy lại GPS.';
+                    }
+                } else if (err && err.code === 3) {
+                    title = 'Định vị quá lâu. Thử lại sau vài giây.';
+                } else if (err && err.code === 2) {
+                    title = 'Chưa có tín hiệu GPS. Đợi vài giây rồi nhấn Lấy lại GPS.';
+                }
+
+                if (statusTitle) statusTitle.innerText = title;
+            }
+
+            async function fetchVerificationGPS() {
+                const statusTitle = document.getElementById('gpsStatusTitle');
+                const btn = document.getElementById('btnRefreshGPS');
 
                 if (!navigator.geolocation) {
                     if (statusTitle) statusTitle.innerText = 'Trình duyệt không hỗ trợ Geolocation';
-                    if (statusDetail) statusDetail.innerText = 'Vui lòng bật quyền vị trí trên trình duyệt.';
                     return;
                 }
+                if (verificationGpsInProgress) return;
 
-                if (statusTitle) statusTitle.innerText = 'Đang định vị GPS thời gian thực...';
-                if (statusDetail) statusDetail.innerText = 'Đang kết nối vệ tinh GPS để xác định tọa độ...';
+                verificationGpsInProgress = true;
+                const requestId = ++verificationGpsRequestId;
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('is-loading');
+                }
+                if (statusTitle) statusTitle.innerText = 'Đang định vị GPS...';
+                showLocateStatusToast('Đang lấy vị trí...');
 
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        verificationLat = position.coords.latitude;
-                        verificationLng = position.coords.longitude;
-                        verificationTime = new Date().toISOString();
+                const attempts = [
+                    { mode: 'get', options: { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 } },
+                    { mode: 'get', options: { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 } },
+                    { mode: 'watch', options: { enableHighAccuracy: false, maximumAge: 0 }, waitMs: 22000 },
+                ];
 
-                        const acc = Math.round(position.coords.accuracy || 0);
-                        if (statusTitle) statusTitle.innerText = `GPS Đã Khóa: ${verificationLat.toFixed(6)}, ${verificationLng.toFixed(6)}`;
-                        if (statusDetail) statusDetail.innerText = `Độ chính xác: ±${acc} mét (${new Date().toLocaleTimeString('vi-VN')})`;
-
-                        const mapLat = parseFloat(document.getElementById('input_lat')?.value);
-                        const mapLng = parseFloat(document.getElementById('input_lng')?.value);
-
-                        if (mapLat && mapLng && distanceBadge && distanceText) {
-                            const dist = calculateDistanceMeters(verificationLat, verificationLng, mapLat, mapLng);
-                            distanceBadge.classList.remove('d-none');
-                            if (dist <= 100) {
-                                distanceText.style.cssText = 'background:#f1f5f9; color:#1e3a5f; border:1px solid #cbdbe8; font-weight:500; padding:6px 10px;';
-                                distanceText.innerHTML = `Trùng khớp vị trí bản đồ (Lệch ${dist}m)`;
-                            } else if (dist <= 500) {
-                                distanceText.style.cssText = 'background:#fef3c7; color:#92400e; border:1px solid #fcd34d; font-weight:500; padding:6px 10px;';
-                                distanceText.innerHTML = `Cách vị trí bản đồ ${dist}m`;
-                            } else {
-                                distanceText.style.cssText = 'background:#f1f5f9; color:#52525b; border:1px solid #cbdbe8; font-weight:500; padding:6px 10px;';
-                                distanceText.innerHTML = `Cách vị trí ghim bản đồ ${(dist/1000).toFixed(1)}km`;
-                            }
+                let lastError = null;
+                for (let i = 0; i < attempts.length; i++) {
+                    if (requestId !== verificationGpsRequestId) return;
+                    try {
+                        if (i > 0) {
+                            await new Promise((r) => setTimeout(r, 500));
                         }
 
-                        renderVerificationMiniMap(verificationLat, verificationLng);
-                        saveWizardState();
-                    },
-                    (err) => {
-                        console.warn('Geolocation error:', err);
-                        if (statusTitle) statusTitle.innerText = 'Chưa thể lấy tọa độ GPS tự động';
-                        if (statusDetail) statusDetail.innerText = 'Vui lòng bật Vị Trí (Location) trên trình duyệt hoặc nhấn nút "Lấy lại GPS".';
-                    },
-                    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
-                );
+                        const attempt = attempts[i];
+                        const position = attempt.mode === 'watch'
+                            ? await requestBizMapPositionWatch(attempt.options, attempt.waitMs)
+                            : await requestBizMapPosition(attempt.options);
+
+                        if (requestId !== verificationGpsRequestId) return;
+                        dismissLocateStatusToast();
+                        applyVerificationGpsPosition(position);
+                        showToast('Đã lấy vị trí GPS xác thực.', true);
+                        verificationGpsInProgress = false;
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.classList.remove('is-loading');
+                        }
+                        return;
+                    } catch (err) {
+                        lastError = err;
+                        console.warn('Verification GPS attempt ' + (i + 1) + ' failed:', err);
+                    }
+                }
+
+                if (requestId !== verificationGpsRequestId) return;
+                dismissLocateStatusToast();
+                const permissionState = await getBizGeolocationPermissionState();
+                showVerificationGpsError(lastError, permissionState);
+                verificationGpsInProgress = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('is-loading');
+                }
             }
 
             // Camera Controls & Handlers
@@ -1742,6 +2403,10 @@
             const inputFallbackVerificationPhoto = document.getElementById('inputFallbackVerificationPhoto');
 
             async function initCameraStream() {
+                if (isVerificationTooFar()) {
+                    showToast('Bạn đang cách vị trí được ghim quá xa; chỉ có thể xác thực trong khoảng ' + VERIFICATION_MAX_DISTANCE_M + 'm. Hãy đến gần rồi nhấn Lấy lại GPS.', false);
+                    return;
+                }
                 try {
                     if (cameraStream) {
                         cameraStream.getTracks().forEach(track => track.stop());
@@ -1817,12 +2482,15 @@
             if (btnRefreshGPS) {
                 btnRefreshGPS.addEventListener('click', function() {
                     fetchVerificationGPS();
-                    showToast('Đang cập nhật lại vị trí GPS...', true);
                 });
             }
 
             if (btnCapturePhoto) {
                 btnCapturePhoto.addEventListener('click', function() {
+                    if (isVerificationTooFar()) {
+                        showToast('Bạn đang cách vị trí được ghim quá xa; chỉ có thể xác thực trong khoảng ' + VERIFICATION_MAX_DISTANCE_M + 'm.', false);
+                        return;
+                    }
                     if (!cameraVideo || cameraVideo.classList.contains('d-none')) return;
 
                     let width = cameraVideo.videoWidth || 640;
@@ -1975,6 +2643,8 @@
                     const state = {
                         userId: BIZ_USER_ID,
                         bizStep: bizStep,
+                        claimLocationId: claimLocationId || null,
+                        claimLocationMeta: claimLocationMeta || null,
                         businessName: inputBizName ? inputBizName.value.trim() : '',
                         businessTypes: Array.from(document.querySelectorAll('.biz-type-card.selected')).map(c => c.getAttribute('data-val')),
                         categoryId: inputCategoryId ? inputCategoryId.value : '',
@@ -1982,7 +2652,6 @@
                         categorySearchName: inputCategorySearch ? inputCategorySearch.value : '',
                         addressStreet: inputStreet ? inputStreet.value.trim() : '',
                         addressCity: inputCity ? inputCity.value.trim() : '',
-                        addressDistrict: inputDistrict ? inputDistrict.value.trim() : '',
                         addressProvince: inputProvince ? inputProvince.value.trim() : '',
                         addressPostalCode: document.getElementById('input_address_postal_code') ? document.getElementById('input_address_postal_code').value.trim() : '',
                         phone: inputPhone ? inputPhone.value.trim() : '',
@@ -2075,6 +2744,28 @@
                     if (state.bizStep && !isNaN(state.bizStep)) {
                         bizStep = parseInt(state.bizStep);
                     }
+                    if (!getActiveStepList().includes(bizStep)) {
+                        bizStep = getActiveStepList()[0] || 1;
+                    }
+                });
+
+                restore('địa điểm nhận quyền', () => {
+                    if (state.claimLocationId && state.claimLocationMeta) {
+                        claimLocationId = state.claimLocationId;
+                        claimLocationMeta = state.claimLocationMeta;
+                        if (inputClaimLocationId) inputClaimLocationId.value = claimLocationId;
+                        if (bizClaimChip) bizClaimChip.classList.remove('d-none');
+                        if (bizClaimPreview) bizClaimPreview.classList.add('d-none');
+                        if (bizClaimHint) bizClaimHint.classList.add('d-none');
+                        if (bizClaimName) bizClaimName.textContent = claimLocationMeta.name || '';
+                        if (bizClaimAddr) {
+                            bizClaimAddr.textContent = [claimLocationMeta.address, claimLocationMeta.category]
+                                .filter(Boolean).join(' · ');
+                        }
+                        if (isClaimMode() && !claimBizSteps.includes(bizStep)) {
+                            bizStep = 1;
+                        }
+                    }
                 });
 
                 restore('tên doanh nghiệp', () => {
@@ -2139,18 +2830,8 @@
 
                 restore('địa chỉ', () => {
                     if (state.addressStreet && inputStreet) inputStreet.value = state.addressStreet;
-                    if (state.addressProvince && inputProvince) {
-                        inputProvince.dataset.savedValue = state.addressProvince;
-                        inputProvince.value = state.addressProvince;
-                    }
-                    if (state.addressDistrict && inputDistrict) {
-                        inputDistrict.dataset.savedValue = state.addressDistrict;
-                        inputDistrict.value = state.addressDistrict;
-                    }
-                    if (state.addressCity && inputCity) {
-                        inputCity.dataset.savedValue = state.addressCity;
-                        inputCity.value = state.addressCity;
-                    }
+                    if (state.addressCity && inputCity) inputCity.value = state.addressCity;
+                    if (state.addressProvince && inputProvince) inputProvince.value = state.addressProvince;
                     const postalEl = document.getElementById('input_address_postal_code');
                     if (state.addressPostalCode && postalEl) {
                         postalEl.value = state.addressPostalCode;
@@ -2325,49 +3006,66 @@
                 }
 
                 // Update nodes
+                const activeList = getActiveStepList();
+                const activeIdx = getActiveStepIndex();
+                const activeCount = getActiveStepCount();
+
                 bizStepNodes.forEach(node => {
                     const stepNum = parseInt(node.getAttribute('data-step'));
-                    if (stepNum < bizStep) {
+                    const inFlow = activeList.includes(stepNum);
+                    node.classList.toggle('is-claim-hidden', !inFlow);
+                    if (!inFlow) return;
+
+                    const listIdx = activeList.indexOf(stepNum);
+                    if (listIdx < activeIdx) {
                         node.className = 'step-progress-node completed';
-                    } else if (stepNum === bizStep) {
+                    } else if (listIdx === activeIdx) {
                         node.className = 'step-progress-node active';
                     } else {
                         node.className = 'step-progress-node';
                     }
                 });
 
-                // Update fill line
-                const fillPercent = ((bizStep - 1) / (totalBizSteps - 1)) * 100;
+                // Update fill line theo số bước đang dùng (claim = 4, tạo mới = 11)
+                const fillPercent = activeCount <= 1 ? 0 : (activeIdx / (activeCount - 1)) * 100;
                 bizStepFill.style.width = fillPercent + '%';
 
                 // Update header step counter + name (if present)
                 const regCur = document.getElementById('regStepCurrent');
-                if (regCur) regCur.textContent = bizStep;
+                if (regCur) regCur.textContent = (activeIdx + 1);
+                const regTotal = document.getElementById('regStepTotal');
+                if (regTotal) regTotal.textContent = activeCount;
                 const regName = document.getElementById('regStepName');
                 if (regName) regName.textContent = bizStepNames[bizStep] || '';
 
                 // Update the left step navigation (grouped phases + sub-steps)
+                document.querySelectorAll('.reg-nav__sub').forEach(sub => {
+                    const s = parseInt(sub.getAttribute('data-step'));
+                    const visible = getActiveStepList().includes(s);
+                    sub.classList.toggle('is-claim-hidden', !visible);
+                    sub.classList.toggle('active', s === bizStep);
+                    sub.classList.toggle('done', activeList.indexOf(s) > -1 && activeList.indexOf(s) < activeIdx);
+                });
                 document.querySelectorAll('.reg-nav__group').forEach(group => {
-                    const parts = (group.getAttribute('data-range') || '').split('-').map(Number);
-                    const lo = parts[0], hi = parts[1];
+                    const subs = Array.from(group.querySelectorAll('.reg-nav__sub'))
+                        .filter(sub => !sub.classList.contains('is-claim-hidden'));
+                    const hasVisible = subs.length > 0;
+                    group.style.display = hasVisible ? '' : 'none';
                     const phase = group.querySelector('.reg-nav__phase');
-                    const isActive = bizStep >= lo && bizStep <= hi;
-                    const isDone = bizStep > hi;
+                    const stepNums = subs.map(s => parseInt(s.getAttribute('data-step')));
+                    const isActive = stepNums.includes(bizStep);
+                    const isDone = stepNums.length && Math.max(...stepNums.map(n => activeList.indexOf(n))) < activeIdx
+                        && stepNums.every(n => activeList.indexOf(n) > -1 && activeList.indexOf(n) < activeIdx);
                     group.classList.toggle('is-open', isActive);
                     if (phase) {
                         phase.classList.toggle('active', isActive);
-                        phase.classList.toggle('done', isDone);
+                        phase.classList.toggle('done', !!isDone && !isActive);
                     }
-                });
-                document.querySelectorAll('.reg-nav__sub').forEach(sub => {
-                    const s = parseInt(sub.getAttribute('data-step'));
-                    sub.classList.toggle('active', s === bizStep);
-                    sub.classList.toggle('done', s < bizStep);
                 });
 
                 // Update buttons
-                bizPrevBtn.disabled = (bizStep === 1);
-                if (bizStep === totalBizSteps) {
+                bizPrevBtn.disabled = (activeIdx === 0);
+                if (activeIdx >= activeCount - 1) {
                     bizNextBtn.innerText = 'Hoàn tất & Gửi';
                 } else {
                     bizNextBtn.innerText = 'Tiếp tục';
@@ -2390,7 +3088,13 @@
                     if (!verificationLat || !verificationLng) {
                         fetchVerificationGPS();
                     } else {
-                        renderVerificationMiniMap(verificationLat, verificationLng);
+                        applyVerificationGpsPosition({
+                            coords: {
+                                latitude: verificationLat,
+                                longitude: verificationLng,
+                                accuracy: 0
+                            }
+                        });
                     }
                 }
 
@@ -2642,7 +3346,7 @@
                             minZoom: 10
                         }).setView([defaultLat, defaultLng], hasSavedPosition ? 16 : 12);
 
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        L.tileLayer(@json(config('services.carto.tile_url')), {
                             subdomains: 'abcd',
                             maxZoom: 19
                         }).addTo(bizMap);
@@ -2871,23 +3575,20 @@
             // Address updates
             function updateMockAddress() {
                 const street = inputStreet ? inputStreet.value.trim() : '';
-                const ward = inputCity ? inputCity.value.trim() : '';
-                const district = inputDistrict ? inputDistrict.value.trim() : '';
+                const city = inputCity ? inputCity.value.trim() : '';
                 const province = inputProvince ? inputProvince.value.trim() : '';
 
                 let addr = '';
                 if (street) addr += street;
-                if (ward) addr += (addr ? ', ' : '') + ward;
-                if (district) addr += (addr ? ', ' : '') + district;
+                if (city) addr += (addr ? ', ' : '') + city;
                 if (province) addr += (addr ? ', ' : '') + province;
 
                 if (mockBizAddress) mockBizAddress.innerText = addr || 'Địa chỉ đường phố, thành phố';
                 saveWizardState();
             }
             if (inputStreet) inputStreet.addEventListener('input', updateMockAddress);
-            if (inputCity) inputCity.addEventListener('change', updateMockAddress);
-            if (inputDistrict) inputDistrict.addEventListener('change', updateMockAddress);
-            if (inputProvince) inputProvince.addEventListener('change', updateMockAddress);
+            if (inputCity) inputCity.addEventListener('input', updateMockAddress);
+            if (inputProvince) inputProvince.addEventListener('input', updateMockAddress);
 
             const inputPostalCode = document.getElementById('input_address_postal_code');
             if (inputPostalCode) {
@@ -3223,12 +3924,6 @@
                         showToast('Vui lòng điền tên doanh nghiệp.', false);
                         return false;
                     }
-                } else if (bizStep === 2) {
-                    const selected = document.querySelectorAll('.biz-type-card.selected');
-                    if (selected.length === 0) {
-                        showToast('Vui lòng chọn ít nhất một loại hình.', false);
-                        return false;
-                    }
                 } else if (bizStep === 3) {
                     if (!inputCategoryId.value) {
                         const selectTrigger = document.getElementById('custom_category_select');
@@ -3240,11 +3935,7 @@
                     let hasError = false;
                     const postalInput = document.getElementById('input_address_postal_code');
 
-                    if (inputProvince && (!inputProvince.value || !inputProvince.value.trim())) {
-                        inputProvince.classList.add('is-invalid-clean');
-                        hasError = true;
-                    }
-                    if (inputCity && (!inputCity.value || !inputCity.value.trim())) {
+                    if (!inputCity.value.trim()) {
                         inputCity.classList.add('is-invalid-clean');
                         hasError = true;
                     }
@@ -3252,13 +3943,13 @@
                         postalInput.classList.add('is-invalid-clean');
                         hasError = true;
                     }
-                    if (inputStreet && !inputStreet.value.trim()) {
+                    if (!inputStreet.value.trim()) {
                         inputStreet.classList.add('is-invalid-clean');
                         hasError = true;
                     }
 
                     if (hasError) {
-                        showToast('Vui lòng chọn Tỉnh/Thành, Huyện/Xã và nhập đầy đủ các trường địa chỉ bắt buộc (*).', false);
+                        showToast('Vui lòng nhập đầy đủ các trường địa chỉ bắt buộc (*).', false);
                         const firstInvalid = currentPane ? currentPane.querySelector('.is-invalid-clean') : null;
                         if (firstInvalid) firstInvalid.focus();
                         return false;
@@ -3317,6 +4008,20 @@
                         showToast('Chưa lấy được GPS. Bật Vị trí trên trình duyệt rồi nhấn "Lấy lại GPS".', false);
                         return false;
                     }
+                    const pin = getMapPinCoords();
+                    if (pin) {
+                        const dist = haversineMeters(verificationLat, verificationLng, pin.lat, pin.lng);
+                        verificationDistanceM = dist;
+                        if (dist > VERIFICATION_MAX_DISTANCE_M) {
+                            showToast(
+                                'Bạn đang cách ' + formatVerificationDistance(dist) +
+                                ' vị trí được ghim; chỉ có thể xác thực trong khoảng ' + VERIFICATION_MAX_DISTANCE_M + 'm.',
+                                false
+                            );
+                            setVerificationDistanceGate(dist);
+                            return false;
+                        }
+                    }
                     if (!verificationPhotos || verificationPhotos.length === 0) {
                         showToast('Bắt buộc phải bật Camera chụp ảnh xác thực thực địa!', false);
                         return false;
@@ -3329,9 +4034,10 @@
             bizNextBtn.addEventListener('click', function() {
                 if (!validateBizStep()) return;
 
-                if (bizStep < totalBizSteps) {
-                    bizStep++;
-                    updateBizStepUI();
+                const list = getActiveStepList();
+                const idx = getActiveStepIndex();
+                if (idx < list.length - 1) {
+                    goToRelativeStep(1);
                 } else {
                     submitBizRegistrationForm();
                 }
@@ -3339,18 +4045,18 @@
 
             // Prev button clicked
             bizPrevBtn.addEventListener('click', function() {
-                if (bizStep > 1) {
-                    bizStep--;
-                    updateBizStepUI();
+                if (getActiveStepIndex() > 0) {
+                    goToRelativeStep(-1);
                 }
             });
 
             // Skip button (optional steps) — advance without validation
             if (bizSkipBtn) {
                 bizSkipBtn.addEventListener('click', function() {
-                    if (bizStep < totalBizSteps) {
-                        bizStep++;
-                        updateBizStepUI();
+                    const list = getActiveStepList();
+                    const idx = getActiveStepIndex();
+                    if (idx < list.length - 1) {
+                        goToRelativeStep(1);
                     } else {
                         submitBizRegistrationForm();
                     }
@@ -3361,10 +4067,34 @@
             document.querySelectorAll('.reg-nav__sub').forEach(sub => {
                 sub.addEventListener('click', function() {
                     const s = parseInt(sub.getAttribute('data-step'));
-                    if (!isNaN(s) && s < bizStep) {
+                    const list = getActiveStepList();
+                    const targetIdx = list.indexOf(s);
+                    const curIdx = getActiveStepIndex();
+                    if (!isNaN(s) && targetIdx > -1 && targetIdx < curIdx) {
                         bizStep = s;
                         updateBizStepUI();
                     }
+                });
+            });
+
+            // Click a completed phase header to jump back to its first finished step
+            document.querySelectorAll('.reg-nav__phase').forEach(phase => {
+                phase.addEventListener('click', function() {
+                    if (!phase.classList.contains('done')) return;
+                    const group = phase.closest('.reg-nav__group');
+                    if (!group) return;
+                    const list = getActiveStepList();
+                    const curIdx = getActiveStepIndex();
+                    const candidates = Array.from(group.querySelectorAll('.reg-nav__sub'))
+                        .filter((sub) => !sub.classList.contains('is-claim-hidden'))
+                        .map((sub) => parseInt(sub.getAttribute('data-step'), 10))
+                        .filter((s) => {
+                            const idx = list.indexOf(s);
+                            return idx > -1 && idx < curIdx;
+                        });
+                    if (!candidates.length) return;
+                    bizStep = candidates[0];
+                    updateBizStepUI();
                 });
             });
 
@@ -3373,6 +4103,20 @@
                 if (!Number.isFinite(verificationLat) || !Number.isFinite(verificationLng)) {
                     showToast('Chưa lấy được GPS. Bật Vị trí trên trình duyệt rồi nhấn "Lấy lại GPS" trước khi gửi.', false);
                     return;
+                }
+                const pin = getMapPinCoords();
+                if (pin) {
+                    const dist = haversineMeters(verificationLat, verificationLng, pin.lat, pin.lng);
+                    verificationDistanceM = dist;
+                    if (dist > VERIFICATION_MAX_DISTANCE_M) {
+                        showToast(
+                            'Bạn đang cách ' + formatVerificationDistance(dist) +
+                            ' vị trí được ghim; chỉ có thể xác thực trong khoảng ' + VERIFICATION_MAX_DISTANCE_M + 'm.',
+                            false
+                        );
+                        setVerificationDistanceGate(dist);
+                        return;
+                    }
                 }
                 if (!verificationPhotos || verificationPhotos.length === 0) {
                     showToast('Bắt buộc phải chụp ảnh xác thực thực địa trước khi gửi.', false);
@@ -3391,20 +4135,20 @@
 
                     const payload = {
                         business_name: inputBizName.value.trim(),
-                        business_types: types,
-                        category_id: inputCategoryId.value,
+                        business_types: types.length ? types : ['local_store'],
+                        category_id: inputCategoryId.value || (claimLocationMeta && claimLocationMeta.category_id) || null,
                         address_country: 'Việt Nam',
-                        address_street: inputStreet.value.trim(),
-                        address_city: inputCity.value.trim(),
-                        address_province: inputProvince.value.trim(),
-                        address_postal_code: document.getElementById('input_address_postal_code') ? document.getElementById('input_address_postal_code').value.trim() : '',
+                        address_street: inputStreet.value.trim() || (claimLocationMeta && claimLocationMeta.address) || '',
+                        address_city: inputCity.value.trim() || 'Ninh Bình',
+                        address_province: inputProvince.value.trim() || 'Ninh Bình',
+                        address_postal_code: document.getElementById('input_address_postal_code') ? document.getElementById('input_address_postal_code').value.trim() : (isClaimMode() ? '00000' : ''),
                         phone: inputPhone.value.trim(),
                         website: inputWebsite ? inputWebsite.value.trim() : '',
-                        lat: parseFloat(document.getElementById('input_lat').value),
-                        lng: parseFloat(document.getElementById('input_lng').value),
+                        lat: parseFloat(document.getElementById('input_lat').value) || (claimLocationMeta ? claimLocationMeta.lat : null),
+                        lng: parseFloat(document.getElementById('input_lng').value) || (claimLocationMeta ? claimLocationMeta.lng : null),
                         receive_tips: (document.getElementById('receive_tips') && document.getElementById('receive_tips').checked) ? 1 : 0,
                         receive_surveys: (document.getElementById('receive_surveys') && document.getElementById('receive_surveys').checked) ? 1 : 0,
-                        description: inputDesc.value.trim(),
+                        description: inputDesc.value.trim() || (claimLocationMeta && claimLocationMeta.description) || '',
                         menu_photos: menuPhotos || [],
                         avatar_photo: avatarPhoto || null,
                         business_documents: businessDocs || [],
@@ -3413,6 +4157,7 @@
                         verification_lat: typeof verificationLat !== 'undefined' ? verificationLat : null,
                         verification_lng: typeof verificationLng !== 'undefined' ? verificationLng : null,
                         verification_time: typeof verificationTime !== 'undefined' ? verificationTime : null,
+                        location_id: claimLocationId || null,
                         _token: '{{ csrf_token() }}'
                     };
 
@@ -3458,91 +4203,6 @@
                     console.error('Payload Build Error:', err);
                 }
             }
-        }
-    });
-
-    // --- TỰ ĐỘNG NẠP DỮ LIỆU TỈNH / THÀNH VÀ XÃ / PHƯỜNG TỪ API ---
-    document.addEventListener('DOMContentLoaded', function() {
-        const provinceSelect = document.getElementById('input_address_province');
-        const citySelect = document.getElementById('input_address_city');
-        const bizForm = document.getElementById('bizRegisterForm');
-        const bizNextBtn = document.getElementById('bizNextBtn');
-
-        const zipCodes = {
-            'Hà Nội': '10000', 'Hồ Chí Minh': '70000', 'Hải Phòng': '15000',
-            'Ninh Bình': '19000', 'Đà Nẵng': '58000', 'Cần Thơ': '95000',
-            'An Giang': '91000', 'Bắc Ninh': '22000', 'Cà Mau': '94000',
-            'Cao Bằng': '02000', 'Đắk Lắk': '67000', 'Điện Biên': '14000',
-            'Đồng Nai': '92000', 'Đồng Tháp': '83000', 'Gia Lai': '63000',
-            'Hà Tĩnh': '38000', 'Thừa Thiên Huế': '53000', 'Huế': '53000',
-            'Hưng Yên': '17000', 'Khánh Hòa': '65000', 'Lai Châu': '13000',
-            'Lạng Sơn': '25000', 'Lào Cai': '27000', 'Lâm Đồng': '66000',
-            'Nghệ An': '37000', 'Phú Thọ': '21000', 'Quảng Ngãi': '57000',
-            'Quảng Ninh': '20000', 'Quảng Trị': '52000', 'Sơn La': '11000',
-            'Tây Ninh': '80000', 'Thái Nguyên': '23000', 'Thanh Hóa': '36000',
-            'Tuyên Quang': '25000', 'Vĩnh Long': '98000'
-        };
-
-        // Khi người dùng gõ phím Enter trên bất kỳ ô nhập nào -> Kích hoạt chuyển bước Tiếp tục
-        if (bizForm) {
-            bizForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (bizNextBtn && !bizNextBtn.disabled) {
-                    bizNextBtn.click();
-                }
-            });
-        }
-
-        if (provinceSelect && citySelect) {
-            const loadNinhBinhWards = function(provCode) {
-                citySelect.innerHTML = '<option value="">-- Đang tải dữ liệu... --</option>';
-
-                fetch('/api/location/wards/' + (provCode || '37'))
-                    .then(res => res.json())
-                    .then(wards => {
-                        const savedCity = citySelect.dataset.savedValue || '';
-                        citySelect.innerHTML = '<option value="">-- Chọn Huyện / Thị xã / Xã --</option>';
-                        if (Array.isArray(wards) && wards.length > 0) {
-                            wards.forEach(w => {
-                                const opt = document.createElement('option');
-                                const valStr = w.full_name || w.name;
-                                opt.value = valStr;
-                                opt.textContent = valStr;
-                                if (savedCity && valStr === savedCity) {
-                                    opt.selected = true;
-                                }
-                                citySelect.appendChild(opt);
-                            });
-                        } else {
-                            citySelect.innerHTML = '<option value="">Không có dữ liệu xã/phường</option>';
-                        }
-                        if (typeof updateMockAddress === 'function') updateMockAddress();
-                    })
-                    .catch(err => {
-                        console.error('Lỗi khi nạp danh sách Xã/Phường:', err);
-                        citySelect.innerHTML = '<option value="">-- Chọn Huyện / Thị xã / Xã --</option>';
-                    });
-            };
-
-            // Nạp mã tỉnh Ninh Bình để lấy danh sách xã/phường
-            fetch('/api/location/provinces')
-                .then(res => res.json())
-                .then(data => {
-                    let code = '37';
-                    if (Array.isArray(data)) {
-                        const nb = data.find(p => (p.full_name || p.name || '').includes('Ninh Bình'));
-                        if (nb && nb.code) code = nb.code;
-                    }
-                    provinceSelect.dataset.code = code;
-                    loadNinhBinhWards(code);
-                })
-                .catch(() => {
-                    loadNinhBinhWards('37');
-                });
-
-            citySelect.addEventListener('change', function() {
-                if (typeof updateMockAddress === 'function') updateMockAddress();
-            });
         }
     });
 </script>

@@ -244,8 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
         attributionControl: false,
     }).setView([lat, lng], 15);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd',
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 19,
     }).addTo(map);
 
