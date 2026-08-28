@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Requests\Client\Location\SuggestLocationRequest;
 use App\Models\Location;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
@@ -222,24 +223,9 @@ class InteractionController extends Controller
     }
 
     /** Gửi đề xuất địa điểm mới kèm ảnh; lưu ở trạng thái chờ admin duyệt, không tự lên bản đồ. */
-    public function suggestLocation(Request $request)
+    public function suggestLocation(SuggestLocationRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:200',
-            'address' => 'nullable|string|max:500',
-            'description' => 'nullable|string',
-            'category_suggest' => 'nullable|string|max:80',
-            'lat' => 'nullable|numeric',
-            'lng' => 'nullable|numeric',
-            'images' => 'nullable|array|max:10',
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:10240',
-        ], [
-            'name.required' => 'Vui lòng nhập tên địa điểm.',
-            'images.max' => 'Chỉ được đính kèm tối đa 10 ảnh.',
-            'images.*.image' => 'File đính kèm phải là hình ảnh.',
-            'images.*.mimes' => 'Ảnh chỉ hỗ trợ định dạng JPG, PNG hoặc WEBP.',
-            'images.*.max' => 'Mỗi ảnh không được lớn hơn 10MB. Hãy nén ảnh hoặc chọn ảnh nhỏ hơn.',
-        ]);
+        $validated = $request->validated();
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -251,12 +237,12 @@ class InteractionController extends Controller
 
         $suggestion = \App\Models\LocationSuggestion::create([
             'user_id' => Auth::id(),
-            'name' => $request->name,
-            'address' => $request->address,
-            'description' => $request->description,
-            'category_suggest' => $request->category_suggest,
-            'lat' => $request->lat,
-            'lng' => $request->lng,
+            'name' => $validated['name'],
+            'address' => $validated['address'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'category_suggest' => $validated['category_suggest'] ?? null,
+            'lat' => $validated['lat'] ?? null,
+            'lng' => $validated['lng'] ?? null,
             'images' => $imagePaths,
             'status' => 'pending'
         ]);

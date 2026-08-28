@@ -17,7 +17,7 @@ class CategoryController extends Controller
     /** Danh sách danh mục (sắp theo thứ tự hiển thị). */
     public function index()
     {
-        $categories = Category::orderBy('display_order', 'asc')->paginate(10);
+        $categories = Category::withCount('locations')->orderBy('display_order', 'asc')->paginate(10);
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -35,7 +35,7 @@ class CategoryController extends Controller
         $data = $request->except('icon');
         $data['slug'] = Str::slug($request->name);
         if (!$request->filled('display_order')) {
-            $data['display_order'] = Category::max('display_order') + 1;
+            $data['display_order'] = (int) Category::max('display_order') + 1;
         }
 
         if ($request->hasFile('icon')) {
@@ -82,8 +82,9 @@ class CategoryController extends Controller
     /** Xóa danh mục (chặn nếu còn địa điểm thuộc danh mục này). */
     public function destroy(Category $category)
     {
-        if ($category->locations()->count() > 0) {
-            return back()->with('error', 'Không thể xóa danh mục đang có chứa địa điểm!');
+        $locationsCount = $category->locations()->count();
+        if ($locationsCount > 0) {
+            return back()->with('error', 'Không thể xóa! Danh mục "' . $category->name . '" đang chứa ' . $locationsCount . ' địa điểm du lịch.');
         }
         
         $category->delete();

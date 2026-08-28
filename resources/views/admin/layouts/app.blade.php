@@ -104,6 +104,32 @@
             background: #ffffff !important;
         }
 
+        /* Form Select Polish & Arrow Spacing */
+        .form-select {
+            border-color: var(--border-light, #e2e8f0);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            padding-right: 2.25rem !important;
+            background-position: right 0.75rem center !important;
+            color: var(--text-body, #334155);
+            transition: all 0.15s ease;
+        }
+
+        .form-select:focus {
+            border-color: var(--accent-primary, #1e3a5f);
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        }
+
+        .form-select-sm {
+            padding-top: 0.35rem !important;
+            padding-bottom: 0.35rem !important;
+            padding-left: 0.75rem !important;
+            padding-right: 2.25rem !important;
+            background-position: right 0.65rem center !important;
+            font-size: 0.78rem !important;
+            border-radius: 6px !important;
+        }
+
         body {
             font-family: 'Be Vietnam Pro', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-main);

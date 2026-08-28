@@ -50,15 +50,19 @@
                         </td>
                         <td class="text-end pe-4">
                             <a href="{{ route('admin.categories.edit', $item->id) }}" class="btn-minimal py-1 px-2 text-decoration-none me-1" style="font-size: 0.75rem;">Sửa</a>
-                            <form action="{{ route('admin.categories.destroy', $item->id) }}" method="POST" class="d-inline" 
-                                  data-confirm-title="Xóa danh mục" 
-                                  data-confirm-text="Bạn có chắc chắn muốn xóa danh mục <strong>&quot;{{ $item->name }}&quot;</strong> không? Thao tác này không thể hoàn tác." 
-                                  data-confirm-btn="Xóa danh mục" 
-                                  data-confirm-type="danger">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size: 0.75rem;">Xóa</button>
-                            </form>
+                            @if(($item->locations_count ?? 0) > 0)
+                                <button type="button" class="btn-minimal py-1 px-2 text-muted" style="font-size: 0.75rem; cursor: not-allowed; opacity: 0.5;" title="Danh mục này đang chứa {{ $item->locations_count }} địa điểm du lịch, không thể xóa" disabled>Xóa</button>
+                            @else
+                                <form action="{{ route('admin.categories.destroy', $item->id) }}" method="POST" class="d-inline" 
+                                      data-confirm-title="Xóa danh mục" 
+                                      data-confirm-text="Bạn có chắc chắn muốn xóa danh mục <strong>&quot;{{ $item->name }}&quot;</strong> không? Thao tác này không thể hoàn tác." 
+                                      data-confirm-btn="Xóa danh mục" 
+                                      data-confirm-type="danger">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-minimal py-1 px-2 text-danger" style="font-size: 0.75rem;">Xóa</button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty
