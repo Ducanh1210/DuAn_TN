@@ -22,7 +22,7 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name' => 'required|string|max:80|unique:categories,name',
             'status' => 'required|in:active,hidden',
-            'display_order' => 'nullable|integer|min:0',
+            'display_order' => 'nullable|integer|min:0|unique:categories,display_order',
             'icon_color' => 'nullable|string|max:20',
             'icon' => 'nullable|image|mimes:png,jpg,jpeg,svg,gif|max:2048',
         ];
@@ -39,6 +39,7 @@ class StoreCategoryRequest extends FormRequest
             'name.unique' => 'Tên danh mục này đã tồn tại.',
             'display_order.integer' => 'Thứ tự hiển thị phải là số nguyên.',
             'display_order.min' => 'Thứ tự hiển thị không được nhỏ hơn 0.',
+            'display_order.unique' => 'Thứ tự hiển thị này đã tồn tại, vui lòng chọn thứ tự khác.',
             'icon.image' => 'File tải lên phải là hình ảnh.',
             'icon.mimes' => 'Hình ảnh icon phải có định dạng png, jpg, jpeg, svg hoặc gif.',
             'icon.max' => 'Kích thước ảnh icon không vượt quá 2MB.',

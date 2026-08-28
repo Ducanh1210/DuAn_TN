@@ -1330,7 +1330,7 @@
                                         @guest
                                             <a href="{{ route('login') }}" class="btn btn-action-compact text-decoration-none text-center d-block">Đăng nhập để đổi</a>
                                         @else
-                                            <button class="btn btn-action-compact btn-buy-frame" type="button" data-id="{{ $frame->id }}" data-points="{{ (int) $frame->required_points }}" {{ $canAfford ? '' : 'disabled' }}>
+                                            <button class="btn btn-action-compact btn-buy-frame" type="button" data-id="{{ $frame->id }}" data-name="{{ $frame->name }}" data-points="{{ (int) $frame->required_points }}" {{ $canAfford ? '' : 'disabled' }}>
                                                 {{ $canAfford ? 'Đổi khung' : 'Không đủ xu' }}
                                             </button>
                                         @endguest
@@ -2332,25 +2332,77 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const frameId = this.dataset.id;
             const points = this.dataset.points;
-            if (!confirm(`Xác nhận dùng ${points} xu để đổi Khung Avatar này?`)) return;
+            const frameName = this.dataset.name || 'Khung Avatar';
 
-            fetch(`/avatar-frames/buy/${frameId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": csrfToken
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                showRewardModal({
-                    title: data.success ? '🎉 ĐỔI KHUNG THÀNH CÔNG!' : 'THÔNG BÁO',
-                    message: data.message,
-                    isError: !data.success,
-                    icon: 'fa-solid fa-store',
-                    onConfirm: function() {
-                        if (data.success) location.reload();
+            Swal.fire({
+                title: 'Xác nhận đổi khung',
+                html: `Bạn có chắc chắn muốn dùng <strong style="color: #735c00;">${points} xu</strong> để đổi Khung Avatar <strong>"${frameName}"</strong> này không?`,
+                icon: 'question',
+                iconColor: '#1e3a5f',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý đổi',
+                cancelButtonText: 'Hủy bỏ',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'custom-swal-popup',
+                    title: 'custom-swal-title',
+                    htmlContainer: 'custom-swal-text',
+                    confirmButton: 'custom-swal-confirm-btn',
+                    cancelButton: 'custom-swal-cancel-btn'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                fetch(`/avatar-frames/buy/${frameId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken
                     }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showRewardModal({
+                            title: '🎉 ĐỔI KHUNG THÀNH CÔNG!',
+                            message: data.message,
+                            isError: false,
+                            frame: data.frame || null,
+                            icon: 'fa-solid fa-store'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            iconColor: '#dc2626',
+                            title: 'Thông báo',
+                            text: data.message || 'Không thể đổi khung avatar!',
+                            confirmButtonText: 'Đóng',
+                            customClass: {
+                                popup: 'custom-swal-popup',
+                                title: 'custom-swal-title',
+                                htmlContainer: 'custom-swal-text',
+                                confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    }
+                })
+                .catch(() => {
+                    Swal.fire({
+                        icon: 'error',
+                        iconColor: '#dc2626',
+                        title: 'Lỗi hệ thống',
+                        text: 'Không thể kết nối máy chủ!',
+                        confirmButtonText: 'Đóng',
+                        customClass: {
+                            popup: 'custom-swal-popup',
+                            title: 'custom-swal-title',
+                            htmlContainer: 'custom-swal-text',
+                            confirmButton: 'custom-swal-confirm-btn custom-swal-confirm-danger'
+                        },
+                        buttonsStyling: false
+                    });
                 });
             });
         });

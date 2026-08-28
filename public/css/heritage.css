@@ -365,8 +365,13 @@
 }
 
 @keyframes nbHeroDrift {
-    from { transform: scale(1); }
-    to { transform: scale(1.08); }
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.08);
+    }
 }
 
 .nb-hero__scrim {
@@ -491,8 +496,13 @@
 }
 
 @media (min-width: 992px) {
-    .nb-dest-grid--stagger > *:nth-child(2) { margin-top: 44px; }
-    .nb-dest-grid--stagger > *:nth-child(3) { margin-top: 88px; }
+    .nb-dest-grid--stagger>*:nth-child(2) {
+        margin-top: 44px;
+    }
+
+    .nb-dest-grid--stagger>*:nth-child(3) {
+        margin-top: 88px;
+    }
 }
 
 /* ---------- Khối chia đôi chữ / ảnh ---------- */
@@ -571,10 +581,25 @@
     background: var(--nb-surface-mist);
 }
 
-.nb-bento__cell--wide { grid-column: span 8; height: 440px; }
-.nb-bento__cell--narrow { grid-column: span 4; height: 440px; }
-.nb-bento__cell--narrow-b { grid-column: span 4; height: 360px; }
-.nb-bento__cell--wide-b { grid-column: span 8; height: 360px; }
+.nb-bento__cell--wide {
+    grid-column: span 8;
+    height: 440px;
+}
+
+.nb-bento__cell--narrow {
+    grid-column: span 4;
+    height: 440px;
+}
+
+.nb-bento__cell--narrow-b {
+    grid-column: span 4;
+    height: 360px;
+}
+
+.nb-bento__cell--wide-b {
+    grid-column: span 8;
+    height: 360px;
+}
 
 .nb-bento__img {
     width: 100%;
@@ -674,7 +699,9 @@
 }
 
 @media (min-width: 992px) {
-    .nb-tri--stagger > *:nth-child(2) { margin-top: -32px; }
+    .nb-tri--stagger>*:nth-child(2) {
+        margin-top: -32px;
+    }
 }
 
 .nb-values {
@@ -1079,10 +1106,18 @@
 /* ---------- Responsive ---------- */
 
 @media (max-width: 991.98px) {
-    .nb-section { padding: 64px 0; }
-    .nb-section--tight { padding: 48px 0; }
+    .nb-section {
+        padding: 64px 0;
+    }
 
-    .nb-dest-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .nb-section--tight {
+        padding: 48px 0;
+    }
+
+    .nb-dest-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
 
     .nb-split,
     .nb-split--reverse,
@@ -1091,9 +1126,14 @@
         gap: 36px;
     }
 
-    .nb-split--reverse .nb-split__figure { order: -1; }
+    .nb-split--reverse .nb-split__figure {
+        order: -1;
+    }
 
-    .nb-bento { grid-template-columns: 1fr 1fr; }
+    .nb-bento {
+        grid-template-columns: 1fr 1fr;
+    }
+
     .nb-bento__cell--wide,
     .nb-bento__cell--narrow,
     .nb-bento__cell--narrow-b,
@@ -1102,27 +1142,68 @@
         height: 280px;
     }
 
-    .nb-tri { grid-template-columns: 1fr 1fr; }
+    .nb-tri {
+        grid-template-columns: 1fr 1fr;
+    }
 
-    .nb-columns { grid-template-columns: 1fr; gap: 40px; }
-    .nb-side { position: static; }
+    .nb-columns {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
 
-    .nb-feature { aspect-ratio: 16 / 9; }
-    .nb-feature__body { padding: 24px; }
+    .nb-side {
+        position: static;
+    }
+
+    .nb-feature {
+        aspect-ratio: 16 / 9;
+    }
+
+    .nb-feature__body {
+        padding: 24px;
+    }
 }
 
 @media (max-width: 767.98px) {
-    .nb-wrap { padding: 0 20px; }
+    .nb-wrap {
+        padding: 0 20px;
+    }
 
-    .nb-hero { min-height: 520px; height: 80vh; }
-    .nb-hero--short { min-height: 380px; height: 52vh; }
+    .nb-hero {
+        min-height: 520px;
+        height: 80vh;
+    }
 
-    .nb-dest-grid { grid-template-columns: 1fr; }
-    .nb-bento { grid-template-columns: 1fr; }
-    .nb-tri { grid-template-columns: 1fr; }
-    .nb-card-grid { grid-template-columns: 1fr; }
+    .nb-hero--short {
+        min-height: 380px;
+        height: 52vh;
+    }
 
-    .nb-stats { gap: 28px; }
-    .nb-section__head { margin-bottom: 32px; }
-    .nb-feature { aspect-ratio: 4 / 3; }
+    .nb-dest-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nb-bento {
+        grid-template-columns: 1fr;
+    }
+
+    .nb-tri {
+        grid-template-columns: 1fr;
+    }
+
+    .nb-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nb-stats {
+        gap: 28px;
+    }
+
+    .nb-section__head {
+        margin-bottom: 32px;
+    }
+
+    .nb-feature {
+        aspect-ratio: 4 / 3;
+    }
 }

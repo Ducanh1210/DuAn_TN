@@ -77,15 +77,15 @@
                         </td>
                         <td class="small text-muted">{{ $item->created_at->format('d/m/Y H:i') }}</td>
                         <td class="text-end pe-3">
-                            <form action="{{ route('admin.panorama-requests.update', $item) }}" method="POST" class="d-inline-flex gap-1 align-items-center justify-content-end flex-wrap">
+                            <form action="{{ route('admin.panorama-requests.update', $item) }}" method="POST" class="d-inline-flex gap-1.5 align-items-center justify-content-end flex-wrap">
                                 @csrf
                                 @method('PATCH')
-                                <select name="status" class="form-select form-select-sm" style="width:auto;font-size:0.72rem;">
+                                <select name="status" class="form-select form-select-sm" style="width: auto; min-width: 130px;">
                                     @foreach($statusLabels as $key => $label)
                                         <option value="{{ $key }}" @selected($item->status === $key)>{{ $label }}</option>
                                     @endforeach
                                 </select>
-                                <button type="submit" class="btn-minimal btn-minimal-primary py-1 px-2" style="font-size:0.7rem;">Lưu</button>
+                                <button type="submit" class="btn-minimal btn-minimal-primary py-1 px-2.5" style="font-size:0.75rem;">Lưu</button>
                             </form>
                         </td>
                     </tr>

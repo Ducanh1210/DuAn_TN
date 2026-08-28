@@ -1,4 +1,4 @@
-﻿<script src="https://unpkg.com/@turf/turf@7.2.0/dist/turf.min.js"></script>
+<script src="https://unpkg.com/@turf/turf@7.2.0/dist/turf.min.js"></script>
 
 <style>
 /* Modern Ultra-Clean Modal Styling - Sharp Crisp Edges */
@@ -219,8 +219,8 @@
 
 .contrib-form-error {
     margin-top: 8px;
-    padding: 8px 10px;
-    border-radius: 5px;
+    padding: 10px 12px;
+    border-radius: 6px;
     background: #fef2f2;
     border: 1px solid #fecaca;
     color: #b91c1c;
@@ -229,6 +229,20 @@
 }
 
 .contrib-form-error.d-none, .contrib-form-error:empty {
+    display: none !important;
+}
+
+.contrib-field-error {
+    color: #dc2626;
+    font-size: 0.73rem;
+    font-weight: 500;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.contrib-field-error.d-none {
     display: none !important;
 }
 
@@ -404,19 +418,20 @@
         </div>
         <div class="custom-modal-body">
             @if(Auth::check())
-            <form id="suggestLocationForm" onsubmit="submitLocationSuggestion(event)">
+            <form id="suggestLocationForm" onsubmit="submitLocationSuggestion(event)" novalidate>
                 @csrf
                 <div class="contrib-grid-form">
                     <!-- Tên địa điểm -->
                     <div class="contrib-form-group">
-                        <label class="contrib-form-label">Tên địa điểm</label>
-                        <input type="text" name="name" class="contrib-form-control" required placeholder="Ví dụ: Chùa Bầu, Đền Lăng...">
+                        <label class="contrib-form-label">Tên địa điểm <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="contrib-form-control" placeholder="Ví dụ: Chùa Bầu, Đền Lăng...">
+                        <div class="contrib-field-error d-none" id="err-name"></div>
                     </div>
 
                     <!-- Danh mục -->
                     <div class="contrib-form-group">
-                        <label class="contrib-form-label">Danh mục</label>
-                        <select name="category_suggest" class="contrib-form-control" required>
+                        <label class="contrib-form-label">Danh mục <span class="text-danger">*</span></label>
+                        <select name="category_suggest" class="contrib-form-control">
                             <option value="" disabled selected>Chọn danh mục...</option>
                             <option value="Tâm linh">Tâm linh</option>
                             <option value="Sinh thái">Sinh thái</option>
@@ -426,17 +441,19 @@
                             <option value="Lưu trú">Lưu trú</option>
                             <option value="Khác">Khác</option>
                         </select>
+                        <div class="contrib-field-error d-none" id="err-category_suggest"></div>
                     </div>
 
                     <!-- Địa chỉ chi tiết -->
                     <div class="contrib-form-group contrib-grid-full">
                         <label class="contrib-form-label">Địa chỉ</label>
                         <input type="text" name="address" class="contrib-form-control" placeholder="Ví dụ: Phường Hai Bà Trưng, Phủ Lý...">
+                        <div class="contrib-field-error d-none" id="err-address"></div>
                     </div>
 
                     <!-- Embedded Leaflet Map for Coordinates Selection -->
                     <div class="contrib-form-group contrib-grid-full">
-                        <label class="contrib-form-label" style="margin-bottom: 3px;">Chọn vị trí trên bản đồ</label>
+                        <label class="contrib-form-label" style="margin-bottom: 3px;">Chọn vị trí trên bản đồ <span class="text-danger">*</span></label>
                         <p class="text-secondary small mb-2" style="font-size: 0.75rem; color: #64748b; margin-bottom: 8px;">Kéo marker hoặc nhấp trên bản đồ để ghim vị trí. Dùng nút định vị góc phải bản đồ để lấy vị trí hiện tại.</p>
                         <div class="contrib-map-wrapper">
                             <div id="modalPickerMap"></div>
@@ -451,14 +468,16 @@
                                 </svg>
                             </button>
                         </div>
-                        <input type="hidden" id="suggestLat" name="lat" required>
-                        <input type="hidden" id="suggestLng" name="lng" required>
+                        <input type="hidden" id="suggestLat" name="lat">
+                        <input type="hidden" id="suggestLng" name="lng">
+                        <div class="contrib-field-error d-none" id="err-map"></div>
                     </div>
 
                     <!-- Mô tả ngắn -->
                     <div class="contrib-form-group contrib-grid-full">
                         <label class="contrib-form-label">Mô tả ngắn</label>
                         <textarea name="description" class="contrib-form-control" rows="2" placeholder="Giới thiệu sơ lược về địa điểm..."></textarea>
+                        <div class="contrib-field-error d-none" id="err-description"></div>
                     </div>
 
                     <!-- Clean Multi-Image Upload Zone -->
@@ -508,13 +527,30 @@ function formatFileSize(bytes) {
 function showSuggestFormError(message) {
     const box = document.getElementById('suggestFormError');
     if (!box) return;
-    if (!message || !message.trim()) {
+
+    if (!message || (Array.isArray(message) && message.length === 0) || (typeof message === 'string' && !message.trim())) {
         box.classList.add('d-none');
         box.style.display = 'none';
-        box.textContent = '';
+        box.innerHTML = '';
         return;
     }
-    box.textContent = message;
+
+    if (Array.isArray(message)) {
+        box.innerHTML = message.map(m => `
+            <div class="d-flex align-items-center gap-2 mb-1" style="font-size: 0.78rem;">
+                <i class="fa-solid fa-circle-exclamation text-danger flex-shrink-0" style="font-size:0.75rem;"></i>
+                <span>${m}</span>
+            </div>
+        `).join('');
+    } else {
+        box.innerHTML = `
+            <div class="d-flex align-items-center gap-2" style="font-size: 0.78rem;">
+                <i class="fa-solid fa-circle-exclamation text-danger flex-shrink-0" style="font-size:0.75rem;"></i>
+                <span>${message}</span>
+            </div>
+        `;
+    }
+
     box.classList.remove('d-none');
     box.style.display = 'block';
 }
@@ -1003,17 +1039,20 @@ function submitLocationSuggestion(e) {
     const submitBtn = form.querySelector('button[type="submit"]');
     const fileInput = document.getElementById('contribFileInput');
 
+    // Clear previous errors & field highlight borders
     showSuggestFormError('');
-
-    if (!formData.get('lat') || !formData.get('lng')) {
-        const msg = 'Vui lòng nhấp chọn vị trí hợp lệ trong địa phận tỉnh Ninh Bình!';
-        showSuggestFormError(msg);
-        if (typeof showToast === 'function') {
-            showToast('⚠️ ' + msg, 'warning', 3500);
-        } else {
-            alert('⚠️ ' + msg);
-        }
-        return;
+    form.querySelectorAll('.contrib-form-control').forEach(el => {
+        el.style.borderColor = '';
+        el.style.boxShadow = '';
+    });
+    form.querySelectorAll('.contrib-field-error').forEach(el => {
+        el.classList.add('d-none');
+        el.innerHTML = '';
+    });
+    const mapBox = document.getElementById('modalPickerMap');
+    if (mapBox) {
+        mapBox.style.borderColor = '';
+        mapBox.style.boxShadow = '';
     }
 
     const fileCheck = validateSuggestFiles(fileInput ? fileInput.files : []);
@@ -1039,14 +1078,60 @@ function submitLocationSuggestion(e) {
     .then(async res => {
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-            const serverMsg = data.message
-                || (data.errors ? Object.values(data.errors).flat().join(' ') : '')
-                || 'Không gửi được đề xuất. Vui lòng thử lại.';
-            throw new Error(serverMsg);
+            if (data.errors) {
+                const allMsgs = [];
+
+                Object.keys(data.errors).forEach(fieldName => {
+                    const fieldMsgs = data.errors[fieldName];
+                    if (Array.isArray(fieldMsgs) && fieldMsgs.length > 0) {
+                        allMsgs.push(...fieldMsgs);
+
+                        // Highlight input border
+                        const fieldEl = form.querySelector(`[name="${fieldName}"]`);
+                        if (fieldEl) {
+                            fieldEl.style.borderColor = '#ef4444';
+                            fieldEl.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.12)';
+                        }
+
+                        // Show inline field error
+                        const errDiv = document.getElementById(`err-${fieldName}`);
+                        if (errDiv) {
+                            errDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="font-size:0.72rem;"></i> <span>${fieldMsgs[0]}</span>`;
+                            errDiv.classList.remove('d-none');
+                        }
+
+                        if (fieldName === 'lat' || fieldName === 'lng') {
+                            if (mapBox) {
+                                mapBox.style.borderColor = '#ef4444';
+                                mapBox.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.18)';
+                            }
+                            const mapErrDiv = document.getElementById('err-map');
+                            if (mapErrDiv) {
+                                mapErrDiv.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="font-size:0.72rem;"></i> <span>${fieldMsgs[0]}</span>`;
+                                mapErrDiv.classList.remove('d-none');
+                            }
+                        }
+                    }
+                });
+
+                showSuggestFormError(allMsgs);
+                const toastMsg = allMsgs[0] || 'Vui lòng điền đầy đủ các trường bắt buộc.';
+                if (typeof showToast === 'function') {
+                    showToast('⚠️ ' + toastMsg, 'warning', 4500);
+                }
+                return;
+            }
+            const serverMsg = data.message || 'Không gửi được đề xuất. Vui lòng thử lại.';
+            showSuggestFormError(serverMsg);
+            if (typeof showToast === 'function') {
+                showToast('⚠️ ' + serverMsg, 'error', 4500);
+            }
+            return;
         }
         return data;
     })
     .then(data => {
+        if (!data) return;
         if (data.success) {
             if (typeof showToast === 'function') {
                 showToast(data.message, 'success', 3500);
@@ -1079,8 +1164,6 @@ function submitLocationSuggestion(e) {
         showSuggestFormError(msg);
         if (typeof showToast === 'function') {
             showToast(msg, 'error', 4500);
-        } else {
-            alert(msg);
         }
     })
     .finally(() => {
@@ -1088,4 +1171,27 @@ function submitLocationSuggestion(e) {
         submitBtn.textContent = 'Gửi đề xuất';
     });
 }
+
+// Add input event listeners to clear error border styling when user edits input
+document.addEventListener('DOMContentLoaded', function() {
+    const suggestForm = document.getElementById('suggestLocationForm');
+    if (suggestForm) {
+        suggestForm.querySelectorAll('.contrib-form-control').forEach(input => {
+            function clearError() {
+                input.style.borderColor = '';
+                input.style.boxShadow = '';
+                const fieldName = input.getAttribute('name');
+                if (fieldName) {
+                    const errDiv = document.getElementById(`err-${fieldName}`);
+                    if (errDiv) {
+                        errDiv.classList.add('d-none');
+                        errDiv.innerHTML = '';
+                    }
+                }
+            }
+            input.addEventListener('input', clearError);
+            input.addEventListener('change', clearError);
+        });
+    }
+});
 </script>

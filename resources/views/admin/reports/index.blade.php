@@ -136,7 +136,7 @@
                             <form action="{{ route('admin.reports.update_status', $report->id) }}" method="POST">
                                 @csrf
                                 @method('PATCH')
-                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="font-size:0.75rem;padding:0.2rem 0.5rem;border-color:#e2e8f0;">
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto; min-width: 120px;">
                                     <option value="pending" @selected($report->status === 'pending')>Chờ xử lý</option>
                                     <option value="resolved" @selected($report->status === 'resolved')>Đã xử lý</option>
                                     <option value="rejected" @selected($report->status === 'rejected')>Từ chối</option>
