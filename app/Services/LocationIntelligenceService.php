@@ -98,6 +98,28 @@ class LocationIntelligenceService
     }
 
     /**
+     * Phân tích nhanh chỉ dùng dữ liệu DB, không gọi AI.
+     * Tiết kiệm 20-45 giây so với analyze() đầy đủ.
+     *
+     * @param  Collection<int, Location>  $locations
+     * @return array<int, array<string, mixed>>
+     */
+    public function analyzeHeuristicOnly(Collection $locations): array
+    {
+        $metadata = [];
+        foreach ($locations as $location) {
+            $metadata[(int) $location->id] = $this->heuristicMetadata($location);
+        }
+
+        Log::info('LocationIntelligence: dùng heuristic (bỏ qua AI để tăng tốc).', [
+            'candidates' => $locations->count(),
+        ]);
+
+        return $metadata;
+    }
+
+
+    /**
      * Điểm hợp nhau giữa từng cặp địa điểm (0..1).
      * Khoảng cách 40%, trải nghiệm chung 25%, hợp loại chuyến 15%, hợp nhịp độ 10%, độ nổi bật 10%.
      *

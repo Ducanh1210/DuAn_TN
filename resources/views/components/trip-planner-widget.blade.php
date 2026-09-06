@@ -1,4 +1,4 @@
-﻿<!-- AI Trip Planner Widget — Refined Hybrid UI -->
+<!-- AI Trip Planner Widget — Refined Hybrid UI -->
 <style>
     /* ═══════════════════════════════════════════════════
        OVERLAY & CONTAINER
@@ -1766,73 +1766,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ],
         };
 
-        const interestsByType = {
-            spiritual: [
-                { value: 'tam_linh', label: 'Chùa, đền, phủ' },
-                { value: 'van_hoa', label: 'Di tích lịch sử' },
-                { value: 'am_thuc', label: 'Ăn chay, quán thanh đạm' },
-                { value: 'thien_nhien', label: 'Cảnh quanh điểm lễ' },
-            ],
-            food_tour: [
-                { value: 'am_thuc', label: 'Đặc sản địa phương' },
-                { value: 'check_in', label: 'Quán đẹp, dễ chụp' },
-                { value: 'van_hoa', label: 'Món gắn với vùng' },
-                { value: 'thien_nhien', label: 'Quán gần thiên nhiên' },
-            ],
-            check_in: [
-                { value: 'check_in', label: 'Điểm view, sống ảo' },
-                { value: 'thien_nhien', label: 'Núi, sông, thiên nhiên' },
-                { value: 'van_hoa', label: 'Kiến trúc, di tích' },
-                { value: 'am_thuc', label: 'Quán cafe, đồ uống' },
-                { value: 'tam_linh', label: 'Chùa đền có cảnh đẹp' },
-            ],
-            family: [
-                { value: 'thien_nhien', label: 'Chỗ thoáng, dễ đi' },
-                { value: 'check_in', label: 'Điểm vui, chụp ảnh gia đình' },
-                { value: 'am_thuc', label: 'Ăn uống dễ cho cả nhà' },
-                { value: 'tam_linh', label: 'Ghé chùa, đền' },
-                { value: 'nghi_duong', label: 'Nghỉ ngơi' },
-            ],
-            couple: [
-                { value: 'check_in', label: 'Góc ảnh đẹp' },
-                { value: 'am_thuc', label: 'Ăn uống, cafe' },
-                { value: 'thien_nhien', label: 'Hoàng hôn, thiên nhiên' },
-                { value: 'nghi_duong', label: 'Nghỉ dưỡng' },
-            ],
-            resort: [
-                { value: 'nghi_duong', label: 'Chỗ nghỉ dễ chịu' },
-                { value: 'thien_nhien', label: 'Không gian xanh' },
-                { value: 'am_thuc', label: 'Ăn uống tại chỗ' },
-                { value: 'check_in', label: 'Góc chill, chụp ảnh' },
-            ],
-            team_building: [
-                { value: 'thien_nhien', label: 'Ngoài trời, thiên nhiên' },
-                { value: 'am_thuc', label: 'Ăn uống tập thể' },
-                { value: 'check_in', label: 'Điểm chụp ảnh nhóm' },
-                { value: 'nghi_duong', label: 'Chỗ ở đủ cho đoàn' },
-            ],
-            backpacking: [
-                { value: 'thien_nhien', label: 'Đường đẹp, thiên nhiên' },
-                { value: 'check_in', label: 'Điểm view' },
-                { value: 'am_thuc', label: 'Quán địa phương' },
-                { value: 'van_hoa', label: 'Làng, di tích' },
-            ],
-        };
-
-        const interests = {
-            key: 'interests',
-            greeting: 'Chọn thứ bạn muốn làm, có thể chọn nhiều.',
-            question: 'Bạn muốn ưu tiên điều gì?',
-            type: 'multi',
-            options: interestsByType[type] || [
-                { value: 'tam_linh', label: 'Tâm linh' },
-                { value: 'am_thuc', label: 'Ẩm thực' },
-                { value: 'check_in', label: 'Check-in' },
-                { value: 'thien_nhien', label: 'Thiên nhiên' },
-                { value: 'van_hoa', label: 'Văn hóa, lịch sử' },
-                { value: 'nghi_duong', label: 'Nghỉ dưỡng' },
-            ],
-        };
 
         const budget = {
             key: 'budget',
@@ -1846,60 +1779,21 @@ document.addEventListener('DOMContentLoaded', function() {
             ],
         };
 
-        const paceByType = {
-            spiritual: [
-                { value: 'cham_rai', label: 'Chậm, ít điểm, tĩnh tâm' },
-                { value: 'can_bang', label: 'Vừa lễ vừa tham quan' },
-                { value: 'dap_dong', label: 'Ghé nhiều chùa trong ngày' },
-            ],
-            food_tour: [
-                { value: 'cham_rai', label: 'Ít quán, ăn kỹ' },
-                { value: 'can_bang', label: 'Vài quán mỗi ngày' },
-                { value: 'dap_dong', label: 'Thử nhiều quán' },
-            ],
-            check_in: [
-                { value: 'cham_rai', label: 'Ít điểm, chụp kỹ' },
-                { value: 'can_bang', label: 'Vài điểm mỗi ngày' },
-                { value: 'dap_dong', label: 'Ghé nhiều góc ảnh' },
-            ],
-            family: [
-                { value: 'cham_rai', label: 'Chậm, nhiều nghỉ' },
-                { value: 'can_bang', label: 'Vừa chơi vừa nghỉ' },
-                { value: 'dap_dong', label: 'Xem nhiều điểm' },
-            ],
-            resort: [
-                { value: 'cham_rai', label: 'Ở chỗ nghỉ là chính' },
-                { value: 'can_bang', label: 'Nửa nghỉ, nửa đi chơi' },
-                { value: 'dap_dong', label: 'Vẫn muốn đi nhiều' },
-            ],
-            team_building: [
-                { value: 'cham_rai', label: 'Nhẹ, thiên về nghỉ' },
-                { value: 'can_bang', label: 'Có hoạt động và nghỉ' },
-                { value: 'dap_dong', label: 'Nhiều hoạt động nhóm' },
-            ],
-            backpacking: [
-                { value: 'cham_rai', label: 'Đi chậm, tùy hứng' },
-                { value: 'can_bang', label: 'Cân bằng' },
-                { value: 'dap_dong', label: 'Khám phá nhiều điểm' },
-            ],
-        };
-
         const pace = {
             key: 'pace',
             greeting: 'Nhịp độ quyết định ngày dày hay thoải mái.',
             question: 'Bạn muốn lịch trình thế nào?',
             type: 'single',
-            options: paceByType[type] || [
-                { value: 'cham_rai', label: 'Chậm, ít điểm' },
+            options: [
+                { value: 'cham_rai', label: 'Ít địa điểm' },
                 { value: 'can_bang', label: 'Vừa phải' },
-                { value: 'dap_dong', label: 'Nhiều điểm' },
+                { value: 'dap_dong', label: 'Nhiều địa điểm' },
             ],
         };
 
         return [
             duration,
             ...(who ? [who] : []),
-            interests,
             budget,
             pace,
             {
@@ -1914,55 +1808,17 @@ document.addEventListener('DOMContentLoaded', function() {
     let activeSteps = [];
     let defaultStepIndex = 0;
 
-    /* ─── Step 0: Trip Type ─── */
+    /* ─── Step 0: Bỏ chọn kiểu chuyến đi, vào thẳng wizard ─── */
     function renderTripTypeStep() {
-        currentStep = 0;
+        // Auto-set trip type mặc định (tổng hợp) và vào thẳng bước đầu tiên
+        tripType = 'general';
+        tripTypeLabel = 'Tổng hợp';
+        aiAnswers = [];
+        currentStep = 1;
         defaultStepIndex = 0;
-        updateProgress();
-        backBtn.disabled = true;
-        nextBtn.classList.remove('visible');
-        multiHint.style.display = 'none';
-
-        let html = '<div class="tp-step">';
-        html += '<div class="tp-step-greeting">Chọn kiểu chuyến đi để xếp lịch cho đúng.</div>';
-        html += '<div class="tp-step-question">Bạn muốn đi theo hướng nào?</div>';
-        html += '<div class="tp-card-grid cols-4">';
-        TRIP_TYPES.forEach(opt => {
-            html += `<div class="tp-card tp-card-large" data-value="${opt.value}" data-label="${opt.label}">
-                <span class="tp-card-icon">${opt.icon}</span>
-                <span class="tp-card-label">${opt.label}</span>
-                <span class="tp-card-desc">${opt.desc}</span>
-            </div>`;
-        });
-        html += '</div></div>';
-        wizardBody.innerHTML = html;
-
-        wizardBody.querySelectorAll('.tp-card').forEach(card => {
-            card.addEventListener('click', () => {
-                tripType = card.dataset.value;
-                tripTypeLabel = card.dataset.label;
-                if (tripType === 'couple') {
-                    aiAnswers = [{
-                        question: 'Bạn đi cùng ai?',
-                        answer: 'Hai người',
-                        key: 'who',
-                        value: 'doi_lua',
-                    }];
-                } else {
-                    aiAnswers = [];
-                }
-                wizardBody.querySelectorAll('.tp-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                updateProfile();
-                setTimeout(() => {
-                    stepHistory.push({ step: 0, renderFn: renderTripTypeStep });
-                    currentStep = 1;
-                    defaultStepIndex = 0;
-                    activeSteps = getWizardSteps(tripType);
-                    renderDefaultStep(0);
-                }, 250);
-            });
-        });
+        activeSteps = getWizardSteps(tripType);
+        updateProfile();
+        renderDefaultStep(0);
     }
 
     let pickedLocationId = null;
@@ -2205,12 +2061,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (stepHistory.length === 0) return;
         const prev = stepHistory.pop();
         if (prev.step === 0) {
-            currentStep = 0; tripType = ''; tripTypeLabel = '';
-            aiAnswers = []; aiDone = false; currentAiQuestion = null;
+            currentStep = 1; aiDone = false; currentAiQuestion = null;
             defaultStepIndex = 0;
-            activeSteps = [];
+            aiAnswers = [];
             generateBtn.disabled = true;
-            updateProfile(); renderTripTypeStep();
+            updateProfile(); renderDefaultStep(0);
         } else {
             currentStep = prev.step;
             aiAnswers = prev.answersSnapshot ? prev.answersSnapshot.slice(0, -1) : [];
@@ -2293,7 +2148,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const LOADING_MESSAGES = [
         'Đang phân tích thông tin...',
         'Đang chọn địa điểm phù hợp...',
-        'AI đang sắp xếp lịch trình (thường 20–45 giây)...',
+        'AI đang sắp xếp lịch trình (thường 10–30 giây)...',
         'Đang tối ưu di chuyển...',
         'Gần xong rồi...',
     ];
