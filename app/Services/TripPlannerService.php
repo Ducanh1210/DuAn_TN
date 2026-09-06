@@ -200,7 +200,9 @@ class TripPlannerService
             ];
         }
 
-        $this->metadata = $this->intelligence->analyze($this->candidates, $prefs);
+        // Dùng heuristic thay vì gọi AI phân tích metadata (tiết kiệm 20-45 giây).
+        // Heuristic suy ra scale/visit/tags từ category + tên + mô tả trong DB, đủ tốt cho lập lịch.
+        $this->metadata = $this->intelligence->analyzeHeuristicOnly($this->candidates);
         $compatibility = $this->intelligence->compatibilityMatrix($this->candidates, $this->metadata, $prefs);
         $clusters = $this->intelligence->buildClusters($this->candidates, $compatibility, $this->metadata, $prefs);
 
@@ -2256,7 +2258,7 @@ PROMPT;
         return $this->gemini->generate([
             ['role' => 'system', 'content' => $systemPrompt],
             ['role' => 'user', 'content' => $userPrompt],
-        ], 0.35, $maxTokens, 60, [
+        ], 0.35, $maxTokens, 45, [
             'json' => true,
             'compact_models' => true,
         ]);
