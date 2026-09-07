@@ -199,4 +199,20 @@ class BusinessProfileController extends Controller
         return redirect()->route('admin.business-profiles.index')
             ->with('success', "Đã từ chối yêu cầu của doanh nghiệp \"{$businessProfile->business_name}\".");
     }
+
+    /** Xóa vĩnh viễn hồ sơ đăng ký doanh nghiệp khỏi hệ thống (Chỉ áp dụng cho hồ sơ Bị từ chối). */
+    public function destroy($id)
+    {
+        $businessProfile = BusinessProfile::findOrFail($id);
+        
+        if ($businessProfile->status !== 'rejected') {
+            return back()->with('error', 'Chỉ có thể xóa hồ sơ doanh nghiệp ở trạng thái Bị từ chối.');
+        }
+
+        $name = $businessProfile->business_name;
+        $businessProfile->delete();
+
+        return redirect()->route('admin.business-profiles.index')
+            ->with('success', "Đã xóa hồ sơ doanh nghiệp bị từ chối \"{$name}\" thành công.");
+    }
 }

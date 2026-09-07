@@ -177,7 +177,7 @@
                         Vui lòng nhập <strong>lý do xóa</strong>. Lý do sẽ được gửi thông báo đến tài khoản doanh nghiệp.
                     </p>
                     <label class="form-label" style="font-size: 0.82rem;">Lý do xóa <span class="text-danger">*</span></label>
-                    <textarea name="delete_reason" id="deleteBizReason" class="form-control form-control-sm" rows="4" maxlength="1000" required placeholder="Ví dụ: Địa điểm không còn hoạt động / thông tin sai lệch / vi phạm quy định..."></textarea>
+                    <textarea name="delete_reason" id="deleteBizReason" class="form-control form-control-sm" rows="4" maxlength="1000" placeholder="Ví dụ: Địa điểm không còn hoạt động / thông tin sai lệch / vi phạm quy định..."></textarea>
                     <div class="invalid-feedback" id="deleteBizReasonError">Vui lòng nhập lý do.</div>
                 </div>
                 <div class="modal-footer">
@@ -206,7 +206,7 @@
                         Không thể khôi phục; ảnh và tour 360° cũng sẽ bị xóa.
                     </p>
                     <label class="form-label" style="font-size: 0.82rem;">Lý do xóa vĩnh viễn <span class="text-danger">*</span></label>
-                    <textarea name="delete_reason" id="forceDeleteBizReason" class="form-control form-control-sm" rows="4" maxlength="1000" required placeholder="Nhập lý do..."></textarea>
+                    <textarea name="delete_reason" id="forceDeleteBizReason" class="form-control form-control-sm" rows="4" maxlength="1000"  placeholder="Nhập lý do..."></textarea>
                     <div class="invalid-feedback">Vui lòng nhập lý do.</div>
                 </div>
                 <div class="modal-footer">

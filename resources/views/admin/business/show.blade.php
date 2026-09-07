@@ -374,16 +374,16 @@
                 <button type="button" class="btn-minimal text-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
                     Từ chối
                 </button>
-                <form action="{{ route('admin.business-profiles.approve', $businessProfile->id) }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn-minimal btn-minimal-primary px-3" onclick="return confirm('Phê duyệt doanh nghiệp này?')">
-                        Phê duyệt
-                    </button>
-                </form>
+                <button type="button" class="btn-minimal btn-minimal-primary px-3" data-bs-toggle="modal" data-bs-target="#approveModal">
+                    Phê duyệt
+                </button>
             @elseif($businessProfile->status === 'approved')
             @elseif($businessProfile->status === 'rejected')
                 <button type="button" class="btn-minimal btn-minimal-primary px-3" data-bs-toggle="modal" data-bs-target="#reApproveModal">
                     Phê duyệt lại
+                </button>
+                <button type="button" class="btn-minimal text-danger border-danger-subtle ms-1" data-bs-toggle="modal" data-bs-target="#deleteProfileModal">
+                    Xóa hồ sơ
                 </button>
             @endif
         </div>
@@ -658,6 +658,30 @@
     </div>
 </div>
 
+{{-- Modal Approve --}}
+<div class="modal fade biz-modal" id="approveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="{{ route('admin.business-profiles.approve', $businessProfile->id) }}" method="POST">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Phê duyệt doanh nghiệp</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0" style="color:#3b5980;font-size:0.875rem;line-height:1.6;">
+                        Phê duyệt yêu cầu doanh nghiệp <strong>"{{ $businessProfile->business_name }}"</strong>? Địa điểm sẽ được công khai trên bản đồ hệ thống và vai trò người dùng sẽ được nâng thành Doanh nghiệp.
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-minimal" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn-minimal btn-minimal-primary px-3">Xác nhận phê duyệt</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 {{-- Modal Re-Approve --}}
 <div class="modal fade biz-modal" id="reApproveModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -676,6 +700,32 @@
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn-minimal" data-bs-dismiss="modal">Hủy</button>
                     <button type="submit" class="btn-minimal btn-minimal-primary px-3">Xác nhận phê duyệt</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- Modal Delete Profile --}}
+<div class="modal fade biz-modal" id="deleteProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="{{ route('admin.business-profiles.destroy', $businessProfile->id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Xóa hồ sơ doanh nghiệp</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0" style="color:#3b5980;font-size:0.875rem;line-height:1.6;">
+                        Bạn có chắc chắn muốn <strong class="text-danger">xóa vĩnh viễn</strong> hồ sơ yêu cầu doanh nghiệp <strong>"{{ $businessProfile->business_name }}"</strong>? 
+                        Thao tác này không thể khôi phục.
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn-minimal" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn-minimal text-danger border-danger-subtle px-3">Xóa vĩnh viễn</button>
                 </div>
             </div>
         </form>

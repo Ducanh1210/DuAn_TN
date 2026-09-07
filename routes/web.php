@@ -280,7 +280,7 @@ Route::prefix('admin')->name('admin.')->middleware(['role:admin,moderator'])->gr
     Route::get('contributions/feedbacks/{id}', fn ($id) => redirect()->route('admin.reports.feedbacks.show', $id));
 
     // Business Upgrade Requests Management (Quản lý yêu cầu doanh nghiệp)
-    Route::resource('business-profiles', \App\Http\Controllers\Admin\BusinessProfileController::class)->only(['index', 'show']);
+    Route::resource('business-profiles', \App\Http\Controllers\Admin\BusinessProfileController::class)->only(['index', 'show', 'destroy']);
     Route::post('business-profiles/{id}/approve', [\App\Http\Controllers\Admin\BusinessProfileController::class, 'approve'])->name('business-profiles.approve');
     Route::post('business-profiles/{id}/reject', [\App\Http\Controllers\Admin\BusinessProfileController::class, 'reject'])->name('business-profiles.reject');
 

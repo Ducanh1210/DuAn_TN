@@ -105,6 +105,24 @@ class LocationController extends Controller
         return redirect()->route('admin.locations.edit', [$location->id] + $request->query())->with('success', 'Thêm địa điểm thành công! Vui lòng tiếp tục cập nhật hình ảnh và 360.');
     }
 
+    /** Hiển thị chi tiết địa điểm -> tự động chuyển hướng thông minh tránh lỗi 404 khi mở trực tiếp /admin/locations/{id}. */
+    public function show($id)
+    {
+        $location = Location::withTrashed()->find($id);
+
+        if (!$location) {
+            return redirect()->route('admin.locations.index')
+                ->with('error', 'Địa điểm này không còn tồn tại hoặc đã bị xóa vĩnh viễn.');
+        }
+
+        if ($location->trashed()) {
+            return redirect()->route('admin.locations.index', ['trash' => 1])
+                ->with('warning', 'Địa điểm này đang nằm trong thùng rác.');
+        }
+
+        return redirect()->route('admin.locations.edit', $location->id);
+    }
+
     /** Form chỉnh sửa địa điểm kèm ảnh và panorama hiện có. */
     public function edit(Location $location)
     {
@@ -330,7 +348,7 @@ class LocationController extends Controller
                     Storage::disk('public')->delete($location->audio_url);
                 }
 
-                if ($isBusinessLocation && $businessProfile && $ownerId) {
+                if ($isBusinessLocation && $ownerId) {
                     UserNotification::create([
                         'user_id' => $ownerId,
                         'type' => 'business_location_removed',
@@ -352,15 +370,17 @@ class LocationController extends Controller
                         if ($owner && $owner->role === 'business') {
                             $owner->update(['role' => 'user']);
                         }
-                        // Hồ sơ có thể đã rejected lúc soft-delete — giữ bản ghi lịch sử, không hard-delete
-                        if ($businessProfile->status !== 'rejected') {
-                            $businessProfile->update([
-                                'status' => 'rejected',
-                                'reject_reason' => 'Địa điểm đã bị xóa vĩnh viễn. Lý do: ' . $deleteReason,
-                            ]);
-                        }
                     }
                 }
+
+                // Xóa hoàn toàn các hồ sơ đăng ký doanh nghiệp liên quan đến địa điểm này
+                BusinessProfile::where('location_id', $location->id)
+                    ->orWhere(function ($q) use ($ownerId) {
+                        if ($ownerId) {
+                            $q->where('user_id', $ownerId);
+                        }
+                    })
+                    ->delete();
 
                 $location->forceDelete();
             });
